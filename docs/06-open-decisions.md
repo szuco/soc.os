@@ -38,7 +38,8 @@ erheblich. Für Jalousien ist sequenzieller Betrieb meist unproblematisch.
 | # | Prio | Entscheidung | Bemerkung |
 |---|---|---|---|
 | 15 | P1 | Konkretes ESP32-Modul | Antennenvariante, Bauhöhe, Pinzahl |
-| 15a | P1 | Display final: ST77916-LCD (Wrapper nötig) oder AMOLED (Plan B, Auflagen) | Entscheidungsrahmen in [`10-firmware-strategy.md`](10-firmware-strategy.md), Abschnitt 5 |
+| ~~15a~~ | ✅ | **Display: ST77916, 1,46" rund, 360×360.** Kein Treiberaufwand — `mipi_spi` mit `model: CUSTOM` + `init_sequence`, validiert | erledigt; Sequenz in [`../firmware/esphome/st77916_init.yaml`](../firmware/esphome/st77916_init.yaml) |
+| 15c | **P0** | **Modul-Außendurchmesser des real gekauften ST77916-Boards messen** | `disp_module_d` in [`../mechanical/frontplate.py`](../mechanical/frontplate.py); bestimmt über eine Zwangsbedingung den Sichel-Innenradius und damit die ganze Frontplattengeometrie |
 | 15b | P2 | Modbus-Registerkarte für den RS-485-Primärbetrieb | `modbus_server` ist in ESPHome enthalten (verifiziert); Registerlayout offen |
 | 16 | P1 | RS-485-Transceiver | Versorgungsspannung, Fail-Safe-Bias, Terminierung |
 | 17 | P1 | Radar-Modul und dessen Versorgung/Logikpegel | Pegelanpassung nötig? Stromaufnahme? |

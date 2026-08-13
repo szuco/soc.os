@@ -51,24 +51,32 @@ PARAMS = dict(
     screw_slot_w      = 3.9,
 
     # --- Displayfenster -----------------------------------------------------
-    # Preset: 1,43"-AMOLED rund, 466x466, CO5300 (aktive Flaeche Ø36,3).
-    # Alternativen: GC9A01 1,28" -> window 33.4 / rebate 38.0
-    #               ST77916 1,46" -> window 38.2 / rebate 42.5 (kein ESPHome!)
-    disp_window_d     = 37.4,   # Sichtoeffnung (aktiv 36,3 + Rand)
-    disp_rebate_d     = 41.5,   # Freiraum fuers Modul - VOR DEM DRUCK MESSEN
+    # Gewaehlt: ST77916 1,46" rund, 360x360, aktive Flaeche Ø37,25.
+    # Alternativen: GC9A01 1,28" -> aktiv 32.4, Modul ~37.5
+    #               CO5300 1,43" -> aktiv 36.3, Modul ~41.0
+    disp_active_d     = 37.25,  # aktive Flaeche laut Datenblatt
+    disp_module_d     = 41.5,   # Modul-Aussendurchmesser - AM REALEN TEIL MESSEN
+    disp_clearance    = 0.5,    # Luft rings um das Modul
+    disp_window_d     = 37.8,   # Sichtoeffnung, etwas > aktiv fuer Blickwinkel
 
     # --- Sicheltasten -------------------------------------------------------
     # Vier Ringsegmente zwischen Fenster und Plattenrand, auf den Diagonalen.
     # Zwischen den Segmenten bleiben vier Stege (Spokes) auf 0/90/180/270 Grad.
-    key_slot_ri       = 21.0,   # Schlitz im Ring innen ...
-    key_slot_ro       = 25.8,   # ... bis aussen
+    #
+    # ZWANGSBEDINGUNG (wird in check_plate geprueft):
+    #   key_slot_ri - key_lip  >=  disp_module_d/2 + disp_clearance
+    # Sonst kollidiert der Rueckhaltekragen der Kappen mit dem Displaymodul.
+    key_slot_ri       = 22.0,   # Schlitz im Ring innen ...
+    key_slot_ro       = 26.2,   # ... bis aussen
     key_spoke_hw      = 4.5,    # halbe Stegbreite des Schlitzrings (9 mm Steg)
     key_gap           = 0.25,   # Spaltmass Kappe/Platte je Seite
     key_proud         = 0.8,    # Kappenueberstand vor der Sichtflaeche
     key_lip           = 0.7,    # Rueckhaltekragen der Kappe je Seite
     key_lip_h         = 1.0,
     key_post_d        = 2.2,    # Fuehrungs-/Druckstoessel zur Leiterplatte
-    key_post_r        = 23.3,   # Radialposition der Stoessel
+    # Radialposition der Stoessel. Begrenzt durch den Platz fuer den SMD-Taster
+    # auf dem Ø52-Board: r + halbe Tasterlaenge + Randabstand <= 26 mm.
+    key_post_r        = 23.2,
     key_post_ang      = 18.0,   # +/- Grad um die Diagonale
     key_post_len      = 4.0,    # Stoessellaenge unter der Kappe - an realen
                                 # Abstand Platte->Top-PCB anpassen!
@@ -76,7 +84,7 @@ PARAMS = dict(
     # --- Kabelausgang Weihnachtsstern (durch den unteren Steg) -------------
     star_exit         = True,
     star_exit_d       = 4.5,
-    star_exit_y       = -23.4,
+    star_exit_y       = -24.0,
 
     # --- USB-C Zugang (aus, Programmierung bei abgenommener Blende) --------
     usb_slot          = False,
@@ -119,7 +127,7 @@ def build_plate(p=PARAMS):
 
         # -- Freiraum fuers Displaymodul hinter der Platte ------------------
         with BuildSketch(Plane.XY):
-            Circle(p["disp_rebate_d"] / 2)
+            Circle(p["disp_module_d"] / 2 + p["disp_clearance"])
         extrude(amount=-back, mode=Mode.SUBTRACT)
 
         # -- Displayfenster --------------------------------------------------
@@ -224,6 +232,45 @@ def check_plate(part, p=PARAMS):
     errs = []
     back = p["ear_thickness"] + p["boss_depth"]
     full = p["plate_thickness"] + back
+
+    # --- Zwangsbedingungen vor der Geometrie ------------------------------
+    # 1. Rueckhaltekragen der Kappen darf das Displaymodul nicht beruehren
+    lip_ri = p["key_slot_ri"] - p["key_lip"]
+    need = p["disp_module_d"] / 2 + p["disp_clearance"]
+    if lip_ri < need:
+        errs.append(
+            "Kappenkragen kollidiert mit Displaymodul: Kragen-Innenradius "
+            f"{lip_ri:.2f} mm < benoetigt {need:.2f} mm "
+            f"(key_slot_ri mindestens {need + p['key_lip']:.2f} mm)")
+
+    # 2. Sichtoeffnung muss die aktive Flaeche freigeben, aber im Modul bleiben
+    if p["disp_window_d"] < p["disp_active_d"]:
+        errs.append(f"Fenster Ø{p['disp_window_d']:.1f} kleiner als aktive "
+                    f"Flaeche Ø{p['disp_active_d']:.1f}")
+    if p["disp_window_d"] > p["disp_module_d"]:
+        errs.append(f"Fenster Ø{p['disp_window_d']:.1f} groesser als Modul "
+                    f"Ø{p['disp_module_d']:.1f} - Modulrand waere sichtbar")
+
+    # 3. Blendring zwischen Fenster und Tastenschlitz mindestens 1,2 mm
+    bezel = p["key_slot_ri"] - p["disp_window_d"] / 2
+    if bezel < 1.2:
+        errs.append(f"Blendring nur {bezel:.2f} mm breit, mindestens 1,2 mm noetig")
+
+    # 4. Restwand zwischen Tastenschlitz und Plattenkante (engste Stelle liegt
+    #    dort, wo der Schlitz auf den Steg trifft)
+    th = math.asin(min(1.0, p["key_spoke_hw"] / p["key_slot_ro"]))
+    edge = (p["plate_size"] / 2) / math.cos(th)
+    wall = edge - p["key_slot_ro"]
+    if wall < 1.2:
+        errs.append(f"Restwand Schlitz/Plattenkante nur {wall:.2f} mm, "
+                    "mindestens 1,2 mm noetig")
+
+    # 5. Stoessel muss innerhalb der Sichel liegen
+    if not (p["key_slot_ri"] + p["key_post_d"] / 2 < p["key_post_r"]
+            < p["key_slot_ro"] - p["key_post_d"] / 2):
+        errs.append(f"Stoesselradius {p['key_post_r']:.2f} liegt nicht "
+                    f"vollstaendig in der Sichel "
+                    f"({p['key_slot_ri']:.1f}..{p['key_slot_ro']:.1f})")
 
     if len(part.solids()) != 1:
         errs.append(f"Platte besteht aus {len(part.solids())} Solids, erwartet 1")

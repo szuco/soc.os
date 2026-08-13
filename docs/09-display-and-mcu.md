@@ -7,11 +7,16 @@
 >
 > **Revision 3:** Die Support-Tabelle in 1b behandelte fehlende ESPHome-Treiber als
 > K.-o.-Kriterium — das war die falsche Abhängigkeitsrichtung und ist in
-> [`10-firmware-strategy.md`](10-firmware-strategy.md) korrigiert. Primärempfehlung
-> jetzt: **1,46"/1,5"-LCD (ST77916)** per External-Component-Wrapper um den
-> offiziellen Espressif-Treiber, ohne Einbrenn-Auflagen. Das AMOLED aus Revision 2
-> bleibt Plan B mit null Treiberaufwand; die Sichel-Mechanik und die Frontplatte
-> gelten unverändert für beide.
+> [`10-firmware-strategy.md`](10-firmware-strategy.md) korrigiert.
+>
+> **Revision 4 — ENTSCHIEDEN: ST77916, 1,46" rund, 360×360, aktiv Ø 37,25 mm.**
+> Und der befürchtete Treiberaufwand entfällt vollständig: ESPHomes `mipi_spi`
+> kennt ein **`model: CUSTOM` mit `init_sequence` in YAML**. Damit läuft der
+> ST77916 **ohne jede C++-Komponente**. Die Hersteller-Initialisierungssequenz
+> (214 Kommandos) liegt als
+> [`../firmware/esphome/st77916_init.yaml`](../firmware/esphome/st77916_init.yaml)
+> bei; die Konfiguration ist mit `esphome config` validiert. Das AMOLED entfällt
+> als Plan B, die Einbrenn-Auflagen aus Revision 2 sind damit gegenstandslos.
 
 ## 1. Die Displayfrage: Touchscreen oder OLED mit 4 Tastern?
 
@@ -101,7 +106,9 @@ esp-iot-solution). Machbar, aber echter Aufwand mit Pflegelast.
 
 ### Entscheidung
 
-> **1,43"-AMOLED rund, 466×466, CO5300** — Fenster Ø 37,4 mm, +26 % aktive Fläche,
+> ~~**1,43"-AMOLED rund, 466×466, CO5300**~~ — **überholt durch Revision 4 (ST77916).**
+> Der folgende Abschnitt bleibt als Entscheidungsprotokoll stehen.
+> Fenster Ø 37,4 mm, +26 % aktive Fläche,
 > 3,8× Pixel gegenüber GC9A01, mit `esphome config` end-to-end validiert.
 
 **Damit revidiere ich das stärkste Argument aus Revision 1** — „kein OLED wegen
@@ -235,7 +242,7 @@ Zusammengezählt aus der Peripherieliste:
 
 | Domäne | Signale | GPIOs |
 |---|---|---:|
-| Display QSPI (CLK, D0–D3, CS, RST; AMOLED hat kein Backlight und kein DC) | | 7 |
+| Display QSPI (CLK, D0–D3, CS, RST, Backlight; QSPI braucht kein DC) | | 8 |
 | I2C (Sensorik, ADC, Expander) | | 2 |
 | Taster | | 4 |
 | RS-485 (TX, RX, DE) | | 3 |
@@ -243,7 +250,12 @@ Zusammengezählt aus der Peripherieliste:
 | Audio | | 1 |
 | Motor Steuerung | 2 × PWM, 2 × DIR | 4 |
 | Motor Sammelsignale | nFAULT, nSLEEP | 2 |
-| **Summe direkt am MCU** | | **25** |
+| **Summe direkt am MCU** | | **26** |
+
+Tatsächlich belegt in [`../firmware/esphome/switchstack.yaml`](../firmware/esphome/switchstack.yaml):
+**26 GPIOs**, geprüft auf Doppelbelegung sowie auf Kollision mit PSRAM (35–37),
+nativem USB (19/20) und Strapping-Pins (0/3/45/46). Das Backlight liegt auf **GPIO43**
+— frei, weil das Logging über den nativen USB läuft und UART0 damit unbenutzt bleibt.
 
 Direkt am MCU nicht mehr unterzubringen wären zusätzlich `HW_TRIP1/2`, `TRIP_RST`,
 `RELAY_CTL` sowie zwei getrennte FAULT-Leitungen. Zwei Konsequenzen:

@@ -2,13 +2,15 @@
 # KiCad SwitchStack - ESPHome-Konfiguration
 # =============================================================================
 # Zielhardware : ESP32-S3-WROOM-1-N16R8
-# Display      : 1,43" AMOLED rund, CO5300, 466x466, QSPI
+# Display      : 1,46" LCD rund, ST77916, 360x360, QSPI
 # Bedienung    : 4 sichelfoermige Hardware-Tasten um das Display
 #
-# AMOLED-AUFLAGE (Einbrennschutz): Das Panel zeigt statischen Inhalt und ist
-# deshalb NUR mit Anwesenheitssteuerung zu betreiben - der Radar schaltet es
-# bei Abwesenheit dunkel (Automation unten). Dauerhaft volle Helligkeit
-# ohne Abschaltung brennt bei AMOLED ein.
+# ST77916 hat keinen eingebauten mipi_spi-Treiber. Er laeuft ueber
+# model: CUSTOM mit der Hersteller-Initialisierungssequenz in
+# st77916_init.yaml - ohne jede C++-Komponente.
+#
+# Die Radar-Dunkeltastung unten ist beim LCD reiner Komfort und
+# Stromsparen, keine Schutzmassnahme (kein Einbrennen).
 #
 # STAND: Die Jalousien laufen hier als template-Cover auf ZEIT. Die
 # stromabhaengige Lasterkennung braucht PWM-synchrones ADC-Sampling und ist in
@@ -111,6 +113,11 @@ pcf8574:
 
 output:
   - platform: ledc
+    id: disp_backlight
+    pin: GPIO43
+    frequency: 2000Hz
+
+  - platform: ledc
     id: m1_pwm
     pin: GPIO38
     frequency: 20000Hz     # oberhalb des Hoerbereichs
@@ -156,23 +163,16 @@ switch:
         output: true
     restore_mode: ALWAYS_OFF
 
-# AMOLED hat keine Hintergrundbeleuchtung - Helligkeit geht als Kommando
-# an den CO5300. Lambda wird erst beim Kompilieren geprueft, nicht bei
-# "esphome config".
-number:
-  - platform: template
+# ST77916 ist ein LCD - die Helligkeit kommt aus der Hintergrundbeleuchtung,
+# nicht aus einem Displaykommando. GPIO43 ist frei, weil das Logging ueber
+# den nativen USB des ESP32-S3 laeuft und UART0 damit unbenutzt bleibt.
+light:
+  - platform: monochromatic
     name: Displayhelligkeit
-    id: disp_brightness
-    entity_category: config
-    min_value: 0
-    max_value: 100
-    step: 5
-    initial_value: 80
-    optimistic: true
-    restore_value: true
-    unit_of_measurement: "%"
-    set_action:
-      - lambda: 'id(panel).set_brightness((uint8_t)(x * 2.55f));'
+    output: disp_backlight
+    id: backlight
+    default_transition_length: 400ms
+    restore_mode: RESTORE_DEFAULT_ON
 
 rtttl:
   output: buzzer_out
@@ -190,30 +190,35 @@ font:
     id: font_small
     size: 14
 
+# ST77916 hat KEINEN eingebauten mipi_spi-Treiber - wird ueber model: CUSTOM
+# mit der Hersteller-Initialisierungssequenz gefahren. Kein C++ noetig.
 display:
   - platform: mipi_spi
-    model: CO5300
+    model: CUSTOM
     id: panel
+    bus_mode: quad
     cs_pin: GPIO10
     reset_pin: GPIO16
     dimensions:
-      width: 466
-      height: 466
-      offset_width: 6
-      offset_height: 0
+      width: 360
+      height: 360
+    invert_colors: true
+    pixel_mode: 16bit
+    data_rate: 40MHz
     auto_clear_enabled: false
     update_interval: 1s
+    init_sequence: !include st77916_init.yaml
     lambda: |-
       it.fill(Color::BLACK);
       if (id(raum_temp).has_state()) {
-        it.printf(233, 180, id(font_big), TextAlign::CENTER,
+        it.printf(180, 140, id(font_big), TextAlign::CENTER,
                   "%.1f°C", id(raum_temp).state);
       }
       if (id(raum_hum).has_state()) {
-        it.printf(233, 258, id(font_small), TextAlign::CENTER,
+        it.printf(180, 200, id(font_small), TextAlign::CENTER,
                   "%.0f %% rF", id(raum_hum).state);
       }
-      it.printf(233, 340, id(font_small), TextAlign::CENTER,
+      it.printf(180, 262, id(font_small), TextAlign::CENTER,
                 id(bewegung).state ? "anwesend" : "");
 
 # -----------------------------------------------------------------------------
@@ -289,8 +294,8 @@ binary_sensor:
       then: [cover.close: jalousie2]
 
   # Radar-Bewegungsmelder. Bis das konkrete Modul feststeht, als einfacher
-  # Praesenzeingang am Expander gefuehrt. Steuert den AMOLED-Einbrennschutz:
-  # bei Abwesenheit wird das Panel nach 2 min dunkelgetastet.
+  # Praesenzeingang am Expander gefuehrt. Dimmt bei Abwesenheit
+  # nach 2 min die Hintergrundbeleuchtung ab (Komfort, kein Schutz).
   - platform: gpio
     name: Bewegung
     id: bewegung
@@ -302,7 +307,9 @@ binary_sensor:
         input: true
     on_press:
       then:
-        - lambda: 'id(panel).set_brightness((uint8_t)(id(disp_brightness).state * 2.55f));'
+        - light.turn_on:
+            id: backlight
+            brightness: 80%
     on_release:
       then:
         - delay: 120s
@@ -310,7 +317,7 @@ binary_sensor:
             condition:
               binary_sensor.is_off: bewegung
             then:
-              - lambda: 'id(panel).set_brightness(0);'
+              - light.turn_off: backlight
 
   # Hardware-Ueberstromabschaltung, latched. Nur lesbar - der Schutz wirkt
   # in Hardware, diese Entitaeten melden ihn lediglich nach Home Assistant.

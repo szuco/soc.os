@@ -3,7 +3,7 @@
 KiCad SwitchStack - Frontplatte fuer 55x55-Schalterprogramme, Version 2.
 FreeCAD-Makro, getestet gegen die Part-Workbench-API (FreeCAD 0.21 / 1.0).
 
-Design: rundes Display in der Mitte (Preset: 1,43"-AMOLED, aktiv Ø36,3),
+Design: rundes Display in der Mitte (ST77916 1,46", aktiv Ø37,25),
 vier sichelfoermige Tastenkappen als Ringsegmente um das Fenster.
 
 Erzeugt zwei Objekte: "Frontplate" (Platte) und "ButtonCaps" (4 Kappen in
@@ -36,24 +36,25 @@ SCREW_PITCH     = 60.0
 SCREW_SLOT_LEN  = 4.0
 SCREW_SLOT_W    = 3.9
 
-DISP_WINDOW_D   = 37.4      # 1,43"-AMOLED; GC9A01: 33.4 / ST77916: 38.2
-DISP_REBATE_D   = 41.5      # Modulfreiraum - VOR DEM DRUCK MESSEN
+DISP_WINDOW_D   = 37.8      # ST77916 1,46"; aktiv 37,25
+DISP_MODULE_D   = 41.5      # Modul-Aussen - AM REALEN TEIL MESSEN
+DISP_CLEARANCE  = 0.5
 
-KEY_SLOT_RI     = 21.0      # Sichelschlitze innen ...
-KEY_SLOT_RO     = 25.8      # ... aussen
+KEY_SLOT_RI     = 22.0      # >= DISP_MODULE_D/2 + CLEARANCE + KEY_LIP
+KEY_SLOT_RO     = 26.2
 KEY_SPOKE_HW    = 4.5       # halbe Stegbreite (9 mm Stege auf 0/90/180/270)
 KEY_GAP         = 0.25
 KEY_PROUD       = 0.8
 KEY_LIP         = 0.7
 KEY_LIP_H       = 1.0
 KEY_POST_D      = 2.2
-KEY_POST_R      = 23.3
+KEY_POST_R      = 23.2      # begrenzt durch SMD-Taster auf dem Ø52-Board
 KEY_POST_ANG    = 18.0
 KEY_POST_LEN    = 4.0
 
 STAR_EXIT       = True
 STAR_EXIT_D     = 4.5
-STAR_EXIT_Y     = -23.4
+STAR_EXIT_Y     = -24.0
 
 BACK = EAR_THICKNESS + BOSS_DEPTH
 FULL = PLATE_THICKNESS + BACK
@@ -103,7 +104,7 @@ def build_plate():
     shape = shape.fuse(outer.cut(inner)).removeSplitter()
 
     # Modulfreiraum und Fenster
-    shape = shape.cut(Part.makeCylinder(DISP_REBATE_D / 2.0, BACK + 1.0,
+    shape = shape.cut(Part.makeCylinder((DISP_MODULE_D / 2.0 + DISP_CLEARANCE), BACK + 1.0,
                                         V(0, 0, -BACK - 1.0), V(0, 0, 1)))
     shape = shape.cut(Part.makeCylinder(DISP_WINDOW_D / 2.0, PLATE_THICKNESS + 2.0,
                                         V(0, 0, -1.0), V(0, 0, 1)))

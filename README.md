@@ -85,7 +85,7 @@ Die **Schaltpläne** werden nativ in KiCad 9.0.7 angelegt, nicht generiert — B
 | Systemspezifikation, Power-Tree, Pinmapping | dokumentiert |
 | Mechanik der drei Boards | erzeugt und verifiziert |
 | Frontplatte, druckfertig | erzeugt und verifiziert |
-| ESPHome-Konfiguration | validiert (`esphome config`) |
+| ESPHome-Konfiguration inkl. ST77916-Display | validiert (`esphome config`) |
 | Schaltpläne, Layout, Routing | **offen** |
 | Fertigungsdaten zum Bestellen | **offen** (setzt das Layout voraus) |
 
