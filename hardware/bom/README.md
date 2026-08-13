@@ -15,9 +15,9 @@ Bestellung zu prüfen — beides ändert sich laufend.
 
 | Funktion | Empfehlung | Warum |
 |---|---|---|
-| MCU | **ESP32-S3-WROOM-1-N16R8** | PSRAM für den Framebuffer, **nativer USB** spart den USB-UART-Baustein, 16 MB Flash für OTA |
-| Display | **1,28" IPS rund, GC9A01A, 240×240, SPI** | passt zur runden Bauform, kein Einbrennen, ESPHome `ili9xxx`/`gc9a01a` |
-| Taster | **Panasonic EVQ-P7A01P** o. ä. SMD-Taster, 6×6 mm | definierter Druckpunkt, lange Lebensdauer |
+| MCU | **ESP32-S3-WROOM-1-N16R8** | PSRAM für den Framebuffer (466² × 16 bit ≈ 434 kB), **nativer USB** spart den USB-UART-Baustein, 16 MB Flash für OTA |
+| Display | **1,43" AMOLED rund, CO5300, 466×466, QSPI** | ESPHome-nativ (`mipi_spi`), echtes Schwarz, Helligkeit per Kommando. **Auflage:** Radar-Dunkeltastung gegen Einbrennen ist Pflicht — Details und Alternativen in `docs/09` |
+| Taster | **8 ×** SMD-Kurzhubtaster, niedrig (z. B. Panasonic EVQP2 3,9×2,9 mm) | je Sicheltaste zwei, elektrisch parallel; Positionen r = 23,3 mm, siehe `docs/09` |
 | GPIO-Expander | **TCA9534** oder **PCF8574** | entlastet das knappe GPIO-Budget, ESPHome-nativ |
 
 Begründung der Displaywahl im Detail: [`../../docs/09-display-and-mcu.md`](../../docs/09-display-and-mcu.md).

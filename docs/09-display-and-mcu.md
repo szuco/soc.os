@@ -1,5 +1,10 @@
 # 09 – Display, MCU und GPIO-Budget
 
+> **Revision 2:** Die ursprüngliche Empfehlung (1,28"-GC9A01-LCD) wurde als zu klein
+> bewertet. Neue Empfehlung in [Abschnitt 1b](#1b-revision-größeres-display-und-sicheltasten):
+> **1,43"-AMOLED (CO5300) mit vier sichelförmigen Tasten** — inklusive der ehrlichen
+> Begründung, warum die Einbrenn-Abwägung jetzt anders ausfällt als in Revision 1.
+
 ## 1. Die Displayfrage: Touchscreen oder OLED mit 4 Tastern?
 
 ### Randbedingung
@@ -57,6 +62,77 @@ Begründung:
 0,96". Die Frontplatte bleibt verwendbar — nur `disp_window_d` und `disp_rebate_d` in
 `mechanical/frontplate.py` anpassen und neu erzeugen.
 
+## 1b. Revision: größeres Display und Sicheltasten
+
+### Was maximal geht
+
+Der 55×55-Rahmenausschnitt setzt die harte Grenze. Mit vier Tasten **neben** dem
+Display (Revision 1) war bei Ø 32 mm Schluss. Die Sichelidee löst das: Die Tasten
+werden **Ringsegmente um das Fenster** statt Kreise daneben — dann trägt der Ring
+r 21–25,8 mm die Tasten, und das Fenster kann bis ≈ Ø 40 mm wachsen. Mehr geht
+geometrisch nicht: Bei Fenster > Ø 40 mm bricht der Sichelring durch die
+Plattenkante an den Seitenmitten (Platte halb = 27,3 mm).
+
+### Marktlage runder Panels, geprüft gegen ESPHome 2026.6.5
+
+Support-Status direkt aus dem installierten ESPHome-Quellcode ermittelt
+(`mipi_spi/models/`, `qspi_dbi`), nicht aus Foren:
+
+| Panel | aktiv | Auflösung | Treiber | ESPHome | Einbrennen |
+|---|---|---|---|---|---|
+| 1,28" LCD | Ø 32,4 | 240×240 | GC9A01A | ✅ nativ | nein |
+| **1,43" AMOLED** | **Ø 36,3** | **466×466** | **CO5300, QSPI** | **✅ nativ (`mipi_spi`)** | **ja — beherrschbar, s. u.** |
+| 1,46"/1,5" LCD | Ø 37–40 | 360×360 | ST77916 | ❌ nicht enthalten | nein |
+| 1,6" LCD | Ø 40,6 | 400×400 | ST77903 | ❌ nicht enthalten | nein |
+| 1,85"+ rund | Ø 47+ | 360×360+ | ST77916 | ❌ | passt ohnehin nicht (Tasten) |
+
+Das ist die unbequeme Wahrheit dieser Tabelle: **die größeren runden LCDs — die
+technisch beste Wahl — haben keinen ESPHome-Treiber.** Wer sie will, schreibt eine
+External Component gegen `esp_lcd_st77916` (existiert in Espressifs
+esp-iot-solution). Machbar, aber echter Aufwand mit Pflegelast.
+
+### Entscheidung
+
+> **1,43"-AMOLED rund, 466×466, CO5300** — Fenster Ø 37,4 mm, +26 % aktive Fläche,
+> 3,8× Pixel gegenüber GC9A01, mit `esphome config` end-to-end validiert.
+
+**Damit revidiere ich das stärkste Argument aus Revision 1** — „kein OLED wegen
+Einbrennen" — und das braucht eine saubere Begründung: Das Argument galt für ein
+Panel, das 24/7 statischen Inhalt zeigt. Der Radar-Bewegungsmelder ändert die
+Rechnung: Das Panel ist **nur bei Anwesenheit an** und wird nach 2 Minuten ohne
+Bewegung dunkelgetastet (Automation in
+[`../firmware/esphome/switchstack.yaml`](../firmware/esphome/switchstack.yaml)).
+Ein Flurpanel kommt so auf wenige Stunden Leuchtzeit pro Tag statt 24 — bei AMOLED
+der Unterschied zwischen „brennt in Monaten ein" und „hält viele Jahre". Dazu kommt,
+was AMOLED an der Wand ausspielt: echtes Schwarz (das Panel verschwindet optisch in
+der Blende), keine Hintergrundbeleuchtung, Helligkeit per Kommando.
+
+**Auflagen, ohne die diese Entscheidung kippt:**
+1. Die Radar-Dunkeltastung ist **Pflichtbestandteil**, keine Option.
+2. Statische UI-Elemente bei gedimmter Grundhelligkeit (≤ 80 %) darstellen.
+3. Fällt der Radar aus der Stückliste, fällt das AMOLED mit — dann GC9A01
+   (klein) oder ST77916 (External-Component-Aufwand).
+
+**Alternative, falls Displayfläche wichtiger ist als die runde Form:** ein 2,0"-Rechteck
+(ST7789V, 320×240, aktiv 40,9 × 30,7 mm) hat **fast die doppelte Fläche**, ist
+ESPHome-nativ und billig; die vier Tasten würden als Softkey-Reihe darunter liegen.
+Das bricht die runde Formensprache — Geschmacksfrage, kein technisches Urteil.
+
+### Sicheltasten-Mechanik
+
+Vier Ringsegment-Kappen (r 21–25,8 mm, je ≈ 63° Bogen) als **separate Druckteile**,
+von hinten eingesetzt, mit Rückhaltekragen gegen Herausfallen und je zwei
+Druckstößeln (Ø 2,2 mm, r = 23,3 mm, ±18° um die Diagonalen), die auf SMD-Taster
+der Top-Leiterplatte drücken. **Die Federung kommt vom Taster, nicht vom
+Kunststoff** — gedruckte Federscharniere ermüden, Metallkuppel-Taster nicht. Zwei
+Stößel pro Kappe verhindern das Verkippen beim Druck ans Bogenende; die beiden
+Taster je Kappe werden elektrisch parallel geschaltet (bleibt bei 4 GPIOs).
+Tastfläche je Sichel ≈ 124 mm² statt 38 mm² beim alten Ø-7-Loch.
+
+Konsequenz fürs Top-Board-Layout: 8 Tasterpositionen bei r = 23,3 mm auf
+27/63/117/153/207/243/297/333°, Modulfreiraum Ø 41,5 mm zentral. Der
+Displaymodul-Außendurchmesser ist **vor dem Layout am realen Teil zu messen**.
+
 ## 2. MCU
 
 > **Empfehlung: ESP32-S3-WROOM-1-N16R8** (16 MB Flash, 8 MB PSRAM)
@@ -82,7 +158,7 @@ Zusammengezählt aus der Peripherieliste:
 
 | Domäne | Signale | GPIOs |
 |---|---|---:|
-| Display SPI (SCK, MOSI, CS, DC, RST, Backlight) | | 6 |
+| Display QSPI (CLK, D0–D3, CS, RST; AMOLED hat kein Backlight und kein DC) | | 7 |
 | I2C (Sensorik, ADC, Expander) | | 2 |
 | Taster | | 4 |
 | RS-485 (TX, RX, DE) | | 3 |
@@ -90,7 +166,7 @@ Zusammengezählt aus der Peripherieliste:
 | Audio | | 1 |
 | Motor Steuerung | 2 × PWM, 2 × DIR | 4 |
 | Motor Sammelsignale | nFAULT, nSLEEP | 2 |
-| **Summe direkt am MCU** | | **24** |
+| **Summe direkt am MCU** | | **25** |
 
 Direkt am MCU nicht mehr unterzubringen wären zusätzlich `HW_TRIP1/2`, `TRIP_RST`,
 `RELAY_CTL` sowie zwei getrennte FAULT-Leitungen. Zwei Konsequenzen:

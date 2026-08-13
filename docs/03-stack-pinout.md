@@ -124,3 +124,4 @@ Hinweise:
 | Version | Änderung |
 |---|---|
 | 0.1 | Erster ausgearbeiteter Vorschlag aus der Projektzusammenfassung |
+| 0.2 (angekündigt) | Displaywechsel auf 1,43"-AMOLED (QSPI): das Display braucht **7 Leitungen** durch den Stack (`QSPI_CLK`, `QSPI_D0–D3`, `DISP_CS`, `DISP_RST`). Vorhanden auf `J_STK_B`: `DISP_RST`, `DISP_DC` (entfällt bei QSPI) und `RSV_B1–B4` — macht 6, **einer fehlt**. Kandidat: `SYS_RST` (Pin 34) prüfen oder Doppelnutzung lösen. Die Neubelegung erfolgt zusammen mit dem Top-Board-Schaltplan; bis dahin gilt v0.1 nicht als eingefroren. |

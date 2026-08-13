@@ -2,8 +2,13 @@
 # KiCad SwitchStack - ESPHome-Konfiguration
 # =============================================================================
 # Zielhardware : ESP32-S3-WROOM-1-N16R8
-# Display      : 1,28" rund, GC9A01A, 240x240
-# Bedienung    : 4 physische Taster
+# Display      : 1,43" AMOLED rund, CO5300, 466x466, QSPI
+# Bedienung    : 4 sichelfoermige Hardware-Tasten um das Display
+#
+# AMOLED-AUFLAGE (Einbrennschutz): Das Panel zeigt statischen Inhalt und ist
+# deshalb NUR mit Anwesenheitssteuerung zu betreiben - der Radar schaltet es
+# bei Abwesenheit dunkel (Automation unten). Dauerhaft volle Helligkeit
+# ohne Abschaltung brennt bei AMOLED ein.
 #
 # STAND: Die Jalousien laufen hier als template-Cover auf ZEIT. Die
 # stromabhaengige Lasterkennung braucht PWM-synchrones ADC-Sampling und ist in
@@ -77,10 +82,12 @@ i2c:
   scan: true
   id: bus_i2c
 
+# QSPI fuer das AMOLED: Takt + 4 Datenleitungen
 spi:
+  id: bus_qspi
+  type: quad
   clk_pin: GPIO12
-  mosi_pin: GPIO11
-  id: bus_spi
+  data_pins: [GPIO11, GPIO13, GPIO14, GPIO21]
 
 # RS-485: primaere Kommunikation. DE/RE ueber flow_control_pin.
 uart:
@@ -103,11 +110,6 @@ pcf8574:
 # -----------------------------------------------------------------------------
 
 output:
-  - platform: ledc
-    id: disp_backlight
-    pin: GPIO21
-    frequency: 2000Hz
-
   - platform: ledc
     id: m1_pwm
     pin: GPIO38
@@ -154,13 +156,23 @@ switch:
         output: true
     restore_mode: ALWAYS_OFF
 
-light:
-  - platform: monochromatic
+# AMOLED hat keine Hintergrundbeleuchtung - Helligkeit geht als Kommando
+# an den CO5300. Lambda wird erst beim Kompilieren geprueft, nicht bei
+# "esphome config".
+number:
+  - platform: template
     name: Displayhelligkeit
-    output: disp_backlight
-    id: backlight
-    default_transition_length: 400ms
-    restore_mode: RESTORE_DEFAULT_ON
+    id: disp_brightness
+    entity_category: config
+    min_value: 0
+    max_value: 100
+    step: 5
+    initial_value: 80
+    optimistic: true
+    restore_value: true
+    unit_of_measurement: "%"
+    set_action:
+      - lambda: 'id(panel).set_brightness((uint8_t)(x * 2.55f));'
 
 rtttl:
   output: buzzer_out
@@ -179,26 +191,29 @@ font:
     size: 14
 
 display:
-  - platform: ili9xxx
-    model: gc9a01a
+  - platform: mipi_spi
+    model: CO5300
     id: panel
     cs_pin: GPIO10
-    dc_pin: GPIO13
-    reset_pin: GPIO14
-    invert_colors: true
+    reset_pin: GPIO16
+    dimensions:
+      width: 466
+      height: 466
+      offset_width: 6
+      offset_height: 0
     auto_clear_enabled: false
     update_interval: 1s
     lambda: |-
       it.fill(Color::BLACK);
       if (id(raum_temp).has_state()) {
-        it.printf(120, 92, id(font_big), TextAlign::CENTER,
+        it.printf(233, 180, id(font_big), TextAlign::CENTER,
                   "%.1f°C", id(raum_temp).state);
       }
       if (id(raum_hum).has_state()) {
-        it.printf(120, 132, id(font_small), TextAlign::CENTER,
+        it.printf(233, 258, id(font_small), TextAlign::CENTER,
                   "%.0f %% rF", id(raum_hum).state);
       }
-      it.printf(120, 176, id(font_small), TextAlign::CENTER,
+      it.printf(233, 340, id(font_small), TextAlign::CENTER,
                 id(bewegung).state ? "anwesend" : "");
 
 # -----------------------------------------------------------------------------
@@ -274,7 +289,8 @@ binary_sensor:
       then: [cover.close: jalousie2]
 
   # Radar-Bewegungsmelder. Bis das konkrete Modul feststeht, als einfacher
-  # Praesenzeingang am Expander gefuehrt.
+  # Praesenzeingang am Expander gefuehrt. Steuert den AMOLED-Einbrennschutz:
+  # bei Abwesenheit wird das Panel nach 2 min dunkelgetastet.
   - platform: gpio
     name: Bewegung
     id: bewegung
@@ -284,6 +300,17 @@ binary_sensor:
       number: 4
       mode:
         input: true
+    on_press:
+      then:
+        - lambda: 'id(panel).set_brightness((uint8_t)(id(disp_brightness).state * 2.55f));'
+    on_release:
+      then:
+        - delay: 120s
+        - if:
+            condition:
+              binary_sensor.is_off: bewegung
+            then:
+              - lambda: 'id(panel).set_brightness(0);'
 
   # Hardware-Ueberstromabschaltung, latched. Nur lesbar - der Schutz wirkt
   # in Hardware, diese Entitaeten melden ihn lediglich nach Home Assistant.

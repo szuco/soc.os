@@ -2,16 +2,18 @@
 
 3D-druckbare Zentralplatte für die Rahmen gängiger **55er-Schalterprogramme**
 (Gira System 55, Jung A/AS, Berker S.1/B.x, Merten M-Smart und die 55er-Linien von
-Busch-Jaeger).
+Busch-Jaeger). Version 2: rundes 1,43"-Display in der Mitte, vier **sichelförmige
+Tastenkappen** als Ringsegmente um das Fenster.
 
 ## Dateien
 
 | Datei | Zweck |
 |---|---|
-| `frontplate.py` | Parametrisches Modell (build123d). **Referenz** — erzeugt STEP + STL und prüft sich selbst |
-| `Frontplate_SwitchStack.FCMacro` | Native FreeCAD-Variante zum interaktiven Weiterkonstruieren |
-| `export/frontplate.step` | Für FreeCAD, KiCad-3D-Ansicht, CAD-Weiterverarbeitung |
-| `export/frontplate.stl` | Direkt für den Slicer |
+| `frontplate.py` | Parametrisches Modell (build123d). **Referenz** — erzeugt alle Exporte und prüft sich selbst |
+| `Frontplate_SwitchStack.FCMacro` | Native FreeCAD-Variante (Objekte `Frontplate` + `ButtonCaps`) |
+| `export/frontplate.step/.stl` | Platte |
+| `export/frontplate_caps.step/.stl` | Die vier Tastenkappen |
+| `export/frontplate_assembly.stl` | Platte + Kappen in Einbaulage (Ansicht/Viewer) |
 
 ```bash
 pip install build123d
@@ -19,34 +21,42 @@ python3 mechanical/frontplate.py
 ```
 
 Alle Parameter stehen im `PARAMS`-Block am Dateianfang. Nach jeder Änderung neu laufen
-lassen — die Selbsttests prüfen, dass Displayfenster, Taster, Kabelausgang und
-Schraublöcher durchgängig frei sind und das Teil ein einziges Solid bleibt.
+lassen — die Selbsttests prüfen Durchbrüche, Stege, Blendring, Solid-Anzahl **und die
+Kollisionsfreiheit der Kappen in Einbaulage**.
 
 ## Geometrie
 
 | Merkmal | Wert |
 |---|---|
 | Sichtfläche | 54,6 × 54,6 mm, Ecken R2, Fase 0,5 mm |
-| Gesamtabmessung | 76,0 × 54,6 × 8,0 mm |
+| Gesamtabmessung | 76,0 × 54,6 × 8,0 mm (Kappenstößel bis −5,0) |
 | Geräteschrauben | Langlöcher 3,9 mm auf **60 mm** Achsabstand (DIN 49073) |
-| Displayfenster | Ø 32,0 mm, dahinter Ø 37,0 mm Freiraum |
-| Taster | 4 × Ø 7,0 mm auf Teilkreis r = 22,5 mm, bei 45/135/225/315° |
-| Kabelausgang Stern | Ø 4,5 mm, unten mittig |
+| Displayfenster | Ø 37,4 mm (1,43"-AMOLED, aktiv Ø 36,3), Modulfreiraum Ø 41,5 mm |
+| Sicheltasten | 4 Ringsegmente r 21,0–25,8 mm, je ≈ 63°, 0,8 mm Überstand |
+| Tastenstößel | je Kappe 2 × Ø 2,2 mm bei r = 23,3 mm, ±18° um die Diagonalen |
+| Kabelausgang Stern | Ø 4,5 mm im unteren Steg (kerbt bewusst den Zentrierkragen) |
 | Zentrierkragen | 50 × 50 mm, 2 mm Wand, 3 mm tief |
 
-Die vier Taster sitzen auf den Ecken, das runde Display in der Mitte — die Anordnung
-folgt der runden Leiterplatte darunter.
+Displaywechsel: `disp_window_d`/`disp_rebate_d` im `PARAMS`-Block (Presets für
+GC9A01 und ST77916 stehen im Kommentar) und neu erzeugen.
+
+## Funktionsprinzip der Sicheltasten
+
+Die Kappen sind **separate Druckteile**, werden von hinten eingesetzt und von einem
+umlaufenden Rückhaltekragen gehalten. Je zwei Stößel drücken auf SMD-Taster der
+Top-Leiterplatte (8 Taster, elektrisch paarweise parallel → weiterhin 4 Eingänge).
+Die Federung kommt vom Taster, nicht vom Kunststoff — gedruckte Federscharniere
+ermüden über Jahre, Metallkuppel-Taster nicht. `key_post_len` (Stößellänge, Startwert
+4,0 mm) ist an den realen Abstand Platte→Leiterplatte anzupassen.
 
 ## Druckhinweise
 
-- **Lage:** Sichtfläche nach unten auf das Druckbett. Alle Durchbrüche sind dann
-  senkrecht, es braucht keine Stützen.
-- **Material:** ASA oder PETG. PLA kriecht bei Dauerlast und vergilbt im Sonnenlicht —
-  an einer Wand über Jahre ein reales Problem.
-- **Layer:** 0,15 mm für eine saubere Sichtfläche.
-- **Toleranz:** Die Platte ist mit 54,6 mm um 0,4 mm untermaßig, weil FDM-Drucker
-  typischerweise nach außen bauen. Sitzt sie zu stramm oder zu lose, `plate_size`
-  anpassen — nicht nachschleifen.
+- **Platte:** Sichtfläche nach unten, keine Stützen nötig.
+- **Kappen:** Bedienfläche nach unten (im Slicer um 180° drehen), keine Stützen.
+- **Material:** ASA oder PETG. PLA kriecht bei Dauerlast und vergilbt im Sonnenlicht.
+- **Layer:** 0,15 mm für saubere Sichtflächen.
+- **Toleranz:** Platte 0,4 mm untermaßig (54,6), Kappenspalt 0,25 mm je Seite.
+  Klemmt eine Kappe, `key_gap` erhöhen — nicht nachschleifen.
 
 ## Vor dem ersten echten Druck
 
