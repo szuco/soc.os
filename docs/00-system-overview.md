@@ -14,12 +14,16 @@ Schalter-Unterputzdose mit 61 mm Tiefe passt.
 
 | Verbraucher | Spannung | Leistung | Strom | Anmerkung |
 |---|---|---|---|---|
-| Jalousiemotor 1 | 24 V DC ±10 % | 100 W | ≈ 4,17 A nominal | Polarity-Reversal |
-| Jalousiemotor 2 | 24 V DC ±10 % | 100 W | ≈ 4,17 A nominal | Polarity-Reversal |
+| Klappladenmotor 1 | 24 V DC ±10 % | 100 W (Maximum) | Dauer ≈ 0,3–1,0 A, max 4,63 A | dynamischer Endschalter |
+| Klappladenmotor 2 | 24 V DC ±10 % | 100 W (Maximum) | Dauer ≈ 0,3–1,0 A, max 4,63 A | dynamischer Endschalter |
 | Weihnachtsstern | 6,0–6,5 V | 0,5 W | ≈ 80 mA | nur im 24-V-Normalbetrieb |
 
-Anlauf- und Blockierstrom der Motoren sind noch nicht gemessen und müssen mit
-deutlicher Reserve berücksichtigt werden. Siehe [`06-open-decisions.md`](06-open-decisions.md).
+Antrieb: Drehflügelmotor für Fensterläden, 25 Nm bei 1,9 U/min, Fahrzeit **18 s**
+(≈ 205° Schwenk), −20…+60 °C, bis 50 kg je Flügel.
+
+**Die 100 W sind die Maximalleistung, nicht der Dauerbetrieb** — die mechanische
+Abtriebsleistung beträgt nur ≈ 5 W. Herleitung und Messprotokoll für die weiterhin
+fehlenden Anlauf- und Blockierströme: [`11-motor-data.md`](11-motor-data.md).
 
 **Externe Verkabelung:** `24V_IN+` und `24V_IN−` kommen herein. Je Motor gehen zwei
 Leitungen heraus: `M1_A`/`M1_B` und `M2_A`/`M2_B`. Insgesamt sechs Leistungsadern am

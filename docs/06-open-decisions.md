@@ -7,7 +7,9 @@ Layout-Freeze nötig · **P2** vor Fertigungsfreigabe nötig.
 
 | # | Prio | Entscheidung | Abhängig davon |
 |---|---|---|---|
-| 1 | **P0** | **Realer Anlauf- und Blockierstrom der Jalousiemotoren** | Sicherungen, Soft-Limit 9 A, Hard-Trip 13 A, FET-/Treiberwahl, Shunt-Leistung, Bulk-Cap-Größe, Steckverbinder |
+| 1 | **P0** | **Realer Anlauf- und Blockierstrom der Motoren messen** — Datenblatt liegt vor, nennt diese Werte aber **nicht** | Sicherungen, Soft-Limit, Hard-Trip, FET-/Treiberwahl, Shunt-Leistung, Bulk-Cap-Größe, Steckverbinder. **Messprotokoll M1–M3 in [`11-motor-data.md`](11-motor-data.md)** |
+| 1a | **P0** | **Verträgt der Motor PWM?** Er hat einen dynamischen Endschalter, also interne Elektronik | Entscheidet zwischen H-Brücke mit PWM und einfacher Vollansteuerung; hängt daran auch die gesamte Strommess-Architektur. Messung M4 |
+| 1b | **P0** | **Aderzahl am Motor: 2 (Umpolung) oder 3 (gemeinsam/auf/zu)?** | Entscheidet, ob überhaupt eine H-Brücke gebraucht wird. Messung M5 — reines Abzählen am Kabel |
 | 2 | **P0** | Hochstrom-Steckverbinder: Micro-Fit 3.0 vs. stromstärkeres System | Footprint Bottom, Tiefenbudget, Layout-Start |
 | 3 | **P0** | Laufen beide Motoren gleichzeitig, oder gibt es einen Software-Interlock? | Eingangsstrom ≈ 9 A vs. ≈ 4,9 A, damit Sicherung, Leiterbahnen und Steckverbinder |
 

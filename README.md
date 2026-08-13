@@ -42,6 +42,7 @@ EMV, Messqualität und Wartbarkeit zentral.
 | [`docs/08-kicad-workflow.md`](docs/08-kicad-workflow.md) | KiCad-Konventionen, Bedienhinweise, Repo-Regeln |
 | [`docs/09-display-and-mcu.md`](docs/09-display-and-mcu.md) | Displaywahl, MCU, GPIO-Budget, ESPHome-Grenzen |
 | [`docs/10-firmware-strategy.md`](docs/10-firmware-strategy.md) | Firmware-Schichten, ESPHome-Unabhängigkeit, Modbus-Pfad |
+| [`docs/11-motor-data.md`](docs/11-motor-data.md) | Motordatenblatt, Leistungsanalyse, **Messprotokoll M1–M5** |
 | [`hardware/bom/README.md`](hardware/bom/README.md) | Beschaffungsliste, Fertigerempfehlung, Bestellweg |
 
 ## Repository-Struktur
@@ -90,5 +91,6 @@ Die **Schaltpläne** werden nativ in KiCad 9.0.7 angelegt, nicht generiert — B
 | Fertigungsdaten zum Bestellen | **offen** (setzt das Layout voraus) |
 
 Nächste Schritte: [`docs/07-roadmap.md`](docs/07-roadmap.md).
-Der kritische Pfad ist die Messung des realen Anlauf- und Blockierstroms der Motoren —
-davon hängen Sicherungen, Trip-Schwellen, Treiberauswahl und Steckverbinder ab.
+Der kritische Pfad sind fünf Messungen am realen Motor — Messprotokoll in
+[`docs/11-motor-data.md`](docs/11-motor-data.md), Abschnitt 4. Ohne sie bleiben
+Sicherungen, Trip-Schwellen, Treiberauswahl und Steckverbinder provisorisch.

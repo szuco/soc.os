@@ -26,8 +26,8 @@ substitutions:
   friendly_name: SwitchStack
 
   # --- Fahrzeiten (Sekunden) --------------------------------------------------
-  # Harte Obergrenze aus docs/02-motor-control.md
-  travel_time: "60s"
+  # Fahrzeit real 18 s (Datenblatt) + Reserve, siehe docs/11-motor-data.md
+  travel_time: "30s"
   # Mechanische Stopzeit vor Umpolung
   reversal_pause: "300ms"
 

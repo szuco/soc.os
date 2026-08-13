@@ -1,5 +1,14 @@
 # 02 – Motorsteuerung, Strommessung, Überstromschutz
 
+> **Achtung — das Motordatenblatt liegt inzwischen vor und stellt Teile dieses
+> Dokuments in Frage.** Siehe [`11-motor-data.md`](11-motor-data.md):
+> Der Antrieb hat einen **dynamischen Endschalter mit Hinderniserkennung**, also
+> eigene Elektronik. Wenn sich bestätigt, dass er kein PWM verträgt, entfallen
+> Abschnitt 3 (PWM), der Prüfpunkt zur PWM-synchronen Messung in Abschnitt 4 und
+> das Software-Konzept in Abschnitt 6 weitgehend. **Hardware-Hard-Trip (Abschnitt 5)
+> und Timeout bleiben in jedem Fall.** Die Fahrzeit beträgt real **18 s**, das
+> Timeout wird deshalb auf **30 s** gesetzt statt auf 60 s.
+
 ## 1. Anforderung
 
 Beide Jalousiemotoren werden durch **Umpolung** vorwärts/rückwärts betrieben. Pro Motor
@@ -11,8 +20,10 @@ bekannt sind:
 - **≥ 5 A Dauerstrom**
 - **≈ 10–15 A kurzzeitige Peak-Fähigkeit**
 
-Nominal fließen ≈ 4,17 A (100 W / 24 V). Anlauf- und Blockierstrom sind unbekannt und
-bei Bürsten-DC-Motoren typischerweise ein Vielfaches des Nennstroms.
+Die 100 W des Datenblatts sind die **Maximalleistung** (≈ 4,63 A bei 21,6 V), nicht der
+Dauerbetrieb — der liegt nach der Rechnung in [`11-motor-data.md`](11-motor-data.md)
+bei ≈ 0,3–1,0 A. Anlauf- und Blockierstrom nennt das Datenblatt **nicht**; sie sind zu
+messen (Protokoll M1–M3).
 
 ## 2. Architektur
 
@@ -42,9 +53,11 @@ Kanäle zwangsläufig identisch bleiben.
   - *Mechanische Stopzeit* vor der Umpolung, damit der Motor wirklich steht.
     Startwert ≥ 300 ms, empirisch zu bestimmen.
 - Signale je Kanal: `Mx_PWM`, `Mx_DIR`, `Mx_EN`, `Mx_FAULT`.
-- **Maximale Laufzeit einer Bewegung: 60 s**, danach zwingend Abschaltung.
-- Positionsfeedback erfolgt ausschließlich über Stromverlauf und Timeout. **Keine
-  Endschalter.**
+- **Maximale Laufzeit einer Bewegung: 30 s** (Fahrzeit real 18 s + Reserve),
+  danach zwingend Abschaltung.
+- Positionsfeedback: der Motor hat einen **eigenen dynamischen Endschalter**
+  (Datenblatt). Stromverlauf und Timeout sind damit Diagnose und Backstop, nicht mehr
+  die primäre Positionslogik — siehe [`11-motor-data.md`](11-motor-data.md).
 
 ## 4. Strommessung
 
@@ -122,7 +135,7 @@ kritische Pfad für die gesamte Schutzauslegung.
 
 Ausgelagert nach [`../firmware/README.md`](../firmware/README.md). Kurzfassung:
 
-- Maximale Bewegung 60 s, danach Abschaltung.
+- Maximale Bewegung 30 s, danach Abschaltung.
 - Anlaufstrom in der Lastanalyse zunächst ausblenden, Startwert **≈ 600 ms** Blanking.
 - Schnellen Strommittelwert gegen eine langsamere Baseline vergleichen und dadurch einen
   **relativen** Lastanstieg erkennen.

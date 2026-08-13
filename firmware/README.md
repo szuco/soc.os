@@ -20,7 +20,7 @@ Component um die offiziellen Espressif-Treiber (`esp_lcd_*`) gewickelt.
 
 | Regel | Wert |
 |---|---|
-| Maximale Laufzeit einer Bewegung | **60 s**, danach zwingend Abschaltung |
+| Maximale Laufzeit einer Bewegung | **30 s** (Fahrzeit real 18 s + Reserve) |
 | Blanking des Anlaufstroms in der Lastanalyse | **≈ 600 ms** (Startwert) |
 | Mechanische Stopzeit vor Richtungswechsel | ≥ 300 ms (Startwert) |
 | Software-Soft-Limit | ≈ 9 A (vorläufig) |
@@ -40,7 +40,7 @@ Verfahren:
    Versorgungstoleranz.
 3. Bei erkanntem Lastanstieg zunächst die PWM reduzieren.
 4. Bei weiterem Anstieg bzw. Stall abschalten.
-5. Nach 60 s in jedem Fall abschalten.
+5. Nach 30 s in jedem Fall abschalten.
 
 Der **Hardware-Hard-Trip bleibt davon vollständig unabhängig** und wirkt auch bei
 abgestürzter oder nicht geladener Firmware. Die Firmware darf sich niemals darauf
