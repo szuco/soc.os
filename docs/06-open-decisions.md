@@ -38,6 +38,8 @@ erheblich. Für Jalousien ist sequenzieller Betrieb meist unproblematisch.
 | # | Prio | Entscheidung | Bemerkung |
 |---|---|---|---|
 | 15 | P1 | Konkretes ESP32-Modul | Antennenvariante, Bauhöhe, Pinzahl |
+| 15a | P1 | Display final: ST77916-LCD (Wrapper nötig) oder AMOLED (Plan B, Auflagen) | Entscheidungsrahmen in [`10-firmware-strategy.md`](10-firmware-strategy.md), Abschnitt 5 |
+| 15b | P2 | Modbus-Registerkarte für den RS-485-Primärbetrieb | `modbus_server` ist in ESPHome enthalten (verifiziert); Registerlayout offen |
 | 16 | P1 | RS-485-Transceiver | Versorgungsspannung, Fail-Safe-Bias, Terminierung |
 | 17 | P1 | Radar-Modul und dessen Versorgung/Logikpegel | Pegelanpassung nötig? Stromaufnahme? |
 | 18 | P1 | Externer ADC ja/nein | folgt aus #10; betrifft `J_STK_A` |

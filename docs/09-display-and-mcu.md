@@ -4,6 +4,14 @@
 > bewertet. Neue Empfehlung in [Abschnitt 1b](#1b-revision-größeres-display-und-sicheltasten):
 > **1,43"-AMOLED (CO5300) mit vier sichelförmigen Tasten** — inklusive der ehrlichen
 > Begründung, warum die Einbrenn-Abwägung jetzt anders ausfällt als in Revision 1.
+>
+> **Revision 3:** Die Support-Tabelle in 1b behandelte fehlende ESPHome-Treiber als
+> K.-o.-Kriterium — das war die falsche Abhängigkeitsrichtung und ist in
+> [`10-firmware-strategy.md`](10-firmware-strategy.md) korrigiert. Primärempfehlung
+> jetzt: **1,46"/1,5"-LCD (ST77916)** per External-Component-Wrapper um den
+> offiziellen Espressif-Treiber, ohne Einbrenn-Auflagen. Das AMOLED aus Revision 2
+> bleibt Plan B mit null Treiberaufwand; die Sichel-Mechanik und die Frontplatte
+> gelten unverändert für beide.
 
 ## 1. Die Displayfrage: Touchscreen oder OLED mit 4 Tastern?
 

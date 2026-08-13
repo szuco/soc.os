@@ -4,6 +4,16 @@ ESP32-Firmware für KiCad SwitchStack. Die Implementierung beginnt nach dem
 Hardware-Freeze. Dieses Dokument hält das bereits festgelegte Konzept fest, damit es
 die Hardwareauslegung mitbestimmen kann.
 
+## Architekturregel (verbindlich)
+
+Aus [`../docs/10-firmware-strategy.md`](../docs/10-firmware-strategy.md):
+**Gerätelogik frameworkfrei, Glue dünn.** Motorregelung, Lasterkennung,
+Trip-Handling und Display-Zustandsmaschine sind reine C++-Klassen ohne
+`esphome::`-Abhängigkeit. ESPHome (und eine spätere Modbus-Registerkarte)
+docken über dünne Adapter an. ESPHome ist Integrationsrahmen — es hat kein
+Vetorecht über die Hardwareauswahl; fehlende Treiber werden als External
+Component um die offiziellen Espressif-Treiber (`esp_lcd_*`) gewickelt.
+
 ## Motor-Softwarekonzept
 
 ### Harte Grenzen
