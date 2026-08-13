@@ -1,0 +1,171 @@
+# -*- coding: utf-8 -*-
+"""
+KiCad SwitchStack - Frontplatte fuer 55x55-Schalterprogramme
+FreeCAD-Makro, getestet gegen die Part-Workbench-API (FreeCAD 0.21 / 1.0).
+
+Verwendung:
+    FreeCAD -> Makro -> Makros... -> dieses Makro auswaehlen -> Ausfuehren
+
+Alle Masse in mm. Aenderungen ausschliesslich im PARAMETER-Block vornehmen,
+danach das Makro erneut ausfuehren.
+
+Dieses Makro erzeugt dieselbe Geometrie wie mechanical/frontplate.py.
+Die Python-Variante ist die Referenz und wird automatisch geprueft; dieses
+Makro dient dem interaktiven Weiterkonstruieren in FreeCAD.
+"""
+
+import math
+import FreeCAD as App
+import Part
+
+# ---------------------------------------------------------------------------
+# PARAMETER
+# ---------------------------------------------------------------------------
+
+PLATE_SIZE        = 54.6    # 55er-Norm mit 0,4 mm Untermass
+PLATE_THICKNESS   = 2.5
+PLATE_CORNER_R    = 2.0
+PLATE_EDGE_CHAM   = 0.5
+
+BOSS_SIZE         = 50.0    # Zentrierkragen nach hinten
+BOSS_WALL         = 2.0
+BOSS_DEPTH        = 3.0
+
+EAR_SPAN          = 76.0    # Tragring-Ohren
+EAR_WIDTH         = 14.0
+EAR_THICKNESS     = 2.5
+SCREW_PITCH       = 60.0    # Geraeteschrauben DIN 49073
+SCREW_SLOT_LEN    = 4.0
+SCREW_SLOT_W      = 3.9
+
+DISP_WINDOW_D     = 32.0    # Sichtoeffnung 1.28" GC9A01
+DISP_REBATE_D     = 37.0    # Freiraum fuer das Modul
+
+BTN_COUNT         = 4
+BTN_HOLE_D        = 7.0
+BTN_RADIUS        = 22.5
+BTN_ANGLE0        = 45.0
+
+STAR_EXIT         = True
+STAR_EXIT_D       = 4.5
+STAR_EXIT_Y       = -20.5
+
+USB_SLOT          = False
+USB_SLOT_W        = 10.0
+USB_SLOT_H        = 4.0
+USB_SLOT_Y        = 20.5
+
+# ---------------------------------------------------------------------------
+
+BACK = EAR_THICKNESS + BOSS_DEPTH          # Bauhoehe hinter der Sichtflaeche
+FULL = PLATE_THICKNESS + BACK              # Gesamttiefe
+V = App.Vector
+
+
+def centred_box(sx, sy, sz, z0):
+    """Quader, in X/Y zentriert, Unterkante bei z0."""
+    return Part.makeBox(sx, sy, sz, V(-sx / 2.0, -sy / 2.0, z0))
+
+
+def rounded_plate(size, thickness, radius, z0):
+    """Quadratische Platte mit gerundeten Ecken."""
+    box = centred_box(size, size, thickness, z0)
+    # Nur die vier senkrechten Kanten runden
+    vertical = [e for e in box.Edges
+                if abs(e.Vertexes[0].Point.z - e.Vertexes[-1].Point.z) > 1e-6]
+    return box.makeFillet(radius, vertical)
+
+
+def thru_cyl(radius, x, y):
+    """Zylinder ueber die gesamte Bauteiltiefe, mit Ueberstand."""
+    return Part.makeCylinder(radius, FULL + 2.0, V(x, y, -BACK - 1.0), V(0, 0, 1))
+
+
+def slot(length, width, x, y, z0, height):
+    """In Y langgestrecktes Langloch (Rechteck plus zwei Halbkreise)."""
+    r = width / 2.0
+    body = Part.makeBox(width, length, height, V(x - r, y - length / 2.0, z0))
+    c1 = Part.makeCylinder(r, height, V(x, y - length / 2.0, z0), V(0, 0, 1))
+    c2 = Part.makeCylinder(r, height, V(x, y + length / 2.0, z0), V(0, 0, 1))
+    return body.fuse(c1).fuse(c2)
+
+
+def build():
+    # -- Grundkoerper -------------------------------------------------------
+    shape = rounded_plate(PLATE_SIZE, PLATE_THICKNESS, PLATE_CORNER_R, 0.0)
+
+    # Tragring-Ohren direkt hinter der Sichtflaeche
+    shape = shape.fuse(centred_box(EAR_SPAN, EAR_WIDTH,
+                                   EAR_THICKNESS, -EAR_THICKNESS))
+
+    # Zentrierkragen als umlaufender Rahmen, nicht massiv
+    outer = centred_box(BOSS_SIZE, BOSS_SIZE, BOSS_DEPTH, -BACK)
+    inner = centred_box(BOSS_SIZE - 2 * BOSS_WALL, BOSS_SIZE - 2 * BOSS_WALL,
+                        BOSS_DEPTH + 2.0, -BACK - 1.0)
+    shape = shape.fuse(outer.cut(inner))
+    shape = shape.removeSplitter()
+
+    # -- Durchbrueche -------------------------------------------------------
+    # Freiraum hinter dem Fenster: raeumt die Ohren im Zentrum aus
+    shape = shape.cut(Part.makeCylinder(DISP_REBATE_D / 2.0, BACK + 1.0,
+                                        V(0, 0, -BACK - 1.0), V(0, 0, 1)))
+
+    # Sichtoeffnung Display
+    shape = shape.cut(Part.makeCylinder(DISP_WINDOW_D / 2.0, PLATE_THICKNESS + 2.0,
+                                        V(0, 0, -1.0), V(0, 0, 1)))
+
+    # Taster
+    for i in range(BTN_COUNT):
+        a = math.radians(BTN_ANGLE0 + i * 360.0 / BTN_COUNT)
+        shape = shape.cut(thru_cyl(BTN_HOLE_D / 2.0,
+                                   BTN_RADIUS * math.cos(a),
+                                   BTN_RADIUS * math.sin(a)))
+
+    # Geraeteschrauben
+    for sx in (SCREW_PITCH / 2.0, -SCREW_PITCH / 2.0):
+        shape = shape.cut(slot(SCREW_SLOT_LEN, SCREW_SLOT_W, sx, 0.0,
+                               -EAR_THICKNESS - 1.0, EAR_THICKNESS + 2.0))
+
+    # Kabelausgang Weihnachtsstern
+    if STAR_EXIT:
+        shape = shape.cut(thru_cyl(STAR_EXIT_D / 2.0, 0.0, STAR_EXIT_Y))
+
+    # Optionaler USB-C-Zugang
+    if USB_SLOT:
+        shape = shape.cut(slot(USB_SLOT_W - USB_SLOT_H, USB_SLOT_H, 0.0,
+                               USB_SLOT_Y, -BACK - 1.0, FULL + 2.0))
+
+    # -- Sichtkante brechen -------------------------------------------------
+    try:
+        top = [e for e in shape.Edges
+               if abs(e.Vertexes[0].Point.z - PLATE_THICKNESS) < 1e-6
+               and abs(e.Vertexes[-1].Point.z - PLATE_THICKNESS) < 1e-6]
+        if top:
+            shape = shape.makeChamfer(PLATE_EDGE_CHAM, top)
+    except Exception as exc:
+        App.Console.PrintWarning("Fase uebersprungen: %s\n" % exc)
+
+    return shape.removeSplitter()
+
+
+doc = App.ActiveDocument or App.newDocument("SwitchStack_Frontplate")
+for obj in list(doc.Objects):
+    if obj.Name.startswith("Frontplate"):
+        doc.removeObject(obj.Name)
+
+shape = build()
+feat = doc.addObject("Part::Feature", "Frontplate")
+feat.Shape = shape
+doc.recompute()
+
+App.Console.PrintMessage(
+    "Frontplate: Volumen %.2f cm3, Solids %d, BBox %.1f x %.1f x %.1f mm\n"
+    % (shape.Volume / 1000.0, len(shape.Solids),
+       shape.BoundBox.XLength, shape.BoundBox.YLength, shape.BoundBox.ZLength))
+
+try:
+    import FreeCADGui
+    FreeCADGui.ActiveDocument.ActiveView.viewAxometric()
+    FreeCADGui.SendMsgToActiveView("ViewFit")
+except Exception:
+    pass

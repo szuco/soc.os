@@ -24,7 +24,7 @@ erheblich. Für Jalousien ist sequenzieller Betrieb meist unproblematisch.
 | 4 | P1 | Buck 24 → 5 V, ca. 3 A | strikt nach Referenzlayout |
 | 5 | P1 | Buck 5 → 3,3 V, ca. 1,5 A | |
 | 6 | P1 | Buck 24 → 6,2 V, ca. 0,5 A | einstellbare Ausgangsspannung nötig |
-| 7 | P1 | H-Bridge: diskret (4× N-FET + Gate-Driver) oder integrierter Treiber | Platz auf Ø 55 mm spricht für integriert, Thermik im geschlossenen Gehäuse ist die Prüffrage |
+| 7 | P1 | H-Bridge: diskret (4× N-FET + Gate-Driver) oder integrierter Treiber | Platz auf Ø 52 mm spricht für integriert, Thermik im geschlossenen Gehäuse ist die Prüffrage |
 | 8 | P1 | MOSFET-Typ, falls diskret | RDS(on) vs. Gate-Ladung vs. Bauhöhe |
 | 9 | P1 | Current-Sense-Amplifier | zusammen mit #10 zu entscheiden |
 | 10 | **P1** | **Sense-Topologie: Low-Side-Shunt mit PWM-synchronem Sampling oder Inline-Messung** | siehe Prüfpunkt in [`02-motor-control.md`](02-motor-control.md); bestimmt, ob die Lasterkennung bei reduzierter PWM überhaupt funktioniert |

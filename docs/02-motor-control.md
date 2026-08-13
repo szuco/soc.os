@@ -21,11 +21,11 @@ Zwei gleichwertige Optionen, Entscheidung offen:
 - **Diskret:** vier N-Kanal-MOSFETs pro Brücke plus High-/Low-Side-Gate-Driver.
   Mehr Fläche, aber bessere Kontrolle über RDS(on), Verlustleistung und Sense-Topologie.
 - **Integriert:** ein ausreichend dimensionierter Motor-Treiber-IC.
-  Deutlich platzsparender auf Ø 55 mm und mit fertigem Schutzkonzept — die entscheidende
+  Deutlich platzsparender auf Ø 52 mm und mit fertigem Schutzkonzept — die entscheidende
   Prüffrage ist die thermische Belastbarkeit im geschlossenen Unterputzgehäuse ohne
   Luftstrom.
 
-Auf einer runden Ø-55-mm-Platine mit zwei Kanälen, DC/DC-Wandlern und Steckverbinder
+Auf einer runden Ø-52-mm-Platine mit zwei Kanälen, DC/DC-Wandlern und Steckverbinder
 ist der Platz knapp. Die integrierte Variante sollte deshalb zuerst geprüft werden.
 
 **Vorgehen:** Kanal 1 vollständig entwickeln und prüfen, danach identisch für Kanal 2

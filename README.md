@@ -1,7 +1,7 @@
 # KiCad SwitchStack
 
 Dreistufiges ESP32-Steuerungsmodul für eine massive Schalter-Unterputzdose (61 mm tief).
-Drei runde, gestapelte Leiterplatten à Ø 55,0 mm steuern zwei 24-V-Jalousiemotoren,
+Drei runde, gestapelte Leiterplatten à Ø 52,0 mm steuern zwei 24-V-Jalousiemotoren,
 lesen Sensorik aus und kommunizieren primär über RS-485.
 
 ## Zentrale Designregel
@@ -40,25 +40,54 @@ EMV, Messqualität und Wartbarkeit zentral.
 | [`docs/06-open-decisions.md`](docs/06-open-decisions.md) | Offene Bauteil- und Auslegungsentscheidungen |
 | [`docs/07-roadmap.md`](docs/07-roadmap.md) | Konkrete Arbeitsschritte in Reihenfolge |
 | [`docs/08-kicad-workflow.md`](docs/08-kicad-workflow.md) | KiCad-Konventionen, Bedienhinweise, Repo-Regeln |
+| [`docs/09-display-and-mcu.md`](docs/09-display-and-mcu.md) | Displaywahl, MCU, GPIO-Budget, ESPHome-Grenzen |
+| [`hardware/bom/README.md`](hardware/bom/README.md) | Beschaffungsliste, Fertigerempfehlung, Bestellweg |
 
 ## Repository-Struktur
 
 ```
 hardware/
-  bottom_power_motor/   KiCad-Projekt BOTTOM (24 V, Motor, DC/DC)
-  mid_logic/            KiCad-Projekt MID (ESP32, RS-485, Radar, Audio)
-  top_ui/               KiCad-Projekt TOP (USB-C, OLED, Taster, Sensorik)
+  bottom_power_motor/   KiCad BOTTOM (24 V, Motor, DC/DC)
+  mid_logic/            KiCad MID (ESP32, RS-485, Radar, Audio)
+  top_ui/               KiCad TOP (USB-C, Display, Taster, Sensorik)
   lib/                  Gemeinsame Symbol-/Footprint-/3D-Bibliotheken
-firmware/               ESP32-Firmware (folgt nach Hardware-Freeze)
+  bom/                  Stückliste und Fertigung
+mechanical/             Frontplatte: build123d-Modell, FreeCAD-Makro, STEP/STL
+tools/                  Generatoren (Board-Mechanik)
+firmware/
+  esphome/              ESPHome-Konfiguration für Home Assistant
 docs/                   Projektübergreifende Spezifikationen
 archive/                Altbestand, nicht Teil dieses Projekts
 ```
 
-Die drei KiCad-Projekte werden **nativ in KiCad 9.0.7 angelegt**, nicht per Skript
-generiert. Details und Begründung in [`docs/08-kicad-workflow.md`](docs/08-kicad-workflow.md).
+## Erzeugen
+
+Die mechanischen Teile sind **generiert, nicht handgezeichnet** — damit können die drei
+Boards nicht auseinanderlaufen:
+
+```bash
+python3 tools/gen_boards.py          # 3 × .kicad_pcb: Outline, Bohrbild, Keepout
+python3 mechanical/frontplate.py     # Frontplatte → STEP + STL, mit Selbsttest
+```
+
+Beide Skripte prüfen ihr Ergebnis und melden Abweichungen. `gen_boards.py` braucht die
+`pcbnew`-Python-API aus einer KiCad-Installation, `frontplate.py` braucht `build123d`
+(`pip install build123d`).
+
+Die **Schaltpläne** werden nativ in KiCad 9.0.7 angelegt, nicht generiert — Begründung in
+[`docs/08-kicad-workflow.md`](docs/08-kicad-workflow.md).
 
 ## Status
 
-Mechanische Definition und Systemspezifikation sind dokumentiert. Der Schaltungsentwurf
-beginnt beim Bottom-Board. Aktueller Arbeitsstand und nächste Schritte:
-[`docs/07-roadmap.md`](docs/07-roadmap.md).
+| Teil | Stand |
+|---|---|
+| Systemspezifikation, Power-Tree, Pinmapping | dokumentiert |
+| Mechanik der drei Boards | erzeugt und verifiziert |
+| Frontplatte, druckfertig | erzeugt und verifiziert |
+| ESPHome-Konfiguration | validiert (`esphome config`) |
+| Schaltpläne, Layout, Routing | **offen** |
+| Fertigungsdaten zum Bestellen | **offen** (setzt das Layout voraus) |
+
+Nächste Schritte: [`docs/07-roadmap.md`](docs/07-roadmap.md).
+Der kritische Pfad ist die Messung des realen Anlauf- und Blockierstroms der Motoren —
+davon hängen Sicherungen, Trip-Schwellen, Treiberauswahl und Steckverbinder ab.

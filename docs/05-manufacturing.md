@@ -8,7 +8,7 @@
 | MID | 4 empfohlen | 1 oz | ESP32-Routingdichte, durchgehende GND-Referenz |
 | TOP | 2 ausreichend | 1 oz | wenig Strom, geringe Dichte |
 
-Alle drei Boards: **1,0 mm Dicke**, Ø 55,0 mm.
+Alle drei Boards: **1,0 mm Dicke**, Ø 52,0 mm.
 
 Bei 1,0 mm Gesamtdicke und vier Lagen wird der dielektrische Abstand dünn — das ist
 herstellbar, aber der konkrete Stackup ist beim Fertiger zu bestätigen, bevor

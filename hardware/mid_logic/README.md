@@ -22,7 +22,7 @@ KiCad-Projekt `mid_logic`. Logik- und Kommunikationsebene des Stacks.
 
 ## Mechanik
 
-- Ø 55,0 mm, 1,0 mm Dicke
+- Ø 52,0 mm, 1,0 mm Dicke
 - Bohrbild und Stackverbinder-Positionen **deckungsgleich** mit BOTTOM und TOP
 - Abstand nach unten ≈ 10 mm, nach oben ≈ 8–10 mm
 

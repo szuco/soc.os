@@ -1,0 +1,523 @@
+<title>SwitchStack</title>
+<style>
+:root{
+  --paper:#F4F1EC; --surface:#FFFFFF; --sunk:#EAE6DF;
+  --ink:#191720; --ink-2:#5B5764; --ink-3:#8C8794;
+  --rule:#D9D3CA; --rule-2:#C3BCB0;
+  --copper:#A8632F;
+  --pwr:#B94A28; --logic:#3C6C93; --ui:#5F8560;
+  --pwr-bg:rgba(185,74,40,.10); --logic-bg:rgba(60,108,147,.10); --ui-bg:rgba(95,133,96,.10);
+  --shadow:rgba(30,24,16,.13);
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#131218; --surface:#1C1B23; --sunk:#100F15;
+    --ink:#EDEAF1; --ink-2:#A8A3B2; --ink-3:#78737F;
+    --rule:#302E3A; --rule-2:#403D4B;
+    --copper:#D2915C;
+    --pwr:#E2795A; --logic:#7BA9CE; --ui:#8FBA8F;
+    --pwr-bg:rgba(226,121,90,.13); --logic-bg:rgba(123,169,206,.13); --ui-bg:rgba(143,186,143,.13);
+    --shadow:rgba(0,0,0,.5);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#131218; --surface:#1C1B23; --sunk:#100F15;
+  --ink:#EDEAF1; --ink-2:#A8A3B2; --ink-3:#78737F;
+  --rule:#302E3A; --rule-2:#403D4B;
+  --copper:#D2915C;
+  --pwr:#E2795A; --logic:#7BA9CE; --ui:#8FBA8F;
+  --pwr-bg:rgba(226,121,90,.13); --logic-bg:rgba(123,169,206,.13); --ui-bg:rgba(143,186,143,.13);
+  --shadow:rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:16px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:960px;margin:0 auto;padding:0 24px 96px}
+.eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink-3); margin:0 0 10px;
+}
+h1{
+  font-size:clamp(38px,7vw,64px); line-height:1.02; letter-spacing:-.03em;
+  font-weight:760; margin:0 0 18px; text-wrap:balance;
+}
+h2{
+  font-size:clamp(21px,3vw,27px); letter-spacing:-.017em; font-weight:680;
+  margin:0 0 6px; text-wrap:balance;
+}
+h3{font-size:16px;letter-spacing:-.005em;font-weight:660;margin:0 0 6px}
+p{margin:0 0 14px;max-width:66ch;color:var(--ink-2)}
+p strong,li strong{color:var(--ink);font-weight:620}
+header.masthead{padding:76px 0 34px;border-bottom:1px solid var(--rule)}
+.lede{font-size:19px;line-height:1.55;color:var(--ink-2);max-width:60ch}
+section{padding-top:60px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:22px;
+  border-bottom:1px solid var(--rule);padding-bottom:12px;flex-wrap:wrap}
+.sec-head .num{font-family:var(--mono);font-size:12px;color:var(--copper);
+  letter-spacing:.08em;flex:none}
+
+/* --- Kennzahlenleiste --- */
+.specs{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));
+  gap:1px;background:var(--rule);border:1px solid var(--rule);margin-top:30px}
+.spec{background:var(--surface);padding:14px 16px}
+.spec dt{font-family:var(--mono);font-size:10.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink-3);margin-bottom:5px}
+.spec dd{margin:0;font-family:var(--mono);font-size:19px;font-weight:600;
+  letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.spec dd small{font-size:12px;font-weight:400;color:var(--ink-3)}
+
+/* --- 3D Szene --- */
+.viewer{background:var(--sunk);border:1px solid var(--rule);position:relative;
+  overflow:hidden}
+.stage{height:min(66vh,540px);perspective:1500px;perspective-origin:50% 44%;
+  display:grid;place-items:center;cursor:grab;touch-action:none;position:relative}
+.stage:active{cursor:grabbing}
+.rig{position:relative;width:0;height:0;transform-style:preserve-3d;
+  transform:rotateX(var(--rx,64deg)) rotateZ(var(--rz,-26deg))}
+.layer{position:absolute;transform-style:preserve-3d;
+  left:0;top:0;transition:transform .45s cubic-bezier(.4,0,.2,1)}
+.disc{border-radius:50%;border:1.5px solid;position:absolute;
+  left:50%;top:50%;transform:translate(-50%,-50%)}
+.plate{border-radius:5px;border:1.5px solid;position:absolute;
+  left:50%;top:50%;transform:translate(-50%,-50%)}
+.tag{position:absolute;left:50%;top:50%;font-family:var(--mono);font-size:10px;
+  letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;
+  padding:2px 7px;border-radius:2px;transform:translate(-50%,-50%);
+  pointer-events:none;font-weight:600}
+.shell{position:absolute;left:50%;top:50%;background:var(--rule-2);opacity:.30}
+.controls{display:flex;gap:20px;align-items:center;flex-wrap:wrap;
+  padding:13px 18px;border-top:1px solid var(--rule);background:var(--surface)}
+.ctl{display:flex;align-items:center;gap:9px}
+.ctl label{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--ink-3)}
+input[type=range]{accent-color:var(--copper);width:126px}
+.hint{font-family:var(--mono);font-size:10.5px;color:var(--ink-3);margin-left:auto}
+button.rst{font-family:var(--mono);font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;background:none;border:1px solid var(--rule-2);
+  color:var(--ink-2);padding:5px 11px;cursor:pointer;border-radius:2px}
+button.rst:hover{border-color:var(--copper);color:var(--copper)}
+button.rst:focus-visible,.stage:focus-visible{outline:2px solid var(--copper);outline-offset:2px}
+
+/* --- Domänen --- */
+.domains{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:16px}
+.dom{background:var(--surface);border:1px solid var(--rule);padding:17px 19px;
+  border-top:3px solid}
+.dom .lv{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;
+  text-transform:uppercase;font-weight:700;margin-bottom:7px}
+.dom ul{margin:9px 0 0;padding-left:17px;font-size:14px;color:var(--ink-2)}
+.dom li{margin-bottom:3px}
+
+/* --- Zeichnungen --- */
+.draw{background:var(--surface);border:1px solid var(--rule);padding:22px}
+.draw svg{width:100%;height:auto;display:block}
+.dim{font-family:var(--mono);font-size:2.6px;fill:var(--ink-3)}
+.dim-b{font-family:var(--mono);font-size:3px;fill:var(--copper);font-weight:600}
+
+/* --- Tabelle --- */
+.tbl-wrap{overflow-x:auto;border:1px solid var(--rule);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:430px}
+th,td{text-align:left;padding:9px 15px;border-bottom:1px solid var(--rule)}
+th{font-family:var(--mono);font-size:10px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink-3);font-weight:600}
+tr:last-child td{border-bottom:none}
+td.n{font-family:var(--mono);text-align:right;font-variant-numeric:tabular-nums;
+  white-space:nowrap}
+tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
+
+/* --- Status --- */
+.status{display:grid;gap:9px}
+.st{display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:start;
+  background:var(--surface);border:1px solid var(--rule);padding:13px 16px}
+.pill{font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;
+  text-transform:uppercase;font-weight:700;padding:3px 8px;border-radius:2px;
+  white-space:nowrap;margin-top:2px}
+.ok{background:var(--ui-bg);color:var(--ui)}
+.part{background:var(--logic-bg);color:var(--logic)}
+.no{background:var(--pwr-bg);color:var(--pwr)}
+.st p{margin:2px 0 0;font-size:14px}
+.st b{display:block;font-size:14.5px;color:var(--ink);font-weight:640}
+.note{border-left:3px solid var(--copper);padding:3px 0 3px 16px;margin:22px 0;
+  color:var(--ink-2);max-width:64ch}
+@media (prefers-reduced-motion:reduce){.layer{transition:none}}
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <p class="eyebrow">ESP32 · Unterputz · Ø 60 mm</p>
+  <h1>SwitchStack</h1>
+  <p class="lede">Drei runde Leiterplatten, gestapelt in einer 61 mm tiefen
+  Unterputzdose. Leistung unten, Logik in der Mitte, Bedienung oben — die
+  Trennung, die den ganzen Aufbau trägt.</p>
+
+  <dl class="specs">
+    <div class="spec"><dt>Leiterplatte</dt><dd>Ø52,0<small> mm</small></dd></div>
+    <div class="spec"><dt>Dicke</dt><dd>1,0<small> mm</small></dd></div>
+    <div class="spec"><dt>Dosentiefe</dt><dd>61<small> mm</small></dd></div>
+    <div class="spec"><dt>Frontplatte</dt><dd>55<small>er Norm</small></dd></div>
+    <div class="spec"><dt>Motoren</dt><dd>2 ×<small> 100 W</small></dd></div>
+    <div class="spec"><dt>Display</dt><dd>1,28"<small> rund</small></dd></div>
+  </dl>
+</header>
+
+<section>
+  <div class="sec-head"><span class="num">01</span><h2>Der Stapel</h2></div>
+  <p>Ziehen zum Drehen, Schieberegler zum Auseinanderziehen. Alle Abstände sind
+  maßstäblich zu den geprüften Modelldaten.</p>
+
+  <div class="viewer">
+    <div class="stage" id="stage" tabindex="0" role="img"
+         aria-label="Dreidimensionale Explosionsdarstellung des Leiterplattenstapels in der Unterputzdose">
+      <div class="rig" id="rig"></div>
+    </div>
+    <div class="controls">
+      <div class="ctl">
+        <label for="ex">Explosion</label>
+        <input type="range" id="ex" min="0" max="100" value="34" aria-label="Explosionsgrad">
+      </div>
+      <button class="rst" id="reset">Ansicht zurücksetzen</button>
+      <span class="hint">Ziehen zum Drehen</span>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">02</span><h2>Drei Domänen</h2></div>
+  <p>Hochstrom bleibt vollständig auf dem Bottom-Board. Die Stackverbinder führen
+  ausschließlich Signale und Kleinleistung. Das ist keine Aufräumregel, sondern die
+  Voraussetzung dafür, dass die Strommessung überhaupt brauchbare Werte liefert.</p>
+  <div class="domains">
+    <div class="dom" style="border-top-color:var(--ui)">
+      <div class="lv" style="color:var(--ui)">Top · UI</div>
+      <h3>Bedienung und Sensorik</h3>
+      <ul>
+        <li>USB-C, direkt am ESP32-S3</li>
+        <li>1,28"-Rund-LCD, GC9A01A</li>
+        <li>4 physische Taster</li>
+        <li>Temperatur und Feuchte, SHT4x</li>
+        <li>Ausgang Weihnachtsstern</li>
+      </ul>
+    </div>
+    <div class="dom" style="border-top-color:var(--logic)">
+      <div class="lv" style="color:var(--logic)">Mid · Logic</div>
+      <h3>Rechnen und Reden</h3>
+      <ul>
+        <li>ESP32-S3-WROOM-1-N16R8</li>
+        <li>RS-485 als primärer Bus</li>
+        <li>Radar-Bewegungsmelder</li>
+        <li>Piezo-Treiber</li>
+        <li>Antennen-Sperrfläche zur Front</li>
+      </ul>
+    </div>
+    <div class="dom" style="border-top-color:var(--pwr)">
+      <div class="lv" style="color:var(--pwr)">Bottom · Power</div>
+      <h3>24 V und Motoren</h3>
+      <ul>
+        <li>2 × H-Brücke, Umpolung</li>
+        <li>Strommessung je Motor</li>
+        <li>Hard-Trip in Hardware</li>
+        <li>3 × DC/DC-Wandler</li>
+        <li>6-poliger Leistungsstecker</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">03</span><h2>Tiefenbudget</h2></div>
+  <p>Die 61 mm der Dose sind der eigentliche Engpass des Projekts — nicht der
+  Durchmesser. Schnitt maßstäblich, von der Wandoberfläche nach innen.</p>
+
+  <div class="draw">
+    <svg viewBox="0 0 200 74" role="img" aria-label="Maßstäblicher Schnitt durch die Unterputzdose mit dem Tiefenbudget">
+      <defs>
+        <pattern id="hatch" width="3" height="3" patternTransform="rotate(45)"
+                 patternUnits="userSpaceOnUse">
+          <line x1="0" y1="0" x2="0" y2="3" stroke="var(--rule-2)" stroke-width=".7"/>
+        </pattern>
+      </defs>
+      <!-- Wand -->
+      <rect x="0" y="0" width="14" height="74" fill="url(#hatch)"/>
+      <line x1="14" y1="0" x2="14" y2="74" stroke="var(--ink-3)" stroke-width=".5"/>
+      <text class="dim" x="2" y="70">WAND</text>
+
+      <!-- Dose: 61 mm ab x=14, Skala 2.6 px/mm -->
+      <rect x="14" y="8" width="158.6" height="58" fill="none"
+            stroke="var(--ink-3)" stroke-width=".7" stroke-dasharray="2 1.6"/>
+      <text class="dim" x="150" y="71">DOSE 61 mm</text>
+
+      <!-- Frontplatte 5,5 mm -->
+      <rect x="14" y="14" width="14.3" height="46" fill="var(--ui-bg)"
+            stroke="var(--ui)" stroke-width=".8"/>
+      <text class="dim-b" x="15" y="12">Frontplatte 5,5</text>
+
+      <!-- Display 5 mm -->
+      <rect x="28.3" y="24" width="13" height="26" fill="none"
+            stroke="var(--ui)" stroke-width=".6" stroke-dasharray="1.5 1.2"/>
+      <text class="dim" x="29.5" y="55">Display</text>
+
+      <!-- Top PCB bei 11 mm, Dicke 1 -->
+      <rect x="42.6" y="16" width="2.6" height="42" fill="var(--ui)"/>
+      <text class="dim-b" x="38" y="12">TOP</text>
+      <!-- Mid PCB bei 21 -->
+      <rect x="68.6" y="16" width="2.6" height="42" fill="var(--logic)"/>
+      <text class="dim-b" x="64" y="12">MID</text>
+      <!-- Bottom PCB bei 31 -->
+      <rect x="94.6" y="16" width="2.6" height="42" fill="var(--pwr)"/>
+      <text class="dim-b" x="88" y="12">BOTTOM</text>
+
+      <!-- Abstandsmasse -->
+      <line x1="45.2" y1="62" x2="68.6" y2="62" stroke="var(--ink-3)" stroke-width=".4"/>
+      <text class="dim" x="51" y="65.6">9 mm</text>
+      <line x1="71.2" y1="62" x2="94.6" y2="62" stroke="var(--ink-3)" stroke-width=".4"/>
+      <text class="dim" x="76.5" y="65.6">10 mm</text>
+
+      <!-- Stecker 10 mm + Kabelbogen 12 mm -->
+      <rect x="97.2" y="28" width="26" height="18" fill="var(--pwr-bg)"
+            stroke="var(--pwr)" stroke-width=".7"/>
+      <text class="dim" x="99" y="26">Stecker 10</text>
+      <rect x="123.2" y="30" width="31.2" height="14" fill="none"
+            stroke="var(--pwr)" stroke-width=".6" stroke-dasharray="1.5 1.2"/>
+      <text class="dim" x="125" y="49">Kabelbogen 12</text>
+
+      <!-- Reserve -->
+      <rect x="154.4" y="8" width="18.2" height="58" fill="var(--ui-bg)"/>
+      <text class="dim-b" x="156" y="38">RESERVE</text>
+      <text class="dim-b" x="158" y="42">≈ 8 mm</text>
+    </svg>
+  </div>
+
+  <div class="tbl-wrap" style="margin-top:18px">
+    <table>
+      <thead><tr><th>Position</th><th class="n">Tiefe</th><th class="n">Kumuliert</th></tr></thead>
+      <tbody>
+        <tr><td>Frontplatte, Struktur hinter der Sichtfläche</td><td class="n">5,5</td><td class="n">5,5</td></tr>
+        <tr><td>Displaymodul mit Flexleitung</td><td class="n">5,0</td><td class="n">10,5</td></tr>
+        <tr><td>Top-PCB</td><td class="n">1,0</td><td class="n">11,5</td></tr>
+        <tr><td>Bauteile und Stackabstand</td><td class="n">9,0</td><td class="n">20,5</td></tr>
+        <tr><td>Mid-PCB</td><td class="n">1,0</td><td class="n">21,5</td></tr>
+        <tr><td>Bauteile und Stackabstand</td><td class="n">10,0</td><td class="n">31,5</td></tr>
+        <tr><td>Bottom-PCB</td><td class="n">1,0</td><td class="n">32,5</td></tr>
+        <tr><td>Leistungsstecker über Platine</td><td class="n">10,0</td><td class="n">42,5</td></tr>
+        <tr><td>Kabelbogen hinter dem Stecker</td><td class="n">12,0</td><td class="n">54,5</td></tr>
+      </tbody>
+      <tfoot><tr><td>Reserve auf 61 mm</td><td class="n">—</td><td class="n">6,5</td></tr></tfoot>
+    </table>
+  </div>
+
+  <div class="note">Die letzten beiden Positionen fressen zusammen 22 mm, mehr als ein
+  Drittel der Dose. Ein abgewinkelter Leistungsstecker ist deshalb der wirksamste
+  Hebel, falls es eng wird — nicht das Zusammenrücken der Platinen.</div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">04</span><h2>Frontplatte</h2></div>
+  <p>Maßstäbliche Sicht auf die 3D-Druck-Vorlage. Passt in die Rahmen der
+  55er-Schalterprogramme; Geräteschrauben nach DIN 49073 auf 60 mm.
+  Gestrichelt: verdeckte Kanten hinter der Sichtfläche.</p>
+
+  <div class="draw">
+    <svg viewBox="-42 -32 84 64" role="img" aria-label="Maßstäbliche Zeichnung der Frontplatte mit Displayfenster, vier Tastern und Schraubenlanglöchern">
+      <!-- Ohren, verdeckt -->
+      <rect x="-38" y="-7" width="76" height="14" fill="none"
+            stroke="var(--ink-3)" stroke-width=".3" stroke-dasharray="1.4 1"/>
+      <!-- Zentrierkragen, verdeckt -->
+      <rect x="-25" y="-25" width="50" height="50" fill="none"
+            stroke="var(--ink-3)" stroke-width=".3" stroke-dasharray="1.4 1"/>
+      <!-- Sichtplatte 54,6 -->
+      <rect x="-27.3" y="-27.3" width="54.6" height="54.6" rx="2"
+            fill="var(--sunk)" stroke="var(--ink)" stroke-width=".55"/>
+      <!-- Freiraum hinter dem Fenster, verdeckt -->
+      <circle cx="0" cy="0" r="18.5" fill="none" stroke="var(--ink-3)"
+              stroke-width=".3" stroke-dasharray="1.4 1"/>
+      <!-- Displayfenster -->
+      <circle cx="0" cy="0" r="16" fill="var(--logic-bg)"
+              stroke="var(--logic)" stroke-width=".55"/>
+      <text class="dim-b" x="-6.4" y="1.2">Ø32,0</text>
+      <!-- Taster -->
+      <circle cx="15.91" cy="-15.91" r="3.5" fill="var(--ui-bg)" stroke="var(--ui)" stroke-width=".5"/>
+      <circle cx="-15.91" cy="-15.91" r="3.5" fill="var(--ui-bg)" stroke="var(--ui)" stroke-width=".5"/>
+      <circle cx="-15.91" cy="15.91" r="3.5" fill="var(--ui-bg)" stroke="var(--ui)" stroke-width=".5"/>
+      <circle cx="15.91" cy="15.91" r="3.5" fill="var(--ui-bg)" stroke="var(--ui)" stroke-width=".5"/>
+      <text class="dim" x="18" y="-19">Ø7,0</text>
+      <!-- Teilkreis -->
+      <circle cx="0" cy="0" r="22.5" fill="none" stroke="var(--copper)"
+              stroke-width=".22" stroke-dasharray="2.5 1.5 .5 1.5"/>
+      <text class="dim-b" x="-9" y="-23.4">Teilkreis r22,5</text>
+      <!-- Schraubenlanglöcher -->
+      <rect x="-31.95" y="-3.95" width="3.9" height="7.9" rx="1.95"
+            fill="var(--paper)" stroke="var(--pwr)" stroke-width=".5"/>
+      <rect x="28.05" y="-3.95" width="3.9" height="7.9" rx="1.95"
+            fill="var(--paper)" stroke="var(--pwr)" stroke-width=".5"/>
+      <!-- Massband Schraubenabstand -->
+      <line x1="-30" y1="10" x2="30" y2="10" stroke="var(--pwr)" stroke-width=".3"/>
+      <line x1="-30" y1="8" x2="-30" y2="12" stroke="var(--pwr)" stroke-width=".3"/>
+      <line x1="30" y1="8" x2="30" y2="12" stroke="var(--pwr)" stroke-width=".3"/>
+      <text class="dim-b" x="-4.5" y="13.6">60,0</text>
+      <!-- Kabelausgang Stern -->
+      <circle cx="0" cy="20.5" r="2.25" fill="none" stroke="var(--copper)" stroke-width=".5"/>
+      <text class="dim" x="3.4" y="21.6">Kabel Stern Ø4,5</text>
+      <!-- Aussenmass -->
+      <text class="dim" x="-27.3" y="-28.6">54,6 × 54,6</text>
+    </svg>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">05</span><h2>Was geprüft ist — und was nicht</h2></div>
+  <p>Der Unterschied zwischen „erzeugt" und „verifiziert" entscheidet, worauf man
+  bauen kann. Deshalb hier getrennt.</p>
+
+  <div class="status">
+    <div class="st"><span class="pill ok">geprüft</span><div>
+      <b>Frontplatte, 3D-Modell</b>
+      <p>Ein Solid, 76,0 × 54,6 × 8,0 mm. STL wasserdicht und manifold, alle
+      Durchbrüche per Volumentest als frei nachgewiesen. STEP und STL liegen bei.</p></div></div>
+
+    <div class="st"><span class="pill ok">geprüft</span><div>
+      <b>Drei KiCad-Boarddateien</b>
+      <p>Von der <code>pcbnew</code>-API geschrieben, wieder eingelesen und gegen die
+      Sollmaße geprüft. Gerber-Export läuft durch — die Dateien sind nachweislich gültig.</p></div></div>
+
+    <div class="st"><span class="pill ok">geprüft</span><div>
+      <b>ESPHome-Konfiguration</b>
+      <p><code>esphome config</code> meldet „Configuration is valid" — inklusive
+      GC9A01A-Display, Oktal-PSRAM, PCF8574-Expander, SHT4x und den Cover-Entitäten.</p></div></div>
+
+    <div class="st"><span class="part">teilweise</span><div>
+      <b>Mechanik im Stapel</b>
+      <p>Das Tiefenbudget geht rechnerisch auf. Die Bauteilhöhen sind aber
+      Annahmen — belastbar wird es erst mit den Datenblättern der gewählten Teile.</p></div></div>
+
+    <div class="st"><span class="no">offen</span><div>
+      <b>Schaltpläne und Layout</b>
+      <p>Die Boards enthalten Outline, Bohrbild und Sperrflächen — keine Bauteile,
+      keine Netze, keine Leiterbahnen. Das ist der eigentliche Entwicklungsteil.</p></div></div>
+
+    <div class="st"><span class="no">offen</span><div>
+      <b>Fertigungsdaten zum Bestellen</b>
+      <p>Ohne Layout gibt es keine belastbaren Gerber, keine Positionsdatei und keine
+      bestellbare Stückliste. Was vorliegt, ist eine begründete Beschaffungsliste.</p></div></div>
+
+    <div class="st"><span class="no">offen</span><div>
+      <b>Anlauf- und Blockierstrom der Motoren</b>
+      <p>Der kritische Pfad. Er bestimmt Sicherungen, Trip-Schwellen, MOSFET-Auswahl
+      und Steckverbinder — und er hängt an keinem Layout, kann also sofort gemessen werden.</p></div></div>
+  </div>
+</section>
+
+</div>
+
+<script>
+(function(){
+  var S = 4.15;                       // px pro mm
+  var rig = document.getElementById('rig');
+  var stage = document.getElementById('stage');
+  var ex = document.getElementById('ex');
+  var css = getComputedStyle(document.documentElement);
+
+  // z in mm, von der Wandoberflaeche nach innen (negativ = tiefer in der Dose)
+  var LAYERS = [
+    {z:  2.5, kind:'plate', size:54.6, col:'--ui',     label:'Frontplatte'},
+    {z: -8.0, kind:'disc',  size:37.0, col:'--logic',  label:'Display 1,28"'},
+    {z:-11.5, kind:'disc',  size:52.0, col:'--ui',     label:'Top · UI'},
+    {z:-21.5, kind:'disc',  size:52.0, col:'--logic',  label:'Mid · Logic'},
+    {z:-32.5, kind:'disc',  size:52.0, col:'--pwr',    label:'Bottom · Power'},
+    {z:-40.0, kind:'plate', size:22.0, col:'--pwr',    label:'Leistungsstecker'}
+  ];
+
+  var nodes = [];
+  LAYERS.forEach(function(L){
+    var wrap = document.createElement('div');
+    wrap.className = 'layer';
+
+    var el = document.createElement('div');
+    el.className = L.kind === 'disc' ? 'disc' : 'plate';
+    var px = L.size * S;
+    el.style.width = px + 'px';
+    el.style.height = px + 'px';
+    var c = css.getPropertyValue(L.col).trim();
+    el.style.borderColor = c;
+    el.style.background = 'color-mix(in srgb, ' + c + ' 15%, transparent)';
+    wrap.appendChild(el);
+
+    var tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.textContent = L.label;
+    tag.style.color = c;
+    tag.style.background = 'color-mix(in srgb, ' + c + ' 14%, transparent)';
+    tag.style.transform = 'translate(-50%,-50%) translateX(' + (px/2 + 46) + 'px) rotate(0deg)';
+    wrap.appendChild(tag);
+
+    rig.appendChild(wrap);
+    nodes.push({el:wrap, z:L.z});
+  });
+
+  // Dosenmantel als Segmentschale, Innendurchmesser 57 mm, Tiefe 61 mm
+  var shell = document.createElement('div');
+  shell.className = 'layer';
+  var R = 28.5 * S, DEPTH = 61 * S, N = 28;
+  var arc = 2 * Math.PI * R / N + 1;
+  for (var i = 0; i < N; i++){
+    var seg = document.createElement('div');
+    seg.className = 'shell';
+    seg.style.width = DEPTH + 'px';
+    seg.style.height = arc + 'px';
+    seg.style.transform =
+      'translate(-50%,-50%) rotateZ(' + (i * 360 / N) + 'deg) translateX(' + R + 'px)' +
+      ' rotateY(90deg) translateX(' + (-DEPTH/2) + 'px)';
+    shell.appendChild(seg);
+  }
+  rig.appendChild(shell);
+
+  function render(){
+    var k = 1 + (ex.value / 100) * 1.5;      // Explosionsfaktor
+    nodes.forEach(function(n){
+      n.el.style.transform = 'translateZ(' + (n.z * S * k) + 'px)';
+    });
+    shell.style.transform = 'translateZ(' + (-30.5 * S) + 'px)';
+    shell.style.opacity = ex.value > 55 ? 0.25 : 1;
+  }
+
+  var rx = 64, rz = -26, drag = null;
+  function apply(){
+    rig.style.setProperty('--rx', rx + 'deg');
+    rig.style.setProperty('--rz', rz + 'deg');
+  }
+  function down(e){
+    drag = {x:(e.touches?e.touches[0]:e).clientX, y:(e.touches?e.touches[0]:e).clientY, rx:rx, rz:rz};
+  }
+  function move(e){
+    if(!drag) return;
+    var p = e.touches ? e.touches[0] : e;
+    rz = drag.rz + (p.clientX - drag.x) * 0.55;
+    rx = Math.max(8, Math.min(104, drag.rx - (p.clientY - drag.y) * 0.4));
+    apply();
+    if(e.cancelable) e.preventDefault();
+  }
+  function up(){ drag = null; }
+
+  stage.addEventListener('pointerdown', down);
+  window.addEventListener('pointermove', move, {passive:false});
+  window.addEventListener('pointerup', up);
+  stage.addEventListener('keydown', function(e){
+    var step = 6;
+    if(e.key === 'ArrowLeft'){ rz -= step; apply(); e.preventDefault(); }
+    if(e.key === 'ArrowRight'){ rz += step; apply(); e.preventDefault(); }
+    if(e.key === 'ArrowUp'){ rx = Math.max(8, rx - step); apply(); e.preventDefault(); }
+    if(e.key === 'ArrowDown'){ rx = Math.min(104, rx + step); apply(); e.preventDefault(); }
+  });
+
+  ex.addEventListener('input', render);
+  document.getElementById('reset').addEventListener('click', function(){
+    rx = 64; rz = -26; ex.value = 34; apply(); render();
+  });
+
+  apply(); render();
+})();
+</script>

@@ -5,14 +5,32 @@
 | Parameter | Wert |
 |---|---|
 | Leiterplattenform | Kreis |
-| Durchmesser | **Ø 55,0 mm** (Radius 27,5 mm) |
-| Leiterplattendicke | **1,0 mm** (bevorzugt) |
-| Unterputzdose | massiv, **61 mm tief** |
+| Durchmesser | **Ø 52,0 mm** (Radius 26,0 mm) |
+| Leiterplattendicke | **1,0 mm** |
+| Unterputzdose | massiv, Ø 60 mm außen, **61 mm tief** |
 | Stack-Abstand Bottom ↔ Mid | ≈ 10 mm |
-| Stack-Abstand Mid ↔ Top | ≈ 8–10 mm |
+| Stack-Abstand Mid ↔ Top | ≈ 9 mm |
 
-Board-Outline in KiCad: Kreis auf `Edge.Cuts`, Mittelpunkt (0,0), Radius 27,5 mm.
+> **Revision: Ø 55,0 mm → Ø 52,0 mm.**
+> Eine Gerätedose mit 60 mm Außendurchmesser hat je nach Hersteller nur etwa
+> 55–57 mm lichte Weite, und im Inneren sitzen Schraubdome und Verstärkungsrippen.
+> Eine Ø-55-mm-Platine wäre damit im besten Fall eine Presspassung ohne jede
+> Toleranz — und beim Einbau von drei gestapelten Platinen mit Steckverbindern
+> gibt es kein Nachjustieren.
+>
+> Ø 52,0 mm lässt ringsum 1,5–2,5 mm Luft. Das ist der Wert, mit dem die
+> KiCad-Templates erzeugt wurden.
+>
+> **Vor dem Layout-Freeze die reale Dose ausmessen.** Ist mehr Platz vorhanden,
+> ist die Änderung eine Zeile: `BOARD_DIAMETER` in
+> [`../tools/gen_boards.py`](../tools/gen_boards.py) und Skript neu laufen lassen.
+
+Board-Outline in KiCad: Kreis auf `Edge.Cuts`, Mittelpunkt (0,0), Radius 26,0 mm.
 Board-Dicke über *Board Setup → Physical Stackup*.
+
+Die drei Boards werden nicht von Hand gezeichnet, sondern von
+[`../tools/gen_boards.py`](../tools/gen_boards.py) erzeugt. Damit ist ausgeschlossen,
+dass Outline oder Bohrbild zwischen den Boards auseinanderlaufen.
 
 ## 2. Koordinatensystem
 
@@ -29,21 +47,24 @@ jedem Board durch eine Silkscreen-Markierung an der 12-Uhr-Position kenntlich zu
 
 ## 3. Befestigungsbohrungen
 
-Drei Bohrungen auf Radius **23,0 mm**, im Winkel 0° / 120° / 240°:
+Drei Bohrungen **M2,5 (Ø 2,7 mm)** auf Radius **21,5 mm**, im Winkel 0° / 120° / 240°:
 
 | Bohrung | Winkel | X [mm] | Y math. [mm] | Y KiCad [mm] |
 |---|---|---:|---:|---:|
-| H1 | 0° | 23,000 | 0,000 | 0,000 |
-| H2 | 120° | −11,500 | +19,919 | −19,919 |
-| H3 | 240° | −11,500 | −19,919 | +19,919 |
+| H1 | 0° | +21,5000 | 0,0000 | 0,0000 |
+| H2 | 120° | −10,7500 | +18,6195 | −18,6195 |
+| H3 | 240° | −10,7500 | −18,6195 | +18,6195 |
 
-Der in der Ausgangsspezifikation genannte Wert 19,92 ist derselbe Punkt, gerundet.
-Exakt: 23 · sin(120°) = 19,9186 mm.
+Exakt: 21,5 · sin(120°) = 18,6195 mm.
 
-**Randabstand:** Bei M2,5 (Bohrung Ø 2,7 mm) reicht die Bohrung bis Radius 24,35 mm,
-also 3,15 mm vom Rand — unkritisch. Bei M3 (Ø 3,2 mm) bis Radius 24,6 mm, 2,9 mm Rand.
-Beides ist fertigbar; **M2,5 ist empfohlen**, weil es mehr Kupferfläche am Rand freilässt
-und in einer Unterputzdose mechanisch völlig ausreicht.
+**12 Uhr bleibt frei.** Die Winkel 0/120/240° halten die Position bei +Y bewusst
+frei — dort sitzen die Frontmarkierung und der `FRONT`-Schriftzug. Ein Bohrbild bei
+90/210/330° kollidiert damit.
+
+**Randabstand:** Bohrungsrand bei Radius 22,85 mm, also 3,15 mm bis zur Kante bei
+Ø 52 mm. Der Schraubenkopf einer M2,5 (≈ Ø 5 mm) reicht bis Radius 24 mm — 2 mm
+Luft. M3 wäre ebenfalls fertigbar, **M2,5 ist empfohlen**: mehr freie Kupferfläche am
+Rand, und in einer Unterputzdose mechanisch völlig ausreichend.
 
 > Die Geometrie ist vor dem finalen Layout gegen Dose, Frontpanel und Steckverbinder zu
 > prüfen. Insbesondere darf keine der drei Bohrungen mit dem Bottom-Connector oder mit

@@ -20,8 +20,8 @@ Stackverbinder geführt.
 
 ## Mechanik
 
-- Ø 55,0 mm, 1,0 mm Dicke
-- Drei Befestigungsbohrungen auf R = 23 mm bei 0° / 120° / 240°
+- Ø 52,0 mm, 1,0 mm Dicke
+- Drei Befestigungsbohrungen auf R = 21,5 mm bei 0° / 120° / 240°
 - Bottom-Connector im Bereich −Y (unten), siehe Frontorientierung
 - 2-oz-Kupfer prüfen
 
@@ -36,7 +36,7 @@ Exakte Koordinaten: [`../../docs/04-mechanical.md`](../../docs/04-mechanical.md)
 
 ## Status
 
-Board-Outline (Kreis auf `Edge.Cuts`, R = 27,5 mm) und Board-Dicke 1,0 mm sind in KiCad
+Board-Outline (Kreis auf `Edge.Cuts`, R = 26,0 mm) und Board-Dicke 1,0 mm sind in KiCad
 angelegt. Das KiCad-Projekt liegt noch nicht im Repository — es wird nativ in
 KiCad 9.0.7 in dieses Verzeichnis erzeugt, siehe
 [`docs/08-kicad-workflow.md`](../../docs/08-kicad-workflow.md).

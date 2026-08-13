@@ -1,0 +1,357 @@
+# =============================================================================
+# KiCad SwitchStack - ESPHome-Konfiguration
+# =============================================================================
+# Zielhardware : ESP32-S3-WROOM-1-N16R8
+# Display      : 1,28" rund, GC9A01A, 240x240
+# Bedienung    : 4 physische Taster
+#
+# STAND: Die Jalousien laufen hier als template-Cover auf ZEIT. Die
+# stromabhaengige Lasterkennung braucht PWM-synchrones ADC-Sampling und ist in
+# reinem YAML nicht umsetzbar - siehe docs/09-display-and-mcu.md, Abschnitt 4.
+# Sie zieht in eine eigene C++-External-Component um.
+#
+# Der Hardware-Hard-Trip (Comparator + Latch) wirkt unabhaengig von dieser
+# Konfiguration und bleibt der eigentliche Schutz.
+# =============================================================================
+
+substitutions:
+  name: switchstack
+  friendly_name: SwitchStack
+
+  # --- Fahrzeiten (Sekunden) --------------------------------------------------
+  # Harte Obergrenze aus docs/02-motor-control.md
+  travel_time: "60s"
+  # Mechanische Stopzeit vor Umpolung
+  reversal_pause: "300ms"
+
+esphome:
+  name: ${name}
+  friendly_name: ${friendly_name}
+  # Beim Start alles stromlos: Treiber schlafen, Richtung definiert.
+  on_boot:
+    priority: 600
+    then:
+      - switch.turn_off: mot_sleep
+      - switch.turn_off: m1_dir
+      - switch.turn_off: m2_dir
+
+esp32:
+  board: esp32-s3-devkitc-1
+  variant: esp32s3
+  framework:
+    type: esp-idf
+
+psram:
+  mode: octal
+  speed: 80MHz
+
+logger:
+  # ESP32-S3 hat nativen USB - kein separater USB-UART-Baustein noetig.
+  hardware_uart: USB_SERIAL_JTAG
+
+api:
+  encryption:
+    key: !secret api_encryption_key
+
+ota:
+  - platform: esphome
+    password: !secret ota_password
+
+# WLAN ist ausdruecklich sekundaer. In einer massiven Unterputzdose hinter einer
+# Frontplatte ist der Empfang schwach - RS-485 ist der primaere Weg.
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  ap:
+    ssid: ${friendly_name} Fallback
+
+captive_portal:
+
+# -----------------------------------------------------------------------------
+# Busse
+# -----------------------------------------------------------------------------
+
+i2c:
+  sda: GPIO8
+  scl: GPIO9
+  scan: true
+  id: bus_i2c
+
+spi:
+  clk_pin: GPIO12
+  mosi_pin: GPIO11
+  id: bus_spi
+
+# RS-485: primaere Kommunikation. DE/RE ueber flow_control_pin.
+uart:
+  - id: uart_rs485
+    tx_pin: GPIO17
+    rx_pin: GPIO18
+    baud_rate: 19200
+  - id: uart_radar
+    tx_pin: GPIO42
+    rx_pin: GPIO41
+    baud_rate: 115200
+
+# GPIO-Expander fuer die langsamen Signale - entlastet das knappe Pinbudget.
+pcf8574:
+  - id: expander
+    address: 0x20
+
+# -----------------------------------------------------------------------------
+# Ausgaenge
+# -----------------------------------------------------------------------------
+
+output:
+  - platform: ledc
+    id: disp_backlight
+    pin: GPIO21
+    frequency: 2000Hz
+
+  - platform: ledc
+    id: m1_pwm
+    pin: GPIO38
+    frequency: 20000Hz     # oberhalb des Hoerbereichs
+  - platform: ledc
+    id: m2_pwm
+    pin: GPIO40
+    frequency: 20000Hz
+
+  - platform: ledc
+    id: buzzer_out
+    pin: GPIO15
+
+switch:
+  - platform: gpio
+    id: m1_dir
+    pin: GPIO39
+    restore_mode: ALWAYS_OFF
+  - platform: gpio
+    id: m2_dir
+    pin: GPIO47
+    restore_mode: ALWAYS_OFF
+  - platform: gpio
+    id: mot_sleep
+    pin: GPIO48
+    restore_mode: ALWAYS_OFF
+
+  - platform: gpio
+    name: Weihnachtsstern
+    icon: mdi:star-four-points
+    pin:
+      pcf8574: expander
+      number: 3
+      mode:
+        output: true
+    restore_mode: RESTORE_DEFAULT_OFF
+
+  - platform: gpio
+    id: trip_reset
+    pin:
+      pcf8574: expander
+      number: 2
+      mode:
+        output: true
+    restore_mode: ALWAYS_OFF
+
+light:
+  - platform: monochromatic
+    name: Displayhelligkeit
+    output: disp_backlight
+    id: backlight
+    default_transition_length: 400ms
+    restore_mode: RESTORE_DEFAULT_ON
+
+rtttl:
+  output: buzzer_out
+  id: alarmton
+
+# -----------------------------------------------------------------------------
+# Display
+# -----------------------------------------------------------------------------
+
+font:
+  - file: "gfonts://Roboto"
+    id: font_big
+    size: 28
+  - file: "gfonts://Roboto"
+    id: font_small
+    size: 14
+
+display:
+  - platform: ili9xxx
+    model: gc9a01a
+    id: panel
+    cs_pin: GPIO10
+    dc_pin: GPIO13
+    reset_pin: GPIO14
+    invert_colors: true
+    auto_clear_enabled: false
+    update_interval: 1s
+    lambda: |-
+      it.fill(Color::BLACK);
+      if (id(raum_temp).has_state()) {
+        it.printf(120, 92, id(font_big), TextAlign::CENTER,
+                  "%.1f°C", id(raum_temp).state);
+      }
+      if (id(raum_hum).has_state()) {
+        it.printf(120, 132, id(font_small), TextAlign::CENTER,
+                  "%.0f %% rF", id(raum_hum).state);
+      }
+      it.printf(120, 176, id(font_small), TextAlign::CENTER,
+                id(bewegung).state ? "anwesend" : "");
+
+# -----------------------------------------------------------------------------
+# Sensorik
+# -----------------------------------------------------------------------------
+
+sensor:
+  - platform: sht4x
+    address: 0x44
+    temperature:
+      name: Temperatur
+      id: raum_temp
+    humidity:
+      name: Luftfeuchte
+      id: raum_hum
+    update_interval: 30s
+
+  # Strommessung. ACHTUNG: Diese Werte sind PWM-gemittelt und NICHT
+  # PWM-synchron abgetastet. Sie taugen zur Anzeige und zur groben
+  # Plausibilitaet, NICHT als Stall-Erkennung. Siehe docs/09, Abschnitt 4.
+  - platform: adc
+    pin: GPIO1
+    name: Strom Motor 1
+    id: i_sense1
+    attenuation: 12db
+    update_interval: 1s
+    unit_of_measurement: A
+    accuracy_decimals: 2
+    filters:
+      - multiply: 5.0          # Platzhalter: 1/(Rshunt * Gain), nach Kalibrierung setzen
+      - sliding_window_moving_average:
+          window_size: 5
+          send_every: 1
+
+  - platform: adc
+    pin: GPIO2
+    name: Strom Motor 2
+    id: i_sense2
+    attenuation: 12db
+    update_interval: 1s
+    unit_of_measurement: A
+    accuracy_decimals: 2
+    filters:
+      - multiply: 5.0
+      - sliding_window_moving_average:
+          window_size: 5
+          send_every: 1
+
+binary_sensor:
+  - platform: gpio
+    id: btn1
+    pin: {number: GPIO4, mode: {input: true, pullup: true}, inverted: true}
+    filters: [delayed_on: 20ms, delayed_off: 20ms]
+    on_press:
+      then: [cover.open: jalousie1]
+  - platform: gpio
+    id: btn2
+    pin: {number: GPIO5, mode: {input: true, pullup: true}, inverted: true}
+    filters: [delayed_on: 20ms, delayed_off: 20ms]
+    on_press:
+      then: [cover.close: jalousie1]
+  - platform: gpio
+    id: btn3
+    pin: {number: GPIO6, mode: {input: true, pullup: true}, inverted: true}
+    filters: [delayed_on: 20ms, delayed_off: 20ms]
+    on_press:
+      then: [cover.open: jalousie2]
+  - platform: gpio
+    id: btn4
+    pin: {number: GPIO7, mode: {input: true, pullup: true}, inverted: true}
+    filters: [delayed_on: 20ms, delayed_off: 20ms]
+    on_press:
+      then: [cover.close: jalousie2]
+
+  # Radar-Bewegungsmelder. Bis das konkrete Modul feststeht, als einfacher
+  # Praesenzeingang am Expander gefuehrt.
+  - platform: gpio
+    name: Bewegung
+    id: bewegung
+    device_class: motion
+    pin:
+      pcf8574: expander
+      number: 4
+      mode:
+        input: true
+
+  # Hardware-Ueberstromabschaltung, latched. Nur lesbar - der Schutz wirkt
+  # in Hardware, diese Entitaeten melden ihn lediglich nach Home Assistant.
+  - platform: gpio
+    name: Hard-Trip Motor 1
+    device_class: problem
+    pin: {pcf8574: expander, number: 0, mode: {input: true}}
+  - platform: gpio
+    name: Hard-Trip Motor 2
+    device_class: problem
+    pin: {pcf8574: expander, number: 1, mode: {input: true}}
+
+# -----------------------------------------------------------------------------
+# Jalousien
+# -----------------------------------------------------------------------------
+# Zeitgesteuert. Jede Fahrt endet spaetestens nach ${travel_time}.
+# Richtungswechsel immer ueber Stop mit ${reversal_pause} Pause.
+
+cover:
+  - platform: time_based
+    name: Jalousie 1
+    id: jalousie1
+    device_class: shutter
+    open_action:
+      - switch.turn_off: m1_dir
+      - delay: ${reversal_pause}
+      - switch.turn_on: mot_sleep
+      - output.set_level: {id: m1_pwm, level: 100%}
+    close_action:
+      - switch.turn_on: m1_dir
+      - delay: ${reversal_pause}
+      - switch.turn_on: mot_sleep
+      - output.set_level: {id: m1_pwm, level: 100%}
+    stop_action:
+      - output.set_level: {id: m1_pwm, level: 0%}
+    open_duration: ${travel_time}
+    close_duration: ${travel_time}
+
+  - platform: time_based
+    name: Jalousie 2
+    id: jalousie2
+    device_class: shutter
+    open_action:
+      - switch.turn_off: m2_dir
+      - delay: ${reversal_pause}
+      - switch.turn_on: mot_sleep
+      - output.set_level: {id: m2_pwm, level: 100%}
+    close_action:
+      - switch.turn_on: m2_dir
+      - delay: ${reversal_pause}
+      - switch.turn_on: mot_sleep
+      - output.set_level: {id: m2_pwm, level: 100%}
+    stop_action:
+      - output.set_level: {id: m2_pwm, level: 0%}
+    open_duration: ${travel_time}
+    close_duration: ${travel_time}
+
+button:
+  - platform: template
+    name: Hard-Trip zuruecksetzen
+    entity_category: config
+    on_press:
+      - switch.turn_on: trip_reset
+      - delay: 50ms
+      - switch.turn_off: trip_reset
+
+  - platform: template
+    name: Alarmton testen
+    entity_category: diagnostic
+    on_press:
+      - rtttl.play: "alarm:d=4,o=5,b=140:8b,8p,8b,8p,8b"

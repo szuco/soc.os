@@ -23,7 +23,7 @@ KiCad-Projekt `top_ui`. Bedien- und Sensorikebene des Stacks, zur Front orientie
 
 ## Mechanik
 
-- Ø 55,0 mm, 1,0 mm Dicke
+- Ø 52,0 mm, 1,0 mm Dicke
 - Bohrbild und Stackverbinder-Positionen **deckungsgleich** mit BOTTOM und MID
 - USB-C, OLED, Taster und Stern-Stecker müssen zur Frontpanel-Geometrie passen —
   diese ist noch offen

@@ -4,15 +4,15 @@
 
 - Systemspezifikation und Mechanik dokumentiert
 - Repository-Struktur angelegt
-- **Bottom-Board:** begonnen — Board-Outline als Kreis auf `Edge.Cuts` mit Radius 27,5 mm
-  (Ø 55 mm), Board-Dicke 1,0 mm über *Board Setup → Physical Stackup*
+- **Bottom-Board:** begonnen — Board-Outline als Kreis auf `Edge.Cuts` mit Radius 26,0 mm
+  (Ø 52 mm), Board-Dicke 1,0 mm über *Board Setup → Physical Stackup*
 - KiCad-Projektdateien noch nicht im Repository, siehe
   [`08-kicad-workflow.md`](08-kicad-workflow.md)
 
 ## Reihenfolge
 
 ### Phase 1 – Bottom-Board Mechanik
-1. Bottom-Projekt nativ in KiCad 9.0.7 fertig mechanisch anlegen: Ø-55-mm-Outline,
+1. Bottom-Projekt nativ in KiCad 9.0.7 fertig mechanisch anlegen: Ø-52-mm-Outline,
    Befestigungsbohrungen nach [`04-mechanical.md`](04-mechanical.md), Connector-Keepouts.
 2. Konkreten Hochstrom-Steckverbinder auswählen und dessen Stromrating und Footprint
    verifizieren. → offene Punkte 2 und 3 in [`06-open-decisions.md`](06-open-decisions.md).

@@ -29,3 +29,10 @@ desktop.ini
 # --- Editor --------------------------------------------------------------
 *.swp
 *~
+
+# ESPHome
+firmware/esphome/secrets.yaml
+.esphome/
+
+# CAD-Zwischenstaende
+__pycache__/

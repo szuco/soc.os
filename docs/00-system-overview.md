@@ -5,7 +5,7 @@
 Stackbares PCB-System aus drei runden Leiterplatten, das in eine massive
 Schalter-Unterputzdose mit 61 mm Tiefe passt.
 
-- Zielgröße je PCB: **Ø 55,0 mm**
+- Zielgröße je PCB: **Ø 52,0 mm**
 - Bevorzugte Leiterplattendicke: **1,0 mm**
 - Die drei Ebenen trennen Benutzeroberfläche/Sensorik, Logik/Kommunikation und
   Leistungselektronik/Motorsteuerung.
