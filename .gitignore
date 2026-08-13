@@ -1,0 +1,31 @@
+# --- KiCad ---------------------------------------------------------------
+# Automatische Backups
+*-backups/
+*.kicad_pcb-bak
+*.kicad_sch-bak
+*.kicad_prl
+*.bak
+_autosave-*
+*.lck
+
+# Caches / generierte Zwischenstände
+fp-info-cache
+*.net
+*.xml
+
+# Temporär
+~*.*
+*.tmp
+
+# Fertigungsdaten werden getaggt released, nicht laufend eingecheckt.
+# Ausgabe pro Projekt unter <projekt>/production/ ablegen und gezielt hinzufuegen.
+production/
+
+# --- Betriebssystem ------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Editor --------------------------------------------------------------
+*.swp
+*~
