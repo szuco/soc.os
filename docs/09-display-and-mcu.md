@@ -121,10 +121,79 @@ der Blende), keine Hintergrundbeleuchtung, Helligkeit per Kommando.
 3. Fällt der Radar aus der Stückliste, fällt das AMOLED mit — dann GC9A01
    (klein) oder ST77916 (External-Component-Aufwand).
 
-**Alternative, falls Displayfläche wichtiger ist als die runde Form:** ein 2,0"-Rechteck
-(ST7789V, 320×240, aktiv 40,9 × 30,7 mm) hat **fast die doppelte Fläche**, ist
-ESPHome-nativ und billig; die vier Tasten würden als Softkey-Reihe darunter liegen.
-Das bricht die runde Formensprache — Geschmacksfrage, kein technisches Urteil.
+**Alternative rechteckig:** siehe [Abschnitt 1c](#1c-warum-kein-rechteckiges-display).
+
+> **Korrektur.** An dieser Stelle stand: ein 2,0"-Rechteck habe „fast die doppelte
+> Fläche" und die Entscheidung sei eine Geschmacksfrage. **Beides war falsch.** Es sind
+> +52 % gegenüber dem GC9A01 und nur +15 % gegenüber dem ST77916 — und das Modul passt
+> gar nicht auf das Ø-52-Board. Nachrechnung in 1c.
+
+## 1c. Warum kein rechteckiges Display?
+
+Die Frage ist berechtigt: Rechteckpanels sind billiger, breiter verfügbar, besser
+treiberunterstützt, und für Text (Temperatur, Status, Listen) ist ein Rechteck
+das bessere UI-Format — ein Kreis verschenkt die Ecken bei jedem Textlayout.
+
+Trotzdem fällt die Entscheidung hier eindeutig gegen das Rechteck, aus **Geometrie,
+nicht aus Formensprache**.
+
+### Der harte Grund: die Diagonale
+
+Das Modul sitzt auf einer **runden Ø-52-mm-Leiterplatte** in einer **runden Dose**.
+Bei 3 mm Randabstand je Seite bleibt ein Hüllkreis von **Ø 46 mm**. Was da hineinpasst:
+
+| Form im Hüllkreis Ø 46 | Fläche | Anteil |
+|---|---:|---:|
+| **Kreis** | **1 662 mm²** | **100 %** |
+| Quadrat 32,5 × 32,5 | 1 058 mm² | 63,7 % |
+| 4:3 — 36,8 × 27,6 | 1 016 mm² | 61,1 % |
+| 16:9 — 40,1 × 22,6 | 904 mm² | 54,4 % |
+
+Das ist kein Zufall, sondern Mathematik: **in einem runden Bauraum ist der Kreis
+flächenoptimal.** Das bestflächige einbeschriebene Rechteck — das Quadrat — erreicht
+nur 2/π = 63,7 % der Kreisfläche. Jedes Rechteck verschenkt in einer runden Dose ein
+gutes Drittel.
+
+### Konkrete Panels gegen das Ø-52-Board
+
+| Panel | aktiv | Modul-Diagonale/Ø | passt? |
+|---|---:|---:|---|
+| GC9A01 1,28" rund | 824 mm² | Ø 37,5 | ✅ |
+| **ST77916 1,46" rund** | **1 090 mm²** | Ø 41,5 | ✅ |
+| CO5300 1,43" AMOLED | 1 035 mm² | Ø 41,0 | ✅ |
+| ST7789V 1,69" rechteckig | 913 mm² | 46,1 mm | ⚠️ auf Kante |
+| ST7789V **2,0" rechteckig** | 1 256 mm² | **54,0 mm** | ❌ **> Ø 52 Board** |
+
+Zwei Ergebnisse, die die frühere Aussage widerlegen:
+
+1. **Das 2,0"-Panel passt nicht.** Modul-Diagonale 54,0 mm gegen 52 mm Boarddurchmesser
+   — die Ecken stehen über die Platine hinaus. Selbst die *aktive* Fläche hat schon
+   51,1 mm Diagonale. Es war nie eine Option, sondern ein Rechenfehler.
+2. **Das 1,69"-Panel passt gerade so — und ist trotzdem kleiner** als das runde
+   ST77916 (913 vs. 1 090 mm², −16 %). Genau der erwartete Effekt aus der Tabelle oben.
+
+### Der Ausweg, und warum er nicht genommen wird
+
+Man könnte das Display **an der Frontplatte statt auf der Leiterplatte** befestigen und
+per Flexleitung anbinden. Dann begrenzt nicht mehr das Ø-52-Board, sondern die lichte
+Dosenweite (≈ 55–57 mm, an den Schraubdomen weniger). Ein 2,0"-Modul mit 54,0 mm
+Diagonale hätte dort **unter 0,5 mm Luft je Seite** — im Toleranzfeld einer
+Kunststoffdose ist das keine Passung, sondern ein Glücksspiel. Dazu käme eine
+mechanisch entkoppelte Flexverbindung zwischen Platte und Stack. Beides für −25 %
+Pixel und +15 % Fläche gegenüber dem runden ST77916: kein guter Handel.
+
+### Wann das Rechteck doch richtig wäre
+
+- **Wenn die runde Dose fällt.** In einem Aufputzgehäuse oder hinter einer 2-fach-Blende
+  ändert sich die Rechnung komplett — dann gewinnt das Rechteck deutlich.
+- **Wenn viel Text angezeigt werden soll.** Fahrpläne, Listen, mehrzeilige Zustände
+  liegen auf einem Kreis schlecht. Bei Temperatur + Symbol + Statusfarbe ist der Kreis
+  kein Nachteil.
+- **Wenn Stückzahl und Preis zählen.** Rechteckpanels sind spürbar billiger und breiter
+  verfügbar als runde.
+
+Für dieses Gerät — rund, in der Dose, mit vier Sicheltasten und wenig Text — bleibt es
+beim runden Panel.
 
 ### Sicheltasten-Mechanik
 
