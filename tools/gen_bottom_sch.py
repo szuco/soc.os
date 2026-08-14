@@ -46,7 +46,7 @@ def build():
     # 1. Leistungseingang und Schutz
     # =====================================================================
     s.add("J1", "Connector_Generic:Conn_02x03_Odd_Even", "Power/Motor 6p",
-          "Connector_Molex:Molex_Micro-Fit_3.0_43045-0600_2x03_P3.00mm_Vertical",
+          "Connector_Molex:Molex_Micro-Fit_3.0_43045-0612_2x03_P3.00mm_Vertical",
           MPN="Micro-Fit 3.0 2x3 - Strombelastbarkeit pruefen")
     s.connect("24V_IN",  ("J1", "1"))
     s.connect("PGND",    ("J1", "2"))
@@ -57,7 +57,8 @@ def build():
 
     # Sicherung - Wert messabhaengig
     s.add("F1", "Device:Fuse", "15A traege",
-          "Fuse:Fuse_Bourns_MF-RG300", MPN="messabhaengig, siehe docs/11")
+          "Fuse:Fuse_Littelfuse-NANO2-451_453",
+          MPN="SMD NANO2, messabhaengig - siehe docs/11")
     s.connect("24V_IN", ("F1", "1"))
     s.connect("24V_F",  ("F1", "2"))
 
@@ -67,8 +68,9 @@ def build():
     s.connect("PGND",  ("D1", "2"))
 
     # Verpolschutz: P-MOSFET high-side, Gate ueber R gegen GND, Zener begrenzt Ugs
-    s.add("Q1", "Device:Q_PMOS_GSD", "P-FET 60V 60A",
-          "Package_TO_SOT_SMD:TO-263-2", MPN="z.B. IRF4905S - bestaetigen")
+    s.add("Q1", "Device:Q_PMOS_GSD", "P-FET 40V 30A",
+          "Package_SO:PowerPAK_SO-8_Single",
+          MPN="z.B. SiR429DP; Pad-Zuordnung siehe PAD_MAP in gen_layouts")
     s.connect("24V_GATE_P", ("Q1", "1"))
     s.connect("24V_F",      ("Q1", "2"))
     s.connect("24V_PROT",   ("Q1", "3"))
@@ -80,9 +82,11 @@ def build():
     s.connect("24V_GATE_P", ("D2", "2"))
 
     # Eingangs- und Bulkkondensatoren
+    # Bulk niedrigbauend: Hoehenbudget Bottom-Oberseite ist ~10 mm
+    # (docs/04). Polymer-Typen, Wert nach Messung M2 ggf. anheben.
     for ref, val, fp in (("C1", "100n", C0603), ("C2", "10u", C1210),
-                         ("C3", "470u/35V", "Capacitor_SMD:CP_Elec_10x10.5"),
-                         ("C4", "470u/35V", "Capacitor_SMD:CP_Elec_10x10.5")):
+                         ("C3", "220u/35V Polymer", "Capacitor_SMD:CP_Elec_8x6.5"),
+                         ("C4", "220u/35V Polymer", "Capacitor_SMD:CP_Elec_8x6.5")):
         s.add(ref, "Device:C", val, fp)
         s.connect("24V_PROT", (ref, "1"))
         s.connect("PGND",     (ref, "2"))
@@ -99,9 +103,11 @@ def build():
     s.connect("PGND",    ("D3", "2"))
     s.add("U1", "Regulator_Linear:L78L12_SOT89", "L78L12",
           "Package_TO_SOT_SMD:SOT-89-3", MPN="30 mA Gate-Ladestrom")
-    s.connect("12V_RAW", ("U1", "1"))
-    s.connect("PGND",    ("U1", "2"))
-    s.connect("12V_GATE", ("U1", "3"))
+    # ACHTUNG Pinbelegung SOT-89: 1 = OUT, 2 = GND, 3 = IN (war anfangs
+    # falsch herum - beim Review gegen das Datenblatt erneut pruefen)
+    s.connect("12V_GATE", ("U1", "1"))
+    s.connect("PGND",     ("U1", "2"))
+    s.connect("12V_RAW",  ("U1", "3"))
     for ref, net in (("C5", "12V_RAW"), ("C6", "12V_GATE")):
         s.add(ref, "Device:C", "1u", C0603)
         s.connect(net,  (ref, "1"))
@@ -113,7 +119,7 @@ def build():
     def buck_tps54360(u, rail, r_hi, r_lo, l_val, cout, cout_fp):
         """TPS54360: 60 V Eingang, Vref 0,8 V."""
         s.add(u, "Regulator_Switching:TPS54360DDA", "TPS54360",
-              "Package_SO:HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.4x3.2mm")
+              "Package_SO:HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm")
         s.connect("24V_PROT", (u, "2"))
         s.connect("PGND",     (u, "7"), (u, "9"))
         s.connect(u + "_SW",   (u, "8"))
@@ -127,7 +133,7 @@ def build():
         s.connect(u + "_BOOT", (u + "_CB", "1"))
         s.connect(u + "_SW",   (u + "_CB", "2"))
         # Speicherdrossel und Freilaufdiode
-        s.add(u + "_L", "Device:L", l_val, "Inductor_SMD:L_Bourns-SRP7028A")
+        s.add(u + "_L", "Device:L", l_val, "Inductor_SMD:L_Bourns_SRP7028A_7.3x6.6mm")
         s.connect(u + "_SW", (u + "_L", "1"))
         s.connect(rail,      (u + "_L", "2"))
         s.add(u + "_D", "Device:D_Schottky", "60V 3A", "Diode_SMD:D_SMB")
@@ -176,7 +182,7 @@ def build():
     s.connect("PGND",   ("U3", "2"))
     s.connect("U3_SW",  ("U3", "3"))
     s.connect("U3_FB",  ("U3", "5"))
-    s.add("L1", "Device:L", "2u2", "Inductor_SMD:L_Bourns-SRP5030T")
+    s.add("L1", "Device:L", "2u2", "Inductor_SMD:L_Bourns_SRP5030T")
     s.connect("U3_SW",   ("L1", "1"))
     s.connect("3V3_SYS", ("L1", "2"))
     s.add("R5", "Device:R", "180k", R0603)
@@ -246,14 +252,14 @@ def build():
                 s.connect("%s_%s_GT" % (tag, side), ("R_%s_%s" % (tag, side), "2"))
             # High-Side- und Low-Side-FET
             s.add("Q_%s_H" % tag, "Device:Q_NMOS_GDS", "N-FET 40V 60A",
-                  "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm",
-                  MPN="PowerPAK SO-8, Rds<5mOhm - Footprint bestaetigen")
+                  "Package_SO:PowerPAK_SO-8_Single",
+                  MPN="Rds<5mOhm, z.B. SiR622DP - bestaetigen")
             s.connect("%s_HO_GT" % tag, ("Q_%s_H" % tag, "1"))
             s.connect("24V_PROT",       ("Q_%s_H" % tag, "2"))
             s.connect(sw,               ("Q_%s_H" % tag, "3"))
             s.add("Q_%s_L" % tag, "Device:Q_NMOS_GDS", "N-FET 40V 60A",
-                  "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm",
-                  MPN="PowerPAK SO-8, Rds<5mOhm - Footprint bestaetigen")
+                  "Package_SO:PowerPAK_SO-8_Single",
+                  MPN="Rds<5mOhm, z.B. SiR622DP - bestaetigen")
             s.connect("%s_LO_GT" % tag, ("Q_%s_L" % tag, "1"))
             s.connect(sw,               ("Q_%s_L" % tag, "2"))
             s.connect("PGND",           ("Q_%s_L" % tag, "3"))

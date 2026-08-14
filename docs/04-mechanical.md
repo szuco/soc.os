@@ -47,28 +47,23 @@ jedem Board durch eine Silkscreen-Markierung an der 12-Uhr-Position kenntlich zu
 
 ## 3. Befestigungsbohrungen
 
-Drei Bohrungen **M2,5 (Ø 2,7 mm)** auf Radius **21,5 mm**, im Winkel 0° / 120° / 240°:
+> **Bohrbild v2 — ZWEI Bohrungen statt drei.** Die Layout-Kollisionsprüfung hat
+> einen Konflikt aufgedeckt, den die Frontplatten-Selbsttests nicht sehen konnten:
+> Die Bohrungen bei 120°/240° lagen nur ≈ 2 mm neben den Sicheltasten-Stößeln
+> (117°/243°) — Schraubenkopf und Taster kollidieren. Und auf r = 21,5 mm blockieren
+> die Stackverbinder (um 45/135/225/315°), die ESP32-Antenne (um 90°) und der
+> Leistungsstecker (um 270°) alle übrigen Kandidaten. **Frei sind genau 0° und 180°.**
+> Die Verdrehsicherung übernehmen die beiden Stackverbinder selbst.
 
-| Bohrung | Winkel | X [mm] | Y math. [mm] | Y KiCad [mm] |
-|---|---|---:|---:|---:|
-| H1 | 0° | +21,5000 | 0,0000 | 0,0000 |
-| H2 | 120° | −10,7500 | +18,6195 | −18,6195 |
-| H3 | 240° | −10,7500 | −18,6195 | +18,6195 |
+Zwei Bohrungen **M2,5 (Ø 2,7 mm)** auf Radius **21,5 mm**:
 
-Exakt: 21,5 · sin(120°) = 18,6195 mm.
+| Bohrung | Winkel | X [mm] | Y [mm] |
+|---|---|---:|---:|
+| H1 | 0° | +21,5 | 0,0 |
+| H2 | 180° | −21,5 | 0,0 |
 
-**12 Uhr bleibt frei.** Die Winkel 0/120/240° halten die Position bei +Y bewusst
-frei — dort sitzen die Frontmarkierung und der `FRONT`-Schriftzug. Ein Bohrbild bei
-90/210/330° kollidiert damit.
-
-**Randabstand:** Bohrungsrand bei Radius 22,85 mm, also 3,15 mm bis zur Kante bei
-Ø 52 mm. Der Schraubenkopf einer M2,5 (≈ Ø 5 mm) reicht bis Radius 24 mm — 2 mm
-Luft. M3 wäre ebenfalls fertigbar, **M2,5 ist empfohlen**: mehr freie Kupferfläche am
-Rand, und in einer Unterputzdose mechanisch völlig ausreichend.
-
-> Die Geometrie ist vor dem finalen Layout gegen Dose, Frontpanel und Steckverbinder zu
-> prüfen. Insbesondere darf keine der drei Bohrungen mit dem Bottom-Connector oder mit
-> den Stackverbindern kollidieren.
+Quelle und Durchsetzung: `tools/gen_layouts.py` (Kollisionsmodell mit Kreisprüfung
+für die Schraubenköpfe) und `tools/gen_boards.py`; beide aus denselben Konstanten.
 
 ## 4. Tiefenbudget
 

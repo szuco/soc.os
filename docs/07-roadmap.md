@@ -29,10 +29,13 @@
 6. ~~Shunt, Sense-Amplifier, Comparator und Latch~~ — 1 mΩ inline, INA240A2,
    LM393-Fenster, 74AUP1G74 auf `~SD`.
 
-### Phase 3b – Bottom-Board Layout ← **hier weiter**
-6a. Bauteile platzieren, Leistungspfade kurz und breit routen, Sternpunkt AGND/PGND
-    über R12, Reglerlayouts nach Referenzdesign.
-6b. Schaltungsreview: IC-Pinbelegungen gegen Datenblätter, Reglerdimensionierung.
+### Phase 3b – Layouts (alle drei Boards) — Platzierung ✅, Routing offen
+6a. ~~Bauteile platzieren~~ — `tools/gen_layouts.py` erzeugt alle drei Layouts:
+    Footprints mit Netzen, mechanisch gebundene Teile exakt, Rest kollisionsfrei,
+    PGND-Zonen beidseitig, DRC ohne Platzierungsfehler.
+6b. **Routing** — Handarbeit in KiCad: Leistungspfade kurz und breit, Sternpunkt
+    AGND/PGND über R12, Reglerlayouts nach Referenzdesign, QSPI gebündelt.
+6c. Schaltungsreview: IC-Pinbelegungen gegen Datenblätter, Reglerdimensionierung.
 
 ### Phase 4 – Stack und weitere Boards
 7. Stackverbinder und endgültiges Pinmapping in allen drei Projekten identisch

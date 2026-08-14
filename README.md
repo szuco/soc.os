@@ -70,6 +70,9 @@ Boards nicht auseinanderlaufen:
 ```bash
 python3 tools/gen_boards.py          # 3 × .kicad_pcb: Outline, Bohrbild, Keepout
 python3 tools/gen_bottom_sch.py      # Bottom-Schaltplan + BOM, mit Netzlistenprüfung
+python3 tools/gen_mid_sch.py         # Mid-Schaltplan (ESP32, RS-485, Expander)
+python3 tools/gen_top_sch.py         # Top-Schaltplan (USB-C, Taster, Sensorik)
+python3 tools/gen_layouts.py         # 3 Layouts: Platzierung, Netze, Zonen, DRC
 python3 mechanical/frontplate.py     # Frontplatte → STEP + STL, mit Selbsttest
 ```
 
@@ -91,7 +94,9 @@ korrekt — und in KiCad frei umarrangierbar.
 | Frontplatte, druckfertig | erzeugt und verifiziert |
 | ESPHome-Konfiguration inkl. ST77916-Display | validiert (`esphome config`) |
 | **Bottom-Board: Schaltplan + Stückliste** | **erzeugt und netzlistengeprüft** |
-| Schaltpläne Mid und Top, alle Layouts | **offen** |
+| Schaltpläne Mid und Top | **erzeugt und netzlistengeprüft** |
+| Layouts aller drei Boards: Platzierung + Zonen | **erzeugt, DRC ohne Platzierungsfehler** |
+| **Routing der Leiterbahnen** | **offen — Handarbeit in KiCad** |
 | Fertigungsdaten zum Bestellen | **offen** (setzt das Layout voraus) |
 
 Nächste Schritte: [`docs/07-roadmap.md`](docs/07-roadmap.md).

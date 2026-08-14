@@ -33,9 +33,11 @@ import pcbnew
 BOARD_DIAMETER   = 52.0     # mm; siehe docs/04-mechanical.md, Abschnitt 1
 BOARD_THICKNESS  = 1.0      # mm
 HOLE_PITCH_R     = 21.5     # mm; Teilkreis der Befestigungsbohrungen
-# Grad, mathematisch (CCW, 0 = +X). 12 Uhr bleibt bewusst frei fuer die
-# Frontmarkierung und den FRONT-Schriftzug.
-HOLE_ANGLES      = (0.0, 120.0, 240.0)
+# Grad, mathematisch (CCW, 0 = +X). Bohrbild v2: nur noch 0/180 -
+# 120/240 kollidierten mit den Sicheltasten-Stoesseln der Frontplatte,
+# und andere Winkel sind durch Stackverbinder, ESP32-Antenne und
+# Leistungsstecker blockiert. Begruendung in tools/gen_layouts.py.
+HOLE_ANGLES      = (0.0, 180.0)
 EDGE_CLEARANCE   = 0.5      # mm
 
 ANTENNA_KEEPOUT_W = 18.0    # mm; Sperrflaeche ESP32-Antenne (nur MID)

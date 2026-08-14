@@ -81,8 +81,8 @@ def build():
         for half in "AB":
             ref = "SW%d%s" % (n, half)
             s.add(ref, "Switch:SW_Push", "BTN%d" % n,
-                  "Button_Switch_SMD:SW_SPST_EVQP2",
-                  MPN="niedrig, 3,9x2,9 - Position siehe mechanical/frontplate.py")
+                  "Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK",
+                  MPN="Alps SKRK o.ae., 3,9x2,9, Pads laengs - Position siehe mechanical/frontplate.py")
             s.connect("BTN%d" % n, (ref, "1"))
             s.connect("PGND",      (ref, "2"))
 
@@ -90,7 +90,7 @@ def build():
     # 3. Temperatur/Feuchte SHT4x
     # =====================================================================
     s.add("U2", "Sensor_Humidity:SHT4x", "SHT40-AD1B",
-          "Package_DFN_QFN:DFN-4-1EP_1.5x1.5mm_P0.8mm_EP0.7x0.9mm",
+          "Sensor_Humidity:Sensirion_DFN-4_1.5x1.5mm_P0.8mm_SHT4x_NoCentralPad",
           MPN="Adresse 0x44 - muss zur YAML passen; thermisch vom Board entkoppeln (Schlitze)")
     s.connect("I2C_SDA", ("U2", "1"))
     s.connect("I2C_SCL", ("U2", "2"))

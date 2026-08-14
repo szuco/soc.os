@@ -21,7 +21,7 @@ Stackverbinder geführt.
 ## Mechanik
 
 - Ø 52,0 mm, 1,0 mm Dicke
-- Drei Befestigungsbohrungen auf R = 21,5 mm bei 0° / 120° / 240°
+- Zwei Befestigungsbohrungen auf R = 21,5 mm bei 0° / 180° (Bohrbild v2, siehe docs/04)
 - Bottom-Connector im Bereich −Y (unten), siehe Frontorientierung
 - 2-oz-Kupfer prüfen
 
