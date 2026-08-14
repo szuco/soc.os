@@ -309,11 +309,10 @@ def route(name, passes=200, timeout=2400):
         raise RuntimeError("SES-Import ergab keine Leiterbahnen")
     pcbnew.SaveBoard(pcb, board)
 
-    n_tracks = sum(1 for t in board.GetTracks()
-                   if t.GetClass() == "PCB_TRACK")
-    n_vias = sum(1 for t in board.GetTracks() if t.GetClass() == "PCB_VIA")
+    # board.GetTracks() liefert nach SaveBoard gelegentlich ein nicht
+    # iterierbares SWIG-Objekt - die Zaehlung kommt daher aus import_ses
     print("%-20s geroutet: %d Bahnsegmente, %d Vias"
-          % (name, n_tracks, n_vias))
+          % (name, n_wires, n_vias))
     return pcb
 
 
