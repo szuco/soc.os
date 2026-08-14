@@ -1,31 +1,45 @@
 # 11 – Motordaten und Messprotokoll
 
 Quelle: Herstellerdatenblatt des Klappladen-Antriebs (Drehflügelmotor für
-Fensterläden), vom Nutzer bereitgestellt.
+Fensterläden), ergänzt um Angaben des Nutzers zum realen Motor.
 
-## 1. Was das Datenblatt liefert
+> **Korrektur gegenüber der ersten Fassung dieses Dokuments.**
+> Ich hatte aus der Zeile „Art des Endschalters: dynamisch" geschlossen, der Motor
+> bringe eigene Elektronik mit Hinderniserkennung mit, und daraus zwei angenehme
+> Folgerungen gezogen: PWM sei vermutlich verboten, und die interne Strombegrenzung
+> deckele den Blockierstrom auf ≈ 4,6 A.
+>
+> **Beides war falsch.** Der Motor hat **keine eigene Elektronik**. Die dynamische
+> Hinderniserkennung leistet der externe Controller — also genau das Gerät, das
+> dieses Projekt ersetzt. Der Motor ist ein **blanker Bürsten-DC-Getriebemotor mit
+> zwei Adern**. Die Konsequenzen stehen in Abschnitt 3 und gehen in die
+> unangenehme Richtung.
+
+## 1. Gesicherte Daten
 
 | Angabe | Wert | Bedeutung fürs Design |
 |---|---|---|
 | Spannung | **24 V DC ±10 %** (21,6–26,4 V) | bestätigt den Power-Tree |
-| Leistung | **100 W** | Auslegungsgrenze — siehe Abschnitt 2 |
+| Leistung (Typenschild) | **100 W** | siehe Abschnitt 2 — **keine harte Obergrenze** |
 | Motormoment | **25 Nm** | |
 | Drehzahl | **1,9 U/min** | |
-| Öffnungs-/Schließzeit | **18 s** | ≈ 205° Schwenk — **Timeout kann von 60 s auf ~30 s** |
-| **Art des Endschalters** | **dynamisch, stoppt bei Hindernissen** | **ändert die Architektur — Abschnitt 3** |
-| Betriebstemperatur | −20 … +60 °C | Außenanwendung, unkritisch für die Elektronik in der Dose |
-| Höchstgewicht je Flügel | 50 kg | mechanisch, keine Auswirkung |
+| Fahrzeit | **18 s** (≈ 205° Schwenk) | Timeout **30 s** |
+| **Adern je Motor** | **2** | **Umpolung ⇒ H-Brücke zwingend** |
+| Eigene Elektronik | **keine** | Hinderniserkennung ist Aufgabe **dieses** Geräts |
+| Betriebstemperatur | −20 … +60 °C | betrifft nur den Motor, nicht die Elektronik in der Dose |
+| Höchstgewicht je Flügel | 50 kg | mechanisch |
 
-## 2. Die 100 W sind fast sicher **nicht** die Laufleistung
+Anschluss am unteren Steckverbinder: 2 × 24 V-Versorgung + 4 Motoradern = **6 Pins**.
+Das bestätigt das bestehende Pinout in [`04-mechanical.md`](04-mechanical.md).
 
-Nachgerechnet aus Moment und Drehzahl:
+## 2. Laufstrom niedrig, Blockierstrom offen
+
+Die Rechnung aus Moment und Drehzahl gilt unverändert — sie ist reine Physik und
+hängt nicht an der Elektronikfrage:
 
 ```
 P_mech = 25 Nm × (1,9 U/min × 2π/60) = 25 × 0,199 rad/s ≈ 4,97 W
 ```
-
-Das Typenschild nennt **100 W — das Zwanzigfache der mechanischen Abtriebsleistung.**
-Selbst mit einem sehr schlechten Schneckengetriebe geht die Rechnung nicht auf:
 
 | Getriebewirkungsgrad | elektrische Aufnahme | Strom bei 24 V |
 |---:|---:|---:|
@@ -34,109 +48,103 @@ Selbst mit einem sehr schlechten Schneckengetriebe geht die Rechnung nicht auf:
 | 30 % | 16,6 W | 0,69 A |
 | 20 % | 24,9 W | 1,04 A |
 
-**Schlussfolgerung:** Die 100 W sind die **Maximal- bzw. Blockierleistung**, nicht der
-Dauerbetrieb. Der reale Laufstrom liegt vermutlich bei **0,3–1,0 A**, nicht bei 4,17 A.
+**Der Laufstrom liegt also weiterhin bei etwa 0,3–1,0 A.** Das Typenschild nennt
+100 W — das Zwanzigfache der Abtriebsleistung.
 
-Falls das stimmt — und das ist eine Schlussfolgerung, keine Messung — hätte es
-angenehme Folgen:
+**Was sich geändert hat:** Ohne interne Elektronik gibt es **nichts, was den Strom
+begrenzt.** Bei blockiertem Läufer gilt schlicht
 
-| Größe | bisher angenommen | mit 100 W als Obergrenze |
-|---|---:|---:|
-| Strom je Motor, Dauer | 4,17 A | ≈ 0,3–1,0 A |
-| Strom je Motor, Maximum | unbekannt, evtl. 25 A | **4,63 A** (bei 21,6 V) |
-| Eingangsstrom, beide Motoren | ≈ 9,0 A | **≈ 10 A Spitze, ≈ 2 A Dauer** |
-| Hardware-Hard-Trip | 13 A | vermutlich **6–7 A** je Kanal ausreichend |
+```
+I_Blockier = U / R_Anker
+```
 
-Ein Bürsten-DC-Motor **ohne** Elektronik hätte einen Blockierstrom von U/R_Wicklung —
-leicht 20–30 A. Dass das Datenblatt 100 W als harte Grenze nennt, passt nur zusammen,
-wenn im Motor eine **strombegrenzende Elektronik** sitzt. Genau darauf deutet auch
-Abschnitt 3.
+und dieser Wert kann ein Vielfaches der 4,17 A betragen, die sich aus den 100 W
+ergeben. Bei Bürsten-DC-Motoren dieser Klasse sind **8–30 A** plausibel. Die 100 W
+sind dann eher die Nennaufnahme oder die empfohlene Netzteilgröße, keine Schranke.
 
-## 3. Der wichtigste Fund: „Dynamischer Endschalter"
+> **Die Spreizung ist die eigentliche Nachricht:** Laufstrom ≈ 0,5 A, Blockierstrom
+> vielleicht 20 A — ein Faktor 40. Für die **Lasterkennung ist das ideal**, weil das
+> Nutzsignal riesig ist. Für die **Leistungsauslegung ist es unangenehm**, weil die
+> Endstufe einen Strom überstehen muss, der weit über allem liegt, was im
+> Normalbetrieb je fließt.
 
-> **„Art des Endschalters: Dynamisch (stoppt bei Hindernissen)"**
+## 3. Was die Korrektur zurückholt
 
-Der Motor bringt **eigene Elektronik mit Hinderniserkennung** mit. Das ist kein
-Detail, sondern greift die Architektur an drei Stellen an:
+Die erste Fassung hatte drei Vereinfachungen in Aussicht gestellt. Alle drei sind
+hinfällig:
 
-### 3.1 PWM ist damit vermutlich verboten
+| erste Fassung (falsch) | tatsächlich |
+|---|---|
+| PWM vermutlich verboten | **PWM ist erlaubt** — nichts im Motor, das gestört werden könnte. Geschwindigkeitsreduzierung bleibt möglich |
+| Stall-Erkennung redundant | **Stall-Erkennung ist Kernfunktion.** Ohne sie fährt der Antrieb gegen ein Hindernis, bis der Timeout greift |
+| PWM-synchrone Messung entfällt | **Bleibt in voller Schärfe** — samt Konflikt mit ESPHomes Polling-Modell und dem Bedarf an einer C++-Komponente |
+| Hard-Trip evtl. 6–7 A ausreichend | **Muss den vollen Blockierstrom abkönnen**, Größenordnung 15–25 A |
+| Steckverbinder-Engpass entschärft | Dauerstrom klein, aber **Blockierstrom über den Steckverbinder** muss er aushalten |
 
-Motoren mit interner Auswertung erwarten **saubere Gleichspannung**. Wird die
-Versorgung zerhackt, misst die interne Elektronik einen falschen Strom- bzw.
-Gegen-EMK-Verlauf und die Hinderniserkennung wird unzuverlässig — im schlimmsten Fall
-löst sie ständig aus oder gar nicht mehr.
+Damit gelten [`02-motor-control.md`](02-motor-control.md) und
+[`09-display-and-mcu.md`](09-display-and-mcu.md) Abschnitt 4 wieder unverändert.
 
-**Konsequenz, wenn bestätigt:** Die geplante PWM-Geschwindigkeitsregelung entfällt.
-Die H-Brücke schaltet dann nur noch **voll ein / Richtung / aus**. Das ist eine
-deutliche Vereinfachung:
-
-- kein PWM-Timing, keine Schaltverluste, kein 20-kHz-Störspektrum in der Dose
-- **die PWM-synchrone Strommessung aus [`02`](02-motor-control.md) und [`09`](09-display-and-mcu.md)
-  entfällt komplett** — damit auch der Konflikt mit ESPHomes Polling-Modell und der
-  Zwang zur C++-External-Component für die Motorregelung
-- ein einfacher Low-Side-Shunt reicht, weil es keine Freilaufphase mit
-  zerhacktem Strom mehr gibt
-
-### 3.2 Die Stall-Erkennung ist weitgehend redundant
-
-Das aufwendige Konzept aus [`02`](02-motor-control.md) Abschnitt 6 — schneller
-Mittelwert gegen langsame Baseline, PWM absenken, dann abschalten — löst ein Problem,
-das der Motor bereits selbst löst.
-
-Was **bleibt** sinnvoll:
-- Strommessung zur **Diagnose** (Lastanstieg über Monate → Scharnier trocken)
-- **Timeout** als Backstop, jetzt auf ~30 s statt 60 s
-- **Hardware-Hard-Trip** als Schutz gegen Kurzschluss und Elektronikfehler im Motor —
-  der bleibt uneingeschränkt nötig, unabhängig von jeder Motorintelligenz
-
-### 3.3 Umpolung könnte trotzdem nötig bleiben
-
-Manche solcher Antriebe haben drei Adern (gemeinsam + auf + zu), andere zwei mit
-Umpolung. Das Datenblatt sagt es nicht. **Die Aderzahl am realen Motor bestimmt, ob
-überhaupt eine H-Brücke gebraucht wird** oder nur zwei Relais/Halbbrücken.
+**Sicherheitsrelevant:** Klemmt ein Laden, steht der Motor unter voller
+Blockierspannung, bis etwas abschaltet. Es gibt keine Selbsthilfe im Motor. Die
+Kette Software-Soft-Limit → Hardware-Hard-Trip → Sicherung ist damit nicht Komfort,
+sondern **die einzige Schutzebene**. Sie muss auch bei nicht geladener Firmware
+wirken — deshalb bleibt der Comparator-plus-Latch pro Kanal zwingend.
 
 ## 4. Messprotokoll
 
-Drei Messungen, alle ohne Elektronik dieses Projekts — nur Labornetzteil und
-Strommessung. Danach ist der komplette Leistungsteil auslegbar.
+Drei Messungen, ohne Elektronik dieses Projekts — Labornetzteil und Strommessung.
 
-**Aufbau:** Labornetzteil 24 V mit Strombegrenzung auf 8 A und Stromanzeige, oder
-Netzteil plus Stromzange/Shunt am Oszilloskop. Ein einfaches Multimeter reicht **nicht**
-für den Anlaufstrom — der ist zu kurz.
+**Aufbau:** Labornetzteil 24 V mit einstellbarer Strombegrenzung und Anzeige, besser
+Stromzange oder Shunt am Oszilloskop. Für den Anlaufstrom reicht ein Multimeter
+**nicht** — er ist zu kurz.
 
 | # | Messung | Wie | Notieren |
 |---|---|---|---|
-| **M1** | **Laufstrom** | Motor unbelastet und mit montiertem Laden komplett auf/zu fahren | Mittelwert, Maximum, Verlauf über die 18 s |
-| **M2** | **Anlaufstrom** | Einschaltmoment, Oszilloskop oder Netzteil mit Peak-Hold | Spitzenwert, Dauer bis zum Einschwingen |
-| **M3** | **Blockierstrom** | Antrieb im Lauf **von Hand oder mechanisch blockieren** | Spitzenwert, ob und nach welcher Zeit die interne Abschaltung greift |
-| **M4** | **Verhalten mit PWM** | falls möglich: mit ~10 kHz PWM bei 50 % speisen | läuft er? reagiert die Hinderniserkennung noch korrekt? |
-| **M5** | **Aderzahl** | am Motorkabel abzählen | 2 Adern (Umpolung) oder 3 (gemeinsam/auf/zu)? |
+| **M1** | **Laufstrom** | Laden komplett auf und zu fahren, montiert | Mittelwert, Maximum, Verlauf über 18 s |
+| **M2** | **Anlaufstrom** | Einschaltmoment | Spitzenwert, Dauer bis zum Einschwingen |
+| **M3** | **Blockierstrom** | **Strombegrenzung am Netzteil auf 10 A**, Abtrieb blockieren, **maximal 1–2 s** | Strom bei Blockade; falls das Netzteil in die Begrenzung geht: Begrenzung schrittweise anheben |
+| **M6** | **Ankerwiderstand** | Motor **stromlos**, Multimeter an die zwei Adern, Welle langsam von Hand drehen | kleinster abgelesener Wert → `I_Blockier ≈ 24 V / R` |
 
-> **Zu M3, Sicherheitshinweis:** Blockieren nur kurz und mit Strombegrenzung am
-> Netzteil. Wenn die interne Elektronik abschaltet, ist das genau das gesuchte
-> Ergebnis — dann ist der Motor selbst der Begrenzer.
+> **M6 ist die sichere Alternative zu M3** und braucht nur ein Multimeter. Der
+> Bürstenübergang macht den Messwert winkelabhängig — deshalb drehen und den
+> **kleinsten** Wert nehmen. Ein Wert von z. B. 1,2 Ω bedeutet 20 A Blockierstrom.
+> Wenn du nur eine Messung machen willst, mach diese.
+
+> **Zu M3, Sicherheit:** nur kurz, nur mit Strombegrenzung, und den Motor danach
+> abkühlen lassen. Ein dauerhaft blockierter DC-Motor brennt durch.
 
 ### Was jede Messung freischaltet
 
 | Messung | Schaltet frei |
 |---|---|
-| M1 | Leiterbahnbreiten, Dauerstromauslegung, Kühlkonzept |
-| M2 | Bulk-Kondensatoren, Sicherungscharakteristik (träge/flink), Soft-Limit |
-| M3 | **Hard-Trip-Schwelle, MOSFET-/Treiberauswahl, Steckverbinder** |
-| M4 | H-Brücke mit PWM **oder** einfache Vollansteuerung — Architekturentscheidung |
-| M5 | H-Brücke **oder** nur zwei Schaltausgänge |
+| M1 | Leiterbahnbreiten für den Dauerbetrieb, Kühlkonzept, Shunt-Verlustleistung |
+| M2 | Bulk-Kondensatoren, Sicherungscharakteristik, Soft-Limit-Schwelle |
+| M3 / M6 | **Hard-Trip-Schwelle, MOSFET-/Treiberauswahl, Steckverbinder, Sicherung** |
 
-## 5. Was sich schon jetzt ändert
+## 5. Trotzdem weiterarbeiten: die defensive Auslegung
 
-Unabhängig vom Messergebnis:
+Der Schaltplan muss nicht auf die Messung warten. Er muss nur so ausgelegt werden,
+dass er den **ungünstigsten plausiblen Fall** übersteht — und dass die wenigen
+messabhängigen Größen als **Widerstandswerte** ausgeführt sind, die sich nachträglich
+ändern lassen, ohne das Layout anzufassen.
 
-- **Timeout 60 s → 30 s** (18 s Fahrzeit + Reserve). Alter Wert war eine Annahme ohne
-  Datenbasis, siehe [`02-motor-control.md`](02-motor-control.md).
-- **Der Steckverbinder-Engpass entschärft sich.** Statt 9 A Dauer sind es nach der
-  Rechnung in Abschnitt 2 eher 2 A Dauer und 10 A kurzzeitig. Micro-Fit 3.0 kommt damit
-  wieder ernsthaft in Frage — bestätigen nach M1/M2.
-- **Der Software-Interlock** (nie beide Motoren gleichzeitig) verliert seine
-  Dringlichkeit, bleibt aber sinnvoll.
-- **Betriebstemperatur −20 °C** betrifft nur den Motor, nicht die Elektronik in der
-  beheizten Innenwand. Kein Bauteil muss deshalb im erweiterten Temperaturbereich
-  gewählt werden.
+**Auslegungsannahme bis zur Messung: 25 A Blockierstrom je Kanal, 1 s lang.**
+
+| Bauteil | Auslegung | Messabhängig? |
+|---|---|---|
+| H-Brücke / MOSFETs | ≥ 30 A Peak, ≥ 10 A Dauer, R_DS(on) klein | nein — Reserve |
+| Shunt | 10 mΩ, ≥ 3 W, Kelvin | nein |
+| Current-Sense-Amp | Messbereich bis 30 A | nein |
+| **Comparator-Referenz** | **Widerstandsteiler** | **ja — ein Wert** |
+| **Soft-Limit** | Firmware-Konstante | **ja — eine Zahl** |
+| **Sicherung** | steckbar oder Lötsicherung | **ja — ein Bauteil** |
+| Bulk-Kondensator | 470–1000 µF, niedrig bauend | nein |
+| Steckverbinder | für 25 A kurzzeitig auswählen | nein |
+
+Damit hängen an der Messung genau **drei Werte**, keiner davon layoutrelevant. Der
+Bottom-Schaltplan kann also sofort beginnen; die Messung muss lediglich **vor der
+Bestellung** vorliegen.
+
+Umgekehrt gilt: Fällt der gemessene Blockierstrom deutlich unter 25 A, lassen sich
+Treiber und Steckverbinder später verkleinern. Zu klein anzufangen und nach der
+Messung neu zu layouten wäre der teurere Weg.

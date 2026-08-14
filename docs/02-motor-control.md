@@ -1,13 +1,15 @@
 # 02 – Motorsteuerung, Strommessung, Überstromschutz
 
-> **Achtung — das Motordatenblatt liegt inzwischen vor und stellt Teile dieses
-> Dokuments in Frage.** Siehe [`11-motor-data.md`](11-motor-data.md):
-> Der Antrieb hat einen **dynamischen Endschalter mit Hinderniserkennung**, also
-> eigene Elektronik. Wenn sich bestätigt, dass er kein PWM verträgt, entfallen
-> Abschnitt 3 (PWM), der Prüfpunkt zur PWM-synchronen Messung in Abschnitt 4 und
-> das Software-Konzept in Abschnitt 6 weitgehend. **Hardware-Hard-Trip (Abschnitt 5)
-> und Timeout bleiben in jedem Fall.** Die Fahrzeit beträgt real **18 s**, das
-> Timeout wird deshalb auf **30 s** gesetzt statt auf 60 s.
+> **Motordaten liegen vor — dieses Dokument gilt unverändert.**
+> Siehe [`11-motor-data.md`](11-motor-data.md): Der Antrieb ist ein **blanker
+> Bürsten-DC-Getriebemotor mit zwei Adern und ohne eigene Elektronik**. Damit ist die
+> H-Brücke zwingend, PWM ist erlaubt, und die **Hinderniserkennung ist Aufgabe dieses
+> Geräts** — es gibt keine Selbsthilfe im Motor.
+>
+> Geändert hat sich nur: Fahrzeit real **18 s**, Timeout deshalb **30 s** statt 60 s.
+> Der Laufstrom liegt bei ≈ 0,3–1,0 A, der **Blockierstrom ist unbegrenzt und
+> unbekannt** (Größenordnung 8–30 A). Die Schwellenwerte in Abschnitt 5 sind bis zur
+> Messung provisorisch.
 
 ## 1. Anforderung
 
@@ -55,9 +57,9 @@ Kanäle zwangsläufig identisch bleiben.
 - Signale je Kanal: `Mx_PWM`, `Mx_DIR`, `Mx_EN`, `Mx_FAULT`.
 - **Maximale Laufzeit einer Bewegung: 30 s** (Fahrzeit real 18 s + Reserve),
   danach zwingend Abschaltung.
-- Positionsfeedback: der Motor hat einen **eigenen dynamischen Endschalter**
-  (Datenblatt). Stromverlauf und Timeout sind damit Diagnose und Backstop, nicht mehr
-  die primäre Positionslogik — siehe [`11-motor-data.md`](11-motor-data.md).
+- Positionsfeedback erfolgt ausschließlich über Stromverlauf und Timeout. **Keine
+  Endschalter, keine Motorelektronik** — die Hinderniserkennung ist vollständig
+  Aufgabe dieses Geräts, siehe [`11-motor-data.md`](11-motor-data.md).
 
 ## 4. Strommessung
 

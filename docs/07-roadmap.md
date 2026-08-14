@@ -18,6 +18,10 @@
    verifizieren. → offene Punkte 2 und 3 in [`06-open-decisions.md`](06-open-decisions.md).
 
 ### Phase 2 – Bottom-Board Leistung
+> **Kann jetzt beginnen.** Der fehlende Blockierstrom blockiert den Schaltplan nicht:
+> defensive Auslegung auf 25 A nach [`11-motor-data.md`](11-motor-data.md) Abschnitt 5,
+> die drei messabhängigen Werte sind nachträglich änderbar.
+
 3. Power-Tree im Bottom-Schaltplan aufbauen: 24-V-Schutz, 24 → 5 V, 5 → 3,3 V,
    24 → 6,2 V, USB-Power-OR.
 4. Konkrete Buck-Regler auswählen und **strikt nach Hersteller-Referenzlayout**
@@ -43,9 +47,10 @@
 
 Diese Punkte hängen nicht am Layout und können jederzeit vorgezogen werden:
 
-- **Anlauf- und Blockierstrom der Motoren messen.** Das ist der kritische Pfad für
-  Sicherungen, Trip-Schwellen, FET-Auswahl und Steckverbinder — je früher, desto besser.
-  Ohne diesen Wert bleiben alle Schutzschwellen provisorisch.
+- **Ankerwiderstand der Motoren messen (M6).** Multimeter an die zwei Adern, Welle
+  langsam drehen, kleinsten Wert nehmen → Blockierstrom = 24 V / R. Fünf Minuten
+  Arbeit, und alle Schutzschwellen werden aus Annahmen zu Zahlen.
+  Protokoll: [`11-motor-data.md`](11-motor-data.md) Abschnitt 4.
 - Entscheidung, ob beide Motoren gleichzeitig laufen dürfen.
 - Musterbestellung für Radar-Modul, OLED und Sensoren, um Abmessungen und
   Stromaufnahme mit realen Teilen zu bestätigen.
