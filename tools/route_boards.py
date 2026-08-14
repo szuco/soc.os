@@ -131,11 +131,21 @@ def route(name, passes=30, timeout=2400):
 
     if os.path.exists(ses):
         os.remove(ses)
+    log = os.path.join(SCRATCH, name + ".log")
+    # optimizer.max_passes=100 (Default) laeuft headless praktisch endlos -
+    # der Router selbst ist nach < 5 min fertig, danach begrenzen wir die
+    # Optimierung hart. improvement_threshold stoppt zusaetzlich frueher,
+    # sobald ein Durchlauf weniger als 1 % Verbesserung bringt.
     cmd = ["java", "-jar", JAR, "-de", dsn, "-do", ses, "-mp", str(passes),
-           "--gui.enabled=false", "--feature_flags.logging=false"]
-    r = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+           "--gui.enabled=false", "--feature_flags.logging=false",
+           "--router.optimizer.max_passes=6",
+           "--router.optimizer.improvement_threshold=0.01",
+           "--usage_and_diagnostic_data.disable_analytics=true"]
+    with open(log, "w") as lf:
+        r = subprocess.run(cmd, stdout=lf, stderr=subprocess.STDOUT,
+                           text=True, timeout=timeout)
     if not os.path.exists(ses):
-        tail = (r.stdout + r.stderr).strip().splitlines()[-6:]
+        tail = open(log).read().strip().splitlines()[-6:]
         raise RuntimeError("Freerouting ohne SES beendet:\n" + "\n".join(tail))
 
     if not pcbnew.ImportSpecctraSES(board, ses):
