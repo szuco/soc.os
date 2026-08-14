@@ -36,3 +36,6 @@ firmware/esphome/secrets.yaml
 
 # CAD-Zwischenstaende
 __pycache__/
+
+# Freerouting-Laufzeitlog (wird beim Routing im CWD angelegt)
+logs/
