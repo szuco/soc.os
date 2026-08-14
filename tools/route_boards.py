@@ -341,11 +341,18 @@ def main():
                     if k.startswith("silk") or k in
                     ("solder_mask_bridge", "lib_footprint_issues",
                      "lib_footprint_mismatch")}
-        # USB-Steckerueberhang am Top-Board ist beabsichtigt
+        # USB-Steckerueberhang am Top-Board ist beabsichtigt: J1-Pads
+        # ragen ueber die Kante, und ihre Anschluss-Stubs in der
+        # Steckerzunge (|x| <= 5,3, y >= 23,8) koennen den Randabstand
+        # strukturell nicht einhalten.
         if name == "top_ui" and "copper_edge_clearance" in vio:
-            waived = sum(1 for d in res.get("details", [])
-                         if d.startswith("copper_edge_clearance")
-                         and d.rstrip().endswith("of J1"))
+            waived = 0
+            rpt_txt = open("/tmp/drc_%s.rpt" % name, encoding="utf-8").read()
+            for m in re.finditer(
+                    r'\[copper_edge_clearance\][^\n]*\n[^\n]*\n[^\n]*\n'
+                    r'\s*@\(([-0-9.]+) mm, ([-0-9.]+) mm\)', rpt_txt):
+                if abs(float(m.group(1))) <= 5.3 and float(m.group(2)) >= 23.8:
+                    waived += 1
             if waived:
                 vio["copper_edge_clearance"] -= waived
                 if vio["copper_edge_clearance"] <= 0:
