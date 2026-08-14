@@ -1,0 +1,53 @@
+Menge,Designator,Wert,Footprint,Hinweis
+10,"C1,C10,C_M1A_B,C_M1B_B,C_M1_CS,C_M2A_B,C_M2B_B,C_M2_CS,U2_CB,U4_CB",100n,Capacitor_SMD:C_0603_1608Metric,
+1,C2,10u,Capacitor_SMD:C_1210_3225Metric,
+2,"C3,C4",470u/35V,Capacitor_SMD:CP_Elec_10x10.5,
+2,"C5,C6",1u,Capacitor_SMD:C_0603_1608Metric,
+4,"C7,C8,C9,U4_CO",22u,Capacitor_SMD:C_1210_3225Metric,
+2,"C_M1_F,C_M2_F",1n,Capacitor_SMD:C_0603_1608Metric,
+1,D1,SMBJ30A,Diode_SMD:D_SMB,
+1,D2,12V,Diode_SMD:D_SOD-123,
+1,D3,27V,Diode_SMD:D_SOD-123,
+2,"D4,D5",40V 3A,Diode_SMD:D_SMA,Vf klein waehlen - Verlust siehe docs/01
+4,"D_M1A_B,D_M1B_B,D_M2A_B,D_M2B_B",100V 1A,Diode_SMD:D_SOD-123,
+1,F1,15A traege,Fuse:Fuse_Bourns_MF-RG300,"messabhaengig, siehe docs/11"
+1,F2,0.5A,Fuse:Fuse_1812_4532Metric,
+1,J1,Power/Motor 6p,Connector_Molex:Molex_Micro-Fit_3.0_43045-0600_2x03_P3.00mm_Vertical,Micro-Fit 3.0 2x3 - Strombelastbarkeit pruefen
+1,J2,J_STK_A,Connector_PinSocket_1.27mm:PinSocket_2x20_P1.27mm_Vertical,
+1,J3,J_STK_B,Connector_PinSocket_1.27mm:PinSocket_2x20_P1.27mm_Vertical,
+1,J4,Stern,Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical,
+1,L1,2u2,Inductor_SMD:L_Bourns-SRP5030T,
+1,Q1,P-FET 60V 60A,Package_TO_SOT_SMD:TO-263-2,z.B. IRF4905S - bestaetigen
+8,"Q_M1A_H,Q_M1A_L,Q_M1B_H,Q_M1B_L,Q_M2A_H,Q_M2A_L,Q_M2B_H,Q_M2B_L",N-FET 40V 60A,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,"PowerPAK SO-8, Rds<5mOhm - Footprint bestaetigen"
+2,"R1,R10",100k,Resistor_SMD:R_0603_1608Metric,
+1,R2,100R,Resistor_SMD:R_0603_1608Metric,begrenzt Strom in D3 bei TVS-Ereignis
+1,R3,392k,Resistor_SMD:R_0603_1608Metric,
+1,R4,88k7,Resistor_SMD:R_0603_1608Metric,
+1,R5,180k,Resistor_SMD:R_0603_1608Metric,
+1,R6,40k2,Resistor_SMD:R_0603_1608Metric,
+2,"R7,R9",10k0,Resistor_SMD:R_0603_1608Metric,Trip-Schwelle - messabhaengig
+1,R8,40k2,Resistor_SMD:R_0603_1608Metric,Trip-Schwelle - messabhaengig
+1,R11,1k,Resistor_SMD:R_0603_1608Metric,Reset vom I2C-Expander
+1,R12,0R,Resistor_SMD:R_0603_1608Metric,einziger Verbindungspunkt Signal- und Leistungsmasse
+4,"R_M1_PU,R_M2_PU,U2_RC,U4_RC",10k,Resistor_SMD:R_0603_1608Metric,
+8,"R_M1A_HO,R_M1A_LO,R_M1B_HO,R_M1B_LO,R_M2A_HO,R_M2A_LO,R_M2B_HO,R_M2B_LO",10R,Resistor_SMD:R_0603_1608Metric,
+2,"R_M1_SH,R_M2_SH",1m0 1W,Resistor_SMD:R_2512_6332Metric,"4-Terminal, Kelvin - Pflicht"
+2,"R_M1_LNK,R_M2_LNK",0R,Resistor_SMD:R_0603_1608Metric,"Bruecke, erlaubt spaeteres Auftrennen zur Messung"
+2,"R_M1_F,R_M2_F",1k,Resistor_SMD:R_0603_1608Metric,
+1,U1,L78L12,Package_TO_SOT_SMD:SOT-89-3,30 mA Gate-Ladestrom
+2,"U2,U4",TPS54360,Package_SO:HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.4x3.2mm,
+1,U2_L,10u,Inductor_SMD:L_Bourns-SRP7028A,
+2,"U2_D,U4_D",60V 3A,Diode_SMD:D_SMB,
+1,U2_RH,53k6,Resistor_SMD:R_0603_1608Metric,
+1,U2_RL,10k2,Resistor_SMD:R_0603_1608Metric,
+2,"U2_RT_R,U4_RT_R",100k,Resistor_SMD:R_0603_1608Metric,fsw ca. 500 kHz - gegen Datenblatt pruefen
+2,"U2_CZ,U4_CZ",3n3,Capacitor_SMD:C_0603_1608Metric,
+1,U2_CO,47u,Capacitor_SMD:C_1210_3225Metric,
+1,U3,TLV62569,Package_TO_SOT_SMD:SOT-23-5,
+1,U4_L,33u,Inductor_SMD:L_Bourns-SRP7028A,
+1,U4_RH,68k1,Resistor_SMD:R_0603_1608Metric,
+1,U4_RL,10k0,Resistor_SMD:R_0603_1608Metric,
+4,"UM1A_DRV,UM1B_DRV,UM2A_DRV,UM2B_DRV",IR2104,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,
+2,"UM1_CS,UM2_CS",INA240A2,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,Pinbelegung gegen Datenblatt pruefen
+2,"UM1_CMP,UM2_CMP",LM393,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,
+2,"UM1_FF,UM2_FF",74AUP1G74,Package_TO_SOT_SMD:SOT-353_SC-70-5,D-FF mit PRE und CLR

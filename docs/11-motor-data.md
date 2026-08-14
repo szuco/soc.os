@@ -103,15 +103,17 @@ Stromzange oder Shunt am Oszilloskop. Für den Anlaufstrom reicht ein Multimeter
 | **M1** | **Laufstrom** | Laden komplett auf und zu fahren, montiert | Mittelwert, Maximum, Verlauf über 18 s |
 | **M2** | **Anlaufstrom** | Einschaltmoment | Spitzenwert, Dauer bis zum Einschwingen |
 | **M3** | **Blockierstrom** | **Strombegrenzung am Netzteil auf 10 A**, Abtrieb blockieren, **maximal 1–2 s** | Strom bei Blockade; falls das Netzteil in die Begrenzung geht: Begrenzung schrittweise anheben |
-| **M6** | **Ankerwiderstand** | Motor **stromlos**, Multimeter an die zwei Adern, Welle langsam von Hand drehen | kleinster abgelesener Wert → `I_Blockier ≈ 24 V / R` |
+| **M6** | **Ankerwiderstand** | Motor **stromlos**, Multimeter an die zwei Adern. Welle **nicht** von Hand drehbar (Schneckengetriebe selbsthemmend) — stattdessen: messen, Motor kurz ein Stück fahren, erneut messen, **10×** wiederholen | **kleinsten** aller Werte nehmen → `I_Blockier ≈ 24 V / R` |
+| **M7** | **Kleinspannungsmethode** | Labornetzteil auf **2 V**, Strom messen. Bei so wenig Spannung überwindet der Motor die Haftreibung des Schneckengetriebes nicht und steht | `I_Blockier ≈ 24 V × I_gemessen / 2 V` |
 
-> **M6 ist die sichere Alternative zu M3** und braucht nur ein Multimeter. Der
-> Bürstenübergang macht den Messwert winkelabhängig — deshalb drehen und den
-> **kleinsten** Wert nehmen. Ein Wert von z. B. 1,2 Ω bedeutet 20 A Blockierstrom.
-> Wenn du nur eine Messung machen willst, mach diese.
+> **Korrektur zu M6:** In der ersten Fassung stand „Welle langsam von Hand drehen".
+> Das geht bei einem selbsthemmenden Schneckengetriebe nicht. Der Bürstenübergang
+> macht den Messwert trotzdem winkelabhängig — deshalb mehrfach messen und den
+> Motor dazwischen mit eigener Kraft ein Stück versetzen.
 
-> **Zu M3, Sicherheit:** nur kurz, nur mit Strombegrenzung, und den Motor danach
-> abkühlen lassen. Ein dauerhaft blockierter DC-Motor brennt durch.
+> **M7 ist die verlässlichste einfache Messung.** Sie umgeht das Bürstenproblem
+> vollständig, weil der Strom über mehrere Lamellen mittelt, und braucht kein
+> Oszilloskop. Wenn du nur eine Messung machst, mach diese.
 
 ### Was jede Messung freischaltet
 
@@ -119,7 +121,7 @@ Stromzange oder Shunt am Oszilloskop. Für den Anlaufstrom reicht ein Multimeter
 |---|---|
 | M1 | Leiterbahnbreiten für den Dauerbetrieb, Kühlkonzept, Shunt-Verlustleistung |
 | M2 | Bulk-Kondensatoren, Sicherungscharakteristik, Soft-Limit-Schwelle |
-| M3 / M6 | **Hard-Trip-Schwelle, MOSFET-/Treiberauswahl, Steckverbinder, Sicherung** |
+| M3 / M6 / M7 | **Hard-Trip-Schwelle (R7/R8/R9), MOSFET-/Treiberauswahl, Steckverbinder, Sicherung F1** |
 
 ## 5. Trotzdem weiterarbeiten: die defensive Auslegung
 
@@ -133,17 +135,22 @@ messabhängigen Größen als **Widerstandswerte** ausgeführt sind, die sich nac
 | Bauteil | Auslegung | Messabhängig? |
 |---|---|---|
 | H-Brücke / MOSFETs | ≥ 30 A Peak, ≥ 10 A Dauer, R_DS(on) klein | nein — Reserve |
-| Shunt | 10 mΩ, ≥ 3 W, Kelvin | nein |
-| Current-Sense-Amp | Messbereich bis 30 A | nein |
-| **Comparator-Referenz** | **Widerstandsteiler** | **ja — ein Wert** |
+| Shunt | **1 mΩ**, 1 W, 4-Terminal/Kelvin | nein |
+| Current-Sense-Amp | INA240A2, Verstärkung 50, aus 3,3 V → ADC-sicher | nein |
+| **Comparator-Referenz** | Widerstandsteiler **R7/R8/R9** | **ja — drei Widerstände** |
 | **Soft-Limit** | Firmware-Konstante | **ja — eine Zahl** |
-| **Sicherung** | steckbar oder Lötsicherung | **ja — ein Bauteil** |
+| **Sicherung** | **F1**, aktuell 15 A träge | **ja — ein Bauteil** |
 | Bulk-Kondensator | 470–1000 µF, niedrig bauend | nein |
 | Steckverbinder | für 25 A kurzzeitig auswählen | nein |
 
-Damit hängen an der Messung genau **drei Werte**, keiner davon layoutrelevant. Der
-Bottom-Schaltplan kann also sofort beginnen; die Messung muss lediglich **vor der
-Bestellung** vorliegen.
+Damit hängen an der Messung genau **drei Positionen**, keine davon layoutrelevant.
+Der Bottom-Schaltplan ist auf dieser Basis **fertig** — siehe
+[`../hardware/bottom_power_motor/`](../hardware/bottom_power_motor/). Die Messung
+muss lediglich **vor der Bestellung** vorliegen.
+
+Konkret im erzeugten Schaltplan: Mit **1 mΩ Shunt** und **INA240A2 (Verstärkung 50)**
+liegt der Messbereich bei ±33 A, die Trip-Schwelle über R7/R8/R9 bei **±22 A**.
+Ergibt die Messung deutlich weniger, werden nur diese drei Widerstände getauscht.
 
 Umgekehrt gilt: Fällt der gemessene Blockierstrom deutlich unter 25 A, lassen sich
 Treiber und Steckverbinder später verkleinern. Zu klein anzufangen und nach der

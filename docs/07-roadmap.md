@@ -4,10 +4,10 @@
 
 - Systemspezifikation und Mechanik dokumentiert
 - Repository-Struktur angelegt
-- **Bottom-Board:** begonnen — Board-Outline als Kreis auf `Edge.Cuts` mit Radius 26,0 mm
-  (Ø 52 mm), Board-Dicke 1,0 mm über *Board Setup → Physical Stackup*
-- KiCad-Projektdateien noch nicht im Repository, siehe
-  [`08-kicad-workflow.md`](08-kicad-workflow.md)
+- **Bottom-Board: Mechanik und Schaltplan fertig.** Ø-52-mm-Outline, Bohrbild,
+  103 Bauteile, 105 Netze, netzlistengeprüft gegen die Soll-Konnektivität
+- Stückliste erzeugt, Stack-Pinout v0.2 daraus abgeleitet
+- **Offen ab hier: das Layout des Bottom-Boards**, danach Mid und Top
 
 ## Reihenfolge
 
@@ -17,20 +17,22 @@
 2. Konkreten Hochstrom-Steckverbinder auswählen und dessen Stromrating und Footprint
    verifizieren. → offene Punkte 2 und 3 in [`06-open-decisions.md`](06-open-decisions.md).
 
-### Phase 2 – Bottom-Board Leistung
-> **Kann jetzt beginnen.** Der fehlende Blockierstrom blockiert den Schaltplan nicht:
-> defensive Auslegung auf 25 A nach [`11-motor-data.md`](11-motor-data.md) Abschnitt 5,
-> die drei messabhängigen Werte sind nachträglich änderbar.
+### Phase 2 – Bottom-Board Leistung ✅
+3. ~~Power-Tree aufbauen~~ — erledigt: 24-V-Schutz, 24 → 5 V, 5 → 3,3 V, 24 → 6,2 V,
+   12-V-Gate-Versorgung, USB-ORing.
+4. ~~Buck-Regler auswählen~~ — TPS54360DDA (2×), TLV62569DBV.
+   **Offen:** Reglerlayout gegen Hersteller-Referenzdesign abgleichen (beim Routing).
 
-3. Power-Tree im Bottom-Schaltplan aufbauen: 24-V-Schutz, 24 → 5 V, 5 → 3,3 V,
-   24 → 6,2 V, USB-Power-OR.
-4. Konkrete Buck-Regler auswählen und **strikt nach Hersteller-Referenzlayout**
-   dimensionieren.
+### Phase 3 – Motorkanal ✅
+5. ~~H-Brücke entwickeln und duplizieren~~ — beide Kanäle identisch aus derselben
+   Funktion erzeugt, damit sie nicht auseinanderlaufen können.
+6. ~~Shunt, Sense-Amplifier, Comparator und Latch~~ — 1 mΩ inline, INA240A2,
+   LM393-Fenster, 74AUP1G74 auf `~SD`.
 
-### Phase 3 – Motorkanal
-5. Motor-H-Bridge Kanal 1 vollständig entwickeln und prüfen, anschließend identisch für
-   Kanal 2 duplizieren.
-6. Shunt und Sense-Amplifier sowie Hardware-Comparator/Latch hinzufügen.
+### Phase 3b – Bottom-Board Layout ← **hier weiter**
+6a. Bauteile platzieren, Leistungspfade kurz und breit routen, Sternpunkt AGND/PGND
+    über R12, Reglerlayouts nach Referenzdesign.
+6b. Schaltungsreview: IC-Pinbelegungen gegen Datenblätter, Reglerdimensionierung.
 
 ### Phase 4 – Stack und weitere Boards
 7. Stackverbinder und endgültiges Pinmapping in allen drei Projekten identisch

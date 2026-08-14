@@ -1,7 +1,13 @@
 # Stückliste und Fertigung
 
-> **Status ehrlich benannt:** Dies ist eine **Auswahl- und Beschaffungsliste**, keine
-> fertigungsfähige BOM. Eine bestellbare BOM entsteht erst aus dem fertigen Schaltplan
+> **Für das Bottom-Board gibt es jetzt eine erzeugte Stückliste:**
+> [`../bottom_power_motor/bom_bottom.csv`](../bottom_power_motor/bom_bottom.csv) —
+> 103 Bauteile, 52 Positionen, aus derselben Quelle wie der Schaltplan erzeugt und
+> damit garantiert konsistent. Was dort noch fehlt, sind Hersteller-Teilenummern für
+> die Leistungsbauteile.
+>
+> **Status ehrlich benannt:** Der Rest hier ist eine **Auswahl- und Beschaffungsliste**,
+> keine fertigungsfähige BOM. Eine bestellbare BOM entsteht erst aus dem fertigen Schaltplan
 > — Referenzbezeichner (`R1`, `U3`, …), Werte und Footprints kommen aus KiCad. Ohne
 > Layout gibt es auch keine Positionsdatei (CPL) und keine Gerber. Was noch fehlt,
 > steht unten unter „Weg zur Bestellung".
@@ -26,21 +32,20 @@ Begründung der Displaywahl im Detail: [`../../docs/09-display-and-mcu.md`](../.
 
 | Funktion | Kandidat | Kernkriterium bei der Auswahl |
 |---|---|---|
-| Motortreiber ×2 | integrierte Vollbrücke mit **PWM/DIR-Interface**, ≥ 5 A Dauer, ≥ 15 A Peak, 24 V+ | **Thermik im geschlossenen Gehäuse ohne Luftstrom** — das ist die eigentliche Hürde, nicht der Nennstrom |
-| Shunt ×2 | 10 mΩ, ≥ 2 W, 4-Terminal (Kelvin) | 4-Terminal ist Pflicht, nicht optional |
-| Current-Sense-Amp ×2 | bidirektional, für Inline-Messung geeignet | siehe Sense-Topologie unten |
-| Comparator + Latch ×2 | Comparator mit Referenz + SR-Latch | **muss ohne Firmware wirken** |
-| Buck 24→5 V | ≥ 3 A, synchron | strikt nach Referenzlayout |
-| Buck 5→3,3 V | ≥ 1,5 A | |
-| Buck 24→6,2 V | ≥ 0,5 A, einstellbar | für den Weihnachtsstern |
-| Power-Mux USB/24 V | Ideal-Diode-Controller | Priorität 24 V vor USB, kein Rückstrom in den PC |
+| Gate-Treiber ×4 | **IR2104** (Halbbrücke, `~SD`-Eingang) | zwei je Motorkanal; `~SD` ist der Eingriffspunkt des Hardware-Trips |
+| Shunt ×2 | **1 mΩ**, 1 W, 4-Terminal (Kelvin), 2512 | 4-Terminal ist Pflicht; Wert folgt aus INA240-Verstärkung 50 |
+| Current-Sense-Amp ×2 | **INA240A2D** | bidirektional, hoher Gleichtaktbereich, PWM-tauglich |
+| Comparator + Latch ×2 | **LM393** (Fenster) + **74AUP1G74** | wirkt ohne Firmware |
+| Buck 24→5 V | **TPS54360DDA** | strikt nach Referenzlayout aufbauen |
+| Buck 5→3,3 V | **TLV62569DBV** | |
+| Buck 24→6,2 V | **TPS54360DDA** (gleiches Teil wie oben) | für den Weihnachtsstern |
+| USB-ORing | 2× Schottky (D4/D5) | einfach, kein Rückstrom; bei hoher 5-V-Last durch Ideal-Diode ersetzen |
 
-> Ich nenne hier bewusst **keine konkreten Hersteller-Teilenummern für die
-> Leistungspfade**. Die Auswahl hängt am realen Anlauf- und Blockierstrom der Motoren
-> ([`../../docs/06-open-decisions.md`](../../docs/06-open-decisions.md), Punkt 1), und
-> der ist nicht gemessen. Ein Treiber, der für 4,17 A nominal passt, kann bei einem
-> Blockierstrom von 25 A sofort sterben. Diese Messung ist der Türöffner für den
-> gesamten Leistungsteil.
+> **Einzige offene Leistungsposition: der N-Kanal-MOSFET** (8 Stück). Er bestimmt,
+> welchen Blockierstrom die Endstufe übersteht, und genau der ist nicht gemessen.
+> Vorgabe bis dahin: 40 V, ≥ 60 A Puls, PowerPAK SO-8, Rds(on) < 5 mΩ. Die diskrete
+> Topologie wurde bewusst gewählt, damit diese eine Entscheidung nachträglich
+> änderbar bleibt.
 
 ### Sensorik und Kommunikation
 

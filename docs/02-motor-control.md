@@ -29,17 +29,17 @@ messen (Protokoll M1–M3).
 
 ## 2. Architektur
 
-Zwei gleichwertige Optionen, Entscheidung offen:
+**Entschieden: diskret.** Je Brücke zwei **IR2104**-Halbbrückentreiber und vier
+N-Kanal-MOSFETs. Ausschlaggebend war der unbekannte Blockierstrom — ein integrierter
+Treiber legt seine Stromgrenze fest, bevor sie gemessen ist. Mit diskreten FETs
+bestimmt die FET-Auswahl die Grenze, und die lässt sich nach der Messung ändern,
+ohne die Topologie anzufassen.
 
-- **Diskret:** vier N-Kanal-MOSFETs pro Brücke plus High-/Low-Side-Gate-Driver.
-  Mehr Fläche, aber bessere Kontrolle über RDS(on), Verlustleistung und Sense-Topologie.
-- **Integriert:** ein ausreichend dimensionierter Motor-Treiber-IC.
-  Deutlich platzsparender auf Ø 52 mm und mit fertigem Schutzkonzept — die entscheidende
-  Prüffrage ist die thermische Belastbarkeit im geschlossenen Unterputzgehäuse ohne
-  Luftstrom.
+Der IR2104 bringt zudem einen `~SD`-Eingang mit, über den der Hardware-Latch die
+Endstufe direkt abschaltet — ohne Umweg über Logik oder Firmware.
 
-Auf einer runden Ø-52-mm-Platine mit zwei Kanälen, DC/DC-Wandlern und Steckverbinder
-ist der Platz knapp. Die integrierte Variante sollte deshalb zuerst geprüft werden.
+Preis dafür: acht FETs und vier Treiber auf Ø 52 mm. Das Board wird dicht und
+beidseitig bestückt.
 
 **Vorgehen:** Kanal 1 vollständig entwickeln und prüfen, danach identisch für Kanal 2
 duplizieren. In KiCad über hierarchische Sheets mit demselben Sheet-File, damit beide
@@ -54,7 +54,10 @@ Kanäle zwangsläufig identisch bleiben.
     hunderte Nanosekunden, wird vom Gate-Driver bzw. Treiber-IC geliefert.
   - *Mechanische Stopzeit* vor der Umpolung, damit der Motor wirklich steht.
     Startwert ≥ 300 ms, empirisch zu bestimmen.
-- Signale je Kanal: `Mx_PWM`, `Mx_DIR`, `Mx_EN`, `Mx_FAULT`.
+- Signale je Kanal: **`Mx_INA`, `Mx_INB`** — je ein PWM-faehiger Ausgang pro
+  Bruueckenzweig. Vorwaerts = INA moduliert, INB low; rueckwaerts umgekehrt; beide
+  low = bremsen. Das spart die frueher vorgesehenen `DIR`/`EN`-Leitungen und die
+  externe Verknuepfungslogik. `~SD` der Treiber gehoert allein dem Hardware-Trip.
 - **Maximale Laufzeit einer Bewegung: 30 s** (Fahrzeit real 18 s + Reserve),
   danach zwingend Abschaltung.
 - Positionsfeedback erfolgt ausschließlich über Stromverlauf und Timeout. **Keine
@@ -66,17 +69,20 @@ Kanäle zwangsläufig identisch bleiben.
 Die eigentliche Last- und Widerstandserkennung erfolgt in Software. Dafür erhält jeder
 Motor eine **getrennte** analoge Strommessung.
 
-**Startpunkt:** Low-Side-Shunt ≈ **10 mΩ**, Kelvin-Anschluss, ausreichend leistungsfähig
-(≥ 2 W), plus Current-Sense-Amplifier. Verlustleistung am Shunt:
+**Umgesetzt im Schaltplan:** **Inline-Shunt 1 mΩ**, 4-Terminal (Kelvin), 1 W, im
+Zweig A jeder Brücke — plus **INA240A2** (Verstärkung 50, bidirektional). Die
+Inline-Position löst das Freilaufproblem im Prüfpunkt unten; INA240 ist genau für
+diesen Fall gebaut und unterdrückt PWM-Gleichtaktsprünge.
 
-| Strom | P am 10-mΩ-Shunt | Sense-Spannung |
-|---|---|---|
-| 4,17 A nominal | 0,17 W | 41,7 mV |
-| 5 A | 0,25 W | 50 mV |
-| 13 A Hard-Trip | 1,69 W | 130 mV |
+| Strom | P am 1-mΩ-Shunt | Shuntspannung | INA240-Ausgang (Offset 1,65 V) |
+|---|---|---|---|
+| 0,5 A Lauf | 0,25 mW | 0,5 mV | 1,68 V |
+| 4,17 A | 17 mW | 4,2 mV | 1,86 V |
+| 22 A Trip | 0,48 W | 22 mV | 2,75 V |
+| 33 A Vollausschlag | 1,09 W | 33 mV | 3,30 V |
 
-Die 2-W-Vorgabe ist damit für den Trip-Punkt richtig dimensioniert; bei häufigen
-Blockierereignissen ist 3 W die sicherere Wahl.
+Der Verstärker läuft aus **3,3 V**, damit sein Ausgang den ADC-Eingang bauartbedingt
+nicht überfahren kann. Vor dem ADC sitzt ein RC-Filter 1 kΩ / 1 nF.
 
 Sense-Ausgänge `I_SENSE1` und `I_SENSE2` gehen an den ESP32 bzw. optional an einen
 externen ADC. Optionales RC-Filter am ADC-Eingang reduziert PWM-Ripple.
@@ -88,21 +94,15 @@ externen ADC. Optionales RC-Filter am ADC-Eingang reduziert PWM-Ripple.
 > passieren. Bei reduzierter PWM misst man dann systematisch zu wenig — genau in dem
 > Betriebsfall, in dem die Lasterkennung gebraucht wird.
 >
-> Zwei saubere Auswege:
-> - **Sampling mit der PWM synchronisieren** und ausschließlich in der aktiven Phase
->   messen. Erfordert einen ADC, dessen Trigger an das PWM-Timing gekoppelt ist — beim
->   ESP32-eigenen ADC unbequem und ein weiteres Argument für einen externen ADC.
-> - **Inline-Messung im Motorzweig** mit bidirektionalem Current-Sense-Amplifier mit
->   ausreichendem Gleichtaktbereich. Misst in jedem PWM-Zustand und liefert zusätzlich
->   das Vorzeichen, kostet aber einen teureren CSA.
->
-> Die Entscheidung fällt zusammen mit der Wahl von H-Bridge und CSA und ist in
-> [`06-open-decisions.md`](06-open-decisions.md) offen geführt.
+> **Entschieden: Inline-Messung.** Der Shunt sitzt im Motorzweig, nicht im
+> Low-Side-Rückpfad. Der INA240A2 hat den dafür nötigen Gleichtaktbereich und ist
+> ausdrücklich für geschaltete Motorzweige gebaut. Damit misst die Schaltung in
+> **jedem** PWM-Zustand und liefert zusätzlich das Vorzeichen des Stroms.
 
 > **Prüfpunkt — ADC-Qualität.** Der interne ESP32-ADC ist nichtlinear und rauscht
-> merklich. Für eine Lasterkennung, die auf *relativen* Änderungen beruht, kann er
-> ausreichen; für reproduzierbare Absolutwerte und PWM-synchrones Sampling ist ein
-> externer ADC auf dem Mid-Board die belastbarere Lösung.
+> merklich. Für eine Lasterkennung, die auf *relativen* Änderungen beruht, reicht er;
+> für reproduzierbare Absolutwerte wäre ein externer ADC besser. Die Entscheidung ist
+> offen (Punkt 18) und **layoutneutral**: `I_SENSE1/2` liegen ohnehin auf `J_STK_A`.
 
 ## 5. Hardwareseitiger Überstromschutz
 
@@ -113,25 +113,29 @@ ESP32 und Firmware** und muss auch bei abgestürzter oder nicht geladener Firmwa
 **Hardware-Trip pro Motor, nicht global** — ein Fehler an einem Kanal darf nicht
 zwangsläufig beide Kanäle abschalten.
 
-| Grenze | Startwert | Wirkung |
-|---|---|---|
-| Software-Soft-Limit | ≈ 9 A | PWM reduzieren, dann abschalten |
-| Hardware-Hard-Trip | ≈ 13 A | Gate-Driver-Shutdown, **latched** |
+| Grenze | Startwert | Wirkung | Realisierung |
+|---|---|---|---|
+| Software-Soft-Limit | noch offen | PWM reduzieren, dann abschalten | Firmware |
+| Hardware-Hard-Trip | **± 22 A** | `~SD` der IR2104 → Endstufe aus, **latched** | LM393-Fensterkomparator + 74AUP1G74, Schwelle über R7/R8/R9 |
 
-Diese Werte sind vorläufig und müssen nach Messung der realen Anlauf- und Blockierströme
-angepasst werden. Der Latch braucht einen definierten Reset-Pfad vom ESP32 (`TRIP_RST`)
-und einen Zustand, den die Firmware lesen kann (`HW_TRIP1`/`HW_TRIP2`).
+Der Fensterkomparator trippt in **beiden** Stromrichtungen — bei Umpolung fließt der
+Strom durch den Shunt in die andere Richtung, ein einzelner Komparator würde die
+Hälfte der Fälle verpassen. Die beiden Open-Drain-Ausgänge sind auf eine aktiv-low
+Leitung verdrahtet, die den Latch asynchron über `~PRE` setzt.
+
+Der Latch (74AUP1G74) wird beim Einschalten über ein RC-Glied gelöscht und lässt sich
+vom ESP32 über `TRIP_RST` zurücksetzen; sein Zustand geht als `HW_TRIP1`/`HW_TRIP2`
+zurück an die Firmware.
 
 Auslegungsregel für die Reihenfolge der Schwellen:
 
 ```
-Nennstrom  <  Anlaufstrom  <  Soft-Limit  <  Hard-Trip  <  Sicherung  <  FET-/Treiber-Grenze
- 4,17 A         (unbekannt)      ~9 A          ~13 A
+Laufstrom  <  Anlaufstrom  <  Soft-Limit  <  Hard-Trip  <  Sicherung  <  FET-/Treiber-Grenze
+ 0,3-1,0 A     (zu messen)    (zu messen)    ±22 A       15 A traege     >30 A
 ```
 
-Der noch unbekannte Anlaufstrom sitzt mitten in dieser Kette. Übersteigt er 9 A, löst
-das Soft-Limit bei jedem Start aus — deshalb ist die Messung der realen Anlaufströme der
-kritische Pfad für die gesamte Schutzauslegung.
+Anlaufstrom und Soft-Limit sind die einzigen noch offenen Glieder. Bis zur Messung
+gilt die defensive Auslegung aus [`11-motor-data.md`](11-motor-data.md) Abschnitt 5.
 
 ## 6. Software-Konzept
 

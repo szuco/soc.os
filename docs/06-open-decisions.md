@@ -26,16 +26,16 @@ erheblich. Für Klappläden ist sequenzieller Betrieb meist unproblematisch.
 
 | # | Prio | Entscheidung | Bemerkung |
 |---|---|---|---|
-| 4 | P1 | Buck 24 → 5 V, ca. 3 A | strikt nach Referenzlayout |
-| 5 | P1 | Buck 5 → 3,3 V, ca. 1,5 A | |
-| 6 | P1 | Buck 24 → 6,2 V, ca. 0,5 A | einstellbare Ausgangsspannung nötig |
-| 7 | P1 | H-Bridge: diskret (4× N-FET + Gate-Driver) oder integrierter Treiber | Platz auf Ø 52 mm spricht für integriert, Thermik im geschlossenen Gehäuse ist die Prüffrage |
-| 8 | P1 | MOSFET-Typ, falls diskret | RDS(on) vs. Gate-Ladung vs. Bauhöhe |
-| 9 | P1 | Current-Sense-Amplifier | zusammen mit #10 zu entscheiden |
-| 10 | **P1** | **Sense-Topologie: Low-Side-Shunt mit PWM-synchronem Sampling oder Inline-Messung** | siehe Prüfpunkt in [`02-motor-control.md`](02-motor-control.md); bestimmt, ob die Lasterkennung bei reduzierter PWM überhaupt funktioniert |
-| 11 | P1 | Comparator + Latch für den Hard-Trip | muss ohne Firmware wirken, Reset-Pfad über `TRIP_RST` |
-| 12 | P1 | Ideal-Diode-Controller / Power-Mux für USB-ORing | Priorität 24 V vor USB |
-| 13 | P1 | Sitzt der Power-Mux auf TOP oder BOTTOM? | folgt aus #12; betrifft `5V_SYS`-Richtung im Stack |
+| ~~4~~ | ✅ | **TPS54360DDA**, 60 V Eingang | Layout noch nach Referenzdesign prüfen |
+| ~~5~~ | ✅ | **TLV62569DBV**, 180k/40k2 → 3,29 V | |
+| ~~6~~ | ✅ | **TPS54360DDA**, 68k1/10k0 → 6,25 V — gleiches Bauteil wie #4 | |
+| ~~7~~ | ✅ | **Diskret: 2× IR2104 + 4 N-FET je Kanal.** Begründung in [`02-motor-control.md`](02-motor-control.md) Abschnitt 2 | |
+| 8 | **P1** | **Konkreter N-FET-Typ** (40 V, ≥ 60 A, PowerPAK SO-8, Rds < 5 mΩ) | einziges Leistungsbauteil ohne Teilenummer; hängt am Blockierstrom |
+| ~~9~~ | ✅ | **INA240A2D**, Verstärkung 50, aus 3,3 V versorgt | Pinbelegung gegen Datenblatt prüfen |
+| ~~10~~ | ✅ | **Inline-Messung**, 1 mΩ Kelvin-Shunt im Motorzweig | löst das Freilaufproblem vollständig |
+| ~~11~~ | ✅ | **LM393 als Fensterkomparator + 74AUP1G74**, wirkt auf `~SD` der IR2104 | |
+| 12 | P2 | USB-ORing: aktuell **zwei Schottky-Dioden** (D4/D5) | einfach und richtig; bei > 1,5 A auf `5V_SYS` durch Ideal-Diode ersetzen |
+| ~~13~~ | ✅ | **BOTTOM**, `USB_VBUS` kommt über `J_STK_A` Pin 18 herunter | |
 | 14 | P2 | Bulk-Kondensatoren: Typ und Bauhöhe | 470–1000 µF, aber max. ≈ 10 mm Bauraum |
 
 ## Bauteilauswahl Logik und Peripherie
@@ -50,7 +50,7 @@ erheblich. Für Klappläden ist sequenzieller Betrieb meist unproblematisch.
 | 17 | P1 | Radar-Modul und dessen Versorgung/Logikpegel | Pegelanpassung nötig? Stromaufnahme? |
 | 18 | P1 | Externer ADC ja/nein | folgt aus #10; betrifft `J_STK_A` |
 | 19 | P1 | Temperatur- und Feuchtesensor | I2C-Adressen dürfen nicht kollidieren |
-| 20 | **P0** | **`J_STK_B` v0.2:** QSPI braucht 7 Leitungen, es fehlt genau ein Pin | siehe Änderungsverlauf in [`03-stack-pinout.md`](03-stack-pinout.md) |
+| ~~20~~ | ✅ | **`J_STK_B` v0.2** festgelegt, QSPI-Bus untergebracht | [`03-stack-pinout.md`](03-stack-pinout.md) |
 | 21 | P1 | Mini-Relais und die zu schaltende Spannung/Stromstärke | **wenn Netzspannung: Isolations- und Kriechstreckenkonzept, verändert die Board-Aufteilung** |
 | 22 | P2 | Speaker/Piezo und gewünschte Lautstärke | bestimmt Treiber und Stromaufnahme |
 | 23 | P1 | Stackverbinder-Serie im 1,27-mm-Raster | Stackhöhe 10 mm bzw. 8–10 mm, Stromrating |

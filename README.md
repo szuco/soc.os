@@ -21,7 +21,7 @@ EMV, Messqualität und Wartbarkeit zentral.
 ## Eckdaten
 
 - Versorgung: 24 V DC über zwei Adern
-- 2 × Jalousiemotor 24 V DC ±10 %, 100 W, Polarity-Reversal (≈ 4,17 A nominal je Motor)
+- 2 × Klappladenmotor 24 V DC ±10 %, 2 Adern, Umpolung — Laufstrom ≈ 0,3–1,0 A, Blockierstrom offen
 - Herrnhuter Mini-Weihnachtsstern 6,0–6,5 V / 0,5 W / ≈ 80 mA, nur im 24-V-Normalbetrieb
 - USB-C ausschließlich für Programmierung und Debug
 - Positionserkennung ausschließlich über Stromverlauf und Timeout, keine Endschalter
@@ -42,7 +42,7 @@ EMV, Messqualität und Wartbarkeit zentral.
 | [`docs/08-kicad-workflow.md`](docs/08-kicad-workflow.md) | KiCad-Konventionen, Bedienhinweise, Repo-Regeln |
 | [`docs/09-display-and-mcu.md`](docs/09-display-and-mcu.md) | Displaywahl, MCU, GPIO-Budget, ESPHome-Grenzen |
 | [`docs/10-firmware-strategy.md`](docs/10-firmware-strategy.md) | Firmware-Schichten, ESPHome-Unabhängigkeit, Modbus-Pfad |
-| [`docs/11-motor-data.md`](docs/11-motor-data.md) | Motordatenblatt, Leistungsanalyse, **Messprotokoll M1–M5** |
+| [`docs/11-motor-data.md`](docs/11-motor-data.md) | Motordatenblatt, Leistungsanalyse, **Messprotokoll M1–M7** |
 | [`hardware/bom/README.md`](hardware/bom/README.md) | Beschaffungsliste, Fertigerempfehlung, Bestellweg |
 
 ## Repository-Struktur
@@ -55,7 +55,7 @@ hardware/
   lib/                  Gemeinsame Symbol-/Footprint-/3D-Bibliotheken
   bom/                  Stückliste und Fertigung
 mechanical/             Frontplatte: build123d-Modell, FreeCAD-Makro, STEP/STL
-tools/                  Generatoren (Board-Mechanik)
+tools/                  Generatoren (Board-Mechanik, Bottom-Schaltplan)
 firmware/
   esphome/              ESPHome-Konfiguration für Home Assistant
 docs/                   Projektübergreifende Spezifikationen
@@ -69,6 +69,7 @@ Boards nicht auseinanderlaufen:
 
 ```bash
 python3 tools/gen_boards.py          # 3 × .kicad_pcb: Outline, Bohrbild, Keepout
+python3 tools/gen_bottom_sch.py      # Bottom-Schaltplan + BOM, mit Netzlistenprüfung
 python3 mechanical/frontplate.py     # Frontplatte → STEP + STL, mit Selbsttest
 ```
 
@@ -76,8 +77,10 @@ Beide Skripte prüfen ihr Ergebnis und melden Abweichungen. `gen_boards.py` brau
 `pcbnew`-Python-API aus einer KiCad-Installation, `frontplate.py` braucht `build123d`
 (`pip install build123d`).
 
-Die **Schaltpläne** werden nativ in KiCad 9.0.7 angelegt, nicht generiert — Begründung in
-[`docs/08-kicad-workflow.md`](docs/08-kicad-workflow.md).
+Auch der Bottom-Schaltplan wird erzeugt: Die Konnektivität steht als Quelltext, und
+nach dem Schreiben liest `kicad-cli` die Netzliste zurück und vergleicht sie gegen
+genau diese Vorgabe. Das Ergebnis ist zweckmäßig gezeichnet, aber nachweislich
+korrekt — und in KiCad frei umarrangierbar.
 
 ## Status
 
@@ -87,10 +90,11 @@ Die **Schaltpläne** werden nativ in KiCad 9.0.7 angelegt, nicht generiert — B
 | Mechanik der drei Boards | erzeugt und verifiziert |
 | Frontplatte, druckfertig | erzeugt und verifiziert |
 | ESPHome-Konfiguration inkl. ST77916-Display | validiert (`esphome config`) |
-| Schaltpläne, Layout, Routing | **offen** |
+| **Bottom-Board: Schaltplan + Stückliste** | **erzeugt und netzlistengeprüft** |
+| Schaltpläne Mid und Top, alle Layouts | **offen** |
 | Fertigungsdaten zum Bestellen | **offen** (setzt das Layout voraus) |
 
 Nächste Schritte: [`docs/07-roadmap.md`](docs/07-roadmap.md).
-Der kritische Pfad sind fünf Messungen am realen Motor — Messprotokoll in
+Der kritische Pfad ist die Messung des Blockierstroms — Messprotokoll in
 [`docs/11-motor-data.md`](docs/11-motor-data.md), Abschnitt 4. Ohne sie bleiben
 Sicherungen, Trip-Schwellen, Treiberauswahl und Steckverbinder provisorisch.

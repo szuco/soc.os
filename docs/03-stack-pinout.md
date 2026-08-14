@@ -35,80 +35,77 @@ gröberes Raster zu wählen.
 
 ## 3. J_STK_A – Power und Motor (2×20, 1,27 mm)
 
-Konvention: ungerade Pins Reihe A, gerade Pins Reihe B. Pin *n* und *n+1* liegen
-nebeneinander. Pin 1 ist markiert und auf allen drei Boards gleich orientiert.
+**Version 0.2 — aus dem erzeugten Bottom-Schaltplan, damit Doku und Schaltplan
+nicht auseinanderlaufen.** Quelle: `tools/gen_bottom_sch.py`.
+
+Konvention: ungerade Pins Reihe A, gerade Reihe B; Pin *n* und *n+1* liegen
+nebeneinander. Pin 1 auf allen drei Boards gleich orientiert.
 
 | Pin | Signal | Pin | Signal |
 |---:|---|---:|---|
-| 1 | GND | 2 | GND |
-| 3 | 5V_SYS | 4 | 5V_SYS |
-| 5 | 5V_SYS | 6 | 5V_SYS |
-| 7 | GND | 8 | GND |
-| 9 | 3V3_SYS | 10 | 3V3_SYS |
-| 11 | GND | 12 | GND |
-| 13 | 6V2_STAR | 14 | GND_STAR |
-| 15 | GND | 16 | M1_PWM |
-| 17 | M1_DIR | 18 | M1_EN |
-| 19 | GND | 20 | M1_FAULT |
-| 21 | GND | 22 | M2_PWM |
-| 23 | M2_DIR | 24 | M2_EN |
-| 25 | GND | 26 | M2_FAULT |
-| 27 | AGND | 28 | I_SENSE1 |
-| 29 | AGND | 30 | I_SENSE2 |
-| 31 | GND | 32 | HW_TRIP1 |
-| 33 | HW_TRIP2 | 34 | TRIP_RST |
-| 35 | RELAY_CTL | 36 | RSV_A1 |
-| 37 | RSV_A2 | 38 | RSV_A3 |
-| 39 | GND | 40 | GND |
+| 1 | `PGND` | 2 | `PGND` |
+| 3 | `5V_SYS` | 4 | `5V_SYS` |
+| 5 | `5V_SYS` | 6 | `5V_SYS` |
+| 7 | `PGND` | 8 | `PGND` |
+| 9 | `3V3_SYS` | 10 | `3V3_SYS` |
+| 11 | `PGND` | 12 | `PGND` |
+| 13 | `6V2_STAR_F` | 14 | `PGND` |
+| 15 | `PGND` | 16 | `M1_INA` |
+| 17 | `M1_INB` | 18 | `USB_VBUS` |
+| 19 | `PGND` | 20 | `M2_INA` |
+| 21 | `PGND` | 22 | `M2_INB` |
+| 23 | `RSV_A1` | 24 | `RSV_A2` |
+| 25 | `PGND` | 26 | `I_SENSE1` |
+| 27 | `AGND` | 28 | `I_SENSE2` |
+| 29 | `AGND` | 30 | `HW_TRIP1` |
+| 31 | `HW_TRIP2` | 32 | `TRIP_RST` |
+| 33 | `RELAY_CTL` | 34 | `RSV_A3` |
+| 35 | `RSV_A4` | 36 | `RSV_A5` |
+| 37 | `RSV_A6` | 38 | `PGND` |
+| 39 | `PGND` | 40 | `PGND` |
 
-Hinweise:
+Änderungen gegenüber v0.1:
 
-- `I_SENSE1`/`I_SENSE2` liegen bewusst jeweils neben `AGND`, damit die analoge Leitung
-  einen definierten, ruhigen Rückpfad direkt daneben hat.
-- `AGND` und `GND` werden **sternförmig an genau einer Stelle** auf dem Bottom-Board
-  verbunden, nicht mehrfach über den Stack.
-- `Mx_PWM` sind die schnellsten Signale auf diesem Verbinder und haben jeweils GND als
-  direkten Nachbarn.
-- `RELAY_CTL` liegt hier unter der Annahme, dass das Relais auf dem Bottom-Board sitzt —
-  siehe Prüfpunkt in [`00-system-overview.md`](00-system-overview.md).
-- `5V_SYS` ist **bidirektional**: im Normalbetrieb speist der Buck auf BOTTOM nach oben,
-  im USB-Betrieb speist USB von TOP nach unten. Siehe
-  [`01-power-tree.md`](01-power-tree.md).
+- **`Mx_PWM`/`Mx_DIR` → `Mx_INA`/`Mx_INB`.** Je ein PWM-Ausgang pro Brückenzweig;
+  spart Richtungslogik. `Mx_EN`/`Mx_FAULT` entfallen — `~SD` gehört dem Hardware-Trip.
+- **`USB_VBUS` neu** (Pin 18). Beim Programmieren speist USB über das ORing auf dem
+  Bottom-Board die Logik; die Datenleitungen bleiben wie bisher auf dem Top-Board.
+- `RELAY_CTL` und `TRIP_RST` bleiben, `HW_TRIP1/2` kommen jetzt direkt vom Latch.
 
 ## 4. J_STK_B – UI und Kommunikation (2×20, 1,27 mm)
 
+**Version 0.2.** Der QSPI-Bus des ST77916 braucht sieben Leitungen — das war der in
+v0.1 vermerkte fehlende Pin. Gelöst, indem `DISP_DC` (bei QSPI unnötig) und die
+Reservepins umgewidmet wurden.
+
 | Pin | Signal | Pin | Signal |
 |---:|---|---:|---|
-| 1 | GND | 2 | GND |
-| 3 | 3V3_SYS | 4 | 3V3_SYS |
-| 5 | GND | 6 | I2C_SCL |
-| 7 | GND | 8 | I2C_SDA |
-| 9 | GND | 10 | I2C_INT |
-| 11 | GND | 12 | UART485_TX |
-| 13 | GND | 14 | UART485_RX |
-| 15 | RS485_DE | 16 | RS485_RE |
-| 17 | GND | 18 | UART_RADAR_TX |
-| 19 | GND | 20 | UART_RADAR_RX |
-| 21 | RADAR_INT | 22 | GND |
-| 23 | AUDIO_PWM | 24 | AUDIO_EN |
-| 25 | GND | 26 | BTN1 |
-| 27 | BTN2 | 28 | BTN3 |
-| 29 | BTN4 | 30 | GND |
-| 31 | DISP_RST | 32 | DISP_DC |
-| 33 | GND | 34 | SYS_RST |
-| 35 | RSV_B1 | 36 | RSV_B2 |
-| 37 | RSV_B3 | 38 | RSV_B4 |
-| 39 | GND | 40 | GND |
+| 1 | `PGND` | 2 | `PGND` |
+| 3 | `3V3_SYS` | 4 | `3V3_SYS` |
+| 5 | `PGND` | 6 | `I2C_SCL` |
+| 7 | `PGND` | 8 | `I2C_SDA` |
+| 9 | `PGND` | 10 | `I2C_INT` |
+| 11 | `PGND` | 12 | `UART485_TX` |
+| 13 | `PGND` | 14 | `UART485_RX` |
+| 15 | `RS485_DE` | 16 | `RS485_RE` |
+| 17 | `PGND` | 18 | `UART_RADAR_TX` |
+| 19 | `PGND` | 20 | `UART_RADAR_RX` |
+| 21 | `RADAR_INT` | 22 | `PGND` |
+| 23 | `AUDIO_PWM` | 24 | `QSPI_CLK` |
+| 25 | `PGND` | 26 | `BTN1` |
+| 27 | `BTN2` | 28 | `BTN3` |
+| 29 | `BTN4` | 30 | `PGND` |
+| 31 | `QSPI_D0` | 32 | `QSPI_D1` |
+| 33 | `PGND` | 34 | `QSPI_D2` |
+| 35 | `QSPI_D3` | 36 | `DISP_CS` |
+| 37 | `DISP_RST` | 38 | `DISP_BL` |
+| 39 | `PGND` | 40 | `PGND` |
 
-Hinweise:
-
-- `DISP_RST`/`DISP_DC` sind nur bei einem SPI-OLED nötig. Bei I2C-OLED bleiben sie frei
-  und dienen als zusätzliche Reserve — der Displaytyp ist noch offen.
-- Bei einem SPI-OLED fehlen auf diesem Verbinder `SCK`, `MOSI` und `CS`. Dann sind drei
-  der `RSV_B*`-Pins entsprechend zu belegen; das ist beim Displayentscheid mitzuführen.
-- `BTN1..BTN4` werden auf dem Mid-Board mit Pull-ups versehen; Entprellung in Software.
-- Die vier `RSV_B*` sind bewusst frei, um spätere Sensorik ohne Redesign des Stacks
-  anbinden zu können.
+- `QSPI_CLK` und `QSPI_D0–D3` laufen mit 40 MHz. Sie liegen bewusst gebündelt und
+  bekommen im Layout gleiche Länge und durchgehende Massereferenz.
+- `DISP_BL` ist die PWM für die Hintergrundbeleuchtung (LCD, kein AMOLED).
+- Zwei Reservepins sind entfallen; ohne Reserve steht der Verbinder nicht da, aber
+  eng ist es.
 
 ## 5. Prüfliste vor dem Footprint-Freeze
 
@@ -124,4 +121,4 @@ Hinweise:
 | Version | Änderung |
 |---|---|
 | 0.1 | Erster ausgearbeiteter Vorschlag aus der Projektzusammenfassung |
-| 0.2 (angekündigt) | Displaywechsel auf 1,43"-AMOLED (QSPI): das Display braucht **7 Leitungen** durch den Stack (`QSPI_CLK`, `QSPI_D0–D3`, `DISP_CS`, `DISP_RST`). Vorhanden auf `J_STK_B`: `DISP_RST`, `DISP_DC` (entfällt bei QSPI) und `RSV_B1–B4` — macht 6, **einer fehlt**. Kandidat: `SYS_RST` (Pin 34) prüfen oder Doppelnutzung lösen. Die Neubelegung erfolgt zusammen mit dem Top-Board-Schaltplan; bis dahin gilt v0.1 nicht als eingefroren. |
+| **0.2** | **Aus dem Bottom-Schaltplan erzeugt.** `INA`/`INB` statt `PWM`/`DIR`, QSPI-Bus für das Display, `USB_VBUS` ergänzt |
