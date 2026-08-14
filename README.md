@@ -96,8 +96,12 @@ korrekt — und in KiCad frei umarrangierbar.
 | **Bottom-Board: Schaltplan + Stückliste** | **erzeugt und netzlistengeprüft** |
 | Schaltpläne Mid und Top | **erzeugt und netzlistengeprüft** |
 | Layouts aller drei Boards: Platzierung + Zonen | **erzeugt, DRC ohne Platzierungsfehler** |
-| **Routing der Leiterbahnen** | **offen — Handarbeit in KiCad** |
-| Fertigungsdaten zum Bestellen | **offen** (setzt das Layout voraus) |
+| **Routing TOP** | **vollständig** — alle Netze verbunden, Kupfer-DRC sauber |
+| **Routing MID** | Signale vollständig; **10 PGND-Pour-Anbindungen offen** (Handgriff in KiCad, s. docs/05) |
+| **Routing BOTTOM** | Leistungsteil ≈ 85 % — **Rest Handarbeit** (docs/05 verlangt das für Leistungspfade ohnehin) |
+| Fertigungsdaten TOP (Gerber/Drill/Pos) | **erzeugt:** `hardware/fab/top_ui.zip` |
+| Stücklisten aller drei Boards | **erzeugt** (`bom_bottom/mid/top.csv`) |
+| Fertigungsdaten Mid + Bottom | nach Rest-Routing: `python3 tools/gen_fab.py` |
 
 Nächste Schritte: [`docs/07-roadmap.md`](docs/07-roadmap.md).
 Der kritische Pfad ist die Messung des Blockierstroms — Messprotokoll in

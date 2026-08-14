@@ -1,0 +1,20 @@
+Menge,Designator,Wert,Footprint,Hinweis
+1,C1,100n,Capacitor_SMD:C_0603_1608Metric,
+1,C2,22u,Capacitor_SMD:C_1210_3225Metric,
+1,J1,USB-C,Connector_USB:USB_C_Receptacle_GCT_USB4085,"16-Pin-Typ, nur USB 2.0"
+1,J2,J_STK_A,Connector_PinSocket_1.27mm:PinSocket_2x20_P1.27mm_Vertical,
+1,J3,J_STK_B,Connector_PinSocket_1.27mm:PinSocket_2x20_P1.27mm_Vertical,
+1,J5,ST77916 QSPI,Connector_PinHeader_1.27mm:PinHeader_1x10_P1.27mm_Vertical,"PLATZHALTER - reales Modul-FPC vermessen, dann Footprint tauschen"
+1,J6,Stern,Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical,"Kabel durch den Frontplatten-Ausgang Ø4,5"
+1,J7,Radar,Connector_JST:JST_PH_B5B-PH-K_1x05_P2.00mm_Vertical,Belegung an reales Modul anpassen (offener Punkt 17)
+1,Q1,BC847,Package_TO_SOT_SMD:SOT-23,
+1,Q2,P-FET 20V 1A,Package_TO_SOT_SMD:SOT-23,"z.B. AO3401 - 80 mA Last, unkritisch"
+2,"R1,R2",5k1,Resistor_SMD:R_0603_1608Metric,
+1,R3,10k,Resistor_SMD:R_0603_1608Metric,
+1,R4,100k,Resistor_SMD:R_0603_1608Metric,Gate-Pull-up: aus ohne Ansteuerung
+2,"SW1A,SW1B",BTN1,Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK,"Alps SKRK o.ae., 3,9x2,9, Pads laengs - Position siehe mechanical/frontplate.py"
+2,"SW2A,SW2B",BTN2,Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK,"Alps SKRK o.ae., 3,9x2,9, Pads laengs - Position siehe mechanical/frontplate.py"
+2,"SW3A,SW3B",BTN3,Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK,"Alps SKRK o.ae., 3,9x2,9, Pads laengs - Position siehe mechanical/frontplate.py"
+2,"SW4A,SW4B",BTN4,Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK,"Alps SKRK o.ae., 3,9x2,9, Pads laengs - Position siehe mechanical/frontplate.py"
+1,U1,USBLC6-2SC6,Package_TO_SOT_SMD:SOT-23-6,
+1,U2,SHT40-AD1B,Sensor_Humidity:Sensirion_DFN-4_1.5x1.5mm_P0.8mm_SHT4x_NoCentralPad,Adresse 0x44 - muss zur YAML passen; thermisch vom Board entkoppeln (Schlitze)

@@ -74,3 +74,41 @@ Umfang eines Fertigungsstands:
 Empfehlung: pro Fertigungsstand ein Git-Tag der Form
 `bottom-v0.1`, `mid-v0.1`, `top-v0.1`, damit der gefertigte Stand später eindeutig
 rekonstruierbar ist.
+
+## 5. Routing-Stand und Restarbeiten (2026-08-14)
+
+Alle drei Boards sind mit der Freerouting-Pipeline geroutet
+(`tools/route_boards.py`, Nacharbeit mit `tools/gnd_*.py`); die Zonen sind
+gefüllt (Vollanbindung, Zonen-Clearance 0,15 mm). Der Stand im Einzelnen:
+
+| Board | Stand | Rest |
+|---|---|---|
+| **TOP** | vollständig, Kupfer-DRC sauber | — (Randabstands-Waiver: USB-Zunge, Pads ragen gewollt über die Kante) |
+| **MID** | alle Signalnetze verbunden | **10 PGND-Pour-Anbindungen**: Massepins der Stackverbinder hinter eng geführten Signal-Verticals. In KiCad 9 mit dem interaktiven Router (Push-and-Shove) in ~10 min zu schließen — die DRC-Liste (`unconnected_items`) zeigt die Stellen. |
+| **BOTTOM** | ≈ 85 % geroutet (964 Segmente) | ~45 Verbindungen im Motor-/Leistungsteil (SW-Knoten, Gate-Netze, 24V_PROT). Der Autorouter konvergiert dort nicht mehr — die Leistungspfade sind laut Prüfliste (Abschnitt 3) **ohnehin von Hand zu ziehen**: kurze dicke Wege, Buck-Schleifen nach Referenzlayout. |
+
+**Wichtige Erfahrungswerte aus der Automatisierung** (Details in den
+Werkzeug-Docstrings):
+
+- Freerouting 2.1.0 headless ist unbrauchbar (SES vom falschen Stand);
+  1.9.0 unter `xvfb-run` funktioniert zuverlässig.
+- `ZONE_FILLER` braucht ein X-Display; headless stürzt er ab.
+- Ein baumelndes Bahnende verbindet sich **nie** mit einer Zone — die
+  Füllung hält auch um Endkappen Abstand. Zonen verbinden nur Pads
+  (Anbindungsmodus) und Vias.
+- Nach `SaveBoard()` ist das Board-Objekt in der SWIG-API instabil —
+  erst speichern, dann für weitere Schritte neu laden.
+
+## 6. Erzeugte Fertigungsdaten
+
+`python3 tools/gen_fab.py [bottom|mid|top]` erzeugt je Board Gerber
+(9 Lagen), Excellon-Bohrdaten mit PDF-Karte und CSV-Positionsdatei und
+packt sie nach `hardware/fab/<board>.zip` — aber **nur, wenn das DRC-Gate
+besteht** (keine Kupferfehler, keine offenen Verbindungen).
+
+Aktuell erzeugt: **`hardware/fab/top_ui.zip`**. Mid und Bottom folgen,
+sobald ihre Restarbeiten (oben) erledigt sind.
+
+Die Stücklisten aller drei Boards liegen als `bom_bottom/mid/top.csv`
+neben den Schaltplänen — erzeugt aus derselben Quelle wie die Schaltpläne
+selbst (`tools/gen_*_sch.py`).
