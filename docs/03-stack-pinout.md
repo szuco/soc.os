@@ -9,8 +9,11 @@
 - Motor-Hochströme werden **nicht** über die Stackverbinder geführt. Sie bleiben
   vollständig auf dem Bottom-Board.
 - Stackverbinder führen ausschließlich Kleinleistung und Signale.
-- USB `D+`/`D−` werden **nicht** durch den Stack geführt. USB-C und USB-UART gehören auf
-  dasselbe Top-Board.
+- **Regeländerung v0.3:** USB `D+`/`D−` laufen **doch** durch den Stack
+  (`J_STK_A` 34/36, benachbart, PGND daneben). Die alte Regel stammte aus der Zeit
+  mit USB-UART-Baustein auf dem Top-Board; mit dem nativen USB des ESP32-S3 auf dem
+  Mid-Board gibt es keine Alternative — und Full-Speed-USB (12 MHz) über zwei
+  benachbarte Kontakte ist unkritisch. ESD-Schutz sitzt an der Buchse auf TOP.
 - Zwei Verbinder: `J_STK_A` (Power/Motor) und `J_STK_B` (UI/Kommunikation).
 - Ausgangspunkt: zwei **2×20-Steckverbinder mit 1,27 mm Raster**. Die konkrete Serie ist
   anhand Stackhöhe und Verfügbarkeit auszuwählen.
@@ -35,8 +38,8 @@ gröberes Raster zu wählen.
 
 ## 3. J_STK_A – Power und Motor (2×20, 1,27 mm)
 
-**Version 0.2 — aus dem erzeugten Bottom-Schaltplan, damit Doku und Schaltplan
-nicht auseinanderlaufen.** Quelle: `tools/gen_bottom_sch.py`.
+**Version 0.3 — alle drei Generatoren importieren `tools/stack_pinout.py`; diese
+Tabellen sind daraus erzeugt.** Damit können die Boards nicht auseinanderlaufen.
 
 Konvention: ungerade Pins Reihe A, gerade Reihe B; Pin *n* und *n+1* liegen
 nebeneinander. Pin 1 auf allen drei Boards gleich orientiert.
@@ -54,13 +57,13 @@ nebeneinander. Pin 1 auf allen drei Boards gleich orientiert.
 | 17 | `M1_INB` | 18 | `USB_VBUS` |
 | 19 | `PGND` | 20 | `M2_INA` |
 | 21 | `PGND` | 22 | `M2_INB` |
-| 23 | `RSV_A1` | 24 | `RSV_A2` |
+| 23 | `STAR_EN` | 24 | `RSV_A2` |
 | 25 | `PGND` | 26 | `I_SENSE1` |
 | 27 | `AGND` | 28 | `I_SENSE2` |
 | 29 | `AGND` | 30 | `HW_TRIP1` |
 | 31 | `HW_TRIP2` | 32 | `TRIP_RST` |
-| 33 | `RELAY_CTL` | 34 | `RSV_A3` |
-| 35 | `RSV_A4` | 36 | `RSV_A5` |
+| 33 | `RELAY_CTL` | 34 | `USB_DP` |
+| 35 | `RSV_A4` | 36 | `USB_DN` |
 | 37 | `RSV_A6` | 38 | `PGND` |
 | 39 | `PGND` | 40 | `PGND` |
 
@@ -74,9 +77,8 @@ nebeneinander. Pin 1 auf allen drei Boards gleich orientiert.
 
 ## 4. J_STK_B – UI und Kommunikation (2×20, 1,27 mm)
 
-**Version 0.2.** Der QSPI-Bus des ST77916 braucht sieben Leitungen — das war der in
-v0.1 vermerkte fehlende Pin. Gelöst, indem `DISP_DC` (bei QSPI unnötig) und die
-Reservepins umgewidmet wurden.
+**Version 0.3.** Pins 15/16 führen beide `RS485_DIR` — DE und /RE des MAX3485 sind
+auf dem Mid-Board zusammengelegt (Standard-Halbduplex, ein GPIO).
 
 | Pin | Signal | Pin | Signal |
 |---:|---|---:|---|
@@ -87,7 +89,7 @@ Reservepins umgewidmet wurden.
 | 9 | `PGND` | 10 | `I2C_INT` |
 | 11 | `PGND` | 12 | `UART485_TX` |
 | 13 | `PGND` | 14 | `UART485_RX` |
-| 15 | `RS485_DE` | 16 | `RS485_RE` |
+| 15 | `RS485_DIR` | 16 | `RS485_DIR` |
 | 17 | `PGND` | 18 | `UART_RADAR_TX` |
 | 19 | `PGND` | 20 | `UART_RADAR_RX` |
 | 21 | `RADAR_INT` | 22 | `PGND` |
@@ -122,3 +124,4 @@ Reservepins umgewidmet wurden.
 |---|---|
 | 0.1 | Erster ausgearbeiteter Vorschlag aus der Projektzusammenfassung |
 | **0.2** | **Aus dem Bottom-Schaltplan erzeugt.** `INA`/`INB` statt `PWM`/`DIR`, QSPI-Bus für das Display, `USB_VBUS` ergänzt |
+| **0.3** | **Gemeinsame Quelle `tools/stack_pinout.py`** für alle drei Boards. `USB_DP`/`USB_DN` durch den Stack (nativer USB), `STAR_EN` neu (Sternstecker sitzt auf TOP, der frühere J4 auf Bottom war ein Fehler), `RS485_DE`+`RE` → `RS485_DIR` |

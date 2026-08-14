@@ -26,6 +26,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from kisch import Schematic                                    # noqa: E402
+from stack_pinout import connect_stack                         # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "hardware", "bottom_power_motor", "bottom_power_motor.kicad_sch")
@@ -205,10 +206,8 @@ def build():
     s.add("C9", "Device:C", "22u", C1210)
     s.connect("6V2_STAR_F", ("C9", "1"))
     s.connect("PGND",       ("C9", "2"))
-    s.add("J4", "Connector_Generic:Conn_01x02", "Stern",
-          "Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical")
-    s.connect("6V2_STAR_F", ("J4", "1"))
-    s.connect("PGND",       ("J4", "2"))
+    # Sternstecker sitzt auf dem TOP-Board (Frontanschluss); hier bleibt nur
+    # die abgesicherte Schiene 6V2_STAR_F, die ueber J_STK_A nach oben geht.
 
     # =====================================================================
     # 4. Motorkanaele
@@ -355,36 +354,7 @@ def build():
     # =====================================================================
     # 5. Stackverbinder
     # =====================================================================
-    stk_a = {
-        1: "PGND", 2: "PGND", 3: "5V_SYS", 4: "5V_SYS", 5: "5V_SYS", 6: "5V_SYS",
-        7: "PGND", 8: "PGND", 9: "3V3_SYS", 10: "3V3_SYS", 11: "PGND", 12: "PGND",
-        13: "6V2_STAR_F", 14: "PGND", 15: "PGND", 16: "M1_INA", 17: "M1_INB",
-        18: "USB_VBUS", 19: "PGND", 20: "M2_INA", 21: "PGND", 22: "M2_INB",
-        23: "RSV_A1", 24: "RSV_A2", 25: "PGND", 26: "I_SENSE1", 27: "AGND",
-        28: "I_SENSE2", 29: "AGND", 30: "HW_TRIP1", 31: "HW_TRIP2",
-        32: "TRIP_RST", 33: "RELAY_CTL", 34: "RSV_A3", 35: "RSV_A4",
-        36: "RSV_A5", 37: "RSV_A6", 38: "PGND", 39: "PGND", 40: "PGND",
-    }
-    s.add("J2", "Connector_Generic:Conn_02x20_Odd_Even", "J_STK_A",
-          "Connector_PinSocket_1.27mm:PinSocket_2x20_P1.27mm_Vertical")
-    for pin, net in stk_a.items():
-        s.connect(net, ("J2", str(pin)))
-
-    stk_b = {
-        1: "PGND", 2: "PGND", 3: "3V3_SYS", 4: "3V3_SYS", 5: "PGND",
-        6: "I2C_SCL", 7: "PGND", 8: "I2C_SDA", 9: "PGND", 10: "I2C_INT",
-        11: "PGND", 12: "UART485_TX", 13: "PGND", 14: "UART485_RX",
-        15: "RS485_DE", 16: "RS485_RE", 17: "PGND", 18: "UART_RADAR_TX",
-        19: "PGND", 20: "UART_RADAR_RX", 21: "RADAR_INT", 22: "PGND",
-        23: "AUDIO_PWM", 24: "QSPI_CLK", 25: "PGND", 26: "BTN1", 27: "BTN2",
-        28: "BTN3", 29: "BTN4", 30: "PGND", 31: "QSPI_D0", 32: "QSPI_D1",
-        33: "PGND", 34: "QSPI_D2", 35: "QSPI_D3", 36: "DISP_CS",
-        37: "DISP_RST", 38: "DISP_BL", 39: "PGND", 40: "PGND",
-    }
-    s.add("J3", "Connector_Generic:Conn_02x20_Odd_Even", "J_STK_B",
-          "Connector_PinSocket_1.27mm:PinSocket_2x20_P1.27mm_Vertical")
-    for pin, net in stk_b.items():
-        s.connect(net, ("J3", str(pin)))
+    connect_stack(s)
 
     return s
 

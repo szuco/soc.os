@@ -15,7 +15,6 @@ Menge,Designator,Wert,Footprint,Hinweis
 1,J1,Power/Motor 6p,Connector_Molex:Molex_Micro-Fit_3.0_43045-0600_2x03_P3.00mm_Vertical,Micro-Fit 3.0 2x3 - Strombelastbarkeit pruefen
 1,J2,J_STK_A,Connector_PinSocket_1.27mm:PinSocket_2x20_P1.27mm_Vertical,
 1,J3,J_STK_B,Connector_PinSocket_1.27mm:PinSocket_2x20_P1.27mm_Vertical,
-1,J4,Stern,Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical,
 1,L1,2u2,Inductor_SMD:L_Bourns-SRP5030T,
 1,Q1,P-FET 60V 60A,Package_TO_SOT_SMD:TO-263-2,z.B. IRF4905S - bestaetigen
 8,"Q_M1A_H,Q_M1A_L,Q_M1B_H,Q_M1B_L,Q_M2A_H,Q_M2A_L,Q_M2B_H,Q_M2B_L",N-FET 40V 60A,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,"PowerPAK SO-8, Rds<5mOhm - Footprint bestaetigen"

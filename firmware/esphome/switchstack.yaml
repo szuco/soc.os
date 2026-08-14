@@ -34,13 +34,14 @@ substitutions:
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
-  # Beim Start alles stromlos: Treiber schlafen, Richtung definiert.
+  # Beim Start alles stromlos: beide Brueckenzweige low = Motor aus.
   on_boot:
     priority: 600
     then:
-      - switch.turn_off: mot_sleep
-      - switch.turn_off: m1_dir
-      - switch.turn_off: m2_dir
+      - output.set_level: {id: m1_ina, level: 0%}
+      - output.set_level: {id: m1_inb, level: 0%}
+      - output.set_level: {id: m2_ina, level: 0%}
+      - output.set_level: {id: m2_inb, level: 0%}
 
 esp32:
   board: esp32-s3-devkitc-1
@@ -117,33 +118,33 @@ output:
     pin: GPIO43
     frequency: 2000Hz
 
+  # Je Brueckenzweig ein PWM-faehiger Ausgang (INA/INB) - die Richtung
+  # entsteht daraus, welcher Zweig moduliert. Pins == Mid-Schaltplan.
   - platform: ledc
-    id: m1_pwm
+    id: m1_ina
     pin: GPIO38
     frequency: 20000Hz     # oberhalb des Hoerbereichs
   - platform: ledc
-    id: m2_pwm
+    id: m1_inb
+    pin: GPIO39
+    frequency: 20000Hz
+  - platform: ledc
+    id: m2_ina
     pin: GPIO40
+    frequency: 20000Hz
+  - platform: ledc
+    id: m2_inb
+    pin: GPIO47
     frequency: 20000Hz
 
   - platform: ledc
     id: buzzer_out
     pin: GPIO15
 
-switch:
-  - platform: gpio
-    id: m1_dir
-    pin: GPIO39
-    restore_mode: ALWAYS_OFF
-  - platform: gpio
-    id: m2_dir
-    pin: GPIO47
-    restore_mode: ALWAYS_OFF
-  - platform: gpio
-    id: mot_sleep
-    pin: GPIO48
-    restore_mode: ALWAYS_OFF
+# GPIO48 ist RS485_DIR (DE + /RE des MAX3485) - wird erst mit der
+# Modbus-/RS485-Komponente belegt.
 
+switch:
   - platform: gpio
     name: Weihnachtsstern
     icon: mdi:star-four-points
@@ -342,17 +343,18 @@ cover:
     id: jalousie1
     device_class: shutter
     open_action:
-      - switch.turn_off: m1_dir
+      - output.set_level: {id: m1_ina, level: 0%}
+      - output.set_level: {id: m1_inb, level: 0%}
       - delay: ${reversal_pause}
-      - switch.turn_on: mot_sleep
-      - output.set_level: {id: m1_pwm, level: 100%}
+      - output.set_level: {id: m1_ina, level: 100%}
     close_action:
-      - switch.turn_on: m1_dir
+      - output.set_level: {id: m1_ina, level: 0%}
+      - output.set_level: {id: m1_inb, level: 0%}
       - delay: ${reversal_pause}
-      - switch.turn_on: mot_sleep
-      - output.set_level: {id: m1_pwm, level: 100%}
+      - output.set_level: {id: m1_inb, level: 100%}
     stop_action:
-      - output.set_level: {id: m1_pwm, level: 0%}
+      - output.set_level: {id: m1_ina, level: 0%}
+      - output.set_level: {id: m1_inb, level: 0%}
     open_duration: ${travel_time}
     close_duration: ${travel_time}
 
@@ -361,17 +363,18 @@ cover:
     id: jalousie2
     device_class: shutter
     open_action:
-      - switch.turn_off: m2_dir
+      - output.set_level: {id: m2_ina, level: 0%}
+      - output.set_level: {id: m2_inb, level: 0%}
       - delay: ${reversal_pause}
-      - switch.turn_on: mot_sleep
-      - output.set_level: {id: m2_pwm, level: 100%}
+      - output.set_level: {id: m2_ina, level: 100%}
     close_action:
-      - switch.turn_on: m2_dir
+      - output.set_level: {id: m2_ina, level: 0%}
+      - output.set_level: {id: m2_inb, level: 0%}
       - delay: ${reversal_pause}
-      - switch.turn_on: mot_sleep
-      - output.set_level: {id: m2_pwm, level: 100%}
+      - output.set_level: {id: m2_inb, level: 100%}
     stop_action:
-      - output.set_level: {id: m2_pwm, level: 0%}
+      - output.set_level: {id: m2_ina, level: 0%}
+      - output.set_level: {id: m2_inb, level: 0%}
     open_duration: ${travel_time}
     close_duration: ${travel_time}
 
