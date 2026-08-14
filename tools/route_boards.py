@@ -59,11 +59,17 @@ CLASSES = {
         # deckt Laufstrom (<= 1 A) wie Trip-Transienten ab; die
         # Leistungspfade werden vor der Fertigung ohnehin von Hand
         # nachgezogen (docs/05).
-        "PWR": (800, 200, VIA_PWR, [
+        # Vias 0,6/0,3 und Standard-Clearance: Die 0,8er-Vias mit 0,2er-
+        # Clearance passen nicht in die Schluchten zwischen den FET-Pads;
+        # die letzten ~50 Verbindungen blieben damit dauerhaft offen.
+        # 0,6er-Vias tragen 2-3 A - fuer Laufstrom und kurze Transienten
+        # ausreichend; Leistungspfade werden vor der Fertigung ohnehin
+        # von Hand nachgezogen (docs/05).
+        "PWR": (800, 150, VIA_STD, [
             "24V_IN", "24V_F", "24V_PROT", "M1_A", "M1_B", "M2_A", "M2_B",
             "M1_SWA", "M1_SWB", "M2_SWA", "M2_SWB",
         ]),
-        "RAIL": (500, 200, VIA_PWR, [
+        "RAIL": (500, 150, VIA_STD, [
             "5V_BUCK", "5V_SYS", "3V3_SYS", "6V2_STAR", "6V2_STAR_F",
             "12V_RAW", "12V_GATE", "U2_SW", "U3_SW", "U4_SW", "USB_VBUS",
         ]),
