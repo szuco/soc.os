@@ -85,7 +85,7 @@ gefüllt (Vollanbindung, Zonen-Clearance 0,15 mm). Der Stand im Einzelnen:
 |---|---|---|
 | **TOP** | vollständig, Kupfer-DRC sauber | — (Randabstands-Waiver: USB-Zunge, Pads ragen gewollt über die Kante) |
 | **MID** | alle Signalnetze verbunden | **10 PGND-Pour-Anbindungen**: Massepins der Stackverbinder hinter eng geführten Signal-Verticals. In KiCad 9 mit dem interaktiven Router (Push-and-Shove) in ~10 min zu schließen — die DRC-Liste (`unconnected_items`) zeigt die Stellen. |
-| **BOTTOM** | ≈ 85 % geroutet (964 Segmente) | ~45 Verbindungen im Motor-/Leistungsteil (SW-Knoten, Gate-Netze, 24V_PROT). Der Autorouter konvergiert dort nicht mehr — die Leistungspfade sind laut Prüfliste (Abschnitt 3) **ohnehin von Hand zu ziehen**: kurze dicke Wege, Buck-Schleifen nach Referenzlayout. |
+| **BOTTOM** | ≈ 85 % geroutet (985 Segmente, 102 Vias) | 43 Verbindungen im Motor-/Leistungsteil (SW-Knoten, Gate-Netze, 24V_PROT). Der Autorouter konvergiert dort nicht mehr — die Leistungspfade sind laut Prüfliste (Abschnitt 3) **ohnehin von Hand zu ziehen**: kurze dicke Wege, Buck-Schleifen nach Referenzlayout. |
 
 **Wichtige Erfahrungswerte aus der Automatisierung** (Details in den
 Werkzeug-Docstrings):
