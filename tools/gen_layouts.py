@@ -219,9 +219,14 @@ class BoardBuilder:
         lset.addLayer(pcbnew.F_Cu)
         lset.addLayer(pcbnew.B_Cu)
         zone.SetLayerSet(lset)
+        # Nur der echte Antennenabschnitt: Das WROOM-Modul (25,5 mm lang,
+        # Mitte y=-16,27) ragt 3 mm ueber die Boardkante - die Antenne
+        # (oberste 6,5 mm des Moduls) beginnt bei y=-22,5. Die fruehere
+        # Flaeche bis y=-15 hat 9 Signalpads des Moduls eingeschlossen
+        # und sie damit unroutbar gemacht (Freerouting-Plateau, 11 offen).
         o = zone.Outline()
         o.NewOutline()
-        for x, y in ((-9, -25), (9, -25), (9, -15), (-9, -15)):
+        for x, y in ((-9, -26.2), (9, -26.2), (9, -22.6), (-9, -22.6)):
             o.Append(mm(x), mm(y))
         zone.SetZoneName("ESP32_ANTENNA_KEEPOUT")
         self.board.Add(zone)
@@ -390,7 +395,7 @@ def build_board(name, module, fixed, auto_sides=("F", "B"),
     # Antennenbereich fuer die Autoplatzierung sperren (das ESP-Modul
     # selbst wurde oben fix platziert und darf dort liegen)
     if antenna:
-        bb.occ.block(-9.5, -25.5, 9.5, -14.5)
+        bb.occ.block(-9.5, -26.5, 9.5, -22.1)
     if block_f:
         bb.occ.block(*block_f, side="F")
     # 3. Rest: grosse zuerst, Hinweis = bester Netznachbar

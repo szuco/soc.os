@@ -115,7 +115,7 @@ def patch_dsn(path, classes):
     open(path, "w", encoding="utf-8").write(src)
 
 
-def route(name, passes=30, timeout=2400):
+def route(name, passes=200, timeout=2400):
     os.makedirs(SCRATCH, exist_ok=True)
     pcb = os.path.join(ROOT, "hardware", name, name + ".kicad_pcb")
     dsn = os.path.join(SCRATCH, name + ".dsn")
@@ -136,7 +136,11 @@ def route(name, passes=30, timeout=2400):
     # der Router selbst ist nach < 5 min fertig, danach begrenzen wir die
     # Optimierung hart. improvement_threshold stoppt zusaetzlich frueher,
     # sobald ein Durchlauf weniger als 1 % Verbesserung bringt.
-    cmd = ["java", "-jar", JAR, "-de", dsn, "-do", ses, "-mp", str(passes),
+    # -mp wird von 2.1.0 ignoriert (Messung: 867 Passes trotz -mp 30);
+    # wirksam ist nur die Settings-Syntax --router.max_passes. Das
+    # Unrouted-Plateau ist nach ~150 Passes erreicht, 200 ist Reserve.
+    cmd = ["java", "-jar", JAR, "-de", dsn, "-do", ses,
+           "--router.max_passes=%d" % passes,
            "--gui.enabled=false", "--feature_flags.logging=false",
            "--router.optimizer.max_passes=6",
            "--router.optimizer.improvement_threshold=0.01",

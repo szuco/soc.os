@@ -41,7 +41,10 @@ HOLE_ANGLES      = (0.0, 180.0)
 EDGE_CLEARANCE   = 0.5      # mm
 
 ANTENNA_KEEPOUT_W = 18.0    # mm; Sperrflaeche ESP32-Antenne (nur MID)
-ANTENNA_KEEPOUT_H = 10.0
+# Nur der echte Antennenabschnitt des WROOM-Moduls (oberste 6,5 mm; das
+# Modul ragt 3 mm ueber die Boardkante). Eine groessere Flaeche schliesst
+# Signalpads des Moduls ein und macht sie unroutbar - siehe gen_layouts.py.
+ANTENNA_KEEPOUT_H = 3.6
 
 FP_LIB = "/usr/share/kicad/footprints/MountingHole.pretty"
 FP_NAME = "MountingHole_2.7mm_M2.5"
@@ -130,7 +133,7 @@ def add_antenna_keepout(board):
         lset.addLayer(lay)
     zone.SetLayerSet(lset)
 
-    top = BOARD_DIAMETER / 2.0 - 1.0
+    top = BOARD_DIAMETER / 2.0 + 0.2
     bot = top - ANTENNA_KEEPOUT_H
     hw = ANTENNA_KEEPOUT_W / 2.0
     outline = zone.Outline()
