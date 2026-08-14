@@ -52,7 +52,14 @@ VIA_PWR = 'Via[0-1]_800:400_um'
 
 CLASSES = {
     "bottom_power_motor": {
-        "PWR": (1000, 250, VIA_PWR, [
+        # 0,8 mm / 0,2 mm statt 1,0 / 0,25: Mit den breiteren Regeln
+        # liess Freerouting nach 200 Passes (62 min) noch 58 Verbindungen
+        # offen - die 1,0-mm-Bahnen passen nicht ueberall zwischen die
+        # FET-Pads. 0,8 mm traegt bei 35-um-Kupfer ~3 A dauerhaft und
+        # deckt Laufstrom (<= 1 A) wie Trip-Transienten ab; die
+        # Leistungspfade werden vor der Fertigung ohnehin von Hand
+        # nachgezogen (docs/05).
+        "PWR": (800, 200, VIA_PWR, [
             "24V_IN", "24V_F", "24V_PROT", "M1_A", "M1_B", "M2_A", "M2_B",
             "M1_SWA", "M1_SWB", "M2_SWA", "M2_SWB",
         ]),
