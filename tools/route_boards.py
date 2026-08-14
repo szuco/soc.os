@@ -71,16 +71,57 @@ CLASSES = {
 }
 
 
-def _shrink_boundary(src, delta_mm=0.5):
-    """Board-Outline im DSN nach innen skalieren.
+RING_RI = 25.6      # mm; Kupfer bleibt unter ~25,45 -> Randabstand > 0,5
+RING_RO = 26.4
 
-    KiCad exportiert die Kante ohne den Kupfer-Randabstand; Freerouting
-    routet dann bis (fast) an die Kante und verletzt die 0,5-mm-Regel.
-    Die Outline ist ein Kreis um (0,0), deshalb genuegt es, alle
-    Boundary-Koordinaten radial zu skalieren.
+
+def _ring_polygon(a0, a1, step=3.0):
+    """Annulus-Sektor von a0 bis a1 Grad (DSN-Koordinaten, Y nach oben)."""
+    import math
+    pts = []
+    a = a0
+    while a < a1:
+        pts.append((RING_RO * math.cos(math.radians(a)),
+                    RING_RO * math.sin(math.radians(a))))
+        a += step
+    pts.append((RING_RO * math.cos(math.radians(a1)),
+                RING_RO * math.sin(math.radians(a1))))
+    a = a1
+    while a > a0:
+        pts.append((RING_RI * math.cos(math.radians(a)),
+                    RING_RI * math.sin(math.radians(a))))
+        a -= step
+    pts.append((RING_RI * math.cos(math.radians(a0)),
+                RING_RI * math.sin(math.radians(a0))))
+    return " ".join("%.1f %.1f" % (x * 1000, y * 1000) for x, y in pts)
+
+
+def _edge_ring(src, slit=None):
+    """Ring-Keepout am Boardrand in den DSN-Structure-Block einfuegen.
+
+    KiCad exportiert die Kante ohne den Kupfer-Randabstand, und Freerouting
+    routet sonst bis fast an die Kante (gemessen: 0,28 mm statt 0,5 mm).
+    Ein Boundary-Shrink hat sich als falscher Weg erwiesen: Er sperrt
+    ueberhaengende Steckerpads komplett aus und wuergt die Randkorridore
+    zwischen den Tastern ab. Der Annulus-Keepout laesst Pads und Korridore
+    intakt; `slit` (Winkelpaar) laesst einen Sektor frei - beim Top-Board
+    der USB-C-Stecker bei 270 Grad, dessen Pads ueber die Kante ragen.
+    Zwei ueberlappende Halbringe, weil ein geschlossener Ring kein
+    einfaches Polygon ist.
     """
+    if slit is None:
+        arcs = [(0.0, 185.0), (180.0, 365.0)]
+    else:
+        s0, s1 = slit
+        arcs = [(s1, (s0 + 360.0 + s1) / 2.0 + 2.5),
+                ((s0 + 360.0 + s1) / 2.0 - 2.5, s0 + 360.0)]
+    blocks = []
+    for i, (a0, a1) in enumerate(arcs):
+        for layer in ("F.Cu", "B.Cu"):
+            blocks.append('    (keepout "ring_%d_%s" (polygon %s 0 %s))'
+                          % (i, layer, layer, _ring_polygon(a0, a1)))
     m = re.search(r'\(boundary', src)
-    depth, i = 0, m.start()
+    depth = 0
     for i in range(m.start(), len(src)):
         if src[i] == "(":
             depth += 1
@@ -88,24 +129,12 @@ def _shrink_boundary(src, delta_mm=0.5):
             depth -= 1
             if depth == 0:
                 break
-    block = src[m.start():i + 1]
-    nums = re.findall(r'-?\d+(?:\.\d+)?', block)
-    coords = [float(n) for n in nums[1:]]        # erster Wert: Breite 0
-    rmax = max(abs(c) for c in coords)
-    f = (rmax - delta_mm * 1000.0) / rmax
-
-    def scale(mo):
-        v = float(mo.group(0))
-        return "%.2f" % (v * f)
-    # nur die Koordinaten skalieren, nicht die Aperturbreite "0"
-    head, tail = block.split(None, 3)[:3], block.split(None, 3)[3]
-    new_block = " ".join(head) + " " + re.sub(r'-?\d+(?:\.\d+)?', scale, tail)
-    return src[:m.start()] + new_block + src[i + 1:]
+    return src[:i + 1] + "\n" + "\n".join(blocks) + src[i + 1:]
 
 
-def patch_dsn(path, classes):
+def patch_dsn(path, classes, slit=None):
     src = open(path, encoding="utf-8").read()
-    src = _shrink_boundary(src)
+    src = _edge_ring(src, slit=slit)
 
     # 1. Groessere Via-Definition ergaenzen (Kopie der Standarddefinition)
     m = re.search(r'\(padstack "%s"' % re.escape(VIA_STD), src)
@@ -242,7 +271,10 @@ def route(name, passes=200, timeout=2400):
     for t in list(board.GetTracks()):
         board.Remove(t)
     pcbnew.ExportSpecctraDSN(board, dsn)
-    patch_dsn(dsn, CLASSES.get(name, {}))
+    # Top: Schlitz im Ring-Keepout am USB-C-Sektor (270 Grad), dessen
+    # Pads beabsichtigt ueber die Boardkante ragen
+    patch_dsn(dsn, CLASSES.get(name, {}),
+              slit=(257.0, 283.0) if name == "top_ui" else None)
     print("%-20s DSN exportiert und gepatcht" % name)
 
     if os.path.exists(ses):
@@ -279,13 +311,13 @@ def route(name, passes=200, timeout=2400):
 
 
 def classify_unrouted(rpt_path):
-    """Unverbundene Paare nach Netz zaehlen."""
+    """Unverbundene Paare nach Netz zaehlen (ein Eintrag je Verletzung)."""
     txt = open(rpt_path, encoding="utf-8").read()
-    section = txt.split("unconnected pads")[-1]
-    nets = re.findall(r'\[(\w+)\]', section)
     counts = {}
-    for i in range(0, len(nets)):
-        counts[nets[i]] = counts.get(nets[i], 0) + 1
+    for block in txt.split("[unconnected_items]")[1:]:
+        m = re.search(r'@\([^)]*\): [^\[]*\[(\w+)\]', block)
+        net = m.group(1) if m else "?"
+        counts[net] = counts.get(net, 0) + 1
     return counts
 
 
@@ -296,7 +328,9 @@ def main():
         key = name.split("_")[0] if name != "top_ui" else "top"
         if which not in ("all", key):
             continue
-        pcb = route(name)
+        # Bottom: 102 Bauteile und breite Leistungsbahnen - braucht laenger
+        pcb = route(name, timeout=7200 if name == "bottom_power_motor"
+                    else 2400)
         res, errs = run_drc(pcb)
         if errs:
             print("  DRC-FEHLER:", errs[0])
