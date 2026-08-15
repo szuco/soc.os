@@ -96,3 +96,43 @@ Herleitung und Belege: [`12-legacy-socos.md`](12-legacy-socos.md).
 |---|---|---|---|
 | 39 | ~~P0~~ ✅ | **Die USB-C-Buchse stand um 180° verdreht — das Top-Layout war so nicht fertigbar.** Im Footprint `USB_C_Receptacle_GCT_USB4085` liegen die THT-Pins am Ende `y = 0`, die Stecköffnung am Ende `y = +8,61` (auf F.Fab als Schlitz bei 6,1 markiert). `gen_layouts.py` drehte J1 um 180°, damit **zeigt die Öffnung zur Platinenmitte** und die Lötseite steht über den Rand | **Nicht kosmetisch:** sechs Bohrungen schneiden die Ø-52-Kontur an — die Schirmbeine um 0,22 mm, die A-Reihe um 0,15 mm. Beim Fräsen werden diese Löcher aufgeschnitten. Der Randabstands-Waiver in [`05-manufacturing.md`](05-manufacturing.md) („Pads ragen gewollt über die Kante") wurde unter der falschen Annahme erteilt, es handle sich um die Steckzunge. **Erledigt am 15.08.2026:** Drehung in `gen_layouts.py` korrigiert, Top-Layout neu erzeugt, der überholte Export `hardware/fab/top_ui.zip` gelöscht. Das engste Pad liegt jetzt 3,2 mm innerhalb der Kontur, die Randabstandsverletzungen sind von 11 auf 1 gefallen — die verbliebene gehört Punkt 30. Bleibt offen: Das Board ist neu zu routen |
 | 40 | P1 | **Im eingebauten Zustand ist USB-C nicht erreichbar** — und das ist eine Festlegung, keine Panne. Die Frontplatte hat nur zwei Durchbrüche, beide auf 12 Uhr (Klinke, ToF); die Buchse sitzt auf 6 Uhr und zeigt radial nach außen in den Spalt zwischen Platine (Ø 52) und Dosenwand (lichte Weite 55–57 mm) — **1,5–2,5 mm, ein Stecker braucht ein Vielfaches** | Zu entscheiden ist nur, ob das so bleibt. Drei Wege: (a) **so lassen** — Erstflash auf dem Tisch, danach OTA über WLAN und RS-485; das ist der Normalfall bei Unterputzgeräten, (b) einen dritten Durchbruch im **unteren** Steg vorsehen und die Buchse nach vorn richten — kostet Bauhöhe und den frei gewordenen Kabelausgang, (c) Programmierkontakte (Pogo-Pads) auf der Rückseite. Fällt zusammen mit Punkt 26 (Bottom-Connector) und dem Tiefenbudget |
+
+## Umbau auf das Busch-Jaeger-Bedienkonzept (15.08.2026)
+
+Die Front wird nicht mehr selbst gestaltet, sondern übernommen: Sichtfläche ist
+die **Zentralscheibe 6435-914** (2CKA006430A0402, Busch-balance SI) mit dem
+Aufdruck „Pfeile und OK". Sie gehört zum Bedienelement **6456-101**
+(54 × 54 × 23 mm, 1,68″-Display mit Hintergrundbeleuchtung, vier Tasten) und
+wird von Busch-Jaeger auch für Raumthermostat 1098 U-101 und CO₂-Sensor 1091 U
+verwendet. Herleitung: [`04-mechanical.md`](04-mechanical.md) Abschnitt 1c.
+
+| # | Prio | Entscheidung | Bemerkung |
+|---|---|---|---|
+| 41 | **P0** | **Gedruckter Adapter statt eigener Frontplatte.** Die Sicheltasten-Platte entfällt. An ihre Stelle tritt ein 3D-gedruckter Korpus, der die Rastgeometrie des 6456-101 nachbildet, die Zentralscheibe trägt und die Ø-52-Platinen aufnimmt | Damit ist die Scheibe **werkzeuglos abnehmbar** — Voraussetzung für den USB-Zugang darunter (Punkt 45). `mechanical/frontplate.py` ist in dieser Form überholt; die Zwangsbedingungen (Displayfreiraum, Stößel, Blendring) verlieren ihren Gegenstand |
+| 42 | **P0** | **Tastenpositionen sind zu messen — und sie entscheiden über das Bohrbild aller drei Boards.** Heute sitzen acht SMD-Taster bei r = 23,2 mm auf ±12° um die **Diagonalen**. Liegen die Druckpunkte der Scheibe stattdessen auf den **Achsen** (Pfeile oben/unten, Tasten links/rechts — so die Aufteilung der Durchbrüche in Punkt 44), müssen die Taster dorthin | **Dann kollidieren sie mit den Befestigungsbohrungen** bei 0° und 180° (r = 21,5, Keepout r 3,2 — belegt r 18,3…24,7). Das Bohrbild ist in `tools/gen_boards.py` für **alle drei** Boards gemeinsam definiert; es zu ändern heißt, alle drei Layouts neu zu erzeugen und die 985 Leiterbahnen des Bottom-Boards zu verlieren. Ausweg wäre, die Platinen im Adapter statt in der Dose zu halten und die Frontbohrungen ganz aufzugeben |
+| 43 | **P0** | **Rechteckiges Display statt rund.** Der Fensterausschnitt der Zentralscheibe gibt die Form vor. Kandidat: **1,69″ / 240 × 240, ST7789** — in [`09-display-and-mcu.md`](09-display-and-mcu.md) Abschnitt 1c bereits vermessen (Moduldiagonale 46,1 mm, passt auf Ø 52) und dicht am BJ-Maß von 1,68″ | Nebenwirkung: **ESPHome unterstützt ST7789 nativ**, die 214-Kommando-Initsequenz `st77916_init.yaml` entfällt. Der QSPI-Bus im Stack bleibt nutzbar (ST7789 ist 4-Draht-SPI: `QSPI_D0` → MOSI, ein freier Datenpin → DC), nur die Namen stimmen dann nicht mehr. Endmaß erst nach dem Ausmessen des Scheibenfensters |
+| 44 | **P1** | **Vier Durchbrüche in der Zentralscheibe, symmetrisch auf den Diagonalen** — je einer zwischen einem Pfeil und einer Taste | oben links **ToF-Fenster**, unten links **Klinkenbuchse** für den Stern, oben rechts und unten rechts **Lüftungsschlitze** für den Raumsensor (Punkt 46). Die Rückseite trägt die Löcher nicht mit: Alle vier liegen im 55er-Fenster und damit über der Dose — anders als der Rahmenrand, siehe Punkt 47 |
+| 45 | **P1** | **USB-C zeigt nach vorn und ist von der Zentralscheibe verdeckt.** Nutzbar erst, wenn die Scheibe abgenommen ist | Braucht eine **vertikale** (Top-Mount-)USB-C-Buchse statt der jetzigen liegenden, Platz neben dem Display und Bauhöhe im Spalt zwischen Platine und Scheibe. Erledigt Punkt 40 auf dem sauberen Weg: kein Loch in der Sichtfläche, trotzdem erreichbar ohne Ausbau des Stapels |
+| 46 | **P1** | **Der SHT4x muss den RAUM messen, nicht die Dose.** Ein externer Fühler ist nicht vorgesehen (ersetzt Punkt 35) | Drei Maßnahmen zusammen: Lüftungsschlitze rechts (Punkt 44), Sensor so weit vorn und so weit weg von Endstufe und Backlight wie möglich, thermische Entkopplung durch Schlitze in der Leiterplatte (bereits im Schaltplan vermerkt). **Ein Offset bleibt nötig** — aus einer geschlossenen Unterputzdose misst niemand die reine Raumtemperatur, auch Busch-Jaeger nicht. Zu kalibrieren gegen ein Referenzthermometer, mit Display an und aus |
+| 47 | ✅ | **Löcher im Abdeckrahmen sind ausgeschlossen** — nachgerechnet, nicht abgewogen | Fenster 55 × 55 ⇒ halbe Kante 27,5 mm; Dose Ø 60 außen ⇒ lichte Weite 55–57 mm ⇒ Radius 27,5–28,5 mm. Der 13 mm breite Rahmenrand liegt damit **vollständig auf der Wand**. Hinter einem Loch dort ist Putz, keine Platine — für Klinke wie für ToF gleichermaßen |
+
+**Was dieser Umbau an früheren Entscheidungen kippt:** 15a (ST77916 rund) wird
+durch 43 ersetzt; 33 (Sicheltasten-Geometrie) verliert mit Punkt 41 den
+Gegenstand; 30 (Klinkenbuchse) behält die Bauteilfrage, wechselt aber auf die
+neue Position unten links; 25 (Frontplatte am Rahmen prüfen) wird zur
+Vermessung von Scheibe **und** Rahmen; 35 (externer Temperaturfühler) ist mit
+Punkt 46 beantwortet — es gibt keinen.
+
+### Messliste für die reale Zentralscheibe
+
+Ohne diese Maße ist kein Layout möglich; ein Maßbild ist öffentlich nicht zu
+bekommen.
+
+1. **Wo drückt die Scheibe?** Vier Druckpunkte in Winkel und Radius — Achsen
+   oder Diagonalen. Das ist die Antwort auf Punkt 42.
+2. **Fensterausschnitt** in Breite, Höhe und Eckradius → bestimmt das Display
+   (Punkt 43).
+3. **Rastgeometrie** auf der Rückseite: Woran hält die Scheibe, mit welchem
+   Übermaß, in welcher Tiefe → der Adapter muss genau das anbieten (Punkt 41).
+4. **Bauhöhe** von der Platinenoberkante bis zur Innenseite der Scheibe →
+   Grenze für Display, USB-C-Buchse und Klinke.

@@ -14,7 +14,7 @@ Legende: ✅ fertig und geprüft · 🟡 begonnen, Rest benannt · ⛔ nicht vor
 | Ebene | Stand |
 |---|---|
 | **Spezifikation** | ✅ vollständig — 13 Dokumente, alle Entscheidungen entweder getroffen oder als Punkt 1–40 offen benannt |
-| **Mechanik** | ✅ Boards und Frontplatte generiert und selbstgeprüft; 🔒 Maßprüfung am realen Rahmen und am realen Displaymodul steht aus |
+| **Mechanik** | 🟡 Boards generiert; die **Frontplatte ist überholt** — die Front wird auf die Busch-Jaeger Zentralscheibe 6435-914 umgestellt (Punkte 41–47) |
 | **Schaltpläne** | ✅ alle drei Boards erzeugt und netzlistengeprüft; ⛔ **keine Schaltungsreview gegen Datenblätter** |
 | **Layouts** | 🟡 alle drei platziert; **geroutet ist nur Bottom** (≈ 85 %), Mid und Top haben null Leiterbahnen |
 | **Fertigungsdaten** | ⛔ **keine** — der frühere Top-Export war überholt und ist gelöscht; der Nutzen ist als Boarddatei erzeugt |
@@ -88,9 +88,10 @@ stimmt, ist damit *nicht* gezeigt.
 
 | Funktion | Hardware | Firmware | Stand |
 |---|---|---|---|
-| Rundes Display 360 × 360 | ✅ ST77916, QSPI, Steckerleiste (Footprint **Platzhalter**) | ✅ `mipi_spi` mit `model: CUSTOM` + 214-Kommando-Initsequenz, validiert | 🟡 Modul-Außendurchmesser 🔒 Punkt 15c |
+| Display | 🟡 **wechselt von rund auf rechteckig** (ST77916 → Kandidat ST7789 1,69″), Footprint Platzhalter | 🟡 die validierte ST77916-Konfiguration wird damit hinfällig, ST7789 ist in ESPHome nativ | 🔒 Punkt 43 — Endmaß erst nach dem Ausmessen des Scheibenfensters |
 | Anzeigeinhalt | — | 🟡 Temperatur, Luftfeuchte, „anwesend" | 🟡 eine feste Seite, keine Zustände, keine Statusfarben |
-| Vier Sicheltasten | ✅ 8 SMD-Taster, je 2 parallel, r = 23,2 mm | 🟡 fest auf Jalousie 1 auf/zu und Jalousie 2 auf/zu verdrahtet | ⛔ **kein Menü** — die Belegung OK/Hoch/Runter/Home aus [`12`](12-legacy-socos.md) ist Papier (Punkt 37) |
+| Vier Tasten | 🟡 8 SMD-Taster, je 2 parallel, r = 23,2 mm auf den **Diagonalen** — die Zentralscheibe drückt möglicherweise auf den **Achsen** | 🟡 fest auf Jalousie 1 auf/zu und Jalousie 2 auf/zu verdrahtet | 🔒 **Punkt 42** — Druckpunkte messen; liegen sie auf den Achsen, kollidieren die Taster mit den Befestigungsbohrungen und das Bohrbild **aller drei** Boards wandert |
+| Bedienmenü | — | ⛔ | ⛔ Die Scheibe bringt die Beschriftung mit (*play / hoch / runter / OK*) — die Zustandsmaschine dahinter fehlt (Punkt 37) |
 | Displayhelligkeit | ✅ PWM-Backlight auf GPIO43 | ✅ dimmbar, Präsenz weckt auf 80 %, 120 s Nachlauf | ✅ |
 | Helligkeit nach Umgebungslicht | ⛔ kein Sensor bestückt | ⛔ | 🔒 Punkt 36 — evtl. kostenlos über den Ambient-Zähler des VL53L1X |
 | Signalton / Alarm | ✅ Piezo passiv + Treiberstufe | 🟡 `rtttl`, nur eine Test-Schaltfläche | 🟡 kein Alarmkonzept, keine Zuordnung zu Ereignissen |
@@ -101,8 +102,8 @@ stimmt, ist damit *nicht* gezeigt.
 
 | Funktion | Hardware | Firmware | Stand |
 |---|---|---|---|
-| Temperatur + Feuchte | ✅ SHT40-AD1B, 0x44 | ✅ `sht4x`, 30 s | 🟡 **misst die Dosentemperatur über der Endstufe**, nicht den Raum — Benennung 🔒 Punkt 35 |
-| Externer Temperaturfühler | ⛔ | ⛔ | 🔒 Punkt 35 — im Vorgängerprojekt vorhanden (DS18B20 oder NTC), hier entfallen |
+| Temperatur + Feuchte **des Raums** | 🟡 SHT40-AD1B, 0x44 — braucht Lüftungsschlitze in der Scheibe | ✅ `sht4x`, 30 s | 🔒 **Punkt 46** — Raummessung ist jetzt Anforderung, ein externer Fühler ist ausgeschlossen. Ohne Schlitze, Entkopplung und Offset misst der Sensor die Dose |
+| Externer Temperaturfühler | ⛔ | ⛔ | ✅ **entschieden: gibt es nicht** (Punkt 46 ersetzt Punkt 35) |
 | Präsenz vor dem Display | ✅ VL53L1X auf Top, Fenster im oberen Steg | 🟡 nur der Interrupt-Pin über den Expander | 🟡 „jemand da / nicht da", **keine Entfernung** |
 | Durchstiegsmeldung durchs Fenster | ✅ derselbe Sensor | ⛔ | 🔒 Punkt 31 — braucht Distanzwert und ROI-Umschaltung, also eine External Component |
 | Blendungserkennung (Sonne) | ✅ Statusflags des Sensors | ⛔ | 🔒 Punkt 32 — am realen Fenster zu messen |
@@ -113,11 +114,11 @@ stimmt, ist damit *nicht* gezeigt.
 
 | Funktion | Hardware | Firmware | Stand |
 |---|---|---|---|
-| Weihnachtsstern 6,2 V | ✅ eigener Buck, P-FET-High-Side, PTC 0,2 A, 2,5-mm-Klinke an der Front | ✅ Schalter-Entität | 🔒 Punkt 30 — Klinkenbuchse ist ein Platzhalter-Footprint |
+| Weihnachtsstern 6,2 V | ✅ eigener Buck, P-FET-High-Side, PTC 0,2 A, 2,5-mm-Klinke | ✅ Schalter-Entität | 🔒 Punkt 30 — Platzhalter-Footprint; neue Position **unten links** in der Zentralscheibe (Punkt 44) |
 | Meldekontakt Dunstabzugshaube | ✅ PhotoMOS AQY282GS, potentialfrei, **nur SELV** | ✅ Schalter-Entität, LOW = geschlossen | ✅ |
 | **RS-485 (primärer Weg)** | ✅ MAX3485, Fail-Safe-Bias, Terminierung als DNP, JST-XH | ⛔ UART definiert, **aber ungenutzt**; `RS485_DIR` (GPIO48) unbelegt | ⛔ 🔒 Punkte 15b/16/38 — Transceiver-Auswahl und Registerkarte offen |
 | WLAN / Home Assistant | ✅ ESP32-S3-WROOM-1-N16R8 | ✅ API, OTA, Fallback-AP | ✅ ausdrücklich **sekundär** |
-| USB-C Programmierung | ✅ nativer USB des S3, ESD-Schutz, D+/D− über den Stack | ✅ Logging über USB-Serial-JTAG | ✅ |
+| USB-C Programmierung | 🟡 nativer USB des S3, ESD-Schutz, D+/D− über den Stack — **die Buchse wird von liegend auf stehend umgebaut** | ✅ Logging über USB-Serial-JTAG | 🔒 Punkt 45 — nach vorn zeigend, verdeckt von der Zentralscheibe, nutzbar nach deren Abnahme |
 | Feldstecker für Reed + Haube | 🟡 JST-SH 6-polig auf der Mid-Rückseite, 0,4 mm neben einem Keepout | — | 🔒 **Punkt 29, P0** — es ist schlicht kein Platz |
 
 ---

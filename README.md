@@ -104,7 +104,7 @@ Vollständige Gegenüberstellung von umgesetzten und fehlenden Funktionen:
 |---|---|
 | Systemspezifikation, Power-Tree, Pinmapping | dokumentiert |
 | Mechanik der drei Boards | erzeugt und verifiziert |
-| Frontplatte, druckfertig | erzeugt und verifiziert |
+| Frontplatte | **überholt** — die Front wird auf die Busch-Jaeger Zentralscheibe 6435-914 umgestellt (docs/06, Punkte 41–47) |
 | Schaltpläne aller drei Boards + Stücklisten | **erzeugt und netzlistengeprüft** — Schaltungsreview gegen Datenblätter steht aus |
 | Layouts aller drei Boards: Platzierung + Zonen | **erzeugt, DRC ohne Platzierungsfehler** |
 | **Routing BOTTOM** | 985 Segmente, 102 Vias, **43 Verbindungen offen** — Rest Handarbeit (docs/05 verlangt das für Leistungspfade ohnehin) |
@@ -112,7 +112,7 @@ Vollständige Gegenüberstellung von umgesetzten und fehlenden Funktionen:
 | **Routing TOP** | **keines** — am 15.08.2026 neu platziert (Klinke nach 6 Uhr, ToF 12 Uhr, USB-C-Drehung korrigiert) |
 | Fertigungsnutzen (3 Platinen in einer Boarddatei) | **erzeugt:** `hardware/fab/panel/` |
 | Fertigungsdaten | **keine** — `python3 tools/gen_fab.py` nach dem Routing, mit DRC-Gate |
-| ESPHome-Konfiguration inkl. ST77916-Display | validiert (`esphome config`) — Motoren fahren **auf Zeit** |
+| ESPHome-Konfiguration | validiert (`esphome config`) — Motoren fahren **auf Zeit**; der ST77916-Teil wird mit dem Displaywechsel hinfällig |
 | Lasterkennung, ToF-Distanz, Menü, RS-485-Protokoll | **fehlen** — eigene C++-Komponente, s. docs/13 |
 | Gefertigt oder gemessen | **nichts** |
 

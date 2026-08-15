@@ -60,6 +60,51 @@ zum Testdruck (Punkt 25):
    Sichtfläche; sie liegen bei r ≤ 26,2 mm und damit sicher im 55er-Fenster,
    dürfen aber nicht an einem Innenabsatz des Rahmens streifen.
 
+## 1c. Frontkonzept: Zentralscheibe statt eigener Platte
+
+**Festgelegt am 15.08.2026.** Die Sichtfläche ist keine Eigenentwicklung mehr,
+sondern die **Busch-Jaeger Zentralscheibe 6435-914** (2CKA006430A0402) mit dem
+Aufdruck „Pfeile und OK". Sie gehört systemisch zum Bedienelement 6456-101 und
+wird auch für Raumthermostat 1098 U-101 und CO₂-Sensor 1091 U verwendet.
+
+| Zielhülle laut Datenblatt 6456-101 | Wert |
+|---|---|
+| Korpus | **54 × 54 × 23 mm** |
+| Display | **1,68″**, hochauflösend, mit Hintergrundbeleuchtung |
+| Bedienung | vier Tasten, Symbole *play / hoch / runter / OK* auf der Scheibe |
+
+Damit entfallen die vier Sicheltasten und die gedruckte 54,6er-Platte; an ihre
+Stelle tritt ein Adapter, der diesen Korpus nachbildet (Punkt 41). Das Display
+wird rechteckig (Punkt 43), USB-C zeigt nach vorn und liegt unter der Scheibe
+(Punkt 45).
+
+### Die vier Durchbrüche
+
+Alle vier liegen **auf den Diagonalen**, je einer zwischen einem Pfeil und einer
+Taste — symmetrisch, und alle vier im 55er-Fenster und damit über der Dose:
+
+| Position | Zweck |
+|---|---|
+| oben links | **ToF-Fenster** (VL53L1X) |
+| unten links | **Klinkenbuchse** Weihnachtsstern |
+| oben rechts | **Lüftungsschlitz** Raumsensor |
+| unten rechts | **Lüftungsschlitz** Raumsensor |
+
+### Warum nicht im Abdeckrahmen
+
+Naheliegend wäre, Klinke und ToF durch den Rahmen zu führen — er hat 13 mm
+Rand rings um das Fenster. Das geht nicht, und zwar aus Maßen, nicht aus
+Geschmack:
+
+```
+Rahmenfenster 55 × 55        -> halbe Kante            27,5 mm
+Dose Ø 60 aussen             -> lichte Weite 55…57 mm  -> Radius 27,5…28,5 mm
+```
+
+Die Fensterkante des Rahmens fällt also mit der Dosenwand zusammen. Alles
+außerhalb — der gesamte Rand — liegt **auf der Wand**. Hinter einem Loch dort
+ist Putz, keine Platine. Aufgenommen als Punkt 47.
+
 Board-Outline in KiCad: Kreis auf `Edge.Cuts`, Mittelpunkt (0,0), Radius 26,0 mm.
 Board-Dicke über *Board Setup → Physical Stackup*.
 

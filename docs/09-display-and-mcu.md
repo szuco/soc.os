@@ -9,7 +9,21 @@
 > K.-o.-Kriterium — das war die falsche Abhängigkeitsrichtung und ist in
 > [`10-firmware-strategy.md`](10-firmware-strategy.md) korrigiert.
 >
-> **Revision 4 — ENTSCHIEDEN: ST77916, 1,46" rund, 360×360, aktiv Ø 37,25 mm.**
+> **Revision 5 — ÜBERHOLT: das Display wird RECHTECKIG.** Mit der Festlegung
+> auf die Busch-Jaeger Zentralscheibe 6435-914 als Sichtfläche
+> ([`04-mechanical.md`](04-mechanical.md) Abschnitt 1c) gibt deren Fenster die
+> Form vor. Kandidat ist **1,69″ / 240 × 240 (ST7789)** — dicht am BJ-Maß von
+> 1,68″, Moduldiagonale 46,1 mm, passt auf die Ø-52-Platine, und ESPHome
+> unterstützt ihn **nativ**; die 214-Kommando-Initsequenz für den ST77916
+> entfällt. Punkt 43 in [`06-open-decisions.md`](06-open-decisions.md).
+>
+> Damit ist die lange Begründung in Abschnitt 1c — „in einem runden Bauraum ist
+> der Kreis flächenoptimal" — nicht widerlegt, aber gegenstandslos: Sie galt für
+> eine frei gestaltbare Frontplatte. Sobald die Sichtfläche ein Serienteil mit
+> rechteckigem Fenster ist, entscheidet nicht mehr die Flächenausbeute, sondern
+> der Ausschnitt. Der folgende Abschnitt bleibt als Entscheidungsprotokoll stehen.
+>
+> **Revision 4 — überholt: ST77916, 1,46" rund, 360×360, aktiv Ø 37,25 mm.**
 > Und der befürchtete Treiberaufwand entfällt vollständig: ESPHomes `mipi_spi`
 > kennt ein **`model: CUSTOM` mit `init_sequence` in YAML**. Damit läuft der
 > ST77916 **ohne jede C++-Komponente**. Die Hersteller-Initialisierungssequenz

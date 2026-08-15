@@ -2,6 +2,19 @@
 """
 KiCad SwitchStack - Frontplatte fuer 55x55-Schalterprogramme, Version 2.
 
+  ACHTUNG: DIESES KONZEPT IST SEIT DEM 15.08.2026 UEBERHOLT.
+  Die Sichtflaeche wird die Busch-Jaeger Zentralscheibe 6435-914
+  (2CKA006430A0402) - eine Serien-Zentralscheibe mit dem Aufdruck "Pfeile und
+  OK", die zum Bedienelement 6456-101 gehoert (54 x 54 x 23 mm, 1,68"-Display,
+  vier Tasten). Damit entfallen die vier Sicheltasten und diese Platte; an ihre
+  Stelle tritt ein gedruckter Adapter, der den BJ-Korpus nachbildet.
+  Siehe docs/06-open-decisions.md, Punkte 41 bis 47, und docs/04 Abschnitt 1c.
+
+  Diese Datei bleibt lauffaehig und erzeugt weiter die alte Platte - sie ist die
+  Grundlage fuer den Adapter (Ohren, Zentrierkragen, Schraubenabstand und die
+  geprueften Zwangsbedingungen sind uebernehmbar). Nicht mehr gueltig sind
+  Sicheltasten, Stoessel, Blendring und das runde Displayfenster.
+
 Design: rundes Display in der Mitte, vier SICHELFOERMIGE Tasten, die sich als
 Ringsegmente um das Displayfenster legen. Die Tastenkappen sind separate
 Druckteile, die von hinten eingesetzt werden und auf SMD-Taster der
