@@ -13,8 +13,8 @@ GPIO-Zuordnung ESP32-S3-WROOM-1-N16R8 (muss mit firmware/esphome/switchstack.yam
 uebereinstimmen - die YAML ist daraus abgeleitet):
 
   IO1  I_SENSE1 (ADC)     IO13 QSPI_D1           IO40 M2_INA
-  IO2  I_SENSE2 (ADC)     IO14 QSPI_D2           IO41 UART_RADAR_RX
-  IO4  BTN1               IO15 AUDIO_PWM         IO42 UART_RADAR_TX
+  IO2  I_SENSE2 (ADC)     IO14 QSPI_D2           IO41 UART_AUX_RX
+  IO4  BTN1               IO15 AUDIO_PWM         IO42 UART_AUX_TX
   IO5  BTN2               IO16 DISP_RST          IO43 (TXD0) DISP_BL
   IO6  BTN3               IO17 UART485_TX        IO47 M2_INB
   IO7  BTN4               IO18 UART485_RX        IO48 RS485_DIR (DE + /RE)
@@ -104,8 +104,8 @@ def build():
     s.connect("M2_INA", ("U1", "33"))         # IO40
     s.connect("M2_INB", ("U1", "24"))         # IO47
     # Radar-UART
-    s.connect("UART_RADAR_RX", ("U1", "34"))  # IO41
-    s.connect("UART_RADAR_TX", ("U1", "35"))  # IO42
+    s.connect("UART_AUX_RX", ("U1", "34"))  # IO41
+    s.connect("UART_AUX_TX", ("U1", "35"))  # IO42
     # Strapping/Boot
     s.connect("ESP_BOOT", ("U1", "27"))       # IO0
 
@@ -196,7 +196,7 @@ def build():
     s.connect("HW_TRIP2",  ("U3", "5"))
     s.connect("TRIP_RST",  ("U3", "6"))
     s.connect("STAR_EN",   ("U3", "7"))
-    s.connect("RADAR_INT", ("U3", "9"))
+    s.connect("PRESENCE_INT", ("U3", "9"))
     s.connect("RELAY_CTL", ("U3", "10"))
     s.connect("EXP_P6",    ("U3", "11"))
     s.connect("EXP_P7",    ("U3", "12"))
@@ -254,8 +254,14 @@ def build():
     s.connect("HOOD_B", ("D4", "2"))
 
     # Feldstecker: Reed 1/2 mit je eigener Masse, danach der Haubenkontakt
+    # JST-SH statt PH: fuer einen PH-Stecker (15 x 5,5 mm) ist auf dem
+    # Mid-Board weder vorn noch hinten Platz - nachgerechnet gegen die
+    # Courtyards aller anderen Bauteile. Der SH sitzt auf der RUECKSEITE,
+    # das Kabel wird wie bei J4 vor dem Stapeln gesteckt.
+    # PRUEFPUNKT: 1-mm-Raster ist fuer mehrere Meter Feldleitung filigran;
+    # Alternative waere ein Stecker auf dem Bottom-Board ueber RSV_A2/RSV_A4.
     s.add("J5", "Connector_Generic:Conn_01x06", "Feld: Reed 1/2, Haube",
-          "Connector_JST:JST_PH_B6B-PH-K_1x06_P2.00mm_Vertical",
+          "Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical",
           MPN="1 REED1 2 GND 3 REED2 4 GND 5 HAUBE_A 6 HAUBE_B")
     s.connect("REED1_IN", ("J5", "1"))
     s.connect("PGND",     ("J5", "2"), ("J5", "4"))
@@ -266,7 +272,7 @@ def build():
     # =====================================================================
     # 4. Piezo-Treiber (passiver Signalgeber an 5V_SYS)
     # =====================================================================
-    s.add("Q2", "Device:Q_NPN_BCE", "BC847", "Package_TO_SOT_SMD:SOT-23")
+    s.add("Q2", "SwitchStack:Q_NPN_BCE", "BC847", "Package_TO_SOT_SMD:SOT-23")
     s.add("R8", "Device:R", "1k", R0603)
     s.connect("AUDIO_PWM", ("R8", "1"))
     s.connect("AUDIO_B",   ("R8", "2"))

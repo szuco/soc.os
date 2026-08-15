@@ -79,12 +79,22 @@ SYM_ALIAS = {
 }
 
 
+# Projekteigene Bibliothek. Sie enthaelt die generischen Transistorsymbole mit
+# den Pinnummern 1/2/3. KiCad 10 hat die Stockvarianten auf G/D/S bzw. B/C/E
+# umgestellt - das passt nicht zu SOT-23-Footprints (Pads 1/2/3) und wuerde die
+# Netzliste still veraendern. Deshalb liegen sie hier im Projekt.
+PROJDIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                       "hardware", "lib")
+
+
 def load_symbol(lib_id):
-    """Holt die Symboldefinition aus der KiCad-Bibliothek."""
+    """Holt die Symboldefinition aus der Projekt- oder KiCad-Bibliothek."""
     if lib_id in _libcache:
         return _libcache[lib_id]
     lib, name = lib_id.split(":", 1)
-    path = os.path.join(SYMDIR, lib + ".kicad_sym")
+    path = os.path.join(PROJDIR, lib + ".kicad_sym")
+    if not os.path.exists(path):
+        path = os.path.join(SYMDIR, lib + ".kicad_sym")
     src = open(path, encoding="utf-8").read()
     m = re.search(r'\(symbol "%s"[\s(]' % re.escape(name), src)
     if not m and lib_id in SYM_ALIAS:

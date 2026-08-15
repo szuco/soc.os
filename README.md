@@ -25,7 +25,7 @@ EMV, Messqualität und Wartbarkeit zentral.
 - Herrnhuter Mini-Weihnachtsstern 6,0–6,5 V / 0,5 W / ≈ 80 mA, nur im 24-V-Normalbetrieb
 - USB-C ausschließlich für Programmierung und Debug
 - Positionserkennung ausschließlich über Stromverlauf und Timeout, keine Endschalter
-- KiCad-Version: **9.0.7**
+- KiCad-Version: **10.0.5** (migriert von 9.0.7, siehe `docs/08-kicad-workflow.md`)
 
 ## Dokumentation
 

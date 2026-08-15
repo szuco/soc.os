@@ -164,6 +164,19 @@ switch:
         output: true
     restore_mode: ALWAYS_OFF
 
+  # Meldekontakt zur Dunstabzugshaube (PhotoMOS, potentialfrei, NUR SELV).
+  # Der PCF8574 senkt kraeftig und sourct kaum, die LED haengt deshalb an
+  # 3,3 V und wird gegen Masse gezogen: LOW = Kontakt geschlossen.
+  - platform: gpio
+    id: haube_kontakt
+    pin:
+      pcf8574: expander
+      number: 5
+      mode:
+        output: true
+      inverted: true
+    restore_mode: RESTORE_DEFAULT_OFF
+
 # ST77916 ist ein LCD - die Helligkeit kommt aus der Hintergrundbeleuchtung,
 # nicht aus einem Displaykommando. GPIO43 ist frei, weil das Logging ueber
 # den nativen USB des ESP32-S3 laeuft und UART0 damit unbenutzt bleibt.
@@ -294,13 +307,19 @@ binary_sensor:
     on_press:
       then: [cover.close: jalousie2]
 
-  # Radar-Bewegungsmelder. Bis das konkrete Modul feststeht, als einfacher
-  # Praesenzeingang am Expander gefuehrt. Dimmt bei Abwesenheit
-  # nach 2 min die Hintergrundbeleuchtung ab (Komfort, kein Schutz).
+  # Praesenz vor dem Display. Der VL53L1X sitzt auf dem Top-Board und schaut
+  # durch das Fenster im oberen Steg der Frontplatte. Der Interrupt GPIO1
+  # liegt auf PRESENCE_INT und damit auf Expanderpin 4 - die Schwelle stellt
+  # der Sensor selbst, ESPHome liest nur das Ergebnis.
+  #
+  # OFFEN: Der Distanzwert selbst braucht eine External Component
+  # (esphome hat nur vl53l0x nativ). Erst damit lassen sich die zwei
+  # Funktionen trennen - unter 0,6 m Display wecken, Baseline minus 15 cm
+  # Durchstieg melden. Siehe docs/09.
   - platform: gpio
-    name: Bewegung
+    name: Praesenz
     id: bewegung
-    device_class: motion
+    device_class: occupancy
     pin:
       pcf8574: expander
       number: 4
@@ -330,6 +349,22 @@ binary_sensor:
     name: Hard-Trip Motor 2
     device_class: problem
     pin: {pcf8574: expander, number: 1, mode: {input: true}}
+
+  # Fensterkontakte. Reed schliesst gegen Masse, der externe 10k-Pullup zieht
+  # den Eingang sonst hoch - geschlossenes Fenster ist also LOW, deshalb
+  # inverted. 300 ms Entprellung zusaetzlich zum RC-Glied auf dem Board.
+  - platform: gpio
+    name: Fenster 1
+    id: fenster1
+    device_class: window
+    pin: {pcf8574: expander, number: 6, mode: {input: true}, inverted: true}
+    filters: [delayed_on_off: 300ms]
+  - platform: gpio
+    name: Fenster 2
+    id: fenster2
+    device_class: window
+    pin: {pcf8574: expander, number: 7, mode: {input: true}, inverted: true}
+    filters: [delayed_on_off: 300ms]
 
 # -----------------------------------------------------------------------------
 # Jalousien

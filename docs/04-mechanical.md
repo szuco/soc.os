@@ -135,6 +135,24 @@ Ausgangspunkt: Micro-Fit 3.0 2×3. **Vor der Footprint-Wahl ist zu prüfen, dass
 konkrete Steckverbinder Nenn- und Peakstrom sicher verträgt** — siehe die Analyse zum
 Engpass an den Pins 1 und 2 in [`01-power-tree.md`](01-power-tree.md), Abschnitt 3.
 
+## 6b. Durchbrüche in der Frontplatte
+
+Die Sichtfläche darf nur an den vier Stegen zwischen den Sicheltasten
+durchbrochen werden. Auf 3 und 9 Uhr liegen die Befestigungsbohrungen, es
+bleiben **12 und 6 Uhr**. Beide Durchbrüche sitzen deshalb im oberen Steg, der
+dafür von 9 auf **17 mm** verbreitert wurde (`key_spoke_hw` 4,5 → 8,5). Die
+Sicheln schrumpfen dadurch von rund 70° auf 45°, die Stößel rücken von ±18° auf
+±12° um die Diagonalen — sonst stünden die Taster der Klinkenbuchse im Weg.
+
+| Durchbruch | Ø | Position (math, Y nach oben) | Zweck |
+|---|---|---|---|
+| Klinkenbuchse | 5,6 mm | x = −4,0, y = +22,5 | Weihnachtsstern, 2,5-mm-Klinke |
+| ToF-Fenster | 4,5 vorn / 3,0 hinten | x = +5,0, y = +22,5 | VL53L1X, konisch für den Sichtkegel |
+
+Der Kabelausgang Ø 4,5 mm im unteren Steg entfällt — der Stern wird gesteckt.
+**Für die Klinkenbuchse gilt ein hartes Höhenmaß: 10,5 mm über der
+Top-Leiterplatte**, mehr Platz ist bis zur Sichtfläche nicht da.
+
 ## 7. Stern-Ausgang
 
 Separater zweipoliger Anschluss im Frontpanel, Ausgangspunkt **JST-PH 2-polig**.

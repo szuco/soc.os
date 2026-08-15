@@ -33,7 +33,17 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gen_bottom_sch, gen_mid_sch, gen_top_sch                # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FPDIR = "/usr/share/kicad/footprints"
+def _fpdir():
+    """Footprintbibliothek finden - Linux, macOS oder per KICAD_FOOTPRINT_DIR."""
+    for d in (os.environ.get("KICAD_FOOTPRINT_DIR"),
+              "/usr/share/kicad/footprints",
+              "/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints"):
+        if d and os.path.isdir(d):
+            return d
+    return "/usr/share/kicad/footprints"
+
+
+FPDIR = _fpdir()
 
 BOARD_R = 26.0
 EDGE_CLEAR = 0.5
@@ -209,7 +219,11 @@ class BoardBuilder:
     def _antenna_keepout(self):
         zone = pcbnew.ZONE(self.board)
         zone.SetIsRuleArea(True)
-        zone.SetDoNotAllowCopperPour(True)
+        # KiCad 10: SetDoNotAllowCopperPour heisst jetzt SetDoNotAllowZoneFills
+        if hasattr(zone, "SetDoNotAllowCopperPour"):
+            zone.SetDoNotAllowCopperPour(True)
+        else:
+            zone.SetDoNotAllowZoneFills(True)
         zone.SetDoNotAllowTracks(True)
         zone.SetDoNotAllowVias(True)
         zone.SetDoNotAllowPads(False)
@@ -417,8 +431,16 @@ def run_drc(path):
     """DRC ueber die pcbnew-API - kicad-cli kann das erst ab KiCad 8."""
     import re as _re
     rpt = "/tmp/drc_%s.rpt" % os.path.basename(path).split(".")[0]
-    board = pcbnew.LoadBoard(path)
-    pcbnew.WriteDRCReport(board, rpt, pcbnew.EDA_UNITS_MILLIMETRES, True)
+    # WriteDRCReport braucht ab KiCad 10 eine initialisierte wxApp und bricht
+    # im blanken Python ab. kicad-cli macht dasselbe aus einem eigenen Prozess
+    # und ist versionsstabil.
+    r = subprocess.run(["kicad-cli", "pcb", "drc", "--format", "report",
+                        "--exit-code-violations",
+                        "-o", rpt, path],
+                       capture_output=True, text=True)
+    if not os.path.exists(rpt):
+        return {"violations": {}, "unconnected": 0,
+                "details": []}, ["kicad-cli drc: " + (r.stdout + r.stderr).strip()[:200]]
     txt = open(rpt, encoding="utf-8").read()
     counts = {}
     unconnected = 0
@@ -457,8 +479,11 @@ def run_drc(path):
 # Platzierungsplaene (KiCad-Koordinaten: +y = nach unten = von der Front weg)
 # --------------------------------------------------------------------------
 
-BTN_ANGLES = {"SW1A": 27, "SW1B": 63, "SW2A": 117, "SW2B": 153,
-              "SW3A": 207, "SW3B": 243, "SW4A": 297, "SW4B": 333}
+# Muss zu key_post_ang in mechanical/frontplate.py passen: die Stoessel der
+# Sicheltasten druecken genau hier. 12 Grad um die Diagonalen, damit auf
+# 12 Uhr Platz fuer Klinkenbuchse und ToF-Fenster bleibt.
+BTN_ANGLES = {"SW1A": 33, "SW1B": 57, "SW2A": 123, "SW2B": 147,
+              "SW3A": 213, "SW3B": 237, "SW4A": 303, "SW4B": 327}
 
 # FET-Raster Bottom: 4 Spalten (M1-A, M1-B, M2-B, M2-A), oben High-, unten
 # Low-Side. PowerPAK quer (5,5 x 7,5) -> Spaltenteilung 6,1 mm.
@@ -488,6 +513,8 @@ FIXED_BOTTOM = dict(_FET_GRID,
 FIXED_MID = {
     "U1":  (0.0, -12.5, 0, "F"),       # ESP32, Antenne zur Frontkante
     "J4":  (0.0, 20.5, 0, "F"),        # RS485-Anschluss unten
+    "J5":  (-19.75, 4.5, 90, "B"),     # Feldstecker Reed/Haube, Rueckseite 9 Uhr
+    "U4":  (12.0, 17.5, 0, "F"),       # PhotoMOS, freie Flaeche rechts unten
     "BZ1": (5.5, 8.0, 0, "F"),         # Piezo
     "U2":  (-8.0, 12.0, 0, "F"),       # MAX3485
     "U3":  (-5.6, 3.5, 0, "F"),        # PCF8574
@@ -500,8 +527,13 @@ FIXED_TOP = dict(
      for ref, a in BTN_ANGLES.items()},
     J1=(0.0, 21.6, 180, "F"),          # USB-C, Steckgesicht ueberhaengt
     J5=(0.0, 3.0, 0, "F"),             # Displayanschluss unterm Modul
-    J6=(8.9, 12.6, 90, "F"),           # Stern
-    J7=(-5.3, 13.3, 0, "F"),           # Radar
+    # 12 Uhr: die beiden einzigen Durchbrueche der Frontplatte. Koordinaten
+    # muessen zu jack_x/jack_y bzw. tof_x/tof_y in frontplate.py passen
+    # (dort Y nach oben, hier nach unten).
+    J6=(-4.0, -22.5, 0, "F"),          # Klinkenbuchse Stern
+    U3=(5.0, -22.5, 0, "F"),           # VL53L1X, schaut durchs ToF-Fenster
+    F1=(7.0, -16.0, 90, "F"),          # PTC direkt hinter der Buchse
+    J7=(-5.3, 13.3, 0, "F"),           # Reserveanschluss, DNP
     U2=(-10.5, -13.5, 0, "F"),         # SHT4x, weg von Waermequellen
 )
 

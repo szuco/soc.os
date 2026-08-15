@@ -90,9 +90,9 @@ auf dem Mid-Board zusammengelegt (Standard-Halbduplex, ein GPIO).
 | 11 | `PGND` | 12 | `UART485_TX` |
 | 13 | `PGND` | 14 | `UART485_RX` |
 | 15 | `RS485_DIR` | 16 | `RS485_DIR` |
-| 17 | `PGND` | 18 | `UART_RADAR_TX` |
-| 19 | `PGND` | 20 | `UART_RADAR_RX` |
-| 21 | `RADAR_INT` | 22 | `PGND` |
+| 17 | `PGND` | 18 | `UART_AUX_TX` |
+| 19 | `PGND` | 20 | `UART_AUX_RX` |
+| 21 | `PRESENCE_INT` | 22 | `PGND` |
 | 23 | `AUDIO_PWM` | 24 | `QSPI_CLK` |
 | 25 | `PGND` | 26 | `BTN1` |
 | 27 | `BTN2` | 28 | `BTN3` |
@@ -108,6 +108,27 @@ auf dem Mid-Board zusammengelegt (Standard-Halbduplex, ein GPIO).
 - `DISP_BL` ist die PWM für die Hintergrundbeleuchtung (LCD, kein AMOLED).
 - Zwei Reservepins sind entfallen; ohne Reserve steht der Verbinder nicht da, aber
   eng ist es.
+
+## 4b. Version 0.4 – Umbenennung nach dem Sensorwechsel
+
+Der Radar ist durch einen **ToF-Sensor VL53L1X auf dem Top-Board** ersetzt
+(Begründung: [`09-display-and-mcu.md`](09-display-and-mcu.md), Abschnitt 5).
+Die Pinlage bleibt unverändert, nur die Namen sind jetzt ehrlich:
+
+| Pin | v0.3 | v0.4 | Funktion |
+|---:|---|---|---|
+| `J_STK_B` 18 | `UART_RADAR_TX` | `UART_AUX_TX` | Reserve-UART auf J7 (unbestückt) |
+| `J_STK_B` 20 | `UART_RADAR_RX` | `UART_AUX_RX` | Reserve-UART auf J7 (unbestückt) |
+| `J_STK_B` 21 | `RADAR_INT` | `PRESENCE_INT` | GPIO1 des VL53L1X, geht auf PCF8574 P4 |
+
+Neu belegt sind zwei bisher freie Expanderpins — **nicht** am Stackverbinder,
+sondern nur auf dem Mid-Board:
+
+| PCF8574 | Signal | Funktion |
+|---|---|---|
+| P6 | `REED1_IN` | Fensterkontakt 1 |
+| P7 | `REED2_IN` | Fensterkontakt 2 |
+| P5 | `RELAY_CTL` | PhotoMOS zur Dunstabzugshaube (LOW = geschlossen) |
 
 ## 5. Prüfliste vor dem Footprint-Freeze
 

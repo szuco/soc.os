@@ -47,11 +47,11 @@ erheblich. Für Klappläden ist sequenzieller Betrieb meist unproblematisch.
 | 15c | **P0** | **Modul-Außendurchmesser des real gekauften ST77916-Boards messen** | `disp_module_d` in [`../mechanical/frontplate.py`](../mechanical/frontplate.py); bestimmt über eine Zwangsbedingung den Sichel-Innenradius und damit die ganze Frontplattengeometrie |
 | 15b | P2 | Modbus-Registerkarte für den RS-485-Primärbetrieb | `modbus_server` ist in ESPHome enthalten (verifiziert); Registerlayout offen |
 | 16 | P1 | RS-485-Transceiver | Versorgungsspannung, Fail-Safe-Bias, Terminierung |
-| 17 | P1 | Radar-Modul und dessen Versorgung/Logikpegel | Pegelanpassung nötig? Stromaufnahme? |
+| ~~17~~ | ✅ | **Radar entfällt — VL53L1X (ToF) auf dem Top-Board.** Hinter dieser Frontplatte hat kein 20-mm-Radarmodul freie Sicht; der ToF passt als 4,9 × 2,5 mm großer Chip in den oberen Steg | Begründung und Grenzen in [`09-display-and-mcu.md`](09-display-and-mcu.md) Abschnitt 5 |
 | 18 | P1 | Externer ADC ja/nein | folgt aus #10; betrifft `J_STK_A` |
 | 19 | P1 | Temperatur- und Feuchtesensor | I2C-Adressen dürfen nicht kollidieren |
 | ~~20~~ | ✅ | **`J_STK_B` v0.2** festgelegt, QSPI-Bus untergebracht | [`03-stack-pinout.md`](03-stack-pinout.md) |
-| 21 | P1 | Mini-Relais und die zu schaltende Spannung/Stromstärke | **wenn Netzspannung: Isolations- und Kriechstreckenkonzept, verändert die Board-Aufteilung** |
+| ~~21~~ | ✅ | **PhotoMOS AQY282GS statt Relais**, SELV bestätigt. Potentialfrei, 60 V / 0,8 A, kein Spulenstrom, keine Bauhöhe im 9-mm-Stapelspalt | **Gilt nur für SELV.** Erwartet die Haube 230 V, gehört das Schaltglied nicht in diese Dose |
 | 22 | P2 | Speaker/Piezo und gewünschte Lautstärke | bestimmt Treiber und Stromaufnahme |
 | 23 | P1 | Stackverbinder-Serie im 1,27-mm-Raster | Stackhöhe 10 mm bzw. 8–10 mm, Stromrating |
 | ~~24~~ | ✅ | **USB-UART entfällt** — ESP32-S3 hat nativen USB | erledigt |
@@ -64,3 +64,13 @@ erheblich. Für Klappläden ist sequenzieller Betrieb meist unproblematisch.
 | 26 | P1 | Bottom-Connector gerade oder abgewinkelt | größter Hebel im Tiefenbudget, siehe [`04-mechanical.md`](04-mechanical.md) |
 | 27 | P2 | Schraubengröße M2,5 vs. M3 | M2,5 empfohlen |
 | 28 | P2 | Bestätigung des Bohrbilds gegen reale Dose und Frontpanel | |
+
+## Neu aufgeworfen beim Umbau vom 15.08.2026
+
+| # | Prio | Entscheidung | Bemerkung |
+|---|---|---|---|
+| 29 | **P0** | **Feldstecker für Reed-Kontakte und Haubenkontakt** — auf dem Mid-Board ist *kein* Platz mehr. Nachgerechnet gegen alle Courtyards: weder vorn noch hinten passt ein 6-poliger oder auch nur 3-poliger JST, mit 4 mm Abstand zu den Befestigungsbohrungen. Aktuell steht ein JST-SH 1 mm auf der Rückseite, 0,4 mm neben dem Keepout von H2 | Vier Wege: (a) Feldsignale auf das Bottom-Board legen und `REED1/2` über die Reservepins `RSV_A2`/`RSV_A4` hochführen, (b) Piezo BZ1 (12 × 9,5 mm) verkleinern und den Platz nutzen, (c) Lötpads statt Steckverbinder, (d) Boarddurchmesser überdenken |
+| 30 | **P0** | **Konkrete 2,5-mm-Klinkenbuchse** — Footprint ist ein Platzhalter (3,5 mm vertikal). Bauhöhe über der Platine darf 10,5 mm nicht überschreiten | Pads aus dem Datenblatt des gewählten Teils übernehmen |
+| 31 | P1 | **VL53L1X-Treiber**: ESPHome hat nur `vl53l0x` nativ. Für Distanzwert, ROI-Umschaltung und die Alarmauswertung ist eine External Component nötig | Fällt mit der ohnehin geplanten C++-Komponente für die Strommessung zusammen |
+| 32 | P1 | **Sonnenlicht am ToF**: In der Fensterlaibung ist Fremdlicht der Störfall schlechthin. `short`-Modus und Statusflags auswerten, Blendung als eigener Zustand melden statt als Fehlalarm | vor der Freigabe am realen Fenster messen |
+| 33 | P2 | **Sicheltasten sind kleiner geworden**: Steg 9 → 17 mm für Klinke und ToF-Fenster, Sichel je ~70° → ~45°, Stößelwinkel 18° → 12° | am Testdruck prüfen, ob die Taste noch gut zu treffen ist |

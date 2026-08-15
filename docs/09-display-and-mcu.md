@@ -303,3 +303,56 @@ Bis diese Komponente geschrieben ist, arbeitet
 `template`-Covers. Die sind in Home Assistant voll bedienbar, haben aber **keine
 Lasterkennung** — sie fahren auf Zeit. Das ist ein bewusster Zwischenstand, kein
 Endzustand.
+
+## 5. Präsenzerkennung: warum ToF statt Radar
+
+Ziel ist nicht Raumüberwachung, sondern **Präsenz bis etwa 1 m vor dem Display**
+— und, weil das Gerät in der Fensterlaibung sitzt, zusätzlich ein Hinweis, wenn
+jemand durch die geöffnete Fensteröffnung steigt.
+
+### Der harte Grund gegen Radar: es gibt kein Fenster
+
+Die Frontplatte hat genau vier Stellen, an denen nach vorn durchbrochen werden
+darf — die vier Stege zwischen den Sicheltasten. Innen liegt das Displaymodul
+(Ø 41,5 mm), im Ring r 22…26,2 mm bewegen sich die Kappen, und auf 3 und 9 Uhr
+sitzen die Befestigungsbohrungen der Platinen. Bleiben 12 und 6 Uhr.
+
+24 GHz strahlt zwar durch gedruckten Kunststoff, aber nicht durch das LCD — und
+für ein Modul von 20 × 20 mm (LD2420, LD2410S) oder 22 × 16 mm (LD2410C) ist in
+einem 17 mm breiten Steg kein Platz. Radar scheitert hier an der Mechanik, nicht
+an der Physik.
+
+### Was stattdessen gewählt wurde
+
+| | VL53L1X (gewählt) | LD2410C | PIR AM312 | Kapazitiv |
+|---|---|---|---|---|
+| Baugröße | **4,9 × 2,5 mm** | 22 × 16 mm | 10 × 8 + Linse | beliebig |
+| Reichweite | 4 m, Schwelle frei | 6 m | 3–5 m | 10–20 cm |
+| Fenster | Loch Ø 4,5 mm | keins | Linse sichtbar | keins |
+| ESPHome | External Component | nativ | `gpio` | `esp32_touch` |
+| passt hinter diese Platte | **ja** | nein | nein | ja, zu kurz |
+
+Der ToF misst **Entfernung**. Die Schwelle liegt damit exakt bei 1,0 m statt bei
+einer Empfindlichkeitsstufe, und der Öffnungswinkel von rund 25° schaut genau
+nach vorn — ein Radar mit ±60° und 6 m würde auf jeden ansprechen, der durch den
+Flur geht.
+
+### Zweitfunktion: Durchstiegsmeldung
+
+In der Laibung montiert misst der Sensor **quer durch die Fensteröffnung**. Die
+Baseline ist die gegenüberliegende Laibung (0,8–1,4 m), alles Nähere steht in der
+Öffnung. Das ergibt eine Lichtschranke ohne Gegenstück. Der VL53L1X kann seine
+**ROI umschalten** und den Messkegel damit um ±10–15° schwenken; drei
+nacheinander abgetastete Zonen spannen ein Dreieck über die Öffnung.
+
+Grenzen, die zur Auslegung gehören:
+
+- **Fremdlicht.** Ein ToF am Fenster ist der ungünstigste Ambient-Fall. In der
+  Sonne bricht die Reichweite ein; `short`-Modus und die Statusflags jeder
+  Messung sind Pflicht, Blendung ist als eigener Zustand zu melden.
+- **Eine Ebene, kein Volumen.** Auch mit drei Zonen bleibt es eine Fläche knapp
+  über der Fensterbank.
+- **Kein Sabotageschutz.** Das Loch lässt sich zukleben. Der Sensor ist ein
+  Indiz neben den Reed-Kontakten, kein VdS-tauglicher Melder.
+- **Der geschlossene Flügel** kann im Strahl stehen. Die Baseline wird beim
+  Einbau gemessen, nicht angenommen.

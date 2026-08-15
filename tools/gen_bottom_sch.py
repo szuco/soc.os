@@ -68,7 +68,7 @@ def build():
     s.connect("PGND",  ("D1", "2"))
 
     # Verpolschutz: P-MOSFET high-side, Gate ueber R gegen GND, Zener begrenzt Ugs
-    s.add("Q1", "Device:Q_PMOS_GSD", "P-FET 40V 30A",
+    s.add("Q1", "SwitchStack:Q_PMOS_GSD", "P-FET 40V 30A",
           "Package_SO:PowerPAK_SO-8_Single",
           MPN="z.B. SiR429DP; Pad-Zuordnung siehe PAD_MAP in gen_layouts")
     s.connect("24V_GATE_P", ("Q1", "1"))
@@ -251,13 +251,13 @@ def build():
                 s.connect("%s_%s_G" % (tag, side), ("R_%s_%s" % (tag, side), "1"))
                 s.connect("%s_%s_GT" % (tag, side), ("R_%s_%s" % (tag, side), "2"))
             # High-Side- und Low-Side-FET
-            s.add("Q_%s_H" % tag, "Device:Q_NMOS_GDS", "N-FET 40V 60A",
+            s.add("Q_%s_H" % tag, "SwitchStack:Q_NMOS_GDS", "N-FET 40V 60A",
                   "Package_SO:PowerPAK_SO-8_Single",
                   MPN="Rds<5mOhm, z.B. SiR622DP - bestaetigen")
             s.connect("%s_HO_GT" % tag, ("Q_%s_H" % tag, "1"))
             s.connect("24V_PROT",       ("Q_%s_H" % tag, "2"))
             s.connect(sw,               ("Q_%s_H" % tag, "3"))
-            s.add("Q_%s_L" % tag, "Device:Q_NMOS_GDS", "N-FET 40V 60A",
+            s.add("Q_%s_L" % tag, "SwitchStack:Q_NMOS_GDS", "N-FET 40V 60A",
                   "Package_SO:PowerPAK_SO-8_Single",
                   MPN="Rds<5mOhm, z.B. SiR622DP - bestaetigen")
             s.connect("%s_LO_GT" % tag, ("Q_%s_L" % tag, "1"))

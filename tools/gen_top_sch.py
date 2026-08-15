@@ -36,6 +36,8 @@ C0603 = "Capacitor_SMD:C_0603_1608Metric"
 
 NC_ALLOWED = {
     ("J1", "A8"), ("J1", "B8"),      # SBU1/SBU2 - bei USB 2.0 unbenutzt
+    ("J6", "TN"),                    # Schaltkontakt der Klinke, absichtlich offen
+    ("U3", "8"),                     # VL53L1X DNC - laut Datenblatt offen lassen
 }
 
 
@@ -49,8 +51,11 @@ def build():
           "Connector_USB:USB_C_Receptacle_GCT_USB4085",
           MPN="16-Pin-Typ, nur USB 2.0")
     s.connect("USB_VBUS", ("J1", "A4"), ("J1", "B4"), ("J1", "A9"), ("J1", "B9"))
+    # Schirm: KiCad 9 nannte den Pin S1, KiCad 10 nennt ihn SH - Symbol und
+    # Footprint sind innerhalb einer Version konsistent, deshalb hier abfragen.
+    shield = "SH" if "SH" in symbol_pins("Connector:USB_C_Receptacle_USB2.0_16P") else "S1"
     s.connect("PGND",     ("J1", "A1"), ("J1", "B1"), ("J1", "A12"), ("J1", "B12"),
-              ("J1", "S1"))
+              ("J1", shield))
     s.connect("USB_CC1",  ("J1", "A5"))
     s.connect("USB_CC2",  ("J1", "B5"))
     s.connect("USB_DP_C", ("J1", "A6"), ("J1", "B6"))
@@ -120,14 +125,14 @@ def build():
     # =====================================================================
     # 5. Stern-Ausgang: High-Side-P-FET, geschaltet ueber STAR_EN
     # =====================================================================
-    s.add("Q1", "Device:Q_NPN_BCE", "BC847", "Package_TO_SOT_SMD:SOT-23")
+    s.add("Q1", "SwitchStack:Q_NPN_BCE", "BC847", "Package_TO_SOT_SMD:SOT-23")
     s.add("R3", "Device:R", "10k", R0603)
     s.connect("STAR_EN", ("R3", "1"))
     s.connect("STAR_B",  ("R3", "2"))
     s.connect("STAR_B",  ("Q1", "1"))
     s.connect("STAR_G",  ("Q1", "2"))
     s.connect("PGND",    ("Q1", "3"))
-    s.add("Q2", "Device:Q_PMOS_GSD", "P-FET 20V 1A", "Package_TO_SOT_SMD:SOT-23",
+    s.add("Q2", "SwitchStack:Q_PMOS_GSD", "P-FET 20V 1A", "Package_TO_SOT_SMD:SOT-23",
           MPN="z.B. AO3401 - 80 mA Last, unkritisch")
     s.connect("STAR_G",      ("Q2", "1"))
     s.connect("6V2_STAR_F",  ("Q2", "2"))
@@ -135,26 +140,68 @@ def build():
     s.add("R4", "Device:R", "100k", R0603, MPN="Gate-Pull-up: aus ohne Ansteuerung")
     s.connect("6V2_STAR_F", ("R4", "1"))
     s.connect("STAR_G",     ("R4", "2"))
+    # Bulk vor der Sicherung: die Ladestromspitze soll nicht durch den PTC
     s.add("C2", "Device:C", "22u", "Capacitor_SMD:C_1210_3225Metric")
-    s.connect("STAR_OUT", ("C2", "1"))
-    s.connect("PGND",     ("C2", "2"))
-    s.add("J6", "Connector_Generic:Conn_01x02", "Stern",
-          "Connector_JST:JST_PH_B2B-PH-K_1x02_P2.00mm_Vertical",
-          MPN="Kabel durch den Frontplatten-Ausgang Ø4,5")
-    s.connect("STAR_OUT", ("J6", "1"))
-    s.connect("PGND",     ("J6", "2"))
+    s.connect("STAR_SW", ("C2", "1"))
+    s.connect("PGND",    ("C2", "2"))
+    # Eine Klinkenbuchse schliesst beim Stecken kurz Tip gegen Sleeve. F2 unten
+    # auf dem Bottom-Board loest dafuer zu langsam aus, deshalb ein PTC direkt
+    # an der Buchse.
+    s.add("F1", "Device:Polyfuse", "0,2 A PTC", "Fuse:Fuse_1206_3216Metric",
+          MPN="Haltestrom > 100 mA, Ausloesestrom < 400 mA")
+    s.connect("STAR_SW",  ("F1", "1"))
+    s.connect("STAR_OUT", ("F1", "2"))
+
+    # Klinkenbuchse in der Frontplatte, 6 Uhr. Der Schaltkontakt TN bleibt
+    # offen - "Stern gesteckt" waere ein zusaetzlicher Stackpin und ein GPIO,
+    # dafuer ist die Funktion zu klein.
+    s.add("J6", "Connector_Audio:AudioJack2_SwitchT", "Stern Klinke",
+          "Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles",
+          MPN="PLATZHALTER 3,5 mm vertikal - Zielteil 2,5 mm, Bauhoehe max 10,5 mm "
+              "ueber der Platine, Footprint aus dem Datenblatt uebernehmen")
+    s.connect("STAR_OUT", ("J6", "T"))
+    s.connect("PGND",     ("J6", "S"))
 
     # =====================================================================
-    # 6. Radaranschluss (Modul liegt hinter der Frontplatte)
+    # 6. Praesenz: VL53L1X (ToF) und Reserveanschluss fuer ein Satellitenmodul
+    #
+    # Der Sensor sitzt auf 12 Uhr am Boardrand und schaut durch ein konisches
+    # Loch in der Frontplatte. In der Fensterlaibung montiert misst er quer
+    # durch die Oeffnung: Baseline = gegenueberliegende Laibung, alles Naehere
+    # steht in der Oeffnung. Damit deckt ein Bauteil zwei Funktionen ab -
+    # Display aufwecken und Durchstieg melden.
     # =====================================================================
-    s.add("J7", "Connector_Generic:Conn_01x05", "Radar",
+    s.add("U3", "Sensor_Distance:VL53L1CXV0FY1", "VL53L1X",
+          "Sensor_Distance:ST_VL53L1x",
+          MPN="Optikfenster freihalten, Uebersprechen: Loch konisch aufweiten")
+    s.connect("3V3_SYS", ("U3", "1"), ("U3", "11"))          # AVDDVCSEL, AVDD
+    s.connect("PGND",    ("U3", "2"), ("U3", "3"), ("U3", "4"),
+              ("U3", "6"), ("U3", "12"))
+    s.connect("TOF_XSHUT",   ("U3", "5"))
+    s.connect("PRESENCE_INT", ("U3", "7"))                   # GPIO1
+    s.connect("I2C_SDA", ("U3", "9"))
+    s.connect("I2C_SCL", ("U3", "10"))
+    s.add("R5", "Device:R", "10k", R0603, MPN="XSHUT-Pullup: Sensor immer aktiv")
+    s.connect("3V3_SYS",   ("R5", "1"))
+    s.connect("TOF_XSHUT", ("R5", "2"))
+    s.add("C3", "Device:C", "100n", C0603)
+    s.connect("3V3_SYS", ("C3", "1"))
+    s.connect("PGND",    ("C3", "2"))
+    s.add("C4", "Device:C", "4u7", C0603)
+    s.connect("3V3_SYS", ("C4", "1"))
+    s.connect("PGND",    ("C4", "2"))
+
+    # J7 bleibt als unbestueckter Reserveanschluss stehen: UART und Interrupt
+    # liegen ohnehin auf dem Stack, damit bleibt ein Satellitensensor moeglich,
+    # ohne das Pinout zu aendern.
+    s.add("J7", "Connector_Generic:Conn_01x05", "Reserve UART",
           "Connector_JST:JST_PH_B5B-PH-K_1x05_P2.00mm_Vertical",
-          MPN="Belegung an reales Modul anpassen (offener Punkt 17)")
-    s.connect("3V3_SYS",        ("J7", "1"))
-    s.connect("PGND",           ("J7", "2"))
-    s.connect("UART_RADAR_TX",  ("J7", "3"))   # ESP TX -> Radar RX
-    s.connect("UART_RADAR_RX",  ("J7", "4"))   # Radar TX -> ESP RX
-    s.connect("RADAR_INT",      ("J7", "5"))
+          MPN="DNP - Reserve fuer ein Satellitenmodul")
+    s.connect("3V3_SYS",      ("J7", "1"))
+    s.connect("PGND",         ("J7", "2"))
+    s.connect("UART_AUX_TX",  ("J7", "3"))
+    s.connect("UART_AUX_RX",  ("J7", "4"))
+    s.connect("PRESENCE_INT", ("J7", "5"))
 
     # =====================================================================
     # 7. Stackverbinder - identische Quelle wie Bottom/Mid

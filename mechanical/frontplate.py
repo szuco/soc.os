@@ -22,7 +22,7 @@ import math
 
 from build123d import (
     BuildPart, BuildSketch, Plane, Rectangle, Circle, SlotOverall, Locations,
-    extrude, fillet, chamfer, Mode, export_step, export_stl, Axis,
+    extrude, fillet, chamfer, loft, Mode, export_step, export_stl, Axis,
     Cylinder, Pos, Compound,
 )
 
@@ -68,7 +68,13 @@ PARAMS = dict(
     # Sonst kollidiert der Rueckhaltekragen der Kappen mit dem Displaymodul.
     key_slot_ri       = 22.0,   # Schlitz im Ring innen ...
     key_slot_ro       = 26.2,   # ... bis aussen
-    key_spoke_hw      = 4.5,    # halbe Stegbreite des Schlitzrings (9 mm Steg)
+    # Stegbreite: die vier Stege sind die EINZIGEN Stellen, an denen die Platte
+    # nach vorn durchbrochen werden darf - innen liegt das Display, im Ring
+    # bewegen sich die Kappen. Auf 3 und 9 Uhr sitzen die Befestigungsbohrungen
+    # der Platinen, es bleiben also 12 und 6 Uhr. Der obere Steg traegt jetzt
+    # zwei Durchbrueche (Klinkenbuchse und ToF-Fenster) und ist deshalb von
+    # 9 auf 17 mm verbreitert; die Sicheln verlieren dadurch je rund 25 Grad.
+    key_spoke_hw      = 8.5,    # halbe Stegbreite des Schlitzrings (17 mm Steg)
     key_gap           = 0.25,   # Spaltmass Kappe/Platte je Seite
     key_proud         = 0.8,    # Kappenueberstand vor der Sichtflaeche
     key_lip           = 0.7,    # Rueckhaltekragen der Kappe je Seite
@@ -77,14 +83,37 @@ PARAMS = dict(
     # Radialposition der Stoessel. Begrenzt durch den Platz fuer den SMD-Taster
     # auf dem Ø52-Board: r + halbe Tasterlaenge + Randabstand <= 26 mm.
     key_post_r        = 23.2,
-    key_post_ang      = 18.0,   # +/- Grad um die Diagonale
+    # Stoesselwinkel: mit dem breiteren Steg sind 18 Grad zu weit aussen, die
+    # Taster wuerden auf 12 Uhr der Klinkenbuchse im Weg stehen.
+    key_post_ang      = 12.0,   # +/- Grad um die Diagonale
     key_post_len      = 4.0,    # Stoessellaenge unter der Kappe - an realen
                                 # Abstand Platte->Top-PCB anpassen!
 
-    # --- Kabelausgang Weihnachtsstern (durch den unteren Steg) -------------
-    star_exit         = True,
+    # --- Kabelausgang Weihnachtsstern --------------------------------------
+    # Entfaellt: der Stern wird jetzt gesteckt statt durchgefaedelt.
+    star_exit         = False,
     star_exit_d       = 4.5,
     star_exit_y       = -24.0,
+
+    # --- Klinkenbuchse Weihnachtsstern (oberer Steg, 12 Uhr) ---------------
+    # Zielteil ist eine 2,5-mm-Buchse; Bauhoehe ueber der Top-Platine
+    # hoechstens 10,5 mm, sonst stoesst sie an die Sichtflaeche.
+    jack_hole         = True,
+    jack_hole_d       = 5.6,    # Gewindebund einer 2,5-mm-Buchse
+    jack_x            = -4.0,
+    jack_y            = 22.5,
+
+    # --- Sichtfenster ToF-Praesenzsensor (oberer Steg, 12 Uhr) -------------
+    # Der VL53L1X sitzt 10,5 mm hinter der Sichtflaeche, die Platte selbst ist
+    # an dieser Stelle 5,5 mm dick. Der Sichtkegel von 27 Grad hat am hinteren
+    # Ende des Kanals Ø2,4 und an der Sichtflaeche Ø5,0 - der Kanal weitet sich
+    # deshalb nach VORN auf. Ø4,5 vorn beschneidet auf rund 24 Grad, das ist
+    # gewollt: weniger Streulicht, weniger Uebersprechen.
+    tof_window        = True,
+    tof_front_d       = 4.5,
+    tof_back_d        = 3.0,
+    tof_x             = 5.0,
+    tof_y             = 22.5,
 
     # --- USB-C Zugang (aus, Programmierung bei abgenommener Blende) --------
     usb_slot          = False,
@@ -163,6 +192,23 @@ def build_plate(p=PARAMS):
                 with Locations((0, p["star_exit_y"])):
                     Circle(p["star_exit_d"] / 2)
             extrude(amount=-(p["plate_thickness"] + back), mode=Mode.SUBTRACT)
+
+        # -- Klinkenbuchse Stern (oberer Steg, volle Tiefe) -------------------
+        if p["jack_hole"]:
+            with BuildSketch(Plane.XY.offset(p["plate_thickness"])):
+                with Locations((p["jack_x"], p["jack_y"])):
+                    Circle(p["jack_hole_d"] / 2)
+            extrude(amount=-(p["plate_thickness"] + back), mode=Mode.SUBTRACT)
+
+        # -- ToF-Fenster: vorn zylindrisch, hinten konisch aufgeweitet -------
+        if p["tof_window"]:
+            with BuildSketch(Plane.XY.offset(p["plate_thickness"])):
+                with Locations((p["tof_x"], p["tof_y"])):
+                    Circle(p["tof_front_d"] / 2)
+            with BuildSketch(Plane.XY.offset(-back)):
+                with Locations((p["tof_x"], p["tof_y"])):
+                    Circle(p["tof_back_d"] / 2)
+            loft(mode=Mode.SUBTRACT)
 
         # -- optionaler USB-C-Schlitz ----------------------------------------
         if p["usb_slot"]:
@@ -303,13 +349,36 @@ def check_plate(part, p=PARAMS):
         clear(Pos(rmid * math.cos(a), rmid * math.sin(a), zc)
               * Cylinder(1.6, full), f"Sichelschlitz Q{q + 1}")
 
-    # Stege auf den Achsen tragen Material. Probe 8 Grad neben der Achse,
-    # weil auf der 270-Grad-Achse absichtlich das Stern-Kabelloch sitzt.
-    for ang in (0, 90, 180, 270):
+    # Stege auf den Achsen tragen Material. Probe 8 Grad neben der Achse.
+    for ang in (0, 180, 270):
         a = math.radians(ang + 8)
         solid(Pos(rmid * math.cos(a), rmid * math.sin(a),
                   p["plate_thickness"] / 2)
               * Cylinder(0.35, p["plate_thickness"]), f"Steg {ang} Grad")
+
+    # Der obere Steg (90 Grad) ist von Klinkenbuchse und ToF-Fenster
+    # durchbrochen. Geprueft werden die verbleibenden Materialbahnen: jede
+    # muss mindestens 1,2 mm breit und real vorhanden sein, sonst haengt der
+    # Blendring nur noch an drei Stegen.
+    holes = []
+    if p["jack_hole"]:
+        holes.append((p["jack_x"], p["jack_hole_d"] / 2))
+    if p["tof_window"]:
+        holes.append((p["tof_x"], max(p["tof_front_d"], p["tof_back_d"]) / 2))
+    holes.sort()
+    bands, lo = [], -p["key_spoke_hw"]
+    for cx, r in holes:
+        bands.append((lo, cx - r))
+        lo = cx + r
+    bands.append((lo, p["key_spoke_hw"]))
+    for i, (x0, x1) in enumerate(bands, start=1):
+        w = x1 - x0
+        if w < 1.2:
+            errs.append(f"Steg 90 Grad: Materialbahn {i} nur {w:.2f} mm breit")
+        else:
+            solid(Pos((x0 + x1) / 2, rmid, p["plate_thickness"] / 2)
+                  * Cylinder(0.35, p["plate_thickness"]),
+                  f"Steg 90 Grad, Bahn {i}")
 
     # Blendring zwischen Fenster und Schlitz intakt
     rb = (p["disp_window_d"] / 2 + p["key_slot_ri"]) / 2
@@ -321,6 +390,17 @@ def check_plate(part, p=PARAMS):
     if p["star_exit"]:
         clear(Pos(0, p["star_exit_y"], zc)
               * Cylinder(p["star_exit_d"] / 2, full), "Kabelausgang Stern")
+
+    # Durchbrueche im oberen Steg: frei, und sie duerfen den Steg nicht
+    # verlassen - sonst laegen sie im Verfahrweg der Sicheltasten.
+    if p["jack_hole"]:
+        clear(Pos(p["jack_x"], p["jack_y"], zc)
+              * Cylinder(p["jack_hole_d"] / 2, full), "Klinkenbuchse Stern")
+    if p["tof_window"]:
+        # Der Kanal ist konisch; garantiert frei ist der engste Querschnitt.
+        clear(Pos(p["tof_x"], p["tof_y"], zc)
+              * Cylinder(min(p["tof_front_d"], p["tof_back_d"]) / 2, full),
+              "ToF-Fenster")
 
     # Schraubenloecher frei
     for sx in (p["screw_pitch"] / 2, -p["screw_pitch"] / 2):
