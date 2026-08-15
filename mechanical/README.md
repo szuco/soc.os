@@ -28,7 +28,7 @@ Kollisionsfreiheit der Kappen in Einbaulage**.
 
 | Merkmal | Wert |
 |---|---|
-| Sichtfläche | 54,6 × 54,6 mm, Ecken R2, Fase 0,5 mm |
+| Sichtfläche | 54,6 × 54,6 mm, Ecken R2, Fase 0,5 mm — für das 55er-Fenster des **Busch-Jaeger 1721-914** (Busch-balance SI, 1-fach) |
 | Gesamtabmessung | 76,0 × 54,6 × 8,0 mm (Kappenstößel bis −5,0) |
 | Geräteschrauben | Langlöcher 3,9 mm auf **60 mm** Achsabstand (DIN 49073) |
 | Displayfenster | Ø 37,8 mm (ST77916 1,46", aktiv Ø 37,25), Modulfreiraum Ø 42,5 mm |

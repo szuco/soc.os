@@ -63,7 +63,7 @@ erheblich. Für Klappläden ist sequenzieller Betrieb meist unproblematisch.
 
 | # | Prio | Entscheidung | Bemerkung |
 |---|---|---|---|
-| 25 | P1 | Finale Frontpanel-Geometrie am realen Rahmen prüfen | Testdruck der Platte in den vorhandenen 55er-Rahmen, siehe [`../mechanical/README.md`](../mechanical/README.md) |
+| 25 | P1 | **Frontplatte gegen den festgelegten Rahmen prüfen: Busch-Jaeger 1721-914, Busch-balance SI, 1-fach** (2CKA001725A1555). Fenster 55 × 55, außen 81 × 81 × 12 mm — beides passt rechnerisch zur Platte (54,6 mm) und zu den Ohren (76 mm) | **Die offene Frage ist die Klemmbefestigung:** Der Rahmen rastet, und zwar bei den SI-Serien üblicherweise am *Tragring*. Diese Platte ersetzt den Tragring durch zwei angeformte Ohren — bietet sie den Rastnasen genug? Messliste in [`04-mechanical.md`](04-mechanical.md) Abschnitt 1b, zu klären am Testdruck |
 | 26 | P1 | Bottom-Connector gerade oder abgewinkelt | größter Hebel im Tiefenbudget, siehe [`04-mechanical.md`](04-mechanical.md) |
 | 27 | P2 | Schraubengröße M2,5 vs. M3 | M2,5 empfohlen |
 | 28 | P2 | Bestätigung des Bohrbilds gegen reale Dose und Frontpanel | |

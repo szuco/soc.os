@@ -32,6 +32,11 @@ from build123d import (
 
 PARAMS = dict(
     # --- Zentralplatte ------------------------------------------------------
+    # Zielrahmen FESTGELEGT: Busch-Jaeger 1721-914, Busch-balance SI, 1-fach
+    # (2CKA001725A1555). Fenster 55 x 55 mm, aussen 81 x 81 x 12 mm. Damit
+    # bleiben 0,2 mm Luft je Seite, und die 76 mm breiten Ohren verschwinden
+    # hinter dem Rahmen. Offen ist, woran seine Klemmbefestigung greift -
+    # Messliste in docs/04-mechanical.md Abschnitt 1b.
     plate_size        = 54.6,   # 55er-Norm; 0,4 mm Untermass fuer Druckertoleranz
     plate_thickness   = 2.5,
     plate_corner_r    = 2.0,

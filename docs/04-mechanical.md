@@ -8,6 +8,7 @@
 | Durchmesser | **Ø 52,0 mm** (Radius 26,0 mm) |
 | Leiterplattendicke | **1,0 mm** |
 | Unterputzdose | massiv, Ø 60 mm außen, **61 mm tief** |
+| **Abdeckrahmen** | **Busch-Jaeger 1721-914, Busch-balance SI, 1-fach** (2CKA001725A1555) |
 | Stack-Abstand Bottom ↔ Mid | ≈ 10 mm |
 | Stack-Abstand Mid ↔ Top | ≈ 9 mm |
 
@@ -24,6 +25,40 @@
 > **Vor dem Layout-Freeze die reale Dose ausmessen.** Ist mehr Platz vorhanden,
 > ist die Änderung eine Zeile: `BOARD_DIAMETER` in
 > [`../tools/gen_boards.py`](../tools/gen_boards.py) und Skript neu laufen lassen.
+
+## 1b. Der Abdeckrahmen ist festgelegt
+
+Verwendet wird der **Busch-Jaeger 1721-914** (Bestellnummer 2CKA001725A1555),
+Serie *Busch-balance SI*, 1-fach, alpinweiß. Damit sind zwei Maße keine
+Annahmen mehr:
+
+| Maß laut Herstellerangabe | Wert | Folge für dieses Projekt |
+|---|---|---|
+| Einbaumaß (Fenster) | **55 × 55 mm** | Die Frontplatte mit 54,6 × 54,6 mm passt mit 0,2 mm Luft je Seite — das bisher angenommene 55er-Maß ist bestätigt |
+| Außenmaß | **81 × 81 mm** | Die Tragring-Ohren der Platte sind 76 mm breit und verschwinden vollständig hinter dem Rahmen (2,5 mm Überdeckung je Seite) |
+| Tiefe | 12 mm | sitzt vor der Wand, geht **nicht** ins 61-mm-Tiefenbudget |
+| Bohrungsöffnung | 71 mm | deckt die Ø-60-Dose sicher ab |
+| Befestigung | „Klemmbefestigung" | **Das ist die offene Stelle — siehe unten** |
+
+### Was am realen Rahmen zu messen ist
+
+Der Rahmen hält durch Klemmung, und die Herstellerangaben sagen nicht, *woran*.
+Bei den SI-Serien greifen die Rastnasen üblicherweise am Tragring, nicht an der
+Zentralscheibe — unsere Frontplatte ersetzt aber den Tragring durch zwei
+angeformte Ohren und bietet den Rastnasen damit möglicherweise nichts zum
+Greifen. Das entscheidet, ob die Platte überhaupt so montierbar ist, und gehört
+zum Testdruck (Punkt 25):
+
+1. **Woran rastet der Rahmen?** Innenkontur der Rastnasen ausmessen und
+   prüfen, ob die Platte dort Material anbieten muss.
+2. **Hat das 55er-Fenster vorn einen umlaufenden Absatz**, der die
+   Zentralscheibe hält? Dann übernimmt er die Halterung, und die Platte braucht
+   nur die richtige Dicke an der Kante.
+3. **Eckradius des Fensters** gegen `plate_corner_r` = 2,0 mm — ein anderer
+   Radius zeigt sich als Spalt in den Ecken.
+4. **Freiraum für den Tastenüberstand:** Die Sicheln stehen 0,8 mm vor der
+   Sichtfläche; sie liegen bei r ≤ 26,2 mm und damit sicher im 55er-Fenster,
+   dürfen aber nicht an einem Innenabsatz des Rahmens streifen.
 
 Board-Outline in KiCad: Kreis auf `Edge.Cuts`, Mittelpunkt (0,0), Radius 26,0 mm.
 Board-Dicke über *Board Setup → Physical Stackup*.
