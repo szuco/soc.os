@@ -42,6 +42,36 @@ Component um die offiziellen Espressif-Treiber (`esp_lcd_*`) gewickelt.
 | Blanking des Anlaufstroms in der Lastanalyse | **≈ 600 ms** (Startwert) |
 | Mechanische Stopzeit vor Richtungswechsel | ≥ 300 ms (Startwert) |
 | Software-Soft-Limit | ≈ 9 A (vorläufig) |
+| Beginn des Sanftauslaufs | ab **≈ 80 %** der erwarteten Fahrzeit (Startwert) |
+| PWM im Sanftauslauf | von 100 % auf ≈ **40 %** rampen (Startwert) |
+
+### Endlagen: Zeitkonstante, Strom — und Sanftauslauf
+
+**Die Endlage wird ausschließlich aus der Fahrzeit und dem Stromverlauf
+bestimmt.** Es gibt keine Endschalter, und die Reed-Kontakte gehören nicht dazu
+(Abschnitt unten).
+
+Daraus folgt eine dritte Anforderung, die über reines Erkennen hinausgeht:
+**Die Läden müssen langsamer werden, wenn sie sich der vermuteten Endlage
+nähern.** Der Grund ist mechanisch — bei voller Drehzahl in den Anschlag zu
+fahren belastet Getriebe, Beschlag und Mauerwerk, und der Stromanstieg beim
+Auflaufen ist bei voller Fahrt so steil, dass die Abschaltung erst nach dem
+Schlag kommt. Mit reduzierter Drehzahl wird der Anstieg flacher und früher
+auswertbar, und der Anschlag wird weich.
+
+Ablauf einer Fahrt:
+
+1. **Anlauf**, die ersten ≈ 600 ms in der Lastanalyse ausgeblendet.
+2. **Fahrt** mit voller PWM, Lastüberwachung nach dem Verfahren unten.
+3. **Sanftauslauf** ab ≈ 80 % der erwarteten Fahrzeit: PWM linear auf ≈ 40 %
+   rampen. Die Schwellwerte der Lastanalyse müssen dabei mitgeführt werden —
+   bei halber PWM ist auch der Normalstrom kleiner.
+4. **Abschaltung** beim Stromanstieg des Anschlags, spätestens nach 30 s.
+
+Die erwartete Fahrzeit ist keine Konstante für die Ewigkeit: Sie ist je Laden
+und Richtung zu führen und nach jeder sauber beendeten Fahrt nachzuziehen —
+sonst wandert der Umschaltpunkt mit Temperatur und Verschleiß aus dem Fenster.
+Startwert ist die Datenblatt-Fahrzeit von 18 s.
 
 ### Lasterkennung
 
@@ -96,14 +126,24 @@ Abschnitt 4.
 | **Tastenbelegung** | Vier Tasten: **OK / Hoch / Runter / Home**. `Home` führt aus *jeder* Menütiefe direkt zur Hauptansicht zurück; das Original hatte dafür zusätzlich einen eigenen RESET-Taster, den diese Hardware nicht mehr hat. Entprellung 50 ms, flankengetriggert. Offen als Punkt 37 in [`../docs/06-open-decisions.md`](../docs/06-open-decisions.md). |
 | **Eine Task je Funktionsblock** | Kooperatives Modell mit eigener Periode je Block (Motor, Sensorik, UI, Kontakte) statt einer Sammelschleife. Deckt sich mit der frameworkfreien Kernregel oben. |
 
-### Verschlusskontakte sind Positionsreferenz, nicht Alarmtechnik
+### Die Reed-Kontakte sichern das Fenster, nicht den Laden
 
-`REED1_IN`/`REED2_IN` heißen im Ursprungsentwurf **Verschlussüberwachung Links/Rechts**
-und melden die Verschlusslage *je Klappladen*. Da es keine Endschalter gibt, sind sie
-der **einzige absolute Positionsbezug im System** — die Lasterkennung oben liefert nur
-relative Information. Die Motorlogik hat sie entsprechend auszuwerten: Verschlusslage
-erreicht ⇒ Fahrt beenden, unabhängig vom Stromverlauf; Verschlusslage bei laufender
-Öffnungsfahrt nicht verlassen ⇒ Fehler.
+**Festgelegt am 15.08.2026, und zwar gegen die Herleitung aus dem Vorgängerprojekt.**
+`REED1_IN`/`REED2_IN` überwachen **das Fenster** — geschlossen oder offen. Mit der
+Endlage der Klappläden haben sie **nichts** zu tun, und die Motorlogik darf sie
+dafür auch nicht heranziehen.
+
+Das korrigiert eine frühere Fassung dieses Abschnitts. Sie schloss aus den
+Blattnamen des Vorgängerentwurfs („Verschlussüberwachung Links/Rechts") auf eine
+Endlagenmeldung und nannte die Kontakte den „einzigen absoluten Positionsbezug im
+System". Das war eine Übernahme aus alten Unterlagen, keine Festlegung für dieses
+Gerät. Der Einordnung in [`../docs/12-legacy-socos.md`](../docs/12-legacy-socos.md)
+ist damit die Grundlage entzogen.
+
+Praktische Folge: **Es gibt keinerlei absolute Positionsrückmeldung der Läden.**
+Die Endlagenbestimmung ruht vollständig auf den zwei Verfahren im nächsten
+Abschnitt, und der Sicherheitsfall „Laden fährt gegen ein Hindernis" wird
+ausschließlich vom Strom erkannt.
 
 ## Weitere Funktionsbereiche
 

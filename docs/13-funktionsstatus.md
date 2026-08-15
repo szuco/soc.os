@@ -79,7 +79,8 @@ stimmt, ist damit *nicht* gezeigt.
 | Hardware-Überstromabschaltung | ✅ INA240A2 → LM393-Fenster → 74AUP1G74 auf `~SD` | ✅ meldet `HW_TRIP1/2` nach Home Assistant, Reset-Taste vorhanden | ✅ wirkt firmwareunabhängig — 🔒 **Schwelle ist eine Annahme** (Punkt 1) |
 | Strommessung anzeigen | ✅ 1 mΩ Inline-Shunt, Kelvin, INA240A2 | 🟡 zwei ADC-Sensoren, Skalierung `multiply: 5.0` ist **Platzhalter** | 🟡 taugt zur Anzeige, nicht zur Auswertung |
 | **Lasterkennung / Stall** | ✅ Hardware vorhanden | ⛔ **fehlt vollständig** | ⛔ braucht PWM-synchrones Sampling → eigene C++-External-Component ([`09`](09-display-and-mcu.md) Abschnitt 4) |
-| Endlage über Verschlusskontakt | ✅ `REED1/2` mit Pull-up, RC-Glied, ESD | 🟡 nur als Fenster-Sensoren in HA sichtbar | ⛔ **nicht mit der Motorlogik verknüpft** — obwohl sie der einzige absolute Positionsbezug sind ([`../firmware/README.md`](../firmware/README.md)) |
+| Endlagenerkennung | — **bewusst keine Hardware** | ⛔ | ⛔ Endlage ausschließlich über Fahrzeit + Strom. Die Reed-Kontakte gehören **nicht** dazu (Festlegung 15.08.2026) — es gibt damit **keine** absolute Positionsrückmeldung |
+| **Sanftauslauf vor der Endlage** | ✅ PWM-fähige Brücken vorhanden | ⛔ | ⛔ Ab ≈ 80 % der Fahrzeit auf ≈ 40 % PWM rampen: schont die Mechanik und macht den Stromanstieg früher auswertbar ([`../firmware/README.md`](../firmware/README.md)) |
 | Interlock „nur ein Motor gleichzeitig" | — | ⛔ | 🔒 Punkt 3 — Nutzungsentscheidung, kostet nichts, entschärft Punkt 2 |
 | Konkreter N-Kanal-MOSFET | ⛔ einziges Leistungsbauteil ohne Teilenummer | — | 🔒 Punkt 8, hängt am Blockierstrom |
 
@@ -105,6 +106,7 @@ stimmt, ist damit *nicht* gezeigt.
 | Präsenz vor dem Display | ✅ VL53L1X auf Top, Fenster im oberen Steg | 🟡 nur der Interrupt-Pin über den Expander | 🟡 „jemand da / nicht da", **keine Entfernung** |
 | Durchstiegsmeldung durchs Fenster | ✅ derselbe Sensor | ⛔ | 🔒 Punkt 31 — braucht Distanzwert und ROI-Umschaltung, also eine External Component |
 | Blendungserkennung (Sonne) | ✅ Statusflags des Sensors | ⛔ | 🔒 Punkt 32 — am realen Fenster zu messen |
+| **Fensterkontakte (Reed)** | ✅ 2 × Reed, Pull-up, RC, ESD | ✅ als `window`-Sensoren in HA | ✅ Zweck ist die **Fensterabsicherung**, nicht die Ladenposition |
 | **Sabotagekontakte** | ⛔ keine Eingänge frei (PCF8574 P0–P7 belegt) | ⛔ | 🔒 **Punkt 34, P0** — im Ursprungsentwurf vorhanden, hier verloren; entweder zweiter Expander oder schriftlich streichen |
 
 ### 3.4 Ausgänge und Kommunikation

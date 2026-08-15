@@ -59,14 +59,19 @@ nach außen können muss:
 
 > **Namensklärung `REED1/REED2`.** Im aktuellen Stand heißen die beiden Eingänge
 > „Fenster 1" und „Fenster 2" ([`../firmware/esphome/switchstack.yaml`](../firmware/esphome/switchstack.yaml)).
-> Im Original heißen sie **Verschlussüberwachung Links/Rechts** — sie überwachen
-> nicht *ein Fenster*, sondern **je einen Klappladen auf Verschlusslage**. Das ist
-> dieselbe Zahl von Eingängen, aber eine andere Semantik: Der Kontakt ist die
-> Referenz für die Endlage der Motorfahrt und gehört fachlich zur Motorlogik, nicht
-> zur Alarmanlage. Für die Lasterkennung ohne Endschalter
-> ([`../firmware/README.md`](../firmware/README.md)) ist das ein relevanter
-> Unterschied: Der Verschlusskontakt ist der einzige *absolute* Positionsbezug im
-> ganzen System.
+> Im Original heißen sie **Verschlussüberwachung Links/Rechts**.
+>
+> **Diese Übernahme war falsch und ist am 15.08.2026 zurückgenommen worden.** Aus
+> dem alten Blattnamen wurde hier geschlossen, die Kontakte meldeten die Endlage
+> der Klappläden und seien damit „der einzige absolute Positionsbezug im ganzen
+> System". Das ist eine Deutung alter Unterlagen, keine Festlegung für dieses
+> Gerät — und die Festlegung lautet anders: **Die Reed-Kontakte sichern das
+> Fenster. Mit den Endlagen der Läden haben sie nichts zu tun.** Die Endlage
+> wird ausschließlich aus Fahrzeit und Stromverlauf bestimmt, samt Sanftauslauf
+> vor dem Anschlag ([`../firmware/README.md`](../firmware/README.md)).
+>
+> Der Eintrag bleibt als Warnung stehen: Ein Blattname aus einem Vorgängerprojekt
+> ist ein Hinweis, kein Nachweis.
 
 ### Der Signalsatz, wie ihn v2 und v3 führten
 
