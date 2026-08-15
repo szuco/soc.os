@@ -481,7 +481,7 @@ def run_drc(path):
 
 # Muss zu key_post_ang in mechanical/frontplate.py passen: die Stoessel der
 # Sicheltasten druecken genau hier. 12 Grad um die Diagonalen, damit auf
-# 12 Uhr Platz fuer Klinkenbuchse und ToF-Fenster bleibt.
+# 12 Uhr das ToF-Fenster und auf 6 Uhr die Klinkenbuchse Platz haben.
 BTN_ANGLES = {"SW1A": 33, "SW1B": 57, "SW2A": 123, "SW2B": 147,
               "SW3A": 213, "SW3B": 237, "SW4A": 303, "SW4B": 327}
 
