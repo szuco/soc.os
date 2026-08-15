@@ -160,3 +160,8 @@ Das ausgearbeitete Messprotokoll **F1–F13** steht in
 [`04-mechanical.md`](04-mechanical.md) Abschnitt 1d. Vier Werte daraus geben das
 Layout frei: **F3** (Fensterausschnitt → Display), **F5/F10** (Tastenpositionen
 → Punkt 42), **F8** (Rastmaß → Adapter) und **F2** (Bauhöhe).
+
+| # | Prio | Entscheidung | Bemerkung |
+|---|---|---|---|
+| 48 | **P0** | **Das Top-Board wird eckig.** Die vier Druckkreuze der Zentralscheibe sitzen bei (±18,0 · ±20,0), also auf **r = 26,91 mm** — 0,9 mm außerhalb der Ø-52-Platine. Mit Taster und Randabstand bräuchte eine runde Platine Ø 59,7; das passt in keine Dose. Ursache ist strukturell: Das BJ-System ist um einen **quadratischen** Einsatz gebaut und setzt seine Tasten in die Ecken | **Vorschlag: 49 × 49 mm mit gerundeten Ecken**, vor der Dose sitzend wie der BJ-Einsatz. Mid und Bottom bleiben rund und bleiben in der Dose. Kosten: der gemeinsame Umriss fällt, `gen_boards.py` und der Fertigungsnutzen ändern sich, das Top-Layout wird neu erzeugt (es trägt ohnehin keine Leiterbahnen). Gewinn: Taster direkt unter den Kreuzen, kein Hebel, kein bewegliches Druckteil — und das Tiefenbudget für Mid und Bottom wächst, weil Top die Dose verlässt. Alternative wäre ein Adapter mit vier Hebeln; das widerspricht der Regel „die Federung kommt vom Taster, nicht vom Kunststoff" |
+| 49 | **P1** | **Der Adapter muss dem Rahmen 70,0 mm anbieten** — auf dieses Maß klemmen seine Doppelstege (F13). Die bisherige Frontplatte hat 76 mm breite Ohren und stünde ihnen im Weg | Tragring-Maß nachbilden, Schraublöcher weiter auf 60 mm (DIN 49073). Damit ist auch Punkt 25 beantwortet: Der Rahmen hält am Tragring, nicht an der Zentralscheibe (F12 — sie hält nicht von allein im Rahmen) |

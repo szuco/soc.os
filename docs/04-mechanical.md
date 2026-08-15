@@ -221,13 +221,62 @@ Damit ist Punkt 43 praktisch entschieden: Das Panel füllt den Ausschnitt in der
 Breite randlos und wird in der Höhe um einen halben Millimeter je Seite
 beschnitten — genau das, was ein Fenster tun soll.
 
+### Nachtrag 16.08.2026: die Kreuze liegen außerhalb der Platine
+
+| Gemessen | |
+|---|---|
+| Kreuzmitten | **7,6 mm** von der oberen bzw. unteren Kante, **9,6 mm** von der linken bzw. rechten |
+| Rahmentiefe (F11) | **12 mm** |
+| Doppelstege im Rahmen (F13) | Innenmaß **70,0 mm** |
+
+Umgerechnet liegen die vier Druckpunkte bei **(±18,0 · ±20,0)** — also auf
+**r = 26,91 mm** unter 48°. Die Ø-52-Platine reicht bis r = 26,0.
+
+> **Der Druckpunkt liegt 0,9 mm außerhalb der Leiterplatte.** Mit dem Taster
+> selbst (3,9 × 2,9 mm) und 0,5 mm Randabstand müsste eine *runde* Platine bis
+> r = 29,8 reichen, also Ø 59,7 — das passt in keine Dose mit 55–57 mm lichter
+> Weite.
+
+Der Grund ist strukturell, kein Rechenfehler: **Das Busch-Jaeger-System ist um
+einen quadratischen Einsatz von 54 × 54 mm gebaut, und seine Tasten sitzen in
+den Ecken. Ein Kreis hat keine Ecken.** Genau die 0,9 mm, die fehlen, sind der
+Unterschied zwischen Quadrat und einbeschriebenem Kreis.
+
+#### Konsequenz: das Top-Board wird eckig
+
+Nur das Top-Board ist betroffen — Mid und Bottom bleiben rund und bleiben in der
+Dose. Das Top-Board wandert **vor** die Dose, so wie es der BJ-Einsatz auch tut,
+und wird zum abgerundeten Quadrat:
+
+| Randbedingung | Wert |
+|---|---|
+| Taster muss abdecken bis | (20,4 · 22,4) → Mindestgröße **40,8 × 44,8 mm** |
+| Rastnasen der Scheibe (innen 50,0) | Kante höchstens **25,0** von der Mitte |
+| **Vorschlag** | **49 × 49 mm**, Ecken gerundet — Kantenmitte 24,5 (0,5 mm innerhalb der Rastnasen), Ecke r = 34,6 |
+
+Das kostet den gemeinsamen Umriss der drei Boards, bringt aber zwei Dinge:
+Die Taster sitzen ohne Umlenkung direkt unter den Kreuzen — kein Hebel, kein
+bewegliches Druckteil, die Federung bleibt beim Taster —, und weil das
+Top-Board die Dose verlässt, **wächst das Tiefenbudget für Mid und Bottom**.
+
+Die Alternative wäre ein Adapter mit vier Hebeln, der den Druck von r = 26,9 nach
+innen auf r ≤ 23 umlenkt. Das widerspricht der Kernregel aus
+[`09-display-and-mcu.md`](09-display-and-mcu.md) Abschnitt 1b — gedruckte
+bewegliche Teile ermüden, Metallkuppel-Taster nicht — und wird deshalb nicht
+empfohlen. Aufgenommen als Punkt 48.
+
+#### Und der Adapter wird zum Tragring
+
+F13 sagt: Der Rahmen klemmt auf **70,0 mm**. Das ist Tragring-Maß. Die bisherige
+Frontplatte hat Ohren mit **76 mm** Spannweite — die stünden den Klemmstegen des
+Rahmens im Weg. Der Adapter muss dem Rahmen also eine Fläche von 70,0 mm
+anbieten, mit den Schraublöchern weiterhin auf 60 mm (DIN 49073).
+
 ### Noch offen
 
-- **Kreuzpositionen** (von links / von oben, alle vier) → bestimmt die
-  Tasterpositionen und damit das Top-Layout.
-- **Eckradius** des Fensters (F3) und des Rahmenfensters (F11).
-- **Innenmaß der Doppelstege** im Rahmen (F13) → woran der Rahmen klemmt, wenn
-  ihn die Scheibe nicht hält.
+- **Eckradius** des Fensters (F3) und des Rahmenfensters.
+- Bestätigung, dass die Platte beim Druck auf ein Symbol um die Mitte **kippt**
+  (dann sind die Tasterpaare wie in Abschnitt „Was daraus folgt" beschrieben).
 
 Board-Outline in KiCad: Kreis auf `Edge.Cuts`, Mittelpunkt (0,0), Radius 26,0 mm.
 Board-Dicke über *Board Setup → Physical Stackup*.
