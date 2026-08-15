@@ -150,11 +150,84 @@ mache ich. Messschieber, 0,1 mm genügt.
 | **F12** | Scheibe in den Rahmen setzen: **Hält sie von allein?** Und wie tief liegt ihre Sichtfläche hinter der Rahmenvorderkante? | Klärt, ob der Rahmen die Scheibe hält oder der Adapter — und wie weit die Tastenfelder vorstehen dürfen |
 | **F13** | Klemmelemente des Rahmens auf seiner Rückseite: Lage und lichtes Maß — worauf klemmt er? | Punkt 25: Der Adapter muss dem Rahmen anbieten, was sonst der Tragring bietet |
 
-### Ergebnisse eintragen
+### Ergebnisse, gemessen am 16.08.2026
 
-Werte hier ergänzen, sobald gemessen. Vier davon geben das Layout frei: **F3**
-(Displaygröße), **F5** oder **F10** (Tastenpositionen), **F8** (Rastmaß) und
-**F2** (Bauhöhe).
+| # | Messwert |
+|---|---|
+| F1 | **55,2 × 55,2 mm**, Sichtfläche **1,0 mm** dick |
+| F2 | Gesamttiefe **7,5 mm** |
+| F3 | Fenster **32,7 × 27,0 mm**, Eckradius klein (noch offen) |
+| F4 | links 10,3 · oben 13,8 → rechnerisch rechts 12,2 · unten 14,4 |
+| F5 | Symbole (von links / von oben): ↑ 28,0/8,0 · ▷ 6,0/27,5 · ↓ 28,0/46,0 · OK 50,0/27,5 |
+| F6 | **starr** — keine beweglichen Felder, keine Trennfugen. Auf der Rückseite kleine Kreuze |
+| F7 | entfällt |
+| F8 | **4 Rastnasen**, je eine mittig pro Kante, 1,0 mm breit und hoch, vorn angeschrägt 1,0 → 1,4 mm. **Lichtes Innenmaß 50,0 mm** |
+| F9 | kein Kragen, nur die 1,0 mm starke Wand |
+| F10 | **4 Kreuze, 3,2 × 3,2 mm, 1,5 mm hoch** — laut Foto an den **Ecken**, nicht bei den Symbolen |
+| F11 | Rahmenfenster **56,00 mm** |
+| F12 | Scheibe hält **nicht** von allein im Rahmen; Sichtfläche liegt **bündig** |
+| F13 | je Innenseite zwei Doppelstege — eher Justierung als Halt |
+
+### Was daraus folgt
+
+Umgerechnet auf den Ursprung in der Plattenmitte (x rechts, y hoch):
+
+| Merkmal | Lage |
+|---|---|
+| **Fenstermitte** | (−0,95 · +0,3) — praktisch mittig, minimal nach links |
+| **Fensterdiagonale** | 42,4 mm = **1,67″** — deckt sich mit der Katalogangabe 1,68″ |
+| Symbol ↑ | (+0,4 · +19,6), r = 19,6 |
+| Symbol ▷ | (−21,6 · +0,1), r = 21,6 |
+| Symbol ↓ | (+0,4 · −18,4), r = 18,4 |
+| Symbol OK | (+22,4 · +0,1), r = 22,4 |
+| **Fensterecke** | (±15,4 · ±13,8), r = **20,7** |
+
+**Die Symbole liegen auf den Achsen, die Kreuze auf den Diagonalen.** Das ist
+der wichtigste Befund: Gedrückt wird dort, wo die Beschriftung steht — die Kraft
+kommt aber an den **Ecken** an. Die starre 1-mm-Platte hängt an vier Rastnasen
+in den Kantenmitten und kippt beim Druck auf ein Symbol; die beiden benachbarten
+Eckkreuze wandern dabei nach hinten.
+
+Zwei Konsequenzen:
+
+1. **Die Taster bleiben auf den Diagonalen.** Die Befürchtung aus Punkt 42 —
+   Taster auf den Achsen, Kollision mit den Befestigungsbohrungen bei 0° und
+   180°, Bohrbild aller drei Boards neu — ist damit **vom Tisch**. Die acht
+   Taster sitzen heute bei r = 23,2 auf ±12° um die Diagonalen; sie müssen nur
+   auf die Kreuzpositionen nachgezogen und von acht auf **vier** reduziert
+   werden, denn ein Kreuz von 3,2 mm trifft genau einen Taster.
+2. **Die Firmware muss Paare auswerten.** Vier Taster an den Ecken, vier
+   Symbole an den Kanten: ↑ = oben links + oben rechts, ↓ = unten links + unten
+   rechts, ▷ = oben links + unten links, OK = oben rechts + unten rechts. Jede
+   Richtung ist über ihr Paar eindeutig. Das ersetzt die bisherige Annahme
+   „vier Tasten, vier GPIOs, eine Taste pro Pin".
+
+**Die vier Durchbrüche passen so nicht mehr.** Sie waren für die Diagonalen
+geplant — dort sitzen jetzt die Taster. Auf der Diagonalen bleibt zwischen
+Fensterecke (r = 20,7) und Platinenrand (r = 26,0) ein Band von 5,3 mm, in dem
+zusätzlich das Kreuz und der Taster liegen. Für ein Ø-4,5-ToF-Fenster und eine
+Ø-5,6-Klinke ist das zu wenig; die Lage der Durchbrüche ist neu zu bestimmen,
+sobald die Kreuzpositionen vermessen sind.
+
+### Display: der Ausschnitt trifft ein Serienpanel fast exakt
+
+| | |
+|---|---|
+| Fenster | 32,70 × 27,00 mm |
+| **1,69″ 240 × 280 (ST7789), quer** | aktiv **32,63 × 27,97 mm** |
+| Passung | Breite **0,07 mm** Luft, Höhe 0,97 mm vom Fenster verdeckt |
+
+Damit ist Punkt 43 praktisch entschieden: Das Panel füllt den Ausschnitt in der
+Breite randlos und wird in der Höhe um einen halben Millimeter je Seite
+beschnitten — genau das, was ein Fenster tun soll.
+
+### Noch offen
+
+- **Kreuzpositionen** (von links / von oben, alle vier) → bestimmt die
+  Tasterpositionen und damit das Top-Layout.
+- **Eckradius** des Fensters (F3) und des Rahmenfensters (F11).
+- **Innenmaß der Doppelstege** im Rahmen (F13) → woran der Rahmen klemmt, wenn
+  ihn die Scheibe nicht hält.
 
 Board-Outline in KiCad: Kreis auf `Edge.Cuts`, Mittelpunkt (0,0), Radius 26,0 mm.
 Board-Dicke über *Board Setup → Physical Stackup*.
