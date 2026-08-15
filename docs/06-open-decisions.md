@@ -123,10 +123,36 @@ neue Position unten links; 25 (Frontplatte am Rahmen prüfen) wird zur
 Vermessung von Scheibe **und** Rahmen; 35 (externer Temperaturfühler) ist mit
 Punkt 46 beantwortet — es gibt keinen.
 
-### Messliste für die reale Zentralscheibe
+### Messliste — und woher die Teile kommen
 
-Ohne diese Maße ist kein Layout möglich; ein Maßbild ist öffentlich nicht zu
-bekommen.
+Ohne diese Maße ist kein Layout möglich, und ein Maßbild ist öffentlich nicht zu
+bekommen. Die Quelle ist deshalb das reale Teil:
+
+> **Busch-Jaeger 6422 UJ-914, „Jalousie-Compact-Timer, Komplettset"**
+> (2CKA006410A0412, Busch-balance SI, alpinweiß)
+
+Der Lieferumfang ist für dieses Projekt der Glücksfall — er enthält **genau die
+beiden Teile, auf die wir uns festgelegt haben**, plus den geometrischen
+Referenzkörper:
+
+| Im Set | Wofür wir es brauchen |
+|---|---|
+| **Zentralscheibe 6435-914** | Punkte 41–44: Druckpunkte, Fensterausschnitt, Rastgeometrie |
+| **Abdeckrahmen 1721-914** | Punkt 25: woran die Klemmbefestigung greift |
+| **Einsatz 6422 U** (Jalousie-Timer) | Der Körper, den unser Adapter nachbildet — und zugleich die Antwort darauf, wie Busch-Jaeger den Einsatz in der Dose hält. Genau das ist der Ausweg aus Punkt 42, falls die Frontbohrungen fallen sollen |
+
+**Der Einsatz ist ein Messobjekt, kein Bauteil.** Er arbeitet mit 230 V und zwei
+Wechslern à 3 A. In dieses Gerät kommt er nicht — der gesamte Aufbau ist SELV
+(Punkt 21), und ein 230-V-Einsatz in dieser Dose wäre die Rücknahme genau der
+Entscheidung, die [`12-legacy-socos.md`](12-legacy-socos.md) Abschnitt 5 als
+geschlossen führt.
+
+Als Zugabe ist er trotzdem lehrreich: Es ist **Busch-Jaegers eigene
+Jalousiesteuerung**. Die Symbolbelegung der Scheibe ist also für genau unseren
+Anwendungsfall entworfen worden, und die Bedienlogik des Originals ist der
+naheliegende Maßstab für Punkt 37 (verbindliche Tastenbelegung).
+
+Zu messen ist dann:
 
 1. **Wo drückt die Scheibe?** Vier Druckpunkte in Winkel und Radius — Achsen
    oder Diagonalen. Das ist die Antwort auf Punkt 42.
