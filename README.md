@@ -107,12 +107,11 @@ Vollständige Gegenüberstellung von umgesetzten und fehlenden Funktionen:
 | Frontplatte, druckfertig | erzeugt und verifiziert |
 | Schaltpläne aller drei Boards + Stücklisten | **erzeugt und netzlistengeprüft** — Schaltungsreview gegen Datenblätter steht aus |
 | Layouts aller drei Boards: Platzierung + Zonen | **erzeugt, DRC ohne Platzierungsfehler** |
-| **Routing TOP** | geroutet, aber **J1 (USB-C) steht um 180° verdreht** — Pads schneiden die Kontur an, Layout nachzuziehen (Punkt 39) |
-| **Routing MID** | Signale vollständig; **10 PGND-Pour-Anbindungen offen** (Handgriff in KiCad, s. docs/05) |
-| **Routing BOTTOM** | Leistungsteil ≈ 85 %, 43 Verbindungen offen — **Rest Handarbeit** (docs/05 verlangt das für Leistungspfade ohnehin) |
-| Fertigungsdaten TOP (Gerber/Drill/Pos) | erzeugt, aber durch Punkt 39 **überholt**: `hardware/fab/top_ui.zip` |
+| **Routing BOTTOM** | 985 Segmente, 102 Vias, **43 Verbindungen offen** — Rest Handarbeit (docs/05 verlangt das für Leistungspfade ohnehin) |
+| **Routing MID** | **keines** — platziert, Leiterbahnen fehlen |
+| **Routing TOP** | **keines** — am 15.08.2026 neu platziert (Klinke nach 6 Uhr, ToF 12 Uhr, USB-C-Drehung korrigiert) |
 | Fertigungsnutzen (3 Platinen in einer Boarddatei) | **erzeugt:** `hardware/fab/panel/` |
-| Fertigungsdaten Mid + Bottom | nach Rest-Routing: `python3 tools/gen_fab.py` |
+| Fertigungsdaten | **keine** — `python3 tools/gen_fab.py` nach dem Routing, mit DRC-Gate |
 | ESPHome-Konfiguration inkl. ST77916-Display | validiert (`esphome config`) — Motoren fahren **auf Zeit** |
 | Lasterkennung, ToF-Distanz, Menü, RS-485-Protokoll | **fehlen** — eigene C++-Komponente, s. docs/13 |
 | Gefertigt oder gemessen | **nichts** |

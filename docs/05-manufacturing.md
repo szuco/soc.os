@@ -75,20 +75,24 @@ Empfehlung: pro Fertigungsstand ein Git-Tag der Form
 `bottom-v0.1`, `mid-v0.1`, `top-v0.1`, damit der gefertigte Stand später eindeutig
 rekonstruierbar ist.
 
-## 5. Routing-Stand und Restarbeiten (2026-08-14)
+## 5. Routing-Stand und Restarbeiten (2026-08-15)
 
-Alle drei Boards sind mit der Freerouting-Pipeline geroutet
-(`tools/route_boards.py`, Nacharbeit mit `tools/gnd_*.py`); die Zonen sind
-gefüllt (Vollanbindung, Zonen-Clearance 0,15 mm). Der Stand im Einzelnen:
+| Board | Segmente im Repository | Stand |
+|---|---:|---|
+| **BOTTOM** | **985** (102 Vias) | ≈ 85 % geroutet, 0 Kupferfehler. Offen sind 43 Verbindungen im Motor-/Leistungsteil (SW-Knoten, Gate-Netze, `24V_PROT`). Der Autorouter konvergiert dort nicht mehr — die Leistungspfade sind laut Prüfliste (Abschnitt 3) **ohnehin von Hand zu ziehen**. |
+| **MID** | **0** | nur platziert. |
+| **TOP** | **0** | nur platziert, Stand vom 15.08.2026 mit Klinke auf 6 Uhr, ToF auf 12 Uhr und korrigierter USB-C-Drehung. |
 
-| Board | Stand | Rest |
-|---|---|---|
-| **TOP** | vollständig geroutet, Kupfer-DRC sauber | ⚠️ **Der Randabstands-Waiver war falsch.** Er wurde für die überstehende USB-Steckzunge erteilt — tatsächlich stehen die **Lötpads** über die Kante, weil J1 um 180° verdreht platziert war (Punkt 39). Sechs Bohrungen schneiden die Kontur an. Drehung in `gen_layouts.py` korrigiert, Layout ist nachzuziehen |
-| **MID** | alle Signalnetze verbunden | **10 PGND-Pour-Anbindungen**: Massepins der Stackverbinder hinter eng geführten Signal-Verticals. In KiCad 9 mit dem interaktiven Router (Push-and-Shove) in ~10 min zu schließen — die DRC-Liste (`unconnected_items`) zeigt die Stellen. |
-| **BOTTOM** | ≈ 85 % geroutet (985 Segmente, 102 Vias) | 43 Verbindungen im Motor-/Leistungsteil (SW-Knoten, Gate-Netze, 24V_PROT). Der Autorouter konvergiert dort nicht mehr — die Leistungspfade sind laut Prüfliste (Abschnitt 3) **ohnehin von Hand zu ziehen**: kurze dicke Wege, Buck-Schleifen nach Referenzlayout. |
+> **Korrektur vom 15.08.2026.** Hier stand, Top sei vollständig und Mid bis auf
+> zehn Masseanbindungen geroutet. Das galt für einen Arbeitsstand, der nie im
+> Repository landete: Der Umbau vom 15.08. (Reed-Kontakte, Haubenkontakt,
+> Klinkenbuchse, ToF) hat die Layouts von Mid und Top **neu erzeugt** und dabei
+> deren Verdrahtung verworfen — `grep -c '(segment'` zählt in beiden Boarddateien
+> null. Nur das Bottom-Board trägt Leiterbahnen. Die Angaben in der Nutzen-
+> Dokumentation („Mid und Top sind platziert, aber noch nicht geroutet") waren
+> die richtigen.
 
-**Wichtige Erfahrungswerte aus der Automatisierung** (Details in den
-Werkzeug-Docstrings):
+**Erfahrungswerte aus der Automatisierung, die weiter gelten:**
 
 - Freerouting 2.1.0 headless ist unbrauchbar (SES vom falschen Stand);
   1.9.0 unter `xvfb-run` funktioniert zuverlässig.
@@ -106,9 +110,19 @@ Werkzeug-Docstrings):
 packt sie nach `hardware/fab/<board>.zip` — aber **nur, wenn das DRC-Gate
 besteht** (keine Kupferfehler, keine offenen Verbindungen).
 
-Aktuell erzeugt: **`hardware/fab/top_ui.zip`** — **überholt**, weil er die
-verdrehte USB-C-Buchse enthält (Punkt 39). Vor der Bestellung neu erzeugen.
-Mid und Bottom folgen, sobald ihre Restarbeiten (oben) erledigt sind.
+**Aktuell existieren keine Fertigungsdaten.** Der frühere Export
+`hardware/fab/top_ui.zip` ist am 15.08.2026 gelöscht worden: Er enthielt die um
+180° verdrehte USB-C-Buchse (Punkt 39) und passte auch sonst nicht mehr zum
+Board. Neue Daten entstehen erst nach dem Routing — das DRC-Gate von
+`gen_fab.py` lässt nichts anderes zu.
+
+**Die 28 `clearance`-Meldungen des Top-Boards gehören nicht dazu.** Sie sind
+Pad-zu-Pad-Abstände **innerhalb** des USB-C-Footprints: 0,85 mm Rasterteilung
+gegen die Vorgabe von 0,15 mm Kupferabstand. Das ist eine Regel-gegen-Footprint-
+Frage (lokale Regelausnahme oder anderer Verbinder), kein Layoutfehler, und sie
+bestand vor und nach der Drehungskorrektur unverändert. Was die Korrektur
+tatsächlich beseitigt hat: **11 → 1** Randabstandsverletzungen. Die eine
+verbliebene ist der Platzhalter-Footprint der Klinkenbuchse (Punkt 30).
 
 Die Stücklisten aller drei Boards liegen als `bom_bottom/mid/top.csv`
 neben den Schaltplänen — erzeugt aus derselben Quelle wie die Schaltpläne

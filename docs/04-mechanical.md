@@ -139,15 +139,23 @@ Engpass an den Pins 1 und 2 in [`01-power-tree.md`](01-power-tree.md), Abschnitt
 
 Die Sichtfläche darf nur an den vier Stegen zwischen den Sicheltasten
 durchbrochen werden. Auf 3 und 9 Uhr liegen die Befestigungsbohrungen, es
-bleiben **12 und 6 Uhr**. Beide Durchbrüche sitzen deshalb im oberen Steg, der
-dafür von 9 auf **17 mm** verbreitert wurde (`key_spoke_hw` 4,5 → 8,5). Die
-Sicheln schrumpfen dadurch von rund 70° auf 45°, die Stößel rücken von ±18° auf
-±12° um die Diagonalen — sonst stünden die Taster der Klinkenbuchse im Weg.
+bleiben **12 und 6 Uhr**. Jeder der beiden trägt **genau einen** Durchbruch:
 
 | Durchbruch | Ø | Position (math, Y nach oben) | Zweck |
 |---|---|---|---|
-| Klinkenbuchse | 5,6 mm | x = −4,0, y = +22,5 | Weihnachtsstern, 2,5-mm-Klinke |
-| ToF-Fenster | 4,5 vorn / 3,0 hinten | x = +5,0, y = +22,5 | VL53L1X, konisch für den Sichtkegel |
+| **ToF-Fenster, 12 Uhr** | 4,5 vorn / 3,0 hinten | x = +5,0, y = **+22,5** | VL53L1X, konisch für den Sichtkegel |
+| **Klinkenbuchse, 6 Uhr** | 5,6 mm | x = 0,0, y = **−22,5** | Weihnachtsstern, 2,5-mm-Klinke |
+
+**Warum diese Aufteilung und nicht umgekehrt:** Der ToF muss nach oben — er soll
+nach vorn und in die Fensteröffnung schauen, nicht auf die Fensterbank. Der
+Steckplatz gehört nach unten, sonst hängt das Sternkabel quer über der Anzeige.
+Vorher saßen beide Durchbrüche oben; die Klinke ist am 15.08.2026 nach unten
+gewandert und liegt dort mittig, weil sie den Steg allein hat.
+
+Die Stege sind von 9 auf **17 mm** verbreitert (`key_spoke_hw` 4,5 → 8,5) — und
+zwar alle vier, weil `_ring_sketch` beide Rechtecke symmetrisch schneidet. Die
+Sicheln schrumpfen dadurch von rund 70° auf 45°, die Stößel rücken von ±18° auf
+±12° um die Diagonalen, sonst stünden die Taster den Durchbrüchen im Weg.
 
 Der Kabelausgang Ø 4,5 mm im unteren Steg entfällt — der Stern wird gesteckt.
 **Für die Klinkenbuchse gilt ein hartes Höhenmaß: 10,5 mm über der

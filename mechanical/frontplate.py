@@ -71,9 +71,11 @@ PARAMS = dict(
     # Stegbreite: die vier Stege sind die EINZIGEN Stellen, an denen die Platte
     # nach vorn durchbrochen werden darf - innen liegt das Display, im Ring
     # bewegen sich die Kappen. Auf 3 und 9 Uhr sitzen die Befestigungsbohrungen
-    # der Platinen, es bleiben also 12 und 6 Uhr. Der obere Steg traegt jetzt
-    # zwei Durchbrueche (Klinkenbuchse und ToF-Fenster) und ist deshalb von
-    # 9 auf 17 mm verbreitert; die Sicheln verlieren dadurch je rund 25 Grad.
+    # der Platinen, es bleiben also 12 und 6 Uhr. Jeder der beiden traegt jetzt
+    # genau EINEN Durchbruch: oben das ToF-Fenster, unten die Klinkenbuchse.
+    # _ring_sketch schneidet beide Rechtecke symmetrisch - die Verbreiterung
+    # von 9 auf 17 mm gilt ohnehin fuer alle vier Stege, sie wird jetzt nur
+    # auch unten gebraucht. Die Sicheln verlieren dadurch je rund 25 Grad.
     key_spoke_hw      = 8.5,    # halbe Stegbreite des Schlitzrings (17 mm Steg)
     key_gap           = 0.25,   # Spaltmass Kappe/Platte je Seite
     key_proud         = 0.8,    # Kappenueberstand vor der Sichtflaeche
@@ -84,7 +86,7 @@ PARAMS = dict(
     # auf dem Ø52-Board: r + halbe Tasterlaenge + Randabstand <= 26 mm.
     key_post_r        = 23.2,
     # Stoesselwinkel: mit dem breiteren Steg sind 18 Grad zu weit aussen, die
-    # Taster wuerden auf 12 Uhr der Klinkenbuchse im Weg stehen.
+    # Taster wuerden den Durchbruechen auf 12 und 6 Uhr im Weg stehen.
     key_post_ang      = 12.0,   # +/- Grad um die Diagonale
     key_post_len      = 4.0,    # Stoessellaenge unter der Kappe - an realen
                                 # Abstand Platte->Top-PCB anpassen!
@@ -95,15 +97,21 @@ PARAMS = dict(
     star_exit_d       = 4.5,
     star_exit_y       = -24.0,
 
-    # --- Klinkenbuchse Weihnachtsstern (oberer Steg, 12 Uhr) ---------------
+    # --- Klinkenbuchse Weihnachtsstern (UNTERER Steg, 6 Uhr) ---------------
     # Zielteil ist eine 2,5-mm-Buchse; Bauhoehe ueber der Top-Platine
     # hoechstens 10,5 mm, sonst stoesst sie an die Sichtflaeche.
+    #
+    # Der Steckplatz gehoert nach unten: Ein Kabel, das oben aus der Blende
+    # kommt, haengt quer ueber der Anzeige. Der ToF muss dagegen nach oben -
+    # er soll nach vorn und in die Fensteroeffnung schauen, nicht auf die
+    # Fensterbank. Die Buchse steht damit allein im unteren Steg und liegt
+    # mittig (x = 0); der obere traegt allein das ToF-Fenster.
     jack_hole         = True,
     jack_hole_d       = 5.6,    # Gewindebund einer 2,5-mm-Buchse
-    jack_x            = -4.0,
-    jack_y            = 22.5,
+    jack_x            = 0.0,
+    jack_y            = -22.5,
 
-    # --- Sichtfenster ToF-Praesenzsensor (oberer Steg, 12 Uhr) -------------
+    # --- Sichtfenster ToF-Praesenzsensor (OBERER Steg, 12 Uhr) -------------
     # Der VL53L1X sitzt 10,5 mm hinter der Sichtflaeche, die Platte selbst ist
     # an dieser Stelle 5,5 mm dick. Der Sichtkegel von 27 Grad hat am hinteren
     # Ende des Kanals Ø2,4 und an der Sichtflaeche Ø5,0 - der Kanal weitet sich
@@ -350,35 +358,52 @@ def check_plate(part, p=PARAMS):
               * Cylinder(1.6, full), f"Sichelschlitz Q{q + 1}")
 
     # Stege auf den Achsen tragen Material. Probe 8 Grad neben der Achse.
-    for ang in (0, 180, 270):
+    # 90 und 270 Grad sind durchbrochen und werden unten einzeln geprueft.
+    for ang in (0, 180):
         a = math.radians(ang + 8)
         solid(Pos(rmid * math.cos(a), rmid * math.sin(a),
                   p["plate_thickness"] / 2)
               * Cylinder(0.35, p["plate_thickness"]), f"Steg {ang} Grad")
 
-    # Der obere Steg (90 Grad) ist von Klinkenbuchse und ToF-Fenster
-    # durchbrochen. Geprueft werden die verbleibenden Materialbahnen: jede
-    # muss mindestens 1,2 mm breit und real vorhanden sein, sonst haengt der
-    # Blendring nur noch an drei Stegen.
-    holes = []
+    # Die beiden senkrechten Stege sind durchbrochen: oben das ToF-Fenster,
+    # unten die Klinkenbuchse. Geprueft werden die verbleibenden
+    # Materialbahnen - jede muss mindestens 1,2 mm breit und real vorhanden
+    # sein, sonst haengt der Blendring nur noch an drei Stegen. Der Test
+    # sortiert die Durchbrueche selbst nach Steg; wandert einer, wandert die
+    # Pruefung mit.
+    spokes = {90: [], 270: []}
     if p["jack_hole"]:
-        holes.append((p["jack_x"], p["jack_hole_d"] / 2))
+        spokes[90 if p["jack_y"] > 0 else 270].append(
+            (p["jack_x"], p["jack_hole_d"] / 2, "Klinke"))
     if p["tof_window"]:
-        holes.append((p["tof_x"], max(p["tof_front_d"], p["tof_back_d"]) / 2))
-    holes.sort()
-    bands, lo = [], -p["key_spoke_hw"]
-    for cx, r in holes:
-        bands.append((lo, cx - r))
-        lo = cx + r
-    bands.append((lo, p["key_spoke_hw"]))
-    for i, (x0, x1) in enumerate(bands, start=1):
-        w = x1 - x0
-        if w < 1.2:
-            errs.append(f"Steg 90 Grad: Materialbahn {i} nur {w:.2f} mm breit")
-        else:
-            solid(Pos((x0 + x1) / 2, rmid, p["plate_thickness"] / 2)
+        spokes[90 if p["tof_y"] > 0 else 270].append(
+            (p["tof_x"], max(p["tof_front_d"], p["tof_back_d"]) / 2, "ToF"))
+
+    for ang, holes in spokes.items():
+        ymid = rmid if ang == 90 else -rmid
+        if not holes:
+            a = math.radians(ang + 8)
+            solid(Pos(rmid * math.cos(a), rmid * math.sin(a),
+                      p["plate_thickness"] / 2)
                   * Cylinder(0.35, p["plate_thickness"]),
-                  f"Steg 90 Grad, Bahn {i}")
+                  f"Steg {ang} Grad (ohne Durchbruch)")
+            continue
+        holes.sort()
+        bands, lo = [], -p["key_spoke_hw"]
+        for cx, r, _ in holes:
+            bands.append((lo, cx - r))
+            lo = cx + r
+        bands.append((lo, p["key_spoke_hw"]))
+        for i, (x0, x1) in enumerate(bands, start=1):
+            w = x1 - x0
+            if w < 1.2:
+                errs.append(f"Steg {ang} Grad: Materialbahn {i} nur "
+                            f"{w:.2f} mm breit "
+                            f"({', '.join(h[2] for h in holes)})")
+            else:
+                solid(Pos((x0 + x1) / 2, ymid, p["plate_thickness"] / 2)
+                      * Cylinder(0.35, p["plate_thickness"]),
+                      f"Steg {ang} Grad, Bahn {i}")
 
     # Blendring zwischen Fenster und Schlitz intakt
     rb = (p["disp_window_d"] / 2 + p["key_slot_ri"]) / 2
@@ -391,8 +416,8 @@ def check_plate(part, p=PARAMS):
         clear(Pos(0, p["star_exit_y"], zc)
               * Cylinder(p["star_exit_d"] / 2, full), "Kabelausgang Stern")
 
-    # Durchbrueche im oberen Steg: frei, und sie duerfen den Steg nicht
-    # verlassen - sonst laegen sie im Verfahrweg der Sicheltasten.
+    # Durchbrueche in den senkrechten Stegen: frei, und sie duerfen den Steg
+    # nicht verlassen - sonst laegen sie im Verfahrweg der Sicheltasten.
     if p["jack_hole"]:
         clear(Pos(p["jack_x"], p["jack_y"], zc)
               * Cylinder(p["jack_hole_d"] / 2, full), "Klinkenbuchse Stern")

@@ -54,11 +54,11 @@ Exakte Koordinaten: [`../../docs/04-mechanical.md`](../../docs/04-mechanical.md)
 57 Netze, Netzlistenvergleich bestanden). Stückliste `bom_mid.csv` aus derselben
 Quelle.
 
-**Layout:** Platzierung generiert, **alle Signalnetze geroutet** (655 Segmente,
-73 Vias), Kupfer-DRC sauber. Offen sind **10 PGND-Pour-Anbindungen** — Massepins
-der Stackverbinder hinter eng geführten Signal-Verticals; mit dem interaktiven
-Router (Push-and-Shove) in etwa 10 Minuten zu schließen. Erst danach besteht das
-DRC-Gate von `gen_fab.py`, und erst dann gibt es Fertigungsdaten.
+**Layout:** platziert, Zonen angelegt — **aber ohne eine einzige Leiterbahn.**
+Es gab einmal einen vollständig gerouteten Stand (655 Segmente, 73 Vias); der
+Umbau auf Reed-Kontakte und Haubenkontakt am 15.08.2026 hat das Layout neu
+erzeugt und die Verdrahtung damit verworfen. Sie ist neu zu ziehen — Pipeline:
+`tools/route_boards.py`, Massenacharbeit mit `tools/gnd_*.py`.
 
 **Nicht geprüft:** Schaltungsreview gegen Datenblätter (MAX3485-Pinbelegung,
 PhotoMOS-LED-Strom). Die Netzliste stimmt mit der Sollvorgabe überein — mehr sagt

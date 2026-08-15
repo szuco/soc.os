@@ -71,8 +71,9 @@ RS-485 ist die **primäre** Kommunikation. WLAN am ESP32 ist sekundär/nice-to-h
 ## 4. Board-Aufteilung
 
 ### TOP – Front / UI
-USB-C, Runddisplay ST77916 über QSPI, vier Sicheltasten (8 Taster), SHT4x,
-VL53L1X hinter dem oberen Steg, Klinkenbuchse für den Stern.
+Runddisplay ST77916 über QSPI, vier Sicheltasten (8 Taster), SHT4x, VL53L1X
+hinter dem oberen Steg (12 Uhr), Klinkenbuchse für den Stern im unteren Steg
+(6 Uhr), USB-C am Rand oben links neben dem ToF.
 
 ### MID – Logic
 ESP32-S3, RS-485-Transceiver, GPIO-Expander, Piezo, PhotoMOS für den

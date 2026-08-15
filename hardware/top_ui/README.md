@@ -15,10 +15,11 @@ Bestückt sind 29 Bauteile, 53 Netze (`bom_top.csv`):
   Sicheltasten bei vier GPIOs, kein Verkippen am Bogenende
 - **SHT40-AD1B** (0x44) für Temperatur und Feuchte, thermisch über Schlitze
   entkoppelt
-- **VL53L1X** als Präsenz- und Durchstiegssensor hinter dem oberen Steg,
-  XSHUT über 10k dauerhaft aktiv
+- **VL53L1X** als Präsenz- und Durchstiegssensor hinter dem **oberen** Steg
+  (12 Uhr), XSHUT über 10k dauerhaft aktiv
 - **Stern-Ausgang** über P-FET-High-Side und 0,2-A-PTC auf eine
-  2,5-mm-Klinkenbuchse an der Front (Footprint noch Platzhalter, Punkt 30)
+  2,5-mm-Klinkenbuchse im **unteren** Steg (6 Uhr, Footprint noch Platzhalter,
+  Punkt 30)
 - `J7` als **unbestückte Reserve-UART** für ein späteres Satellitenmodul
 - Stackverbinder `J_STK_A` und `J_STK_B` nach unten
 
@@ -57,19 +58,25 @@ Exakte Koordinaten: [`../../docs/04-mechanical.md`](../../docs/04-mechanical.md)
 
 ## Status
 
-**Fertigstes der drei Boards.** Schaltplan erzeugt und netzlistengeprüft
-(`tools/gen_top_sch.py`, 29 Bauteile, 53 Netze), **Layout vollständig geroutet**,
-Kupfer-DRC sauber, Fertigungsdaten exportiert nach
-[`../fab/top_ui.zip`](../fab/top_ui.zip) (Gerber, Excellon mit PDF-Karte,
-Positionsdatei).
+Schaltplan erzeugt und netzlistengeprüft (`tools/gen_top_sch.py`, 29 Bauteile,
+53 Netze).
 
-**Ein Fehler ist offen und macht diesen Stand unfertigbar:** J1 stand um 180°
-verdreht, die Stecköffnung zeigt zur Platinenmitte und die **Lötpads** stehen über
-die Kante — sechs Bohrungen schneiden die Ø-52-Kontur an (Schirmbeine 0,22 mm,
-A-Reihe 0,15 mm). Die 28 Randabstandsmeldungen sind also kein Waiver, sondern der
-Befund. Die Drehung ist in `tools/gen_layouts.py` korrigiert; Layout und
-`../fab/top_ui.zip` sind nachzuziehen. Punkt 39 in
-[`docs/06`](../../docs/06-open-decisions.md).
+**Layout: platziert, ohne Leiterbahnen.** Stand vom 15.08.2026, an diesem Tag
+zweimal neu erzeugt:
+
+1. **J1 stand um 180° verdreht** (Punkt 39) — die Stecköffnung zeigte zur
+   Platinenmitte, die Lötpads standen über die Kante, sechs Bohrungen schnitten
+   die Ø-52-Kontur an. Korrigiert: das engste Pad liegt jetzt 3,2 mm innerhalb
+   der Kontur, die Randabstandsverletzungen sind von 11 auf 1 gefallen.
+2. **Klinke und ToF getauscht**: Die Klinkenbuchse sitzt jetzt im **unteren**
+   Steg (6 Uhr, mittig), der ToF allein im **oberen** (12 Uhr). Die USB-C-Buchse
+   musste dafür von 6 nach 12 Uhr weichen und liegt links neben dem ToF; der
+   unbestückte Reserve-UART J7 ist nach innen gerückt.
+
+Die verbliebene Randabstandsverletzung gehört dem **Platzhalter**-Footprint der
+Klinkenbuchse: Der 3,5-mm-Typ ist 14,4 mm lang, sein Bund sitzt in der Mitte —
+bei einem Lochabstand von r = 22,5 steht das hintere Ende 3,3 mm über die
+Platinenkante. Das reale 2,5-mm-Teil muss deutlich kleiner sein, siehe Punkt 30.
 
 **Zwei Footprints sind Platzhalter** und vor der Bestellung zu ersetzen:
 die Displaystiftleiste (Punkt 15c) und die Klinkenbuchse (Punkt 30, 3,5 mm

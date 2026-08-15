@@ -315,7 +315,9 @@ jemand durch die geöffnete Fensteröffnung steigt.
 Die Frontplatte hat genau vier Stellen, an denen nach vorn durchbrochen werden
 darf — die vier Stege zwischen den Sicheltasten. Innen liegt das Displaymodul
 (Ø 41,5 mm), im Ring r 22…26,2 mm bewegen sich die Kappen, und auf 3 und 9 Uhr
-sitzen die Befestigungsbohrungen der Platinen. Bleiben 12 und 6 Uhr.
+sitzen die Befestigungsbohrungen der Platinen. Bleiben 12 und 6 Uhr — und der
+ToF bekommt davon **12 Uhr**: Er soll nach vorn und in die Fensteröffnung
+schauen, nicht auf die Fensterbank. Der untere Steg gehört der Klinkenbuchse.
 
 24 GHz strahlt zwar durch gedruckten Kunststoff, aber nicht durch das LCD — und
 für ein Modul von 20 × 20 mm (LD2420, LD2410S) oder 22 × 16 mm (LD2410C) ist in

@@ -74,12 +74,15 @@ Variante zusammengefasst.
 
 ## Stand der Prüfung
 
-Der DRC des Nutzens ist **deckungsgleich mit der Summe der Einzelboards** —
-28 Clearance-Meldungen (allesamt die USB-C-Pads des Top-Boards — **keine
-Harmlosigkeit**, sondern die um 180° verdrehte Buchse, Punkt 39), 342
-unverbundene Elemente. Letztere sind erwartet: Mid und Top sind platziert, aber
-noch nicht geroutet, und die Massefläche wird erst beim Öffnen in KiCad
-gefüllt.
+Neu erzeugt am 15.08.2026, nachdem das Top-Board umgebaut wurde (Klinke auf
+6 Uhr, ToF auf 12 Uhr, USB-C-Drehung korrigiert). Der DRC des Nutzens ist
+**deckungsgleich mit der Summe der Einzelboards**:
+
+| Klasse | Anzahl | Was dahintersteckt |
+|---|---:|---|
+| `clearance` | 28 | Pad-zu-Pad **innerhalb** des USB-C-Footprints: 0,85 mm Raster gegen 0,15 mm Vorgabe. Eine Regel-gegen-Footprint-Frage, kein Layoutfehler |
+| `copper_edge_clearance` | 2 | Platzhalter-Footprint der Klinkenbuchse (Punkt 30) |
+| `unconnected_items` | 342 | erwartet: **Mid und Top tragen keine Leiterbahnen**, Bottom ist zu ≈ 85 % geroutet, und die Masseflächen werden erst beim Öffnen in KiCad gefüllt |
 
 Was der Nutzen **zusätzlich** meldet, sind Silkscreen-Überlappungen: durch die
 Präfixe werden die Bezeichner länger. Das ist kosmetisch und betrifft keine

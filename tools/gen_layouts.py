@@ -525,20 +525,45 @@ FIXED_TOP = dict(
            -23.2 * math.sin(math.radians(a)),
            "AUTO_TANGENTIAL", "F")
      for ref, a in BTN_ANGLES.items()},
-    # USB-C auf 6 Uhr, Steckgesicht nach AUSSEN. Die Drehung ist 0, nicht 180:
-    # Im Footprint liegen die THT-Pins am Ende y = 0 und die Steckoeffnung am
-    # Ende y = +8,61 (auf F.Fab als Schlitz bei y = 6,1 markiert). Mit 180 Grad
-    # schaut die Oeffnung zur Platinenmitte, und die Pins stehen ueber die Kante
-    # - genau falsch herum. Siehe Punkt 39 in docs/06-open-decisions.md.
-    J1=(0.0, 21.6, 0, "F"),            # USB-C, Steckgesicht ueberhaengt
+    # USB-C auf 12 Uhr, links neben dem ToF. Steckgesicht nach AUSSEN.
+    #
+    # Die Drehung folgt der Regel phi = 90 + theta (theta = Winkel auf der
+    # Platine, mathematisch): Im Footprint liegen die THT-Pins am Ende y = 0
+    # und die Steckoeffnung am Ende y = +8,61 (auf F.Fab als Schlitz bei
+    # y = 6,1 markiert). Mit der falschen Drehung schaut die Oeffnung zur
+    # Platinenmitte und die Pins stehen ueber die Kante - siehe Punkt 39.
+    #
+    # Das Fenster zwischen dem ToF (linke Kante bei x = 2,1) und dem Taster
+    # auf 123 Grad (rechte Kante bei x = -9,9) ist knapp 12 mm breit. Der
+    # Verbinder liegt deshalb ACHSPARALLEL - tangential gedreht waechst seine
+    # BBOX auf 12,2 mm und passt nicht mehr. Mittig im Fenster bleiben je
+    # 1,5 mm Luft.
+    #
+    # Das Steckgesicht liegt bewusst leicht INNERHALB der Kontur (an der
+    # linken Ecke buendig, rechts rund 1,4 mm zurueck): Der Stecker selbst
+    # ragt ueber die 1 mm duenne Platine hinweg, das kostet nichts - Kupfer
+    # oder Bauteil ueber der Kante dagegen stoesst an die Dosenwand.
+    J1=(-3.875, -20.0, 180, "F"),      # USB-C, 12 Uhr, links vom ToF
     J5=(0.0, 3.0, 0, "F"),             # Displayanschluss unterm Modul
-    # 12 Uhr: die beiden einzigen Durchbrueche der Frontplatte. Koordinaten
-    # muessen zu jack_x/jack_y bzw. tof_x/tof_y in frontplate.py passen
-    # (dort Y nach oben, hier nach unten).
-    J6=(-4.0, -22.5, 0, "F"),          # Klinkenbuchse Stern
-    U3=(5.0, -22.5, 0, "F"),           # VL53L1X, schaut durchs ToF-Fenster
+    # Die beiden einzigen Durchbrueche der Frontplatte. Koordinaten muessen zu
+    # jack_x/jack_y bzw. tof_x/tof_y in frontplate.py passen (dort Y nach oben,
+    # hier nach unten).
+    #
+    # Klinke UNTEN (6 Uhr): ein Kabel, das oben aus der Blende kommt, haengt
+    # quer ueber der Anzeige. Drehung 180, damit der Buchsenkoerper nach innen
+    # zeigt. ACHTUNG, zwei Altlasten des Platzhalter-Footprints (Punkt 30):
+    # place() zentriert die BBOX, die Buchsenachse liegt aber 0,70 mm daneben
+    # (Kreis bei lokal y = 6,48), und der 14,4 mm lange Koerper steht hinten
+    # ueber die Platinenkante. Beides ist mit dem realen 2,5-mm-Teil zu loesen.
+    J6=(0.0, 22.5, 180, "F"),          # Klinkenbuchse Stern, 6 Uhr
+    U3=(5.0, -22.5, 0, "F"),           # VL53L1X, 12 Uhr, schaut durchs Fenster
     F1=(7.0, -16.0, 90, "F"),          # PTC direkt hinter der Buchse
-    J7=(-5.3, 13.3, 0, "F"),           # Reserveanschluss, DNP
+    # J7 (Reserve-UART, DNP) hatte seinen festen Platz auf 6 Uhr innen - dort
+    # steht jetzt die Klinkenbuchse. Die Automatik findet fuer ihn KEINEN
+    # Platz: Als THT-Teil braucht er beide Seiten frei, und die Vorderseite
+    # innerhalb r21 gehoert dem Displaymodul. Also fest hierher, rechts neben
+    # den Displayanschluss - kurz zu J3, aus dem der UART kommt.
+    J7=(5.2, 8.0, 90, "F"),            # Reserve-UART, DNP
     U2=(-10.5, -13.5, 0, "F"),         # SHT4x, weg von Waermequellen
 )
 

@@ -34,7 +34,8 @@ Kollisionsfreiheit der Kappen in Einbaulage**.
 | Displayfenster | Ø 37,8 mm (ST77916 1,46", aktiv Ø 37,25), Modulfreiraum Ø 42,5 mm |
 | Sicheltasten | 4 Ringsegmente r 22,0–26,2 mm, je ≈ 68°, 0,8 mm Überstand |
 | Tastenstößel | je Kappe 2 × Ø 2,2 mm bei r = 23,2 mm, ±18° um die Diagonalen |
-| Kabelausgang Stern | Ø 4,5 mm im unteren Steg (kerbt bewusst den Zentrierkragen) |
+| Durchbruch oben (12 Uhr) | ToF-Fenster Ø 4,5 vorn / 3,0 hinten bei x = +5,0 |
+| Durchbruch unten (6 Uhr) | Klinkenbuchse Ø 5,6 mm, mittig — Stern wird gesteckt |
 | Zentrierkragen | 50 × 50 mm, 2 mm Wand, 3 mm tief |
 
 Displaywechsel: `disp_active_d` und `disp_module_d` im `PARAMS`-Block setzen und

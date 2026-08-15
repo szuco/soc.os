@@ -16,8 +16,8 @@ Legende: ✅ fertig und geprüft · 🟡 begonnen, Rest benannt · ⛔ nicht vor
 | **Spezifikation** | ✅ vollständig — 13 Dokumente, alle Entscheidungen entweder getroffen oder als Punkt 1–40 offen benannt |
 | **Mechanik** | ✅ Boards und Frontplatte generiert und selbstgeprüft; 🔒 Maßprüfung am realen Rahmen und am realen Displaymodul steht aus |
 | **Schaltpläne** | ✅ alle drei Boards erzeugt und netzlistengeprüft; ⛔ **keine Schaltungsreview gegen Datenblätter** |
-| **Layouts** | 🟡 Top geroutet, **aber mit verdrehter USB-C-Buchse (Punkt 39)**; Mid bis auf 10 Masseanbindungen fertig; Bottom-Leistungsteil zu ~85 % |
-| **Fertigungsdaten** | ⛔ Top exportiert, aber durch Punkt 39 **überholt**; Nutzen erzeugt; Mid und Bottom fehlen noch |
+| **Layouts** | 🟡 alle drei platziert; **geroutet ist nur Bottom** (≈ 85 %), Mid und Top haben null Leiterbahnen |
+| **Fertigungsdaten** | ⛔ **keine** — der frühere Top-Export war überholt und ist gelöscht; der Nutzen ist als Boarddatei erzeugt |
 | **Firmware** | 🟡 ESPHome-Konfiguration validiert und funktionsfähig, aber **ohne Lasterkennung, ohne Bedienmenü, ohne RS-485-Protokoll** |
 | **Bestellt / gebaut** | ⛔ nichts — kein Board gefertigt, kein Motor vermessen |
 
@@ -32,22 +32,29 @@ Soft-Limit und der einzige noch offene Leistungshalbleiter provisorisch.
 
 | Board | Schaltplan | Layout / Routing | Fertigungsdaten |
 |---|---|---|---|
-| **BOTTOM** `bottom_power_motor` | ✅ 102 Bauteile, 105 Netze, Netzlistenvergleich bestanden | 🟡 985 Segmente, 102 Vias, **43 offene Verbindungen** im Motor-/Leistungsteil, 0 Kupferfehler | ⛔ wartet auf das Rest-Routing |
-| **MID** `mid_logic` | ✅ 37 Bauteile, 57 Netze | 🟡 alle Signalnetze verbunden, **10 PGND-Pour-Anbindungen offen** | ⛔ wartet auf das Rest-Routing |
-| **TOP** `top_ui` | ✅ 29 Bauteile, 53 Netze | 🟡 vollständig geroutet, aber **J1 um 180° verdreht** (Punkt 39) | ⛔ `top_ui.zip` existiert, ist aber **überholt** |
+| **BOTTOM** `bottom_power_motor` | ✅ 102 Bauteile, 105 Netze, Netzlistenvergleich bestanden | 🟡 **985 Segmente, 102 Vias**, 43 offene Verbindungen im Motor-/Leistungsteil, 0 Kupferfehler | ⛔ wartet auf das Rest-Routing |
+| **MID** `mid_logic` | ✅ 37 Bauteile, 57 Netze | ⛔ platziert, **0 Leiterbahnen** | ⛔ |
+| **TOP** `top_ui` | ✅ 29 Bauteile, 53 Netze | ⛔ platziert, **0 Leiterbahnen** — Stand 15.08.2026 mit Klinke auf 6 Uhr | ⛔ |
 | **Nutzen** `fab/panel` | — (Build-Ergebnis) | ✅ 178,4 × 64,4 mm, drei Ø-52-Kreise, Stege + Mausbisse | 🟡 erst mit allen drei Boards bestellbar |
 
 Die 43 offenen Verbindungen auf Bottom sind **kein Rückstand des Autorouters**,
 sondern Absicht: [`05-manufacturing.md`](05-manufacturing.md) Abschnitt 3 verlangt
 für Leistungspfade und Buck-Schleifen ohnehin Handarbeit nach Referenzlayout.
 
-**Die USB-C-Buchse steht falsch herum.** Die Stecköffnung zeigt zur
-Platinenmitte statt nach außen, damit stehen die Lötpads über die Platinenkante
-und sechs Bohrungen schneiden die Kontur an. Der Randabstands-Waiver in docs/05
-wurde unter falscher Annahme erteilt. Drehung im Generator korrigiert, Layout
-nachzuziehen: 🔒 Punkt 39, P0. Getrennt davon die Nutzungsfrage: **im
-eingebauten Zustand ist USB-C nicht erreichbar** (Punkt 40) — Erstflash auf dem
-Tisch, danach OTA.
+**Zum Routing-Stand, korrigiert am 15.08.2026:** Frühere Fassungen dieser Datei
+und der README meldeten Top als vollständig und Mid als fast fertig geroutet.
+Das galt für einen Arbeitsstand, der nie eingecheckt wurde — der Umbau auf
+Reed-Kontakte, Haubenkontakt und ToF hat beide Layouts neu erzeugt und ihre
+Verdrahtung dabei verworfen. Nachzählbar: `grep -c '(segment'` liefert für Mid
+und Top null, für Bottom 985.
+
+**Die USB-C-Buchse stand falsch herum** (Punkt 39) — die Stecköffnung zeigte zur
+Platinenmitte, die Lötpads standen über die Kante. Korrigiert: das engste Pad
+liegt jetzt 3,2 mm innerhalb der Kontur, die Randabstandsverletzungen sind von
+11 auf 1 gefallen. Die verbliebene gehört dem Platzhalter-Footprint der
+Klinkenbuchse (Punkt 30). Getrennt davon die Nutzungsfrage: **im eingebauten
+Zustand ist USB-C nicht erreichbar** (Punkt 40) — Erstflash auf dem Tisch,
+danach OTA.
 
 **Die Stackverbinder sind noch kein Verbinderpaar.** Auf allen drei Boards sitzt
 derselbe Footprint (`PinSocket_2x20_P1.27mm_Vertical`) — dreimal die Buchse. Als
@@ -147,10 +154,8 @@ Alles Generierte ist reproduzierbar; die Werkzeuge prüfen ihr Ergebnis selbst.
 1. **Blockierstrom messen** (M6, Multimeter, 5 min) → Punkte 1, 8, 2 werden entscheidbar.
 2. **Punkt 34 entscheiden**: Sabotagekontakte nachrüsten oder schriftlich streichen.
    Zusammen mit Punkt 29 (Feldstecker) — beide betreffen dieselbe Ecke des Mid-Boards.
-3. **USB-C-Buchse drehen** (Punkt 39) und das Top-Layout nachziehen — entweder
-   `gen_layouts.py` neu laufen lassen und komplett neu routen oder J1 in KiCad an
-   Ort und Stelle drehen und nur die USB-Netze neu ziehen.
-4. **Rest-Routing** Mid (10 Anbindungen) und Bottom (43 Verbindungen, Leistungsteil von Hand).
+3. **Routing**: Mid und Top von Grund auf, Bottom die restlichen 43 Verbindungen
+   im Leistungsteil von Hand.
 5. **Schaltungsreview** gegen Datenblätter, Reglerlayouts gegen Referenzdesign.
 6. **Fertigungsdaten** für Mid und Bottom, dann den Nutzen bestellen.
 7. **Firmware**: External Component für Strommessung, Lasterkennung und VL53L1X-Distanz —
