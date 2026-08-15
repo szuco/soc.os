@@ -191,7 +191,7 @@ def build():
     s.connect("I2C_SCL",  ("U3", "14"))
     s.connect("I2C_SDA",  ("U3", "15"))
     # Portbelegung == YAML: P0/P1 Trip-Eingaenge, P2 Reset, P3 Stern,
-    # P4 Radar-Praesenz, P5 Relais, P6/P7 frei auf Loetpads
+    # P4 Praesenz, P5 Haubenkontakt, P6/P7 Reed-Eingaenge
     s.connect("HW_TRIP1",  ("U3", "4"))
     s.connect("HW_TRIP2",  ("U3", "5"))
     s.connect("TRIP_RST",  ("U3", "6"))
@@ -203,11 +203,65 @@ def build():
     s.add("C6", "Device:C", "100n", C0603)
     s.connect("3V3_SYS", ("C6", "1"))
     s.connect("PGND",    ("C6", "2"))
-    # Reservepads fuer P6/P7
-    s.add("J5", "Connector_Generic:Conn_01x02", "EXP P6/P7",
-          "Connector_PinHeader_2.54mm:PinHeader_1x02_P2.54mm_Vertical")
-    s.connect("EXP_P6", ("J5", "1"))
-    s.connect("EXP_P7", ("J5", "2"))
+
+    # =====================================================================
+    # 3b. Feldsignale: 2 Reed-Kontakte (Fenster) + Haubenkontakt
+    #
+    # Reed: Schliesser gegen PGND. Externer 10k-Pullup, weil die
+    # Stromquelle im PCF8574 (~100 uA) fuer mehrere Meter Leitung zu
+    # schwach ist. 1k Serie + 100n gibt tau = 100 us gegen Prellen und
+    # Einstreuung; bei geschlossenem Kontakt liegen 0,3 V am Eingang,
+    # also sicher unter VIL = 0,3 x VCC. TVS gegen ESD am Steckverbinder.
+    #
+    # Haube: PhotoMOS statt Relais - potentialfrei, lautlos, kein
+    # Spulenstrom, 4,4 x 2,6 mm statt Relaisbauhoehe im 9-mm-Stapelspalt.
+    # NUR FUER SELV. Bei Netzspannung am Haubeneingang gehoert das
+    # Schaltglied nicht in diese Dose (siehe docs/06, Punkt 21).
+    # PCF8574-Ausgaenge senken kraeftig, sourcen aber kaum: die LED
+    # haengt an 3V3 und wird von P5 gegen Masse gezogen -> LOW = EIN,
+    # in der YAML als inverted zu fuehren.
+    # =====================================================================
+    for i, (net_in, net_exp, rp, rs, cc, dd) in enumerate(
+            [("REED1_IN", "EXP_P6", "R9", "R11", "C7", "D2"),
+             ("REED2_IN", "EXP_P7", "R10", "R12", "C8", "D3")], start=1):
+        s.add(rp, "Device:R", "10k", R0603, MPN="Pullup Reed %d" % i)
+        s.connect("3V3_SYS", (rp, "1"))
+        s.connect(net_exp,   (rp, "2"))
+        s.add(rs, "Device:R", "1k", R0603, MPN="Serie Reed %d" % i)
+        s.connect(net_in,  (rs, "1"))
+        s.connect(net_exp, (rs, "2"))
+        s.add(cc, "Device:C", "100n", C0603)
+        s.connect(net_exp, (cc, "1"))
+        s.connect("PGND",  (cc, "2"))
+        s.add(dd, "Device:D_TVS", "5V6", "Diode_SMD:D_SOD-123",
+              MPN="ESD am Feldstecker")
+        s.connect(net_in, (dd, "1"))
+        s.connect("PGND", (dd, "2"))
+
+    s.add("U4", "Relay_SolidState:AQY282GS", "PhotoMOS 60V",
+          "Package_SO:SOP-4_4.4x2.6mm_P1.27mm",
+          MPN="1 Form A, SELV - NICHT fuer Netzspannung")
+    s.add("R13", "Device:R", "330R", R0603, MPN="LED-Strom PhotoMOS, ca. 6 mA")
+    s.connect("3V3_SYS",   ("R13", "1"))
+    s.connect("RELAY_LED", ("R13", "2"))
+    s.connect("RELAY_LED", ("U4", "1"))
+    s.connect("RELAY_CTL", ("U4", "2"))
+    s.connect("HOOD_A",    ("U4", "4"))
+    s.connect("HOOD_B",    ("U4", "3"))
+    s.add("D4", "Device:D_TVS", "33V", "Diode_SMD:D_SOD-123",
+          MPN="Klemmung am Haubenausgang")
+    s.connect("HOOD_A", ("D4", "1"))
+    s.connect("HOOD_B", ("D4", "2"))
+
+    # Feldstecker: Reed 1/2 mit je eigener Masse, danach der Haubenkontakt
+    s.add("J5", "Connector_Generic:Conn_01x06", "Feld: Reed 1/2, Haube",
+          "Connector_JST:JST_PH_B6B-PH-K_1x06_P2.00mm_Vertical",
+          MPN="1 REED1 2 GND 3 REED2 4 GND 5 HAUBE_A 6 HAUBE_B")
+    s.connect("REED1_IN", ("J5", "1"))
+    s.connect("PGND",     ("J5", "2"), ("J5", "4"))
+    s.connect("REED2_IN", ("J5", "3"))
+    s.connect("HOOD_A",   ("J5", "5"))
+    s.connect("HOOD_B",   ("J5", "6"))
 
     # =====================================================================
     # 4. Piezo-Treiber (passiver Signalgeber an 5V_SYS)

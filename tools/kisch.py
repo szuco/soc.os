@@ -19,7 +19,17 @@ import math
 import os
 import re
 
-SYMDIR = "/usr/share/kicad/symbols"
+def _symdir():
+    """Symbolbibliothek finden - Linux, macOS oder per KICAD_SYMBOL_DIR."""
+    for p in (os.environ.get("KICAD_SYMBOL_DIR"),
+              "/usr/share/kicad/symbols",
+              "/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols"):
+        if p and os.path.isdir(p):
+            return p
+    return "/usr/share/kicad/symbols"
+
+
+SYMDIR = _symdir()
 GRID = 1.27
 STUB = 5.08   # Laenge der Drahtstummel zum Label
 
@@ -58,6 +68,17 @@ def _balanced(s, start):
 _libcache = {}
 
 
+# KiCad 10 hat einige Symbole umbenannt bzw. in Gehaeusevarianten aufgeteilt.
+# Gleiche Pinbelegung, nur anderer Name - deshalb hier eine Ersatzliste, damit
+# die Generatoren mit KiCad 9 und 10 laufen. Netzlistengleichheit ist geprueft.
+# Nur aufnehmen, was NACHWEISLICH dieselben Pinnummern hat.
+# NICHT aufnehmen: Q_NPN_BCE -> Q_NPN. KiCad 10 nummeriert dessen Pins mit
+# B/C/E statt 1/2/3 - ein stiller Alias wuerde die Anschluesse vertauschen.
+SYM_ALIAS = {
+    "Interface_Expansion:PCF8574": "Interface_Expansion:PCF8574T",  # SOIC-16, Pins 1..16
+}
+
+
 def load_symbol(lib_id):
     """Holt die Symboldefinition aus der KiCad-Bibliothek."""
     if lib_id in _libcache:
@@ -66,6 +87,12 @@ def load_symbol(lib_id):
     path = os.path.join(SYMDIR, lib + ".kicad_sym")
     src = open(path, encoding="utf-8").read()
     m = re.search(r'\(symbol "%s"[\s(]' % re.escape(name), src)
+    if not m and lib_id in SYM_ALIAS:
+        alt_lib, alt_name = SYM_ALIAS[lib_id].split(":", 1)
+        alt_path = os.path.join(SYMDIR, alt_lib + ".kicad_sym")
+        if os.path.exists(alt_path):
+            src = open(alt_path, encoding="utf-8").read()
+            m = re.search(r'\(symbol "%s"[\s(]' % re.escape(alt_name), src)
     if not m:
         raise KeyError("Symbol %s nicht in %s gefunden" % (lib_id, path))
     body = _balanced(src, m.start())
