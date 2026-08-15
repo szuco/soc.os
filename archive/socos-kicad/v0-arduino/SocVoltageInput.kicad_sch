@@ -1,0 +1,51 @@
+(kicad_sch (version 20230121) (generator eeschema)
+
+  (uuid b42e22e7-d346-4c49-96a5-66ef4d336da7)
+
+  (paper "A4")
+
+  (lib_symbols
+  )
+
+
+  (hierarchical_label "GND" (shape output) (at 244.094 55.626 180) (fields_autoplaced)
+    (effects (font (size 1.524 1.524)) (justify right))
+    (uuid 0aaad03a-b6d2-42e6-9af7-81dd676d7446)
+  )
+  (hierarchical_label "+24V" (shape input) (at 36.83 41.91 180) (fields_autoplaced)
+    (effects (font (size 1.524 1.524)) (justify right))
+    (uuid 43592d56-90ab-437d-a811-ff9108173e7f)
+  )
+  (hierarchical_label "+5V" (shape output) (at 244.348 46.99 180) (fields_autoplaced)
+    (effects (font (size 1.524 1.524)) (justify right))
+    (uuid 5c3f15d1-5d53-40de-9ad7-91c6c2b9ab58)
+  )
+  (hierarchical_label "-24V" (shape input) (at 36.83 49.53 180) (fields_autoplaced)
+    (effects (font (size 1.524 1.524)) (justify right))
+    (uuid fb44aaf7-0518-494c-a488-2f214b574364)
+  )
+
+  (symbol (lib_id "dc-dc1:LM2596T-5") (at 209.296 41.91 0) (unit 1)
+    (in_bom yes) (on_board yes) (dnp no)
+    (uuid 00000000-0000-0000-0000-00005aaac225)
+    (property "Reference" "U?" (at 199.136 33.02 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Value" "LM2596T-5" (at 199.136 35.56 0)
+      (effects (font (size 1.27 1.27)) (justify left))
+    )
+    (property "Footprint" "TO_SOT_Packages_THT:TO-220-5_Pentawatt_Multiwatt-5_Vertical" (at 216.916 48.26 0)
+      (effects (font (size 1.27 1.27) italic) hide)
+    )
+    (property "Datasheet" "" (at 209.296 41.91 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (instances
+      (project "SocMain"
+        (path "/07c89938-4045-4a35-8848-2a75efefc585/00000000-0000-0000-0000-00005a9e4fe7"
+          (reference "U?") (unit 1)
+        )
+      )
+    )
+  )
+)

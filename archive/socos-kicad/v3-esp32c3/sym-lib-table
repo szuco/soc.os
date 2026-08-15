@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "DRV8874PWPR")(type "KiCad")(uri "/Users/szegvari-privat/Documents/Projects/sz/sz.soc.os/hw/parts/DRV8874PWPR/DRV8874PWPR.kicad_sym")(options "")(descr ""))
+)
