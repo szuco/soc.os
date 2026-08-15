@@ -64,7 +64,7 @@ erheblich. Für Klappläden ist sequenzieller Betrieb meist unproblematisch.
 | # | Prio | Entscheidung | Bemerkung |
 |---|---|---|---|
 | 25 | P1 | **Frontplatte gegen den festgelegten Rahmen prüfen: Busch-Jaeger 1721-914, Busch-balance SI, 1-fach** (2CKA001725A1555). Fenster 55 × 55, außen 81 × 81 × 12 mm — beides passt rechnerisch zur Platte (54,6 mm) und zu den Ohren (76 mm) | **Die offene Frage ist die Klemmbefestigung:** Der Rahmen rastet, und zwar bei den SI-Serien üblicherweise am *Tragring*. Diese Platte ersetzt den Tragring durch zwei angeformte Ohren — bietet sie den Rastnasen genug? Messliste in [`04-mechanical.md`](04-mechanical.md) Abschnitt 1b, zu klären am Testdruck |
-| 26 | P1 | Bottom-Connector gerade oder abgewinkelt | größter Hebel im Tiefenbudget, siehe [`04-mechanical.md`](04-mechanical.md) |
+| 26 | P2 | Bottom-Connector gerade oder abgewinkelt | War der größte Hebel im Tiefenbudget — **seit das Top-Board vor die Dose gewandert ist, stehen rund 17 mm Reserve statt 9** ([`04-mechanical.md`](04-mechanical.md) Abschnitt 4). Die Entscheidung bleibt, blockiert aber nichts mehr |
 | 27 | P2 | Schraubengröße M2,5 vs. M3 | M2,5 empfohlen |
 | 28 | P2 | Bestätigung des Bohrbilds gegen reale Dose und Frontpanel | |
 

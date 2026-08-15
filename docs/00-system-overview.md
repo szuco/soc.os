@@ -2,10 +2,13 @@
 
 ## 1. Zielsystem
 
-Stackbares PCB-System aus drei runden Leiterplatten, das in eine massive
-Schalter-Unterputzdose mit 61 mm Tiefe passt.
+Stackbares PCB-System aus drei gestapelten Leiterplatten in einer massiven
+Schalter-Unterputzdose mit 61 mm Tiefe.
 
-- Zielgröße je PCB: **Ø 52,0 mm**
+- **Bottom und Mid: rund, Ø 52,0 mm** — sie sitzen in der Dose
+- **Top: quadratisch, 47 × 47 mm mit R 4** — es sitzt **vor** der Dose im
+  Adapter, weil die Druckkreuze der Zentralscheibe auf r = 26,9 liegen und ein
+  Kreis dort nicht hinreicht ([`04-mechanical.md`](04-mechanical.md) 1d/1e)
 - Bevorzugte Leiterplattendicke: **1,0 mm**
 - Die drei Ebenen trennen Benutzeroberfläche/Sensorik, Logik/Kommunikation und
   Leistungselektronik/Motorsteuerung.

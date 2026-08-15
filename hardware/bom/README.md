@@ -23,7 +23,7 @@ Bestellung zu prüfen — beides ändert sich laufend.
 |---|---|---|
 | MCU | **ESP32-S3-WROOM-1-N16R8** | PSRAM für den Framebuffer (466² × 16 bit ≈ 434 kB), **nativer USB** spart den USB-UART-Baustein, 16 MB Flash für OTA |
 | Display | **1,46" LCD rund, ST77916, 360×360, QSPI** | entschieden. Kein Einbrennen, kein Treiberaufwand — ESPHome `mipi_spi` mit `model: CUSTOM` und der Hersteller-Init-Sequenz. **Modul-Außendurchmesser vor dem Layout messen** |
-| Taster | **8 ×** SMD-Kurzhubtaster, niedrig (z. B. Panasonic EVQP2 3,9×2,9 mm) | je Sicheltaste zwei, elektrisch parallel; Positionen r = 23,2 mm, siehe `docs/09` |
+| Taster | **4 ×** SMD-Kurzhubtaster, niedrig (z. B. Panasonic EVQP2 3,9×2,9 mm) | einer je Ecke, exakt unter den Druckkreuzen der Zentralscheibe bei (±18 · ±20). Bauhöhe ≤ 2,0 mm — sie steht in der Tiefenkette, siehe `docs/04` 1e |
 | GPIO-Expander | **TCA9534** oder **PCF8574** | entlastet das knappe GPIO-Budget, ESPHome-nativ |
 
 Begründung der Displaywahl im Detail: [`../../docs/09-display-and-mcu.md`](../../docs/09-display-and-mcu.md).
@@ -68,7 +68,7 @@ Begründung der Displaywahl im Detail: [`../../docs/09-display-and-mcu.md`](../.
 
 | | BOTTOM | MID | TOP |
 |---|---|---|---|
-| Durchmesser | Ø 52,0 mm | Ø 52,0 mm | Ø 52,0 mm |
+| Umriss | Ø 52,0 mm | Ø 52,0 mm | **47 × 47 mm, R 4** |
 | Dicke | 1,0 mm | 1,0 mm | 1,0 mm |
 | Lagen | 2 oder 4 | 4 | 2 |
 | Kupfer | **2 oz prüfen** | 1 oz | 1 oz |

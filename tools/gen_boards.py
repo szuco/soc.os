@@ -40,7 +40,7 @@ BOARD_DIAMETER   = 52.0     # mm; siehe docs/04-mechanical.md, Abschnitt 1
 BOARD_THICKNESS  = 1.0      # mm
 HOLE_PITCH_R     = 21.5     # mm; Teilkreis der Befestigungsbohrungen
 # Grad, mathematisch (CCW, 0 = +X). Bohrbild v2: nur noch 0/180 -
-# 120/240 kollidierten mit den Sicheltasten-Stoesseln der Frontplatte,
+# 120/240 kollidierten mit den frueheren Sicheltasten-Stoesseln,
 # und andere Winkel sind durch Stackverbinder, ESP32-Antenne und
 # Leistungsstecker blockiert. Begruendung in tools/gen_layouts.py.
 HOLE_ANGLES      = (0.0, 180.0)

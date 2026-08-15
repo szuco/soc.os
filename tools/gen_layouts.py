@@ -9,7 +9,7 @@ Was dieses Skript leistet - und was nicht:
   * alle Footprints geladen, Referenz/Wert gesetzt, JEDES Pad mit dem Netz aus
     dem Schaltplan-Generator verbunden
   * mechanisch gebundene Teile exakt platziert (Stackverbinder deckungsgleich
-    auf allen Boards, Taster auf den Sichel-Stoesselpositionen, USB-C am Rand,
+    auf allen Boards, Taster unter den Druckkreuzen der Zentralscheibe,
     ESP32-Antenne an der Frontkante, ...)
   * uebrige Teile kollisionsfrei per Spiralsuche platziert, Hinweisposition =
     das bereits platzierte Bauteil mit den meisten gemeinsamen Netzen
@@ -87,7 +87,7 @@ PAD_MAP_REF = {
 
 # Stackverbinder - MUESSEN auf allen drei Boards identisch liegen
 # x = +/-14,9: weiter innen als urspruenglich geplant, weil die Buchsen
-# sonst mit den rotierten Sicheltastern des Top-Boards ueberlappen.
+# sonst mit den frueheren Sicheltastern des Top-Boards ueberlappten.
 STACK_POS = {"J2": (-14.2, -2.0, 0), "J3": (14.2, -2.0, 0)}
 
 

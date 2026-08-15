@@ -8,12 +8,13 @@ Entscheidungen stehen in [`06-open-decisions.md`](06-open-decisions.md).
 
 | Phase | Ergebnis |
 |---|---|
-| **1 – Spezifikation** | 13 Dokumente: System, Power-Tree, Motorkonzept, Pinout, Mechanik, Fertigung, Display/MCU, Firmwarestrategie, Motordaten, Altbestand |
-| **2 – Mechanik** | `tools/gen_boards.py` erzeugt die Board-Mechanik (Bottom/Mid rund Ø 52, Top quadratisch 47 × 47); Adapter für die BJ-Zentralscheibe aus `mechanical/adapter.py` |
+| **1 – Spezifikation** | 13 Dokumente: System, Power-Tree, Motorkonzept, Pinout, Mechanik, Fertigung, Display/MCU, Firmwarestrategie, Motordaten, Altbestand, Funktionsstatus |
+| **2 – Mechanik** | Board-Mechanik aus `tools/gen_boards.py`: Bottom und Mid rund Ø 52, **Top quadratisch 47 × 47**. Adapter für die BJ-Zentralscheibe aus `mechanical/adapter.py`, Selbsttest bestanden |
 | **3 – Leistung und Motorkanal** | 24-V-Schutz, drei DC/DC, USB-ORing, zwei identische H-Brücken aus einer Funktion, Inline-Shunt + INA240A2 + LM393-Fenster + Latch auf `~SD` |
 | **4 – Schaltpläne** | alle drei Boards erzeugt, Netzliste je Board gegen die Sollvorgabe im Quelltext geprüft, Stücklisten daraus |
-| **5 – Layouts** | Platzierung, Netze und Zonen aller drei Boards generiert; Bottom zu ≈ 85 % geroutet (985 Segmente). Mid und Top tragen **keine** Leiterbahnen — der Umbau vom 15.08. hat sie neu erzeugt |
-| **6 – Fertigungsvorbereitung** | `gen_fab.py` mit DRC-Gate und `gen_panel.py` (Nutzen aus den drei Quellprojekten) stehen bereit; erzeugte Daten gibt es erst nach dem Routing |
+| **5 – Layouts** | Platzierung, Netze und Zonen aller drei Boards. **Top ist DRC-frei**; Bottom zu ≈ 85 % geroutet (985 Segmente); Mid und Top tragen **keine** Leiterbahnen |
+| **6 – Fertigungsvorbereitung** | `gen_fab.py` mit DRC-Gate; `gen_panel.py` erzeugt den Nutzen aus gemischter Geometrie (173,4 × 64,4 mm) |
+| **7 – Front** | Sichtfläche ist ein Serienteil: BJ-Zentralscheibe 6435-914 im Rahmen 1721-914, vermessen (Protokoll F1–F13). Vier Ecktaster unter den Druckkreuzen, Display ST7789 1,69″, stehende USB-C-Buchse |
 
 ## Als Nächstes
 
@@ -24,10 +25,12 @@ Entscheidungen stehen in [`06-open-decisions.md`](06-open-decisions.md).
    Arbeit, und aus Annahmen werden Zahlen: Comparator-Referenz, Soft-Limit,
    Sicherung, N-FET-Auswahl (Punkte 1 und 8).
    Protokoll: [`11-motor-data.md`](11-motor-data.md) Abschnitt 4.
-2. **Reale Dose und realen 55er-Rahmen vermessen**, Bohrbild und Frontplatte
-   dagegen prüfen (Punkte 25, 28). Testdruck der Platte.
-3. **Displaymodul kaufen und den Außendurchmesser messen** (Punkt 15c) — er bestimmt
-   über eine Zwangsbedingung die gesamte Sichelgeometrie der Frontplatte.
+2. **Displaymodul 1,69″ kaufen und vermessen** (Punkt 15c): Außenmaß, Bauhöhe,
+   FPC-Abgang. Bestimmt den Footprint von J5, die Sperrfläche auf dem Top-Board
+   und die Tasche im Adapter — zwischen Platine und Scheibe stehen 4,5 mm.
+3. **Adapter drucken und zusammenstecken.** Erst am realen Teil zeigt sich, ob
+   die Scheibe hält, ob der Rahmen klemmt und ob die Taster den Druck sauber
+   annehmen.
 
 ### B. Entscheiden
 
@@ -39,39 +42,39 @@ Entscheidungen stehen in [`06-open-decisions.md`](06-open-decisions.md).
    (Hochstrom-Steckverbinder) abhängen.
 6. **Punkt 23 (P0): Stackverbinder-Paar** auswählen — heute sitzt auf allen drei
    Boards dieselbe Buchse. Die Steckhöhe des Paares soll den Plattenabstand
-   ergeben (10 mm bzw. 8–10 mm), damit keine Distanzhülsen nötig werden.
-7. **Punkt 35: externer Temperaturfühler** ja/nein. Ohne ihn ist der SHT4x konsequent
-   als Elektroniktemperatur zu benennen — als Raumtemperatur ist er falsch.
+   ergeben, damit keine Distanzhülsen nötig werden.
 
 ### C. Layout fertigstellen
 
-8. **Top und Mid routen.** Beide tragen null Leiterbahnen. Die Pipeline dafür ist
-   `tools/route_boards.py` (Freerouting 1.9.0 unter `xvfb-run`, siehe docs/05),
-   Nacharbeit an der Masse mit `tools/gnd_*.py`.
-9. **Bottom:** 43 offene Verbindungen im Leistungsteil **von Hand** — kurze breite
+7. **Top und Mid routen.** Beide tragen null Leiterbahnen. Die Pipeline dafür ist
+   `tools/route_boards.py` (Freerouting 1.9.0 unter `xvfb-run`, siehe docs/05) —
+   sie braucht Linux, auf macOS läuft sie nicht. Nacharbeit an der Masse mit
+   `tools/gnd_*.py`.
+8. **Bottom:** 43 offene Verbindungen im Leistungsteil **von Hand** — kurze breite
     Wege, Buck-Schleifen nach Hersteller-Referenzlayout, Sternpunkt AGND/PGND über R12.
     [`05-manufacturing.md`](05-manufacturing.md) verlangt das für Leistungspfade ohnehin.
-10. **Schaltungsreview:** IC-Pinbelegungen gegen Datenblätter (besonders INA240A2D mit
+9. **Schaltungsreview:** IC-Pinbelegungen gegen Datenblätter (besonders INA240A2D mit
     seinen gestapelten GND-Pins), Reglerdimensionierung, Leiterbahnstromrechnung.
 
 ### D. Fertigen
 
-11. `python3 tools/gen_fab.py` für alle drei Boards, danach `gen_panel.py` neu erzeugen.
-12. Prüfliste [`05-manufacturing.md`](05-manufacturing.md) Abschnitt 3 abarbeiten,
+10. `python3 tools/gen_fab.py` für alle drei Boards, danach `gen_panel.py` neu erzeugen.
+11. Prüfliste [`05-manufacturing.md`](05-manufacturing.md) Abschnitt 3 abarbeiten,
     Git-Tag je Fertigungsstand setzen, Nutzen bestellen.
 
 ### E. Firmware
 
-13. **External Component in C++** — der größte zusammenhängende Brocken. Drei Dinge
+12. **External Component in C++** — der größte zusammenhängende Brocken. Drei Dinge
     fallen hinein, die alle am selben Problem hängen (ESPHomes Polling-Modell):
     PWM-synchrone Strommessung mit Lasterkennung (Punkt 4 in
     [`09-display-and-mcu.md`](09-display-and-mcu.md)), der VL53L1X-Distanzwert samt
     ROI-Umschaltung (Punkt 31) und die Blendungsauswertung (Punkt 32).
-14. **Bedienkonzept:** Menü-Zustandsmaschine mit der Belegung OK / Hoch / Runter /
-    Home (Punkt 37) — heute sind die vier Tasten fest auf Auf/Zu verdrahtet.
-15. **Verschlusskontakte in die Motorlogik ziehen:** Verschlusslage erreicht ⇒ Fahrt
-    beenden. Sie sind der einzige absolute Positionsbezug im System.
-16. **BIST und Heartbeat** nach [`../firmware/README.md`](../firmware/README.md).
-17. **RS-485 in Betrieb nehmen** (Punkte 15b, 16, 38): Transceiver bestätigen,
+13. **Bedienkonzept:** Menü-Zustandsmaschine hinter der Paarauswertung (Punkt 37).
+    Die Scheibe bringt die Beschriftung mit: ↑ ▷ ↓ OK.
+14. **Sanftauslauf** vor der Endlage: ab ≈ 80 % der Fahrzeit auf ≈ 40 % PWM rampen,
+    Schwellwerte der Lastanalyse mitführen. Die Reed-Kontakte gehören **nicht**
+    dazu — sie sichern das Fenster ([`../firmware/README.md`](../firmware/README.md)).
+15. **BIST und Heartbeat** nach [`../firmware/README.md`](../firmware/README.md).
+16. **RS-485 in Betrieb nehmen** (Punkte 15b, 16, 38): Transceiver bestätigen,
     Modbus-Registerkarte festlegen. RS-485 ist der *primäre* Weg — heute ist der
     UART zwar konfiguriert, aber ungenutzt.

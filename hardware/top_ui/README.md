@@ -6,13 +6,15 @@ KiCad-Projekt `top_ui`. Bedien- und Sensorikebene des Stacks, zur Front orientie
 
 Bestückt sind 29 Bauteile, 53 Netze (`bom_top.csv`):
 
-- **USB-C-Buchse** (16-polig, nur USB 2.0), ausschließlich für Programmierung und
-  Debug, mit **USBLC6-2SC6** als ESD-Schutz und 2 × 5k1 Rd
+- **USB-C-Buchse, stehend** (G-Switch GT-USB-7051x, vertikal SMT) — zeigt nach
+  vorn und liegt unter der Zentralscheibe, mit **USBLC6-2SC6** als ESD-Schutz
+  und 2 × 5k1 Rd
 - **Runddisplay ST77916**, 1,46", 360 × 360, QSPI — über eine Steckerleiste;
   der Footprint ist ein **Platzhalter**, bis das reale Modul mit seinem FPC
   vermessen ist
-- **Acht SMD-Taster** auf r = 23,2 mm, je zwei elektrisch parallel: vier
-  Sicheltasten bei vier GPIOs, kein Verkippen am Bogenende
+- **Vier SMD-Taster** auf (±18 · ±20), exakt unter den Druckkreuzen der
+  Zentralscheibe. Einzeln bedeuten sie nichts — jede Bedienrichtung ist ein
+  Paar benachbarter Ecken, aufgelöst in der Firmware
 - **SHT40-AD1B** (0x44) für Temperatur und Feuchte, thermisch über Schlitze
   entkoppelt
 - **VL53L1X** als Präsenz- und Durchstiegssensor hinter dem **oberen** Steg
@@ -39,7 +41,7 @@ Ein USB-UART-Baustein entfällt — der ESP32-S3 hat nativen USB (Punkt 24).
 
 ## Mechanik
 
-- Ø 52,0 mm, 1,0 mm Dicke
+- **47 × 47 mm mit R 4**, 1,0 mm Dicke — als einziges Board nicht rund
 - Bohrbild und Stackverbinder-Positionen **deckungsgleich** mit BOTTOM und MID
 - Das Board ist **quadratisch, 47 × 47 mm mit R 4** — als einziges der drei.
   Es sitzt vor der Dose im Adapter, weil die Druckkreuze der Zentralscheibe auf
@@ -54,7 +56,7 @@ Exakte Koordinaten: [`../../docs/04-mechanical.md`](../../docs/04-mechanical.md)
 - [`docs/01-power-tree.md`](../../docs/01-power-tree.md) – USB-ORing, Stern-Versorgung
 - [`docs/03-stack-pinout.md`](../../docs/03-stack-pinout.md) – Pinmapping
 - [`docs/04-mechanical.md`](../../docs/04-mechanical.md) – Stern-Ausgang, Tiefenbudget
-- [`docs/09-display-and-mcu.md`](../../docs/09-display-and-mcu.md) – Displaywahl, Sicheltasten, ToF
+- [`docs/09-display-and-mcu.md`](../../docs/09-display-and-mcu.md) – Displaywahl, MCU, ToF
 - [`docs/13-funktionsstatus.md`](../../docs/13-funktionsstatus.md) – Gesamtstand
 
 ## Status

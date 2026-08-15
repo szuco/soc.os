@@ -362,10 +362,21 @@ Verfügbar sind 61 mm Dosentiefe. Überschlägige Rechnung von der Dosenrückwan
 | 5 | Mid-PCB | 1,0 | 34,0 |
 | 6 | Bauteile Mid-Oberseite + Stack-Abstand | 9,0 | 43,0 |
 | 7 | Top-PCB | 1,0 | 44,0 |
-| 8 | OLED, Taster, Frontpanel | 8,0 | 52,0 |
-| | **Reserve** | | **≈ 9,0** |
+| 8 | Adapter, Zentralscheibe, Rahmen | — | **außerhalb** |
+| | **Reserve** | | **≈ 17,0** |
 
-Das Budget schließt, aber mit wenig Luft. Zwei Positionen sind die kritischen:
+> **Revision 16.08.2026: das Top-Board verlässt die Dose.** Vorher standen hier
+> 8,0 mm für „OLED, Taster, Frontpanel" und ≈ 9 mm Reserve. Seit der Umstellung
+> auf die Busch-Jaeger Zentralscheibe sitzt das Top-Board **vor** der Dose im
+> Adapter — dessen 10,0 mm Bauhöhe liegen vor der Wand, nicht in der Dose
+> (Abschnitt 1e). Die Reserve steigt damit auf **rund 17 mm**.
+>
+> Das entschärft ausgerechnet die Position, die bisher am engsten war: Für den
+> Leistungsstecker samt Kabelbogen (Positionen 1 + 2) ist jetzt Luft, ohne dass
+> ein abgewinkelter Verbinder zwingend wird. Punkt 26 verliert damit seine
+> Dringlichkeit — die Entscheidung bleibt, aber sie blockiert nichts mehr.
+
+Zwei Positionen bleiben die kritischen:
 
 - **Positionen 1 + 2 zusammen 22 mm** — mehr als ein Drittel der gesamten Tiefe geht für
   den Leistungsstecker und den Kabelbogen drauf. Ein **abgewinkelter Steckverbinder**
