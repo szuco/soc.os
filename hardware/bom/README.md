@@ -53,7 +53,7 @@ Begründung der Displaywahl im Detail: [`../../docs/09-display-and-mcu.md`](../.
 |---|---|---|
 | Temperatur + Feuchte | **SHT4x** (SHT40/41/45), I2C | ein Baustein für beides, spart Platz und eine I2C-Adresse; ESPHome `sht4x` |
 | RS-485 | Transceiver mit **Fail-Safe-Bias**, 3,3 V | ohne Fail-Safe klappert der Bus im Leerlauf |
-| Radar | UART-Modul, 3,3-V-Logik | Pegel und Stromaufnahme vor der Auswahl prüfen |
+| Präsenz | **VL53L1X** (ToF), I2C + INT | ersetzt den früheren Radar — 4,9 × 2,5 mm passen hinter den Steg, ein 20-mm-Radarmodul nicht |
 | Piezo | passiver Signalgeber | passiv, nicht aktiv — nur so funktioniert ESPHome `rtttl` |
 
 ### Steckverbinder
@@ -61,7 +61,7 @@ Begründung der Displaywahl im Detail: [`../../docs/09-display-and-mcu.md`](../.
 | Position | Kandidat | Prüfpunkt |
 |---|---|---|
 | Bottom, 6-polig | **Mini-Fit Jr. 2×3** statt Micro-Fit 3.0 | Pin 1/2 führen ≈ 9 A — siehe [`../../docs/01-power-tree.md`](../../docs/01-power-tree.md) |
-| Stern-Ausgang | JST-PH 2-polig | 80 mA, unkritisch |
+| Stern-Ausgang | **2,5-mm-Klinkenbuchse** an der Front | 80 mA, unkritisch; Bauhöhe max. 10,5 mm, Footprint noch Platzhalter (Punkt 30) |
 | Stack ×2 | 2×20, 1,27 mm | **≈ 1 A pro Kontakt** — `5V_SYS` braucht mehrere Pins |
 
 ## 2. Leiterplatten

@@ -9,8 +9,8 @@
 # model: CUSTOM mit der Hersteller-Initialisierungssequenz in
 # st77916_init.yaml - ohne jede C++-Komponente.
 #
-# Die Radar-Dunkeltastung unten ist beim LCD reiner Komfort und
-# Stromsparen, keine Schutzmassnahme (kein Einbrennen).
+# Die Praesenz-Dunkeltastung unten (VL53L1X, kein Radar mehr) ist beim LCD
+# reiner Komfort und Stromsparen, keine Schutzmassnahme (kein Einbrennen).
 #
 # STAND: Die Jalousien laufen hier als template-Cover auf ZEIT. Die
 # stromabhaengige Lasterkennung braucht PWM-synchrones ADC-Sampling und ist in
@@ -98,7 +98,9 @@ uart:
     tx_pin: GPIO17
     rx_pin: GPIO18
     baud_rate: 19200
-  - id: uart_radar
+  # Reserve-UART auf J7 des Top-Boards (unbestueckt). Hiess bis Stack-Pinout
+  # v0.4 uart_radar - der Radar ist durch den VL53L1X ersetzt.
+  - id: uart_aux
     tx_pin: GPIO42
     rx_pin: GPIO41
     baud_rate: 115200

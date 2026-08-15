@@ -1,8 +1,26 @@
 # Firmware
 
-ESP32-Firmware für KiCad SwitchStack. Die Implementierung beginnt nach dem
-Hardware-Freeze. Dieses Dokument hält das bereits festgelegte Konzept fest, damit es
-die Hardwareauslegung mitbestimmen kann.
+ESP32-Firmware für KiCad SwitchStack. Dieses Dokument hält das festgelegte Konzept
+fest, damit es die Hardwareauslegung mitbestimmen kann.
+
+## Was heute läuft — und was nicht
+
+`esphome/switchstack.yaml` ist mit `esphome config` validiert und deckt die
+Grundfunktionen ab: Display mit Init-Sequenz, Backlight mit Präsenz-Dunkeltastung,
+SHT4x, Expander, Hard-Trip-Meldung und -Reset, Verschlusskontakte, Stern,
+Haubenkontakt, zwei Cover und vier Tasten.
+
+**Die vier größten Lücken**, jede mit einem Grund:
+
+| Fehlt | Warum |
+|---|---|
+| **Lasterkennung / Stall** | Braucht PWM-synchrones ADC-Sampling; ESPHomes Polling-Modell kann das nicht. Die Cover fahren deshalb **auf Zeit**. |
+| **ToF-Distanz, ROI, Blendung** | ESPHome hat nur `vl53l0x` nativ; heute wird nur der Interrupt-Pin gelesen („da / nicht da"). |
+| **Bedienmenü** | Die vier Tasten sind fest auf Auf/Zu verdrahtet. Die Belegung unten ist Anforderung, nicht Implementierung. |
+| **RS-485-Protokoll** | UART ist konfiguriert, aber ungenutzt; `RS485_DIR` unbelegt. Das ist der *primäre* Kommunikationsweg. |
+
+Die ersten beiden fallen in **dieselbe** External Component. Vollständige
+Gegenüberstellung: [`../docs/13-funktionsstatus.md`](../docs/13-funktionsstatus.md).
 
 ## Architekturregel (verbindlich)
 
@@ -63,14 +81,39 @@ Diese Punkte müssen vor der Implementierung geklärt sein:
   Steckverbinder- und Sicherungsauslegung hängt dann davon ab. Siehe
   [`../docs/01-power-tree.md`](../docs/01-power-tree.md).
 
+## Verhaltensregeln aus dem Vorgängerprojekt
+
+Vier Festlegungen stammen aus der SoC-OS-Firmware und gelten sprachunabhängig
+weiter. Sie sind **als Anforderung übernommen, nicht als Code** — die Altfirmware
+war ein Laboraufbau, in dem Watchdog, Buzzer, BIST und Menü auskommentiert waren.
+Herleitung und ehrliche Einordnung: [`../docs/12-legacy-socos.md`](../docs/12-legacy-socos.md)
+Abschnitt 4.
+
+| Regel | Inhalt |
+|---|---|
+| **BIST beim Hochlauf** | Vor dem Start der Regeltasks ein definierter Selbsttest mit hörbarer und sichtbarer Quittung (Piezo-Ton, Displaybild). In einer zugeschraubten Unterputzdose ist das der einzige Funktionsnachweis der Peripherie ohne Bus. |
+| **Heartbeat** | Ein Lebenszeichen im festen Takt (Original: LED alle 500 ms), unabhängig von Bus und Display. Trennt „Firmware hängt" von „Kommunikation gestört" — zwei Fehlerbilder, die sonst identisch aussehen. |
+| **Tastenbelegung** | Vier Tasten: **OK / Hoch / Runter / Home**. `Home` führt aus *jeder* Menütiefe direkt zur Hauptansicht zurück; das Original hatte dafür zusätzlich einen eigenen RESET-Taster, den diese Hardware nicht mehr hat. Entprellung 50 ms, flankengetriggert. Offen als Punkt 37 in [`../docs/06-open-decisions.md`](../docs/06-open-decisions.md). |
+| **Eine Task je Funktionsblock** | Kooperatives Modell mit eigener Periode je Block (Motor, Sensorik, UI, Kontakte) statt einer Sammelschleife. Deckt sich mit der frameworkfreien Kernregel oben. |
+
+### Verschlusskontakte sind Positionsreferenz, nicht Alarmtechnik
+
+`REED1_IN`/`REED2_IN` heißen im Ursprungsentwurf **Verschlussüberwachung Links/Rechts**
+und melden die Verschlusslage *je Klappladen*. Da es keine Endschalter gibt, sind sie
+der **einzige absolute Positionsbezug im System** — die Lasterkennung oben liefert nur
+relative Information. Die Motorlogik hat sie entsprechend auszuwerten: Verschlusslage
+erreicht ⇒ Fahrt beenden, unabhängig vom Stromverlauf; Verschlusslage bei laufender
+Öffnungsfahrt nicht verlassen ⇒ Fehler.
+
 ## Weitere Funktionsbereiche
 
 Noch nicht spezifiziert, aus der Hardware abgeleitet:
 
 - RS-485 als primäres Protokoll — Protokollwahl offen
-- Radar-Auswertung über UART
-- OLED-Anzeige und Bedienung über vier Taster
-- Temperatur- und Feuchtemessung
+- Präsenzauswertung über den ToF-Sensor VL53L1X (ersetzt den früheren Radar)
+- Runddisplay-Anzeige und Bedienung über vier Taster
+- Temperatur- und Feuchtemessung — Zuordnung Innen-/Außenmessung offen, Punkt 35
 - Alarmierung über Piezo
-- Ansteuerung des Stern-Ausgangs und des Mini-Relais
+- Ansteuerung des Stern-Ausgangs und des Haubenkontakts (PhotoMOS)
+- Sabotagekontakte, falls Punkt 34 dafür entschieden wird
 - WLAN sekundär

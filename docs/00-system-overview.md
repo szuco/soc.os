@@ -31,37 +31,52 @@ Leitungen heraus: `M1_A`/`M1_B` und `M2_A`/`M2_B`. Insgesamt sechs Leistungsader
 unteren Anschluss.
 
 **USB-C** wird ausschließlich für Programmierung/Debug und ggf. Versorgung der Logik
-während der Programmierung genutzt. Der Stern erhält einen **separaten zweipoligen
-Frontanschluss** und hängt nicht am USB-Port.
+während der Programmierung genutzt. Der Stern erhält einen **separaten
+Frontanschluss** — eine 2,5-mm-Klinkenbuchse, Punkt 30 — und hängt nicht am USB-Port.
 
-## 3. Geplante Peripherie
+## 3. Peripherie (Stand der Schaltpläne)
 
-| Funktion | Anzahl | Schnittstelle | Board |
-|---|---|---|---|
-| Temperaturfühler | 1 | I2C (vorauss.) | TOP |
-| Feuchtigkeitssensor | 1 | I2C (vorauss.) | TOP |
-| OLED-Display | 1 | I2C oder SPI | TOP |
-| Switch-/Bedientaster | 4 | GPIO | TOP |
-| Stern-Ausgang 6,2 V | 1 | 2-polig | TOP (Front) |
-| USB-C + USB-UART | 1 | — | TOP |
-| ESP32 | 1 | — | MID |
-| RS-485-Anschluss | 1 | UART + DE/RE | MID |
-| Mini-Radar Bewegungsmelder | 1 | UART (vorauss.) | MID |
-| Mini-Speaker / Piezo | 1 | PWM + Treiber | MID |
-| Motorendstufe / H-Bridge | 2 | PWM/DIR/EN/FAULT | BOTTOM |
-| Strommessung je Motor | 2 | analog | BOTTOM |
-| Mini-Relais | 1 | GPIO | BOTTOM (siehe unten) |
+| Funktion | Bauteil | Anzahl | Schnittstelle | Board |
+|---|---|---|---|---|
+| Temperatur + Feuchte | SHT40-AD1B, 0x44 | 1 | I2C | TOP |
+| Runddisplay 360 × 360 | ST77916, 1,46" | 1 | QSPI + CS/RST/BL | TOP |
+| Bedientaster | 8 SMD-Taster, je 2 parallel | 4 Tasten | GPIO | TOP |
+| Präsenz / Durchstieg | VL53L1X (ToF) | 1 | I2C + INT | TOP |
+| Stern-Ausgang 6,2 V | P-FET + PTC, 2,5-mm-Klinke | 1 | 2-polig | TOP (Front) |
+| USB-C | nativer USB des S3, ESD USBLC6 | 1 | D+/D− durch den Stack | TOP |
+| MCU | ESP32-S3-WROOM-1-N16R8 | 1 | — | MID |
+| RS-485 | MAX3485 + Fail-Safe-Bias, JST-XH | 1 | UART + DIR | MID |
+| GPIO-Expander | PCF8574, 0x20 | 1 | I2C | MID |
+| Piezo | passiv + Treiberstufe | 1 | PWM (`rtttl`) | MID |
+| Meldekontakt Haube | PhotoMOS AQY282GS (SELV) | 1 | Expander P5 | MID |
+| Verschlusskontakte | Reed, Pull-up + RC + ESD, JST-SH | 2 | Expander P6/P7 | MID |
+| Motorendstufe / H-Brücke | 2 × IR2104 + 4 N-FET je Kanal | 2 | 2 × PWM (INA/INB) | BOTTOM |
+| Strommessung je Motor | 1 mΩ Inline-Shunt + INA240A2 | 2 | analog | BOTTOM |
+| Hardware-Überstromabschaltung | LM393 + 74AUP1G74 auf `~SD` | 2 | Expander P0–P2 | BOTTOM |
+
+Der frühere **Mini-Radar** ist durch den ToF-Sensor ersetzt (Punkt 17), das
+frühere **Mini-Relais** durch den PhotoMOS (Punkt 21), der **USB-UART-Baustein**
+entfällt durch den nativen USB des ESP32-S3 (Punkt 24). Was davon in Firmware
+tatsächlich ausgewertet wird, steht in
+[`13-funktionsstatus.md`](13-funktionsstatus.md).
 
 RS-485 ist die **primäre** Kommunikation. WLAN am ESP32 ist sekundär/nice-to-have.
+
+> **Die Feldperipherie ist gegenüber dem Ursprungsentwurf unvollständig.** Der
+> Vorgängerentwurf führte je Laden **zwei** Kontakte (Verschluss *und* Sabotage) und
+> einen externen Temperaturfühler an zwei 10-poligen Schraubklemmen. Beides fehlt hier.
+> Auswertung und Belege: [`12-legacy-socos.md`](12-legacy-socos.md), Entscheidung
+> offen als Punkte 34 und 35 in [`06-open-decisions.md`](06-open-decisions.md).
 
 ## 4. Board-Aufteilung
 
 ### TOP – Front / UI
-USB-C, USB-UART möglichst direkt neben der USB-C-Buchse, OLED, vier Taster,
-Temperatur- und Feuchtigkeitssensor, zweipoliger Stern-Ausgang.
+USB-C, Runddisplay ST77916 über QSPI, vier Sicheltasten (8 Taster), SHT4x,
+VL53L1X hinter dem oberen Steg, Klinkenbuchse für den Stern.
 
 ### MID – Logic
-ESP32, RS-485-Transceiver, Radar-Schnittstelle, Audio-Treiber und ggf. zusätzlicher ADC.
+ESP32-S3, RS-485-Transceiver, GPIO-Expander, Piezo, PhotoMOS für den
+Haubenkontakt, Feldstecker für die Verschlusskontakte.
 
 ### BOTTOM – Power & Motor
 24-V-Eingangsschutz, zwei Motor-H-Bridges, Strommessung, hardwareseitige
@@ -75,15 +90,16 @@ Kleinleistung.
 
 ## 6. Zuordnungshinweise / Prüfpunkte
 
-Zwei Dinge sind in der Ausgangsspezifikation nicht eindeutig festgelegt und beim
-Schaltplanentwurf zu entscheiden:
+Beide Punkte dieses Abschnitts sind inzwischen entschieden — sie bleiben als
+Entscheidungsprotokoll stehen:
 
-- **Mini-Relais:** „Unterbrechen bzw. Verbinden einer Leitung“ — welche Spannung und
-  welcher Strom geschaltet werden, ist offen. Die Zuordnung zum Bottom-Board ist die
-  naheliegende Annahme, weil es zur Leistungsdomäne gehört; die Ansteuerung `RELAY_CTL`
-  kommt dann über `J_STK_A` vom ESP32. Sobald die zu schaltende Last feststeht, ist die
-  Board-Zuordnung zu bestätigen. Bei Netzspannung wäre eine komplett andere Isolations-
-  und Kriechstreckenbetrachtung nötig — das würde die Board-Aufteilung verändern.
-- **ADC:** Ob die Strommessung direkt am ESP32-ADC oder an einem externen ADC hängt,
-  entscheidet über Signale und Pinbelegung von `J_STK_A`. Empfehlung in
-  [`02-motor-control.md`](02-motor-control.md).
+- ~~**Mini-Relais**~~ → **PhotoMOS AQY282GS auf dem Mid-Board** (Punkt 21). Potentialfrei,
+  60 V / 0,8 A, kein Spulenstrom, keine Bauhöhe im Stapelspalt. **Die Freigabe gilt
+  ausdrücklich nur für SELV.** Erwartet die Dunstabzugshaube 230 V, gehört das
+  Schaltglied nicht in diese Dose — dann kippt die ganze Isolations- und
+  Kriechstreckenbetrachtung und mit ihr die Board-Aufteilung.
+- **ADC:** Die Strommessung hängt am **internen ADC des ESP32-S3** (`I_SENSE1/2` über
+  `J_STK_A` 26/28). Ein externer ADC bleibt als Punkt 18 offen — er wird erst
+  relevant, wenn die C++-Komponente zeigt, dass das PWM-synchrone Sampling mit dem
+  internen ADC nicht ausreicht. Herleitung: [`02-motor-control.md`](02-motor-control.md),
+  Grenzen: [`09-display-and-mcu.md`](09-display-and-mcu.md) Abschnitt 4.

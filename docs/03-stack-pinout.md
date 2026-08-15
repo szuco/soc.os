@@ -17,6 +17,12 @@
 - Zwei Verbinder: `J_STK_A` (Power/Motor) und `J_STK_B` (UI/Kommunikation).
 - Ausgangspunkt: zwei **2×20-Steckverbinder mit 1,27 mm Raster**. Die konkrete Serie ist
   anhand Stackhöhe und Verfügbarkeit auszuwählen.
+- **Der Plattenabstand soll aus dem Verbinder kommen**, nicht aus Distanzhülsen oder
+  abgelängten Pins: Stapelverbinder gibt es in gestuften Steckhöhen. Gesucht ist ein
+  Paar für gesteckt 10 mm (Bottom↔Mid) und 8–10 mm (Mid↔Top).
+  **Achtung:** In den Layouts sitzt derzeit auf *allen drei* Boards dieselbe Buchse
+  (`PinSocket_2x20_P1.27mm_Vertical`) — ein Platzhalter für die Mechanik, kein
+  steckbares Paar. Punkt 23 in [`06-open-decisions.md`](06-open-decisions.md).
 
 ## 2. Strombelastbarkeit der Stackpins
 

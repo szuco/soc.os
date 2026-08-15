@@ -103,7 +103,7 @@ def build():
     s.connect("M1_INB", ("U1", "32"))         # IO39
     s.connect("M2_INA", ("U1", "33"))         # IO40
     s.connect("M2_INB", ("U1", "24"))         # IO47
-    # Radar-UART
+    # Reserve-UART (frueher Radar, siehe Stack-Pinout v0.4)
     s.connect("UART_AUX_RX", ("U1", "34"))  # IO41
     s.connect("UART_AUX_TX", ("U1", "35"))  # IO42
     # Strapping/Boot

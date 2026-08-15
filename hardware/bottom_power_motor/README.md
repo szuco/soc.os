@@ -70,7 +70,14 @@ INA240A2, Fensterkomparator und Latch je Kanal, beide Stackverbinder.
 - **Die Darstellung ist zweckmäßig, nicht schön.** Jedes Bauteil hängt über kurze
   Stummel an globalen Labels. Das ist netzlistenidentisch mit einem gezeichneten Plan
   und lässt sich in KiCad frei umarrangieren, ohne die Verbindungen zu verlieren.
-- **Kein Layout.** Das ist der nächste Schritt.
+
+**Layout:** Platzierung generiert, Zonen gefüllt, **985 Segmente und 102 Vias**
+geroutet, keine Kupferfehler. Offen sind **43 Verbindungen im Motor- und
+Leistungsteil** (SW-Knoten, Gate-Netze, `24V_PROT`). Der Autorouter konvergiert
+dort nicht mehr — und soll es auch nicht: Diese Pfade sind laut
+[`docs/05`](../../docs/05-manufacturing.md) Abschnitt 3 **von Hand** zu ziehen,
+kurz und breit, Buck-Schleifen nach Hersteller-Referenzlayout, Sternpunkt
+AGND/PGND über R12. Erst danach greift das DRC-Gate von `gen_fab.py`.
 
 Offene Bauteilposition: der N-Kanal-MOSFET (Punkt 8 in
 [`docs/06`](../../docs/06-open-decisions.md)) — er hängt am noch nicht gemessenen

@@ -43,6 +43,8 @@ EMV, Messqualität und Wartbarkeit zentral.
 | [`docs/09-display-and-mcu.md`](docs/09-display-and-mcu.md) | Displaywahl, MCU, GPIO-Budget, ESPHome-Grenzen |
 | [`docs/10-firmware-strategy.md`](docs/10-firmware-strategy.md) | Firmware-Schichten, ESPHome-Unabhängigkeit, Modbus-Pfad |
 | [`docs/11-motor-data.md`](docs/11-motor-data.md) | Motordatenblatt, Leistungsanalyse, **Messprotokoll M1–M7** |
+| [`docs/12-legacy-socos.md`](docs/12-legacy-socos.md) | Vorgängerprojekt SoC OS: übernommene Anforderungen, verlorene Funktionen, Restriktionen |
+| [`docs/13-funktionsstatus.md`](docs/13-funktionsstatus.md) | **Was steht, was fehlt** — Hardware, Firmware und Mechanik nebeneinander |
 | [`hardware/bom/README.md`](hardware/bom/README.md) | Beschaffungsliste, Fertigerempfehlung, Bestellweg |
 
 ## Repository-Struktur
@@ -50,17 +52,22 @@ EMV, Messqualität und Wartbarkeit zentral.
 ```
 hardware/
   bottom_power_motor/   KiCad BOTTOM (24 V, Motor, DC/DC)
-  mid_logic/            KiCad MID (ESP32, RS-485, Radar, Audio)
-  top_ui/               KiCad TOP (USB-C, Display, Taster, Sensorik)
+  mid_logic/            KiCad MID (ESP32-S3, RS-485, Expander, PhotoMOS, Piezo)
+  top_ui/               KiCad TOP (USB-C, Runddisplay, 8 Taster, SHT4x, ToF, Stern)
   lib/                  Gemeinsame Symbol-/Footprint-/3D-Bibliotheken
-  bom/                  Stückliste und Fertigung
+  bom/                  Beschaffung und Fertigerempfehlung
+  fab/                  Erzeugte Fertigungsdaten und der Nutzen (Build-Ergebnis)
 mechanical/             Frontplatte: build123d-Modell, FreeCAD-Makro, STEP/STL
-tools/                  Generatoren (Board-Mechanik, Bottom-Schaltplan)
+tools/                  Generatoren (Mechanik, Schaltpläne, Layouts, Routing, Fertigung)
 firmware/
   esphome/              ESPHome-Konfiguration für Home Assistant
 docs/                   Projektübergreifende Spezifikationen
-archive/                Altbestand, nicht Teil dieses Projekts
 ```
+
+Ein Verzeichnis `archive/` mit dem Altbestand der Vorgängerprojekte gab es bis zum
+15.08.2026. Es ist ausgewertet und entfernt; das Ergebnis steht in
+[`docs/12-legacy-socos.md`](docs/12-legacy-socos.md), die Dateien selbst liegen nur
+noch in der Git-Historie.
 
 ## Erzeugen
 
@@ -73,6 +80,9 @@ python3 tools/gen_bottom_sch.py      # Bottom-Schaltplan + BOM, mit Netzlistenpr
 python3 tools/gen_mid_sch.py         # Mid-Schaltplan (ESP32, RS-485, Expander)
 python3 tools/gen_top_sch.py         # Top-Schaltplan (USB-C, Taster, Sensorik)
 python3 tools/gen_layouts.py         # 3 Layouts: Platzierung, Netze, Zonen, DRC
+python3 tools/route_boards.py        # Freerouting-Pipeline, Nacharbeit mit gnd_*.py
+python3 tools/gen_fab.py [board]     # Gerber/Drill/Pos + BOMs, nur nach DRC-Gate
+python3 tools/gen_panel.py           # Fertigungsnutzen aus den drei Quellprojekten
 python3 mechanical/frontplate.py     # Frontplatte → STEP + STL, mit Selbsttest
 ```
 
@@ -87,21 +97,25 @@ korrekt — und in KiCad frei umarrangierbar.
 
 ## Status
 
+Vollständige Gegenüberstellung von umgesetzten und fehlenden Funktionen:
+[`docs/13-funktionsstatus.md`](docs/13-funktionsstatus.md).
+
 | Teil | Stand |
 |---|---|
 | Systemspezifikation, Power-Tree, Pinmapping | dokumentiert |
 | Mechanik der drei Boards | erzeugt und verifiziert |
 | Frontplatte, druckfertig | erzeugt und verifiziert |
-| ESPHome-Konfiguration inkl. ST77916-Display | validiert (`esphome config`) |
-| **Bottom-Board: Schaltplan + Stückliste** | **erzeugt und netzlistengeprüft** |
-| Schaltpläne Mid und Top | **erzeugt und netzlistengeprüft** |
+| Schaltpläne aller drei Boards + Stücklisten | **erzeugt und netzlistengeprüft** — Schaltungsreview gegen Datenblätter steht aus |
 | Layouts aller drei Boards: Platzierung + Zonen | **erzeugt, DRC ohne Platzierungsfehler** |
 | **Routing TOP** | **vollständig** — alle Netze verbunden, Kupfer-DRC sauber |
 | **Routing MID** | Signale vollständig; **10 PGND-Pour-Anbindungen offen** (Handgriff in KiCad, s. docs/05) |
-| **Routing BOTTOM** | Leistungsteil ≈ 85 % — **Rest Handarbeit** (docs/05 verlangt das für Leistungspfade ohnehin) |
+| **Routing BOTTOM** | Leistungsteil ≈ 85 %, 43 Verbindungen offen — **Rest Handarbeit** (docs/05 verlangt das für Leistungspfade ohnehin) |
 | Fertigungsdaten TOP (Gerber/Drill/Pos) | **erzeugt:** `hardware/fab/top_ui.zip` |
-| Stücklisten aller drei Boards | **erzeugt** (`bom_bottom/mid/top.csv`) |
+| Fertigungsnutzen (3 Platinen in einer Boarddatei) | **erzeugt:** `hardware/fab/panel/` |
 | Fertigungsdaten Mid + Bottom | nach Rest-Routing: `python3 tools/gen_fab.py` |
+| ESPHome-Konfiguration inkl. ST77916-Display | validiert (`esphome config`) — Motoren fahren **auf Zeit** |
+| Lasterkennung, ToF-Distanz, Menü, RS-485-Protokoll | **fehlen** — eigene C++-Komponente, s. docs/13 |
+| Gefertigt oder gemessen | **nichts** |
 
 Nächste Schritte: [`docs/07-roadmap.md`](docs/07-roadmap.md).
 Der kritische Pfad ist die Messung des Blockierstroms — Messprotokoll in

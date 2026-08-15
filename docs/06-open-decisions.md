@@ -3,6 +3,9 @@
 Legende Priorität: **P0** blockiert den nächsten Arbeitsschritt · **P1** vor
 Layout-Freeze nötig · **P2** vor Fertigungsfreigabe nötig.
 
+Welche Funktionen diese Punkte blockieren, zeigt
+[`13-funktionsstatus.md`](13-funktionsstatus.md).
+
 ## Kritischer Pfad
 
 | # | Prio | Entscheidung | Abhängig davon |
@@ -53,7 +56,7 @@ erheblich. Für Klappläden ist sequenzieller Betrieb meist unproblematisch.
 | ~~20~~ | ✅ | **`J_STK_B` v0.2** festgelegt, QSPI-Bus untergebracht | [`03-stack-pinout.md`](03-stack-pinout.md) |
 | ~~21~~ | ✅ | **PhotoMOS AQY282GS statt Relais**, SELV bestätigt. Potentialfrei, 60 V / 0,8 A, kein Spulenstrom, keine Bauhöhe im 9-mm-Stapelspalt | **Gilt nur für SELV.** Erwartet die Haube 230 V, gehört das Schaltglied nicht in diese Dose |
 | 22 | P2 | Speaker/Piezo und gewünschte Lautstärke | bestimmt Treiber und Stromaufnahme |
-| 23 | P1 | Stackverbinder-Serie im 1,27-mm-Raster | Stackhöhe 10 mm bzw. 8–10 mm, Stromrating |
+| 23 | **P0** | **Stackverbinder-Serie im 1,27-mm-Raster — und die Buchse/Stecker-Zuordnung.** Aktuell tragen **alle drei Boards denselben Footprint** (`PinSocket_2x20_P1.27mm_Vertical`), also dreimal die Buchse; drei Buchsen stecken nicht ineinander. Das ist ein Mechanik-Platzhalter, kein Verbinderpaar | Der Plattenabstand soll aus dem **Verbinder** kommen, nicht aus Distanzhülsen: Stapelverbinder gibt es in gestuften Steckhöhen (z. B. Samtec SFM/TFM oder ESQ/TSM, Harwin M50-3xx). Gesucht ist ein Paar, das gesteckt **10 mm** (Bottom↔Mid) bzw. **8–10 mm** (Mid↔Top) ergibt. Zu prüfen: Verfügbarkeit dieser Höhen im 1,27er-Raster, ≈ 1 A je Kontakt gegen [`03-stack-pinout.md`](03-stack-pinout.md) Abschnitt 2, Verpolungssicherheit A/B, und ob die Höhe des *unteren* Verbinders zum Tiefenbudget passt |
 | ~~24~~ | ✅ | **USB-UART entfällt** — ESP32-S3 hat nativen USB | erledigt |
 
 ## Mechanik
@@ -74,3 +77,15 @@ erheblich. Für Klappläden ist sequenzieller Betrieb meist unproblematisch.
 | 31 | P1 | **VL53L1X-Treiber**: ESPHome hat nur `vl53l0x` nativ. Für Distanzwert, ROI-Umschaltung und die Alarmauswertung ist eine External Component nötig | Fällt mit der ohnehin geplanten C++-Komponente für die Strommessung zusammen |
 | 32 | P1 | **Sonnenlicht am ToF**: In der Fensterlaibung ist Fremdlicht der Störfall schlechthin. `short`-Modus und Statusflags auswerten, Blendung als eigener Zustand melden statt als Fehlalarm | vor der Freigabe am realen Fenster messen |
 | 33 | P2 | **Sicheltasten sind kleiner geworden**: Steg 9 → 17 mm für Klinke und ToF-Fenster, Sichel je ~70° → ~45°, Stößelwinkel 18° → 12° | am Testdruck prüfen, ob die Taste noch gut zu treffen ist |
+
+## Aus dem Vorgängerprojekt zurückgeholt (Auswertung 15.08.2026)
+
+Herleitung und Belege: [`12-legacy-socos.md`](12-legacy-socos.md).
+
+| # | Prio | Entscheidung | Bemerkung |
+|---|---|---|---|
+| 34 | **P0** | **Sabotagekontakte je Laden — zwei zusätzliche Eingänge.** Der v0-Plan und die alte Firmware hatten je Laden *zwei* Kontakte: Verschluss **und** Sabotage. Heute existiert nur der Verschlusskontakt, obwohl [`09-display-and-mcu.md`](09-display-and-mcu.md) Abschnitt 5 den fehlenden Sabotageschutz des ToF ausdrücklich auf „die Reed-Kontakte" abwälzt | **Der PCF8574 ist mit P0–P7 restlos belegt.** Nötig wären ein zweiter Expander (eigene Adresse, Platz auf Mid) oder Reservepins am Stack. Fällt mit Punkt 29 zusammen — dort ist die Steckerfrage für die *vorhandenen* Kontakte schon ungelöst. Entweder beide Punkte gemeinsam lösen oder die Sabotageüberwachung schriftlich streichen |
+| 35 | **P1** | **Externer Temperaturfühler ja/nein — und was der SHT4x dann misst.** Der On-Board-SHT4x sitzt in der geschlossenen Dose über einer 9-A-Endstufe und misst damit *Elektroniktemperatur*, nicht Raumtemperatur. v0 führte einen „Externen Thermistor" als Feldsignal, v3 hatte einen eigenen Block „Internal Temperature" | Zwei fertig ausgearbeitete Altvarianten: **DS18B20** (1-Wire, 10k Pull-up, mehrere Fühler an einer Leitung — die alte Firmware kann das bereits) oder **NTC MF52-103, B = 3435, 1 %**. Entscheidet über eine weitere Feldader und damit erneut über Punkt 29. Ohne externen Fühler ist der SHT4x konsequent als Innentemperatur (Derating/Schutz) zu benennen und zu bewerten |
+| 36 | P1 | **Umgebungslichtsensor für die Displayhelligkeit.** Über v0, v3 und die alte Pinout-Datei durchgehend vorgesehen („Ambient light detection", 2 Fotodioden), heute entfallen — die Helligkeit hängt allein an der ToF-Präsenz | In der Fensterlaibung ist der Dynamikumfang der Störfall: direkte Sonne bis Dunkelheit. Zu prüfen ist, ob der **VL53L1X** das mit abdeckt: sein Ambient-Rate-Zähler ist ohnehin auszuwerten (Punkt 32) und liefert ein grobes Helligkeitsmaß. Dann kostet die Funktion kein Bauteil und keinen Pin |
+| 37 | P2 | **Verbindliche Tastenbelegung festlegen.** Vier Tasten, und eine davon muss aus jeder Menütiefe direkt herausführen — die Altfirmware belegte OK / Hoch / Runter / **Home**, v0 hatte dafür sogar einen fünften RESET-Taster, der heute fehlt | Betrifft nur Firmware und Beschriftung, kein Layout. Festhalten in [`../firmware/README.md`](../firmware/README.md), bevor die Display-Zustandsmaschine entsteht |
+| 38 | P2 | **RS-485-Transceiver: MAX13450E als Ausgangspunkt für Punkt 16** — in v0 bereits ausgewählt, 3,3 V, Fail-Safe-Bias integriert | Ersetzt Punkt 16 nicht, verkürzt aber die Auswahl. Verfügbarkeit und Preis gegen aktuelle Alternativen prüfen |

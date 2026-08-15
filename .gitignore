@@ -1,6 +1,8 @@
 # --- KiCad ---------------------------------------------------------------
 # Automatische Backups
 *-backups/
+# KiCad 10 legt je Projekt ein eigenes Git-Repo als lokale Historie an
+.history/
 *.kicad_pcb-bak
 *.kicad_sch-bak
 *.kicad_prl

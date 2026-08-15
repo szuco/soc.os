@@ -1,0 +1,148 @@
+# 13 – Funktionsstatus: was steht, was fehlt
+
+Stand **15.08.2026**. Diese Datei ist die einzige Stelle, an der Hardware-,
+Firmware- und Mechanikstand nebeneinander stehen. Sie beantwortet genau eine
+Frage: *Was kann das Gerät heute, und was fehlt bis zum fertigen Produkt?*
+
+Legende: ✅ fertig und geprüft · 🟡 begonnen, Rest benannt · ⛔ nicht vorhanden ·
+🔒 blockiert durch eine offene Entscheidung ([`06-open-decisions.md`](06-open-decisions.md))
+
+---
+
+## 1. Kurzfassung
+
+| Ebene | Stand |
+|---|---|
+| **Spezifikation** | ✅ vollständig — 13 Dokumente, alle Entscheidungen entweder getroffen oder als Punkt 1–38 offen benannt |
+| **Mechanik** | ✅ Boards und Frontplatte generiert und selbstgeprüft; 🔒 Maßprüfung am realen Rahmen und am realen Displaymodul steht aus |
+| **Schaltpläne** | ✅ alle drei Boards erzeugt und netzlistengeprüft; ⛔ **keine Schaltungsreview gegen Datenblätter** |
+| **Layouts** | 🟡 Top fertig, Mid bis auf 10 Masseanbindungen fertig, Bottom-Leistungsteil zu ~85 % |
+| **Fertigungsdaten** | 🟡 Top exportiert, Nutzen erzeugt; Mid und Bottom fehlen noch |
+| **Firmware** | 🟡 ESPHome-Konfiguration validiert und funktionsfähig, aber **ohne Lasterkennung, ohne Bedienmenü, ohne RS-485-Protokoll** |
+| **Bestellt / gebaut** | ⛔ nichts — kein Board gefertigt, kein Motor vermessen |
+
+**Der kritische Pfad ist nicht das Routing, sondern die Messung.** Solange der
+Blockierstrom der Motoren nicht gemessen ist ([`11-motor-data.md`](11-motor-data.md)
+Abschnitt 4, Messung M6, ≈ 5 Minuten Arbeit), bleiben Sicherung, Trip-Schwelle,
+Soft-Limit und der einzige noch offene Leistungshalbleiter provisorisch.
+
+---
+
+## 2. Hardware je Board
+
+| Board | Schaltplan | Layout / Routing | Fertigungsdaten |
+|---|---|---|---|
+| **BOTTOM** `bottom_power_motor` | ✅ 102 Bauteile, 105 Netze, Netzlistenvergleich bestanden | 🟡 985 Segmente, 102 Vias, **43 offene Verbindungen** im Motor-/Leistungsteil, 0 Kupferfehler | ⛔ wartet auf das Rest-Routing |
+| **MID** `mid_logic` | ✅ 37 Bauteile, 57 Netze | 🟡 alle Signalnetze verbunden, **10 PGND-Pour-Anbindungen offen** | ⛔ wartet auf das Rest-Routing |
+| **TOP** `top_ui` | ✅ 29 Bauteile, 53 Netze | ✅ vollständig, Kupfer-DRC sauber | ✅ [`hardware/fab/top_ui.zip`](../hardware/fab/top_ui.zip) |
+| **Nutzen** `fab/panel` | — (Build-Ergebnis) | ✅ 178,4 × 64,4 mm, drei Ø-52-Kreise, Stege + Mausbisse | 🟡 erst mit allen drei Boards bestellbar |
+
+Die 43 offenen Verbindungen auf Bottom sind **kein Rückstand des Autorouters**,
+sondern Absicht: [`05-manufacturing.md`](05-manufacturing.md) Abschnitt 3 verlangt
+für Leistungspfade und Buck-Schleifen ohnehin Handarbeit nach Referenzlayout.
+
+**Die Stackverbinder sind noch kein Verbinderpaar.** Auf allen drei Boards sitzt
+derselbe Footprint (`PinSocket_2x20_P1.27mm_Vertical`) — dreimal die Buchse. Als
+Platzhalter für die Mechanik ist das in Ordnung, gesteckt werden kann es nicht.
+Der Plattenabstand soll aus der Steckhöhe des Verbinders kommen, nicht aus
+Distanzhülsen: 🔒 Punkt 23, hochgestuft auf P0.
+
+**Was allen drei Boards fehlt, unabhängig vom Routing:** eine Schaltungsreview.
+Die Netzliste ist maschinell gegen die Sollvorgabe geprüft — dass die
+IC-Pinbelegungen den Datenblättern entsprechen und die Reglerdimensionierung
+stimmt, ist damit *nicht* gezeigt.
+
+---
+
+## 3. Gerätefunktionen
+
+### 3.1 Antrieb und Schutz
+
+| Funktion | Hardware | Firmware | Stand |
+|---|---|---|---|
+| Zwei Motoren auf/zu fahren | ✅ 2 H-Brücken, je 2 × IR2104 + 4 N-FET | ✅ `cover: time_based`, Umpolung über INA/INB, 300 ms Stoppause | 🟡 **fährt auf Zeit** (30 s Timeout), keine Positionsrückmeldung |
+| Hardware-Überstromabschaltung | ✅ INA240A2 → LM393-Fenster → 74AUP1G74 auf `~SD` | ✅ meldet `HW_TRIP1/2` nach Home Assistant, Reset-Taste vorhanden | ✅ wirkt firmwareunabhängig — 🔒 **Schwelle ist eine Annahme** (Punkt 1) |
+| Strommessung anzeigen | ✅ 1 mΩ Inline-Shunt, Kelvin, INA240A2 | 🟡 zwei ADC-Sensoren, Skalierung `multiply: 5.0` ist **Platzhalter** | 🟡 taugt zur Anzeige, nicht zur Auswertung |
+| **Lasterkennung / Stall** | ✅ Hardware vorhanden | ⛔ **fehlt vollständig** | ⛔ braucht PWM-synchrones Sampling → eigene C++-External-Component ([`09`](09-display-and-mcu.md) Abschnitt 4) |
+| Endlage über Verschlusskontakt | ✅ `REED1/2` mit Pull-up, RC-Glied, ESD | 🟡 nur als Fenster-Sensoren in HA sichtbar | ⛔ **nicht mit der Motorlogik verknüpft** — obwohl sie der einzige absolute Positionsbezug sind ([`../firmware/README.md`](../firmware/README.md)) |
+| Interlock „nur ein Motor gleichzeitig" | — | ⛔ | 🔒 Punkt 3 — Nutzungsentscheidung, kostet nichts, entschärft Punkt 2 |
+| Konkreter N-Kanal-MOSFET | ⛔ einziges Leistungsbauteil ohne Teilenummer | — | 🔒 Punkt 8, hängt am Blockierstrom |
+
+### 3.2 Bedienung und Anzeige
+
+| Funktion | Hardware | Firmware | Stand |
+|---|---|---|---|
+| Rundes Display 360 × 360 | ✅ ST77916, QSPI, Steckerleiste (Footprint **Platzhalter**) | ✅ `mipi_spi` mit `model: CUSTOM` + 214-Kommando-Initsequenz, validiert | 🟡 Modul-Außendurchmesser 🔒 Punkt 15c |
+| Anzeigeinhalt | — | 🟡 Temperatur, Luftfeuchte, „anwesend" | 🟡 eine feste Seite, keine Zustände, keine Statusfarben |
+| Vier Sicheltasten | ✅ 8 SMD-Taster, je 2 parallel, r = 23,2 mm | 🟡 fest auf Jalousie 1 auf/zu und Jalousie 2 auf/zu verdrahtet | ⛔ **kein Menü** — die Belegung OK/Hoch/Runter/Home aus [`12`](12-legacy-socos.md) ist Papier (Punkt 37) |
+| Displayhelligkeit | ✅ PWM-Backlight auf GPIO43 | ✅ dimmbar, Präsenz weckt auf 80 %, 120 s Nachlauf | ✅ |
+| Helligkeit nach Umgebungslicht | ⛔ kein Sensor bestückt | ⛔ | 🔒 Punkt 36 — evtl. kostenlos über den Ambient-Zähler des VL53L1X |
+| Signalton / Alarm | ✅ Piezo passiv + Treiberstufe | 🟡 `rtttl`, nur eine Test-Schaltfläche | 🟡 kein Alarmkonzept, keine Zuordnung zu Ereignissen |
+| **BIST beim Hochlauf** | ✅ Piezo und Display vorhanden | ⛔ | ⛔ als Regel festgehalten, nicht umgesetzt — in einer zugeschraubten Dose der einzige Funktionsnachweis |
+| **Heartbeat** | ✅ Piezo/Display/Expander vorhanden | ⛔ | ⛔ trennt „Firmware hängt" von „Bus gestört" |
+
+### 3.3 Sensorik
+
+| Funktion | Hardware | Firmware | Stand |
+|---|---|---|---|
+| Temperatur + Feuchte | ✅ SHT40-AD1B, 0x44 | ✅ `sht4x`, 30 s | 🟡 **misst die Dosentemperatur über der Endstufe**, nicht den Raum — Benennung 🔒 Punkt 35 |
+| Externer Temperaturfühler | ⛔ | ⛔ | 🔒 Punkt 35 — im Vorgängerprojekt vorhanden (DS18B20 oder NTC), hier entfallen |
+| Präsenz vor dem Display | ✅ VL53L1X auf Top, Fenster im oberen Steg | 🟡 nur der Interrupt-Pin über den Expander | 🟡 „jemand da / nicht da", **keine Entfernung** |
+| Durchstiegsmeldung durchs Fenster | ✅ derselbe Sensor | ⛔ | 🔒 Punkt 31 — braucht Distanzwert und ROI-Umschaltung, also eine External Component |
+| Blendungserkennung (Sonne) | ✅ Statusflags des Sensors | ⛔ | 🔒 Punkt 32 — am realen Fenster zu messen |
+| **Sabotagekontakte** | ⛔ keine Eingänge frei (PCF8574 P0–P7 belegt) | ⛔ | 🔒 **Punkt 34, P0** — im Ursprungsentwurf vorhanden, hier verloren; entweder zweiter Expander oder schriftlich streichen |
+
+### 3.4 Ausgänge und Kommunikation
+
+| Funktion | Hardware | Firmware | Stand |
+|---|---|---|---|
+| Weihnachtsstern 6,2 V | ✅ eigener Buck, P-FET-High-Side, PTC 0,2 A, 2,5-mm-Klinke an der Front | ✅ Schalter-Entität | 🔒 Punkt 30 — Klinkenbuchse ist ein Platzhalter-Footprint |
+| Meldekontakt Dunstabzugshaube | ✅ PhotoMOS AQY282GS, potentialfrei, **nur SELV** | ✅ Schalter-Entität, LOW = geschlossen | ✅ |
+| **RS-485 (primärer Weg)** | ✅ MAX3485, Fail-Safe-Bias, Terminierung als DNP, JST-XH | ⛔ UART definiert, **aber ungenutzt**; `RS485_DIR` (GPIO48) unbelegt | ⛔ 🔒 Punkte 15b/16/38 — Transceiver-Auswahl und Registerkarte offen |
+| WLAN / Home Assistant | ✅ ESP32-S3-WROOM-1-N16R8 | ✅ API, OTA, Fallback-AP | ✅ ausdrücklich **sekundär** |
+| USB-C Programmierung | ✅ nativer USB des S3, ESD-Schutz, D+/D− über den Stack | ✅ Logging über USB-Serial-JTAG | ✅ |
+| Feldstecker für Reed + Haube | 🟡 JST-SH 6-polig auf der Mid-Rückseite, 0,4 mm neben einem Keepout | — | 🔒 **Punkt 29, P0** — es ist schlicht kein Platz |
+
+---
+
+## 4. Mechanik
+
+| Teil | Stand |
+|---|---|
+| Board-Outline, Bohrbild, Keepouts (3 ×) | ✅ generiert, deckungsgleich, selbstgeprüft |
+| Frontplatte mit vier Sicheltasten | ✅ `mechanical/frontplate.py` → STEP + STL, mit Selbsttest |
+| Tiefenbudget 61 mm | 🟡 gerechnet, 🔒 mit realen Bauteilhöhen nachzurechnen (Punkte 26, 14) |
+| Passung im realen 55er-Rahmen | ⛔ 🔒 Punkt 25 — Testdruck steht aus |
+| Bohrbild gegen reale Dose | ⛔ 🔒 Punkt 28 |
+
+---
+
+## 5. Werkzeuge
+
+Alles Generierte ist reproduzierbar; die Werkzeuge prüfen ihr Ergebnis selbst.
+
+| Werkzeug | Zweck |
+|---|---|
+| `tools/gen_boards.py` | Board-Mechanik aller drei Projekte |
+| `tools/gen_bottom_sch.py`, `gen_mid_sch.py`, `gen_top_sch.py` | Schaltpläne + Netzlistenvergleich |
+| `tools/stack_pinout.py` | **gemeinsame** Quelle des Stack-Pinmappings — die Boards können nicht auseinanderlaufen |
+| `tools/gen_layouts.py` | Platzierung, Netze, Zonen |
+| `tools/route_boards.py`, `gnd_stitch.py`, `gnd_connect.py`, `gnd_iterate.py` | Routing-Pipeline und Masseanbindung |
+| `tools/gen_fab.py` | Gerber/Drill/Pos + Stücklisten, **nur nach bestandenem DRC-Gate** |
+| `tools/gen_panel.py` | Fertigungsnutzen aus den drei Quellprojekten |
+| `mechanical/frontplate.py` | Frontplatte |
+
+---
+
+## 6. Reihenfolge der nächsten Schritte
+
+1. **Blockierstrom messen** (M6, Multimeter, 5 min) → Punkte 1, 8, 2 werden entscheidbar.
+2. **Punkt 34 entscheiden**: Sabotagekontakte nachrüsten oder schriftlich streichen.
+   Zusammen mit Punkt 29 (Feldstecker) — beide betreffen dieselbe Ecke des Mid-Boards.
+3. **Rest-Routing** Mid (10 Anbindungen) und Bottom (43 Verbindungen, Leistungsteil von Hand).
+4. **Schaltungsreview** gegen Datenblätter, Reglerlayouts gegen Referenzdesign.
+5. **Fertigungsdaten** für Mid und Bottom, dann den Nutzen bestellen.
+6. **Firmware**: External Component für Strommessung, Lasterkennung und VL53L1X-Distanz —
+   der größte zusammenhängende Brocken, und alle drei Funktionen fallen in dieselbe Komponente.
+
+Detaillierte Arbeitsschritte: [`07-roadmap.md`](07-roadmap.md).
