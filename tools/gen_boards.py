@@ -18,6 +18,12 @@ Erzeugt je Board eine .kicad_pcb mit:
 WICHTIG: Alle drei Boards teilen dieselben mechanischen Konstanten. Aenderungen
 nur hier vornehmen und das Skript neu laufen lassen, damit die Boards nicht
 auseinanderlaufen.
+
+  ACHTUNG: Dieses Skript SCHREIBT hardware/<slug>/<slug>.kicad_pcb - es
+  ueberschreibt also die realen Boarddateien samt Bestueckung und Leiterbahnen.
+  Der Regelweg ist tools/gen_layouts.py, das die Boards komplett aus den
+  Schaltplan-Generatoren aufbaut. gen_boards.py ist nur noch die Referenz fuer
+  die reine Mechanik.
 """
 
 import math
@@ -40,6 +46,14 @@ HOLE_PITCH_R     = 21.5     # mm; Teilkreis der Befestigungsbohrungen
 HOLE_ANGLES      = (0.0, 180.0)
 EDGE_CLEARANCE   = 0.5      # mm
 
+# Das TOP-Board ist als einziges NICHT rund: Die Zentralscheibe
+# Busch-Jaeger 6435-914 gibt ihren Tastendruck ueber vier Kreuze an den ECKEN
+# weiter, bei (+/-18,0 / +/-20,0) - also r = 26,91 und damit ausserhalb einer
+# Oe52-Platine. Es wird ein abgerundetes Quadrat und sitzt vor der Dose.
+# Siehe docs/04-mechanical.md Abschnitt 1d und Punkt 48 in docs/06.
+TOP_SQ           = 49.0     # mm Kantenlaenge
+TOP_CR           = 4.0      # mm Eckradius
+
 ANTENNA_KEEPOUT_W = 18.0    # mm; Sperrflaeche ESP32-Antenne (nur MID)
 # Nur der echte Antennenabschnitt des WROOM-Moduls (oberste 6,5 mm; das
 # Modul ragt 3 mm ueber die Boardkante). Eine groessere Flaeche schliesst
@@ -49,10 +63,11 @@ ANTENNA_KEEPOUT_H = 3.6
 FP_LIB = "/usr/share/kicad/footprints/MountingHole.pretty"
 FP_NAME = "MountingHole_2.7mm_M2.5"
 
+# slug, Beschriftung, Antennen-Keepout, quadratisch
 BOARDS = [
-    ("bottom_power_motor", "BOTTOM - Power & Motor", False),
-    ("mid_logic",          "MID - Logic",            True),
-    ("top_ui",             "TOP - Front / UI",       False),
+    ("bottom_power_motor", "BOTTOM - Power & Motor", False, False),
+    ("mid_logic",          "MID - Logic",            True,  False),
+    ("top_ui",             "TOP - Front / UI",       False, True),
 ]
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -67,14 +82,38 @@ def pt(x_mm, y_mm_math):
     return pcbnew.VECTOR2I(mm(x_mm), mm(-y_mm_math))
 
 
-def add_outline(board):
-    c = pcbnew.PCB_SHAPE(board)
-    c.SetShape(pcbnew.SHAPE_T_CIRCLE)
-    c.SetLayer(pcbnew.Edge_Cuts)
-    c.SetCenter(pt(0, 0))
-    c.SetEnd(pt(BOARD_DIAMETER / 2.0, 0))
-    c.SetWidth(mm(0.1))
-    board.Add(c)
+def add_outline(board, square=False):
+    if not square:
+        c = pcbnew.PCB_SHAPE(board)
+        c.SetShape(pcbnew.SHAPE_T_CIRCLE)
+        c.SetLayer(pcbnew.Edge_Cuts)
+        c.SetCenter(pt(0, 0))
+        c.SetEnd(pt(BOARD_DIAMETER / 2.0, 0))
+        c.SetWidth(mm(0.1))
+        board.Add(c)
+        return
+    h, cr, k = TOP_SQ / 2.0, TOP_CR, 0.7071067811865476
+    for a, b in (((-(h - cr), h), ((h - cr), h)),
+                 (((h - cr), -h), (-(h - cr), -h)),
+                 ((-h, -(h - cr)), (-h, (h - cr))),
+                 ((h, (h - cr)), (h, -(h - cr)))):
+        seg = pcbnew.PCB_SHAPE(board)
+        seg.SetShape(pcbnew.SHAPE_T_SEGMENT)
+        seg.SetLayer(pcbnew.Edge_Cuts)
+        seg.SetStart(pt(*a))
+        seg.SetEnd(pt(*b))
+        seg.SetWidth(mm(0.1))
+        board.Add(seg)
+    for sx, sy in ((1, 1), (1, -1), (-1, -1), (-1, 1)):
+        cx, cy = sx * (h - cr), sy * (h - cr)
+        arc = pcbnew.PCB_SHAPE(board)
+        arc.SetShape(pcbnew.SHAPE_T_ARC)
+        arc.SetLayer(pcbnew.Edge_Cuts)
+        arc.SetArcGeometry(pt(sx * (h - cr), sy * h),
+                           pt(cx + sx * k * cr, cy + sy * k * cr),
+                           pt(sx * h, sy * (h - cr)))
+        arc.SetWidth(mm(0.1))
+        board.Add(arc)
 
 
 def add_holes(board):
@@ -144,21 +183,22 @@ def add_antenna_keepout(board):
     board.Add(zone)
 
 
-def build(slug, label, antenna):
+def build(slug, label, antenna, square=False):
     board = pcbnew.CreateEmptyBoard()
 
     ds = board.GetDesignSettings()
     ds.SetBoardThickness(mm(BOARD_THICKNESS))
     ds.m_CopperEdgeClearance = mm(EDGE_CLEARANCE)
 
-    add_outline(board)
+    add_outline(board, square)
     holes = add_holes(board)
     add_front_marker(board)
 
     add_text(board, label, 0, 6.5, size=1.6)
     add_text(board, "SwitchStack  D%.0f  t%.1f" % (BOARD_DIAMETER, BOARD_THICKNESS),
              0, 3.8, size=1.0)
-    add_text(board, "FRONT", 0, BOARD_DIAMETER / 2.0 - 6.2, size=1.0)
+    add_text(board, "FRONT", 0,
+             (TOP_SQ / 2.0 if square else BOARD_DIAMETER / 2.0) - 6.2, size=1.0)
 
     if antenna:
         add_antenna_keepout(board)
@@ -170,21 +210,32 @@ def build(slug, label, antenna):
     return path, holes
 
 
-def verify(path, expect_antenna):
+def verify(path, expect_antenna, square=False):
     """Datei neu einlesen und den Inhalt gegen die Vorgaben pruefen."""
     errs = []
     b = pcbnew.LoadBoard(path)
 
-    circles = [d for d in b.GetDrawings()
-               if d.GetClass() == "PCB_SHAPE"
-               and d.GetShape() == pcbnew.SHAPE_T_CIRCLE
-               and d.GetLayer() == pcbnew.Edge_Cuts]
-    if len(circles) != 1:
-        errs.append("%d Edge.Cuts-Kreise, erwartet 1" % len(circles))
+    if square:
+        edge = [d for d in b.GetDrawings()
+                if d.GetClass() == "PCB_SHAPE"
+                and d.GetLayer() == pcbnew.Edge_Cuts]
+        segs = [d for d in edge if d.GetShape() == pcbnew.SHAPE_T_SEGMENT]
+        arcs = [d for d in edge if d.GetShape() == pcbnew.SHAPE_T_ARC]
+        if len(segs) != 4 or len(arcs) != 4:
+            errs.append("Kontur: %d Geraden / %d Boegen, erwartet 4 / 4"
+                        % (len(segs), len(arcs)))
     else:
-        r = pcbnew.ToMM(circles[0].GetRadius())
-        if abs(r - BOARD_DIAMETER / 2.0) > 0.01:
-            errs.append("Radius %.3f mm, erwartet %.3f" % (r, BOARD_DIAMETER / 2.0))
+        circles = [d for d in b.GetDrawings()
+                   if d.GetClass() == "PCB_SHAPE"
+                   and d.GetShape() == pcbnew.SHAPE_T_CIRCLE
+                   and d.GetLayer() == pcbnew.Edge_Cuts]
+        if len(circles) != 1:
+            errs.append("%d Edge.Cuts-Kreise, erwartet 1" % len(circles))
+        else:
+            r = pcbnew.ToMM(circles[0].GetRadius())
+            if abs(r - BOARD_DIAMETER / 2.0) > 0.01:
+                errs.append("Radius %.3f mm, erwartet %.3f"
+                            % (r, BOARD_DIAMETER / 2.0))
 
     fps = list(b.GetFootprints())
     if len(fps) != len(HOLE_ANGLES):
@@ -195,7 +246,8 @@ def verify(path, expect_antenna):
         rad = math.hypot(x, y)
         if abs(rad - HOLE_PITCH_R) > 0.01:
             errs.append("Bohrung auf r=%.3f mm, erwartet %.3f" % (rad, HOLE_PITCH_R))
-        if rad + 1.35 + EDGE_CLEARANCE > BOARD_DIAMETER / 2.0:
+        limit = TOP_SQ / 2.0 if square else BOARD_DIAMETER / 2.0
+        if rad + 1.35 + EDGE_CLEARANCE > limit:
             errs.append("Bohrung verletzt Randabstand")
 
     t = pcbnew.ToMM(b.GetDesignSettings().GetBoardThickness())
@@ -219,9 +271,9 @@ def main():
 
     ok = True
     ref_holes = None
-    for slug, label, antenna in BOARDS:
-        path, holes = build(slug, label, antenna)
-        errs = verify(path, antenna)
+    for slug, label, antenna, square in BOARDS:
+        path, holes = build(slug, label, antenna, square)
+        errs = verify(path, antenna, square)
 
         if ref_holes is None:
             ref_holes = holes

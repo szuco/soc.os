@@ -61,7 +61,10 @@ PARAMS = dict(
     boss_depth        = 3.0,
 
     # --- Tragring-Ohren (DIN 49073, 60 mm Schraubenabstand) ----------------
-    ear_span          = 76.0,
+    # 70,0 statt der frueheren 76,0: Am realen Rahmen 1721-914 gemessen
+    # (docs/04, F13) klemmen dessen Doppelstege auf genau 70,0 mm. Mit 76 mm
+    # breiten Ohren staenden sie im Weg. Punkt 49 in docs/06.
+    ear_span          = 70.0,
     ear_width         = 14.0,
     ear_thickness     = 2.5,
     screw_pitch       = 60.0,

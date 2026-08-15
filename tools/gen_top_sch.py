@@ -13,8 +13,9 @@ Besonderheiten:
   * Der Stern-Ausgang sitzt hier (Frontanschluss laut Frontplatte) und wird
     per High-Side-P-FET geschaltet; STAR_EN kommt vom I2C-Expander des
     Mid-Boards ueber den Stack.
-  * Acht Taster: je Sicheltaste zwei, elektrisch parallel. Positionen laut
-    mechanical/frontplate.py: r = 23,2 mm auf 27/63/117/153/207/243/297/333 Grad.
+  * Vier Ecktaster unter den Druckkreuzen der Zentralscheibe 6435-914, bei
+    (+/-18,0 / +/-20,0) mm. Jede Bedienrichtung ist ein Paar benachbarter
+    Ecken - die Aufloesung macht die Firmware.
   * Displaymodul ueber Steckerleiste - Footprint ist PLATZHALTER, bis das
     reale ST77916-Modul mit seinem FPC vermessen ist.
 """
@@ -80,16 +81,28 @@ def build():
     s.connect("USB_DN",   ("U1", "6"))
 
     # =====================================================================
-    # 2. Sicheltasten: 8 Taster, paarweise parallel
+    # 2. Vier Ecktaster unter den Druckkreuzen der Zentralscheibe
     # =====================================================================
-    for n in range(1, 5):
-        for half in "AB":
-            ref = "SW%d%s" % (n, half)
-            s.add(ref, "Switch:SW_Push", "BTN%d" % n,
-                  "Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK",
-                  MPN="Alps SKRK o.ae., 3,9x2,9, Pads laengs - Position siehe mechanical/frontplate.py")
-            s.connect("BTN%d" % n, (ref, "1"))
-            s.connect("PGND",      (ref, "2"))
+    # Die Busch-Jaeger Zentralscheibe 6435-914 traegt die Symbole auf den
+    # ACHSEN, gibt den Druck aber ueber vier Kreuze an den ECKEN weiter
+    # (gemessen: +/-18,0 / +/-20,0 mm von der Plattenmitte). Ein Kreuz ist
+    # 3,2 mm gross und trifft genau EINEN Taster - die frueheren acht
+    # parallelgeschalteten Taster der Sichelkappen sind damit hinfaellig.
+    #
+    # Jede Bedienrichtung ist ein PAAR benachbarter Ecken; die Aufloesung
+    # macht die Firmware:
+    #     hoch   = BTN1 + BTN2      runter = BTN3 + BTN4
+    #     links  = BTN2 + BTN3      OK     = BTN1 + BTN4
+    # Siehe docs/04-mechanical.md Abschnitt 1d und firmware/README.md.
+    for n, ecke in ((1, "oben rechts"), (2, "oben links"),
+                    (3, "unten links"), (4, "unten rechts")):
+        ref = "SW%d" % n
+        s.add(ref, "Switch:SW_Push", "BTN%d" % n,
+              "Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK",
+              MPN="Alps SKRK o.ae., 3,9x2,9 - Ecke %s, unter dem Druckkreuz "
+                  "der Zentralscheibe" % ecke)
+        s.connect("BTN%d" % n, (ref, "1"))
+        s.connect("PGND",      (ref, "2"))
 
     # =====================================================================
     # 3. Temperatur/Feuchte SHT4x

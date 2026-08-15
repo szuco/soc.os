@@ -1,5 +1,12 @@
 # Fertigungsnutzen
 
+> **⚠ Der erzeugte Nutzen ist am 16.08.2026 gelöscht worden.** Das Top-Board ist
+> seither **quadratisch** (49 × 49 mm, Punkt 48) — `gen_panel.py` setzt aber drei
+> Kreise Ø 52 nebeneinander und würde um das quadratische Board herum eine runde
+> Fräsbahn legen. Das Werkzeug ist auf gemischte Geometrie zu erweitern: zwei
+> Kreise und ein abgerundetes Quadrat, mit je eigener Stegberechnung. Bis dahin
+> beschreibt dieses Dokument den **Aufbau**, nicht einen vorhandenen Stand.
+
 `switchstack_panel.kicad_pcb` enthält alle drei Platinen in einer Datei —
 Bottom, Mid und Top nebeneinander, gehalten von Trennstegen in einem Rahmen.
 

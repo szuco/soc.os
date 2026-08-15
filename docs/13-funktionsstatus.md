@@ -34,8 +34,8 @@ Soft-Limit und der einzige noch offene Leistungshalbleiter provisorisch.
 |---|---|---|---|
 | **BOTTOM** `bottom_power_motor` | ✅ 102 Bauteile, 105 Netze, Netzlistenvergleich bestanden | 🟡 **985 Segmente, 102 Vias**, 43 offene Verbindungen im Motor-/Leistungsteil, 0 Kupferfehler | ⛔ wartet auf das Rest-Routing |
 | **MID** `mid_logic` | ✅ 37 Bauteile, 57 Netze | ⛔ platziert, **0 Leiterbahnen** | ⛔ |
-| **TOP** `top_ui` | ✅ 29 Bauteile, 53 Netze | ⛔ platziert, **0 Leiterbahnen** — Stand 15.08.2026 mit Klinke auf 6 Uhr | ⛔ |
-| **Nutzen** `fab/panel` | — (Build-Ergebnis) | ✅ 178,4 × 64,4 mm, drei Ø-52-Kreise, Stege + Mausbisse | 🟡 erst mit allen drei Boards bestellbar |
+| **TOP** `top_ui` | ✅ 25 Bauteile, 53 Netze | ⛔ platziert, **0 Leiterbahnen** — Stand 16.08.2026: **quadratisch 49 × 49**, vier Ecktaster unter den Druckkreuzen der Zentralscheibe | ⛔ |
+| **Nutzen** `fab/panel` | — (Build-Ergebnis) | ⛔ **gelöscht** — `gen_panel.py` kann nur Kreise, das Top-Board ist jetzt quadratisch | ⛔ Werkzeug auf gemischte Geometrie erweitern |
 
 Die 43 offenen Verbindungen auf Bottom sind **kein Rückstand des Autorouters**,
 sondern Absicht: [`05-manufacturing.md`](05-manufacturing.md) Abschnitt 3 verlangt
@@ -90,7 +90,7 @@ stimmt, ist damit *nicht* gezeigt.
 |---|---|---|---|
 | Display | 🟡 **wechselt von rund auf rechteckig** (ST77916 → Kandidat ST7789 1,69″), Footprint Platzhalter | 🟡 die validierte ST77916-Konfiguration wird damit hinfällig, ST7789 ist in ESPHome nativ | 🔒 Punkt 43 — Endmaß erst nach dem Ausmessen des Scheibenfensters |
 | Anzeigeinhalt | — | 🟡 Temperatur, Luftfeuchte, „anwesend" | 🟡 eine feste Seite, keine Zustände, keine Statusfarben |
-| Vier Tasten | 🟡 8 SMD-Taster, je 2 parallel, r = 23,2 mm auf den **Diagonalen** — die Zentralscheibe drückt möglicherweise auf den **Achsen** | 🟡 fest auf Jalousie 1 auf/zu und Jalousie 2 auf/zu verdrahtet | 🔒 **Punkt 42** — Druckpunkte messen; liegen sie auf den Achsen, kollidieren die Taster mit den Befestigungsbohrungen und das Bohrbild **aller drei** Boards wandert |
+| Vier Tasten | ✅ **4 SMD-Taster auf (±18 · ±20)**, exakt unter den Druckkreuzen | ⛔ noch fest auf Jalousie auf/zu verdrahtet, **ohne Paarauswertung** | ⛔ Die Firmware muss Paare auflösen: ↑ = SW1+SW2, ↓ = SW3+SW4, ▷ = SW2+SW3, OK = SW1+SW4 |
 | Bedienmenü | — | ⛔ | ⛔ Die Scheibe bringt die Beschriftung mit (*play / hoch / runter / OK*) — die Zustandsmaschine dahinter fehlt (Punkt 37) |
 | Displayhelligkeit | ✅ PWM-Backlight auf GPIO43 | ✅ dimmbar, Präsenz weckt auf 80 %, 120 s Nachlauf | ✅ |
 | Helligkeit nach Umgebungslicht | ⛔ kein Sensor bestückt | ⛔ | 🔒 Punkt 36 — evtl. kostenlos über den Ambient-Zähler des VL53L1X |

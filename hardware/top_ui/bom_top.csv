@@ -15,10 +15,10 @@ Menge,Designator,Wert,Footprint,Hinweis
 1,R3,10k,Resistor_SMD:R_0603_1608Metric,
 1,R4,100k,Resistor_SMD:R_0603_1608Metric,Gate-Pull-up: aus ohne Ansteuerung
 1,R5,10k,Resistor_SMD:R_0603_1608Metric,XSHUT-Pullup: Sensor immer aktiv
-2,"SW1A,SW1B",BTN1,Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK,"Alps SKRK o.ae., 3,9x2,9, Pads laengs - Position siehe mechanical/frontplate.py"
-2,"SW2A,SW2B",BTN2,Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK,"Alps SKRK o.ae., 3,9x2,9, Pads laengs - Position siehe mechanical/frontplate.py"
-2,"SW3A,SW3B",BTN3,Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK,"Alps SKRK o.ae., 3,9x2,9, Pads laengs - Position siehe mechanical/frontplate.py"
-2,"SW4A,SW4B",BTN4,Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK,"Alps SKRK o.ae., 3,9x2,9, Pads laengs - Position siehe mechanical/frontplate.py"
+1,SW1,BTN1,Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK,"Alps SKRK o.ae., 3,9x2,9 - Ecke oben rechts, unter dem Druckkreuz der Zentralscheibe"
+1,SW2,BTN2,Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK,"Alps SKRK o.ae., 3,9x2,9 - Ecke oben links, unter dem Druckkreuz der Zentralscheibe"
+1,SW3,BTN3,Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK,"Alps SKRK o.ae., 3,9x2,9 - Ecke unten links, unter dem Druckkreuz der Zentralscheibe"
+1,SW4,BTN4,Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK,"Alps SKRK o.ae., 3,9x2,9 - Ecke unten rechts, unter dem Druckkreuz der Zentralscheibe"
 1,U1,USBLC6-2SC6,Package_TO_SOT_SMD:SOT-23-6,
 1,U2,SHT40-AD1B,Sensor_Humidity:Sensirion_DFN-4_1.5x1.5mm_P0.8mm_SHT4x_NoCentralPad,Adresse 0x44 - muss zur YAML passen; thermisch vom Board entkoppeln (Schlitze)
 1,U3,VL53L1X,Sensor_Distance:ST_VL53L1x,"Optikfenster freihalten, Uebersprechen: Loch konisch aufweiten"

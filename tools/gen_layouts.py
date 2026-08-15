@@ -48,6 +48,17 @@ FPDIR = _fpdir()
 BOARD_R = 26.0
 EDGE_CLEAR = 0.5
 HOLE_R = 21.5
+
+# Das TOP-Board ist als einziges NICHT rund. Grund: Die Zentralscheibe
+# Busch-Jaeger 6435-914 gibt ihren Tastendruck ueber vier Kreuze an den ECKEN
+# weiter, gemessen bei (+/-18,0 / +/-20,0) - das ist r = 26,91 und liegt damit
+# ausserhalb einer Oe52-Platine. Ein Kreis hat keine Ecken; das BJ-System ist um
+# einen quadratischen Einsatz von 54 x 54 gebaut. Das Top-Board wird deshalb ein
+# abgerundetes Quadrat und sitzt VOR der Dose, so wie der BJ-Einsatz auch.
+# Kantenmitte 24,5 liegt 0,5 mm innerhalb der Rastnasenlinie der Scheibe (50,0).
+# Siehe docs/04-mechanical.md Abschnitt 1d und Punkt 48 in docs/06.
+TOP_SQ = 49.0          # Kantenlaenge
+TOP_CR = 4.0           # Eckradius
 # Bohrbild v2: ZWEI Bohrungen bei 0/180 Grad. Die alten Winkel 120/240
 # kollidierten mit den Sicheltasten-Stoesseln (117/243 Grad, nur ~2 mm
 # daneben), und bei r21,5 blockieren Stackverbinder (um 45/135/225/315),
@@ -122,12 +133,27 @@ def pads_bbox_mm(fp):
     return (lo_x, lo_y, hi_x, hi_y)
 
 
+def inside_outline(x, y, square, margin=0.0):
+    """Liegt der Punkt in der Platinenkontur, mit margin Abstand zum Rand?"""
+    if square:
+        h = TOP_SQ / 2.0 - margin
+        ax, ay = abs(x), abs(y)
+        if ax > h or ay > h:
+            return False
+        dx, dy = ax - (h - TOP_CR), ay - (h - TOP_CR)
+        if dx > 0 and dy > 0:
+            return math.hypot(dx, dy) <= TOP_CR
+        return True
+    return math.hypot(x, y) <= BOARD_R - margin
+
+
 class Occupancy:
     """Belegtflaechen je Seite; Loecher und THT blockieren beide Seiten."""
 
-    def __init__(self, blocks=None):
+    def __init__(self, blocks=None, square=False):
         self.rects = {"F": [], "B": []}
         self.circles = [(x, y, 3.2) for x, y in HOLES]
+        self.square = square
         for r in (blocks or []):
             self.block(*r)
 
@@ -141,7 +167,7 @@ class Occupancy:
         # urteilt die echte DRC)
         if check_edge:
             for cx, cy in ((x1, y1), (x2, y1), (x1, y2), (x2, y2)):
-                if math.hypot(cx, cy) > BOARD_R - EDGE_CLEAR - 0.2:
+                if not inside_outline(cx, cy, self.square, EDGE_CLEAR + 0.2):
                     return False
         for (a1, b1, a2, b2) in self.rects[side]:
             if not (x2 + margin < a1 or a2 + margin < x1
@@ -156,7 +182,8 @@ class Occupancy:
 
 
 class BoardBuilder:
-    def __init__(self, name, schematic, antenna=False):
+    def __init__(self, name, schematic, antenna=False, square=False):
+        self.square = square
         self.name = name
         self.sch = schematic
         self.board = pcbnew.CreateEmptyBoard()
@@ -181,19 +208,48 @@ class BoardBuilder:
         self.fps = {}
         self.loose = set()
         self.errors = []
-        self.occ = Occupancy()
+        self.occ = Occupancy(square=square)
         self.antenna = antenna
 
     # -- Mechanik ---------------------------------------------------------
 
     def _outline(self):
-        c = pcbnew.PCB_SHAPE(self.board)
-        c.SetShape(pcbnew.SHAPE_T_CIRCLE)
-        c.SetLayer(pcbnew.Edge_Cuts)
-        c.SetCenter(pcbnew.VECTOR2I(0, 0))
-        c.SetEnd(pcbnew.VECTOR2I(mm(BOARD_R), 0))
-        c.SetWidth(mm(0.1))
-        self.board.Add(c)
+        if not self.square:
+            c = pcbnew.PCB_SHAPE(self.board)
+            c.SetShape(pcbnew.SHAPE_T_CIRCLE)
+            c.SetLayer(pcbnew.Edge_Cuts)
+            c.SetCenter(pcbnew.VECTOR2I(0, 0))
+            c.SetEnd(pcbnew.VECTOR2I(mm(BOARD_R), 0))
+            c.SetWidth(mm(0.1))
+            self.board.Add(c)
+            return
+        # Abgerundetes Quadrat: vier Geraden, vier Eckboegen
+        h, cr = TOP_SQ / 2.0, TOP_CR
+        k = 0.7071067811865476
+        for a, b in (((-(h - cr), -h), ((h - cr), -h)),
+                     (((h - cr), h), (-(h - cr), h)),
+                     ((-h, (h - cr)), (-h, -(h - cr))),
+                     ((h, -(h - cr)), (h, (h - cr)))):
+            seg = pcbnew.PCB_SHAPE(self.board)
+            seg.SetShape(pcbnew.SHAPE_T_SEGMENT)
+            seg.SetLayer(pcbnew.Edge_Cuts)
+            seg.SetStart(pcbnew.VECTOR2I(mm(a[0]), mm(a[1])))
+            seg.SetEnd(pcbnew.VECTOR2I(mm(b[0]), mm(b[1])))
+            seg.SetWidth(mm(0.1))
+            self.board.Add(seg)
+        for sx, sy in ((1, -1), (1, 1), (-1, 1), (-1, -1)):
+            cx, cy = sx * (h - cr), sy * (h - cr)
+            p1 = (sx * (h - cr), sy * h)
+            p2 = (sx * h, sy * (h - cr))
+            pm = (cx + sx * k * cr, cy + sy * k * cr)
+            arc = pcbnew.PCB_SHAPE(self.board)
+            arc.SetShape(pcbnew.SHAPE_T_ARC)
+            arc.SetLayer(pcbnew.Edge_Cuts)
+            arc.SetArcGeometry(pcbnew.VECTOR2I(mm(p1[0]), mm(p1[1])),
+                               pcbnew.VECTOR2I(mm(pm[0]), mm(pm[1])),
+                               pcbnew.VECTOR2I(mm(p2[0]), mm(p2[1])))
+            arc.SetWidth(mm(0.1))
+            self.board.Add(arc)
 
     def _holes(self):
         for i, (x, y) in enumerate(HOLES):
@@ -203,7 +259,7 @@ class BoardBuilder:
             self.board.Add(fp)
 
     def _marker(self):
-        r = BOARD_R - 2.0
+        r = (TOP_SQ / 2.0 if self.square else BOARD_R) - 2.0
         pts = [((0, -r), (-1.6, -(r - 2.2))),
                ((-1.6, -(r - 2.2)), (1.6, -(r - 2.2))),
                ((1.6, -(r - 2.2)), (0, -r))]
@@ -380,9 +436,9 @@ class BoardBuilder:
 
 
 def build_board(name, module, fixed, auto_sides=("F", "B"),
-                antenna=False, block_f=None, loose=()):
+                antenna=False, block_f=None, loose=(), square=False):
     sch = module.build()
-    bb = BoardBuilder(name, sch, antenna=antenna)
+    bb = BoardBuilder(name, sch, antenna=antenna, square=square)
     bb.loose = set(loose)
     for c in sch.components:
         bb.add_component(c)
@@ -479,11 +535,17 @@ def run_drc(path):
 # Platzierungsplaene (KiCad-Koordinaten: +y = nach unten = von der Front weg)
 # --------------------------------------------------------------------------
 
-# Muss zu key_post_ang in mechanical/frontplate.py passen: die Stoessel der
-# Sicheltasten druecken genau hier. 12 Grad um die Diagonalen, damit auf
-# 12 Uhr das ToF-Fenster und auf 6 Uhr die Klinkenbuchse Platz haben.
-BTN_ANGLES = {"SW1A": 33, "SW1B": 57, "SW2A": 123, "SW2B": 147,
-              "SW3A": 213, "SW3B": 237, "SW4A": 303, "SW4B": 327}
+# Vier Ecktaster, exakt unter den Druckkreuzen der Zentralscheibe 6435-914.
+# Gemessen am realen Teil (docs/04, Messprotokoll F10): Kreuzmitten 7,6 mm von
+# der oberen bzw. unteren und 9,6 mm von der linken bzw. rechten Kante der
+# 55,2er Platte -> (+/-18,0 / +/-20,0) um die Plattenmitte. Ein Kreuz ist
+# 3,2 x 3,2 mm gross und trifft genau EINEN Taster; die frueheren acht
+# parallelen Taster der Sichelkappen sind entfallen.
+# KiCad zaehlt Y nach unten, deshalb hier das Vorzeichen gedreht.
+BTN_POS = {"SW1": (18.0, -20.0),      # oben rechts
+           "SW2": (-18.0, -20.0),     # oben links
+           "SW3": (-18.0, 20.0),      # unten links
+           "SW4": (18.0, 20.0)}       # unten rechts
 
 # FET-Raster Bottom: 4 Spalten (M1-A, M1-B, M2-B, M2-A), oben High-, unten
 # Low-Side. PowerPAK quer (5,5 x 7,5) -> Spaltenteilung 6,1 mm.
@@ -521,50 +583,29 @@ FIXED_MID = {
 }
 
 FIXED_TOP = dict(
-    {ref: (23.2 * math.cos(math.radians(a)),
-           -23.2 * math.sin(math.radians(a)),
-           "AUTO_TANGENTIAL", "F")
-     for ref, a in BTN_ANGLES.items()},
-    # USB-C auf 12 Uhr, links neben dem ToF. Steckgesicht nach AUSSEN.
-    #
-    # Die Drehung folgt der Regel phi = 90 + theta (theta = Winkel auf der
-    # Platine, mathematisch): Im Footprint liegen die THT-Pins am Ende y = 0
-    # und die Steckoeffnung am Ende y = +8,61 (auf F.Fab als Schlitz bei
-    # y = 6,1 markiert). Mit der falschen Drehung schaut die Oeffnung zur
-    # Platinenmitte und die Pins stehen ueber die Kante - siehe Punkt 39.
-    #
-    # Das Fenster zwischen dem ToF (linke Kante bei x = 2,1) und dem Taster
-    # auf 123 Grad (rechte Kante bei x = -9,9) ist knapp 12 mm breit. Der
-    # Verbinder liegt deshalb ACHSPARALLEL - tangential gedreht waechst seine
-    # BBOX auf 12,2 mm und passt nicht mehr. Mittig im Fenster bleiben je
-    # 1,5 mm Luft.
-    #
-    # Das Steckgesicht liegt bewusst leicht INNERHALB der Kontur (an der
-    # linken Ecke buendig, rechts rund 1,4 mm zurueck): Der Stecker selbst
-    # ragt ueber die 1 mm duenne Platine hinweg, das kostet nichts - Kupfer
-    # oder Bauteil ueber der Kante dagegen stoesst an die Dosenwand.
-    J1=(-3.875, -20.0, 180, "F"),      # USB-C, 12 Uhr, links vom ToF
-    J5=(0.0, 3.0, 0, "F"),             # Displayanschluss unterm Modul
-    # Die beiden einzigen Durchbrueche der Frontplatte. Koordinaten muessen zu
-    # jack_x/jack_y bzw. tof_x/tof_y in frontplate.py passen (dort Y nach oben,
-    # hier nach unten).
-    #
-    # Klinke UNTEN (6 Uhr): ein Kabel, das oben aus der Blende kommt, haengt
-    # quer ueber der Anzeige. Drehung 180, damit der Buchsenkoerper nach innen
-    # zeigt. ACHTUNG, zwei Altlasten des Platzhalter-Footprints (Punkt 30):
-    # place() zentriert die BBOX, die Buchsenachse liegt aber 0,70 mm daneben
-    # (Kreis bei lokal y = 6,48), und der 14,4 mm lange Koerper steht hinten
-    # ueber die Platinenkante. Beides ist mit dem realen 2,5-mm-Teil zu loesen.
-    J6=(0.0, 22.5, 180, "F"),          # Klinkenbuchse Stern, 6 Uhr
-    U3=(5.0, -22.5, 0, "F"),           # VL53L1X, 12 Uhr, schaut durchs Fenster
-    F1=(7.0, -16.0, 90, "F"),          # PTC direkt hinter der Buchse
-    # J7 (Reserve-UART, DNP) hatte seinen festen Platz auf 6 Uhr innen - dort
-    # steht jetzt die Klinkenbuchse. Die Automatik findet fuer ihn KEINEN
-    # Platz: Als THT-Teil braucht er beide Seiten frei, und die Vorderseite
-    # innerhalb r21 gehoert dem Displaymodul. Also fest hierher, rechts neben
-    # den Displayanschluss - kurz zu J3, aus dem der UART kommt.
+    {ref: (x, y, 0, "F") for ref, (x, y) in BTN_POS.items()},
+    # Displayanschluss unter dem Modul. Das Fenster der Zentralscheibe misst
+    # 32,7 x 27,0 mm (Eckradius 0,7) und liegt bei (-0,95 / +0,3) mathematisch,
+    # also praktisch mittig - dafuer ist ein 1,69"-Panel 240x280 quer der
+    # Kandidat (Punkt 43).
+    J5=(0.0, 3.0, 0, "F"),
+    # Die vier Durchbrueche der Zentralscheibe liegen in den Diagonalfeldern
+    # zwischen Pfeil und Ecktaster, bei (+/-9 / +/-19) mathematisch. Das haelt
+    # rund 8 mm Abstand zu Kreuz und Symbol und liegt sicher auf der Platine.
+    # Links oben ToF, links unten Klinke; rechts zweimal Lueftung - dort sitzt
+    # deshalb der SHT4x (Punkt 46, Raummessung).
+    J6=(-9.0, 19.0, 180, "F"),         # Klinkenbuchse Stern, unten links
+    U3=(-9.0, -19.0, 0, "F"),          # VL53L1X, oben links
+    U2=(9.0, -19.0, 0, "F"),           # SHT4x unter dem oberen Lueftungsschlitz
+    # USB-C mittig oben, vollstaendig von der Zentralscheibe verdeckt.
+    # ACHTUNG: Der Footprint ist noch die LIEGENDE Buchse. Punkt 45 verlangt
+    # eine STEHENDE (Top-Mount), damit der Stecker nach vorn geht und nach
+    # Abnahme der Scheibe erreichbar ist. Bauteilauswahl steht aus.
+    J1=(0.0, -19.0, 180, "F"),
+    # F1 (PTC) hat keine mechanische Bindung mehr - auf dem quadratischen Board
+    # ist jede feste Position entweder unter dem Stackverbinder oder unter dem
+    # Klinken-Platzhalter. Die Automatik findet ihn.
     J7=(5.2, 8.0, 90, "F"),            # Reserve-UART, DNP
-    U2=(-10.5, -13.5, 0, "F"),         # SHT4x, weg von Waermequellen
 )
 
 
@@ -577,9 +618,12 @@ def main():
                        fixed=FIXED_MID, auto_sides=("F", "B"), antenna=True,
                        loose=("U1",)),
         # Top: Vorderseite innerhalb r21 gehoert dem Displaymodul
-        "top":    dict(name="top_ui", module=gen_top_sch,
+        # Top: quadratisch (siehe TOP_SQ). Die Vorderseite unter dem
+        # Displaymodul bleibt frei - das Fenster misst 32,7 x 27,0, das Modul
+        # ist groesser; 36 x 31 als Sperrflaeche ist der vorlaeufige Ansatz.
+        "top":    dict(name="top_ui", module=gen_top_sch, square=True,
                        fixed=FIXED_TOP, auto_sides=("B", "F"),
-                       block_f=(-21, -21, 21, 21), edge_ok=("J1",)),
+                       block_f=(-18, -15.5, 17, 15.5), edge_ok=("J1", "J6")),
     }
     fail = 0
     for key, plan in plans.items():
