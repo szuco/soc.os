@@ -112,7 +112,7 @@ Vollständige Gegenüberstellung von umgesetzten und fehlenden Funktionen:
 | **Routing TOP** | **keines** — am 15.08.2026 neu platziert (Klinke nach 6 Uhr, ToF 12 Uhr, USB-C-Drehung korrigiert) |
 | Fertigungsnutzen (3 Platinen in einer Boarddatei) | **erzeugt:** `hardware/fab/panel/` |
 | Fertigungsdaten | **keine** — `python3 tools/gen_fab.py` nach dem Routing, mit DRC-Gate |
-| ESPHome-Konfiguration | validiert (`esphome config`) — Motoren fahren **auf Zeit**; der ST77916-Teil wird mit dem Displaywechsel hinfällig |
+| ESPHome-Konfiguration | auf ST7789 und Tastenpaare umgestellt — ⚠️ **seit dem Umbau nicht mehr validiert** (kein ESPHome auf dem Rechner). Motoren fahren **auf Zeit** |
 | Lasterkennung, ToF-Distanz, Menü, RS-485-Protokoll | **fehlen** — eigene C++-Komponente, s. docs/13 |
 | Gefertigt oder gemessen | **nichts** |
 

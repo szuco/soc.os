@@ -2,12 +2,17 @@
 # KiCad SwitchStack - ESPHome-Konfiguration
 # =============================================================================
 # Zielhardware : ESP32-S3-WROOM-1-N16R8
-# Display      : 1,46" LCD rund, ST77916, 360x360, QSPI
-# Bedienung    : 4 sichelfoermige Hardware-Tasten um das Display
+# Display      : 1,69" LCD rechteckig, ST7789, 240x280, quer eingebaut
+# Front        : Busch-Jaeger Zentralscheibe 6435-914 (balance SI) im Rahmen
+#                1721-914. Ihr Fenster misst 32,70 x 27,00 mm - die aktive
+#                Flaeche des Panels ist 32,63 x 27,97 und fuellt es aus.
+# Bedienung    : VIER Ecktaster unter den Druckkreuzen der Scheibe. Die
+#                Symbole stehen auf den Achsen, die Kraft kommt an den Ecken
+#                an - jede Richtung ist ein PAAR. Aufloesung siehe unten.
 #
-# ST77916 hat keinen eingebauten mipi_spi-Treiber. Er laeuft ueber
-# model: CUSTOM mit der Hersteller-Initialisierungssequenz in
-# st77916_init.yaml - ohne jede C++-Komponente.
+# NICHT mit `esphome config` geprueft: Auf dem Rechner, auf dem der
+# Displaywechsel entstand, war ESPHome nicht installiert. Vor dem ersten Flash
+# validieren; besonders die Offsets des 240x280-Panels.
 #
 # Die Praesenz-Dunkeltastung unten (VL53L1X, kein Radar mehr) ist beim LCD
 # reiner Komfort und Stromsparen, keine Schutzmassnahme (kein Einbrennen).
@@ -85,12 +90,14 @@ i2c:
   scan: true
   id: bus_i2c
 
-# QSPI fuer das AMOLED: Takt + 4 Datenleitungen
+# Der ST7789 ist 4-Draht-SPI, kein QSPI. Die Netznamen am Stack heissen
+# weiterhin QSPI_*, weil sie durch alle drei Boards laufen und eine
+# Umbenennung den Bottom-Schaltplan aendern wuerde (dessen Layout ist geroutet).
+# Belegung: QSPI_CLK = SCK, QSPI_D0 = MOSI, QSPI_D1 = DC.
 spi:
-  id: bus_qspi
-  type: quad
+  id: bus_disp
   clk_pin: GPIO12
-  data_pins: [GPIO11, GPIO13, GPIO14, GPIO21]
+  mosi_pin: GPIO11
 
 # RS-485: primaere Kommunikation. DE/RE ueber flow_control_pin.
 uart:
@@ -179,7 +186,7 @@ switch:
       inverted: true
     restore_mode: RESTORE_DEFAULT_OFF
 
-# ST77916 ist ein LCD - die Helligkeit kommt aus der Hintergrundbeleuchtung,
+# Der ST7789 ist ein LCD - die Helligkeit kommt aus der Hintergrundbeleuchtung,
 # nicht aus einem Displaykommando. GPIO43 ist frei, weil das Logging ueber
 # den nativen USB des ESP32-S3 laeuft und UART0 damit unbenutzt bleibt.
 light:
@@ -206,35 +213,37 @@ font:
     id: font_small
     size: 14
 
-# ST77916 hat KEINEN eingebauten mipi_spi-Treiber - wird ueber model: CUSTOM
-# mit der Hersteller-Initialisierungssequenz gefahren. Kein C++ noetig.
+# ST7789 ist in ESPHome nativ enthalten - die 214-Kommando-Initsequenz des
+# ST77916 entfaellt ersatzlos. Das 240x280-Panel sitzt auf einem 240x320-
+# Controller, deshalb der Zeilenversatz von 20; quer eingebaut ueber rotation.
+# OFFSETS AM REALEN PANEL PRUEFEN - sie sind der haeufigste Fehler bei diesem
+# Typ und zeigen sich als Streifen am Rand.
 display:
-  - platform: mipi_spi
+  - platform: st7789v
     model: CUSTOM
     id: panel
-    bus_mode: quad
     cs_pin: GPIO10
+    dc_pin: GPIO13
     reset_pin: GPIO16
-    dimensions:
-      width: 360
-      height: 360
-    invert_colors: true
-    pixel_mode: 16bit
-    data_rate: 40MHz
+    width: 240
+    height: 280
+    offset_width: 0
+    offset_height: 20
+    rotation: 90
     auto_clear_enabled: false
     update_interval: 1s
-    init_sequence: !include st77916_init.yaml
     lambda: |-
+      // Quer: 280 breit, 240 hoch. Mitte x = 140.
       it.fill(Color::BLACK);
       if (id(raum_temp).has_state()) {
-        it.printf(180, 140, id(font_big), TextAlign::CENTER,
+        it.printf(140, 90, id(font_big), TextAlign::CENTER,
                   "%.1f°C", id(raum_temp).state);
       }
       if (id(raum_hum).has_state()) {
-        it.printf(180, 200, id(font_small), TextAlign::CENTER,
+        it.printf(140, 140, id(font_small), TextAlign::CENTER,
                   "%.0f %% rF", id(raum_hum).state);
       }
-      it.printf(180, 262, id(font_small), TextAlign::CENTER,
+      it.printf(140, 180, id(font_small), TextAlign::CENTER,
                 id(bewegung).state ? "anwesend" : "");
 
 # -----------------------------------------------------------------------------
@@ -284,30 +293,65 @@ sensor:
           send_every: 1
 
 binary_sensor:
+  # --- Vier Ecktaster ---------------------------------------------------
+  # Sie sitzen unter den Druckkreuzen der Zentralscheibe bei (+/-18 / +/-20).
+  # Einzeln haben sie KEINE Bedeutung - sie sind nur die Rohsignale.
   - platform: gpio
-    id: btn1
+    id: ecke_or
+    internal: true
     pin: {number: GPIO4, mode: {input: true, pullup: true}, inverted: true}
     filters: [delayed_on: 20ms, delayed_off: 20ms]
-    on_press:
-      then: [cover.open: jalousie1]
   - platform: gpio
-    id: btn2
+    id: ecke_ol
+    internal: true
     pin: {number: GPIO5, mode: {input: true, pullup: true}, inverted: true}
     filters: [delayed_on: 20ms, delayed_off: 20ms]
-    on_press:
-      then: [cover.close: jalousie1]
   - platform: gpio
-    id: btn3
+    id: ecke_ul
+    internal: true
     pin: {number: GPIO6, mode: {input: true, pullup: true}, inverted: true}
     filters: [delayed_on: 20ms, delayed_off: 20ms]
-    on_press:
-      then: [cover.open: jalousie2]
   - platform: gpio
-    id: btn4
+    id: ecke_ur
+    internal: true
     pin: {number: GPIO7, mode: {input: true, pullup: true}, inverted: true}
     filters: [delayed_on: 20ms, delayed_off: 20ms]
+
+  # --- Daraus die vier Bedienrichtungen ---------------------------------
+  # Die starre Scheibe kippt beim Druck auf ein Symbol; die beiden
+  # benachbarten Eckkreuze gehen mit. Jede Richtung ist damit ein Paar, und
+  # jedes Paar ist eindeutig. Die 30 ms Verzoegerung fangen ab, dass die
+  # beiden Taster eines Paares nie exakt gleichzeitig schliessen.
+  #
+  # Die Zuordnung Richtung -> Aktion ist VORLAEUFIG. Verbindlich wird sie
+  # erst mit der Menue-Zustandsmaschine, Punkt 37.
+  - platform: template
+    name: Taste Hoch
+    id: taste_hoch
+    lambda: 'return id(ecke_ol).state && id(ecke_or).state;'
+    filters: [delayed_on: 30ms]
     on_press:
-      then: [cover.close: jalousie2]
+      then: [cover.open: jalousie1, cover.open: jalousie2]
+  - platform: template
+    name: Taste Runter
+    id: taste_runter
+    lambda: 'return id(ecke_ul).state && id(ecke_ur).state;'
+    filters: [delayed_on: 30ms]
+    on_press:
+      then: [cover.close: jalousie1, cover.close: jalousie2]
+  - platform: template
+    name: Taste OK
+    id: taste_ok
+    lambda: 'return id(ecke_or).state && id(ecke_ur).state;'
+    filters: [delayed_on: 30ms]
+    on_press:
+      then: [cover.stop: jalousie1, cover.stop: jalousie2]
+  - platform: template
+    name: Taste Play
+    id: taste_play
+    lambda: 'return id(ecke_ol).state && id(ecke_ul).state;'
+    filters: [delayed_on: 30ms]
+    # noch ohne Funktion - vorgesehen fuer den Automatikbetrieb
 
   # Praesenz vor dem Display. Der VL53L1X sitzt auf dem Top-Board und schaut
   # durch das Fenster im oberen Steg der Frontplatte. Der Interrupt GPIO1

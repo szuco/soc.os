@@ -6,7 +6,7 @@ Menge,Designator,Wert,Footprint,Hinweis
 1,J1,USB-C,Connector_USB:USB_C_Receptacle_GCT_USB4085,"16-Pin-Typ, nur USB 2.0"
 1,J2,J_STK_A,Connector_PinSocket_1.27mm:PinSocket_2x20_P1.27mm_Vertical,
 1,J3,J_STK_B,Connector_PinSocket_1.27mm:PinSocket_2x20_P1.27mm_Vertical,
-1,J5,ST77916 QSPI,Connector_PinHeader_1.27mm:PinHeader_1x10_P1.27mm_Vertical,"PLATZHALTER - reales Modul-FPC vermessen, dann Footprint tauschen"
+1,J5,ST7789 240x280,Connector_PinHeader_1.27mm:PinHeader_1x10_P1.27mm_Vertical,"PLATZHALTER - reales Modul mit FPC vermessen, dann Footprint und Pinzahl tauschen (Module haben meist 8 Pins)"
 1,J6,Stern Klinke,Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles,"PLATZHALTER 3,5 mm vertikal - Zielteil 2,5 mm, Bauhoehe max 10,5 mm ueber der Platine, Footprint aus dem Datenblatt uebernehmen"
 1,J7,Reserve UART,Connector_JST:JST_PH_B5B-PH-K_1x05_P2.00mm_Vertical,DNP - Reserve fuer ein Satellitenmodul
 1,Q1,BC847,Package_TO_SOT_SMD:SOT-23,

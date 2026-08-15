@@ -121,16 +121,28 @@ def build():
     # =====================================================================
     # 4. Displayanschluss ST77916 (PLATZHALTER-Footprint)
     # =====================================================================
-    s.add("J5", "Connector_Generic:Conn_01x10", "ST77916 QSPI",
+    # Display: 1,69" 240x280 (ST7789), QUER eingebaut. Der Fensterausschnitt der
+    # Zentralscheibe misst gemessene 32,70 x 27,00 mm; die aktive Flaeche des
+    # Panels ist 32,63 x 27,97 - in der Breite bleiben 0,07 mm, in der Hoehe
+    # verdeckt das Fenster einen halben Millimeter je Seite. Punkt 43.
+    #
+    # Der ST7789 ist ein 4-Draht-SPI-Display, kein QSPI. Die Netznamen am Stack
+    # bleiben trotzdem QSPI_*: Sie laufen ueber J_STK_B durch ALLE drei Boards,
+    # und eine Umbenennung wuerde auch den Bottom-Schaltplan aendern - dessen
+    # Layout traegt 985 Leiterbahnen. Belegung deshalb per Kommentar:
+    #     QSPI_CLK -> SCK      QSPI_D0 -> MOSI/SDA     QSPI_D1 -> DC
+    #     QSPI_D2, QSPI_D3 -> frei (Reserve am Stack)
+    s.add("J5", "Connector_Generic:Conn_01x10", "ST7789 240x280",
           "Connector_PinHeader_1.27mm:PinHeader_1x10_P1.27mm_Vertical",
-          MPN="PLATZHALTER - reales Modul-FPC vermessen, dann Footprint tauschen")
+          MPN="PLATZHALTER - reales Modul mit FPC vermessen, dann Footprint "
+              "und Pinzahl tauschen (Module haben meist 8 Pins)")
     s.connect("3V3_SYS",  ("J5", "1"))
     s.connect("PGND",     ("J5", "2"))
-    s.connect("QSPI_CLK", ("J5", "3"))
-    s.connect("QSPI_D0",  ("J5", "4"))
-    s.connect("QSPI_D1",  ("J5", "5"))
-    s.connect("QSPI_D2",  ("J5", "6"))
-    s.connect("QSPI_D3",  ("J5", "7"))
+    s.connect("QSPI_CLK", ("J5", "3"))    # SCK
+    s.connect("QSPI_D0",  ("J5", "4"))    # MOSI / SDA
+    s.connect("QSPI_D1",  ("J5", "5"))    # DC
+    s.connect("QSPI_D2",  ("J5", "6"))    # frei
+    s.connect("QSPI_D3",  ("J5", "7"))    # frei
     s.connect("DISP_CS",  ("J5", "8"))
     s.connect("DISP_RST", ("J5", "9"))
     s.connect("DISP_BL",  ("J5", "10"))

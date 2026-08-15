@@ -19,6 +19,11 @@ Haubenkontakt, zwei Cover und vier Tasten.
 | **Bedienmenü** | Die vier Tasten sind fest auf Auf/Zu verdrahtet. Die Belegung unten ist Anforderung, nicht Implementierung. |
 | **RS-485-Protokoll** | UART ist konfiguriert, aber ungenutzt; `RS485_DIR` unbelegt. Das ist der *primäre* Kommunikationsweg. |
 
+> **Die Konfiguration ist seit dem Displaywechsel nicht mehr mit `esphome config`
+> geprüft** — auf dem Rechner, auf dem er entstand, war ESPHome nicht
+> installiert. Vor dem ersten Flash validieren, besonders die Offsets des
+> 240×280-Panels (0/20) und die Tastenpaar-Templates.
+
 Die ersten beiden fallen in **dieselbe** External Component. Vollständige
 Gegenüberstellung: [`../docs/13-funktionsstatus.md`](../docs/13-funktionsstatus.md).
 
