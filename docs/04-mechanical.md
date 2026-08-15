@@ -252,7 +252,7 @@ und wird zum abgerundeten Quadrat:
 |---|---|
 | Taster muss abdecken bis | (20,4 · 22,4) → Mindestgröße **40,8 × 44,8 mm** |
 | Rastnasen der Scheibe (innen 50,0) | Kante höchstens **25,0** von der Mitte |
-| **Vorschlag** | **49 × 49 mm**, Ecken gerundet — Kantenmitte 24,5 (0,5 mm innerhalb der Rastnasen), Ecke r = 34,6 |
+| **Umgesetzt** | **47 × 47 mm**, Ecken R 4 — die Größe folgt aus der Tiefenkette, siehe Abschnitt 1e |
 
 Das kostet den gemeinsamen Umriss der drei Boards, bringt aber zwei Dinge:
 Die Taster sitzen ohne Umlenkung direkt unter den Kreuzen — kein Hebel, kein
@@ -278,7 +278,38 @@ anbieten, mit den Schraublöchern weiterhin auf 60 mm (DIN 49073).
 - Bestätigung, dass die Platte beim Druck auf ein Symbol um die Mitte **kippt**
   (dann sind die Tasterpaare wie in Abschnitt „Was daraus folgt" beschrieben).
 
-Board-Outline in KiCad: Kreis auf `Edge.Cuts`, Mittelpunkt (0,0), Radius 26,0 mm.
+## 1e. Die Tiefenkette — sie bestimmt Platinengröße und Adapter
+
+Von der Sichtfläche der Zentralscheibe nach hinten gezählt:
+
+| von … bis | was |
+|---|---|
+| 0,0 … 1,0 | Zentralscheibe, Sichtfläche (F1) |
+| 1,0 … 2,5 | Druckkreuz auf ihrer Rückseite (F10) |
+| 2,5 … 4,5 | SMD-Taster über der Leiterplatte |
+| 4,5 … 5,5 | **Top-Leiterplatte** |
+| 7,5 | Rastebene und hinterer Rand der Scheibe (F2) |
+
+Zwei Folgerungen, die nicht verhandelbar sind:
+
+**Die Rastebene liegt hinter der Leiterplatte.** Der Schnapprand des Adapters
+steht also hinter ihr und trägt sie zugleich — er ist Rastglied und Auflage in
+einem.
+
+**Das Top-Board misst 47 × 47 mm.** Die Scheibe rastet auf lichte 50,0 (F8),
+der Rand ist außen 49,8, und bei 1,4 mm Wand bleiben innen genau 47,0. Nach
+unten begrenzen die Taster: Sie stehen auf (±18 · ±20), reichen mit Footprint
+bis 22,2, und mit Randabstand braucht es mindestens 45,4 — also liegt 47,0
+zwischen zwei harten Grenzen und ist keine gewählte Zahl.
+
+Der Adapter ist damit vollständig bestimmt und erzeugt:
+[`../mechanical/adapter.py`](../mechanical/adapter.py), Selbsttest bestanden.
+Flansch 70 × 70 × 2,5 (darauf klemmt der Rahmen, F13), Schnapprand 49,8 mit
+zurückspringendem Rastraum, Platinentasche 47,4, zentrale Durchführung 43 × 43
+für die beiden Stackverbinder, Schraubschlitze auf 60 mm. Gesamthöhe 10,0 mm.
+
+Board-Outline in KiCad: Kreis auf `Edge.Cuts`, Mittelpunkt (0,0), Radius 26,0 mm
+— **außer TOP**, das ist ein abgerundetes Quadrat 47 × 47 mit R 4.
 Board-Dicke über *Board Setup → Physical Stackup*.
 
 Die drei Boards werden nicht von Hand gezeichnet, sondern von

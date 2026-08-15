@@ -51,7 +51,7 @@ EDGE_CLEARANCE   = 0.5      # mm
 # weiter, bei (+/-18,0 / +/-20,0) - also r = 26,91 und damit ausserhalb einer
 # Oe52-Platine. Es wird ein abgerundetes Quadrat und sitzt vor der Dose.
 # Siehe docs/04-mechanical.md Abschnitt 1d und Punkt 48 in docs/06.
-TOP_SQ           = 49.0     # mm Kantenlaenge
+TOP_SQ           = 47.0     # mm Kantenlaenge
 TOP_CR           = 4.0      # mm Eckradius
 
 ANTENNA_KEEPOUT_W = 18.0    # mm; Sperrflaeche ESP32-Antenne (nur MID)

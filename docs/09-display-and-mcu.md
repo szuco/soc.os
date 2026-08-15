@@ -87,7 +87,7 @@ Begründung:
 
 **Fallback**, falls das Budget oder der Bauraum doch nicht reicht: `ssd1306_i2c` mit
 0,96". Die Frontplatte bleibt verwendbar — nur `disp_window_d` und `disp_rebate_d` in
-`mechanical/frontplate.py` anpassen und neu erzeugen.
+`mechanical/adapter.py` anpassen und neu erzeugen.
 
 ## 1b. Revision: größeres Display und Sicheltasten
 

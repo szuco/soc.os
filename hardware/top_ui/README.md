@@ -41,9 +41,10 @@ Ein USB-UART-Baustein entfällt — der ESP32-S3 hat nativen USB (Punkt 24).
 
 - Ø 52,0 mm, 1,0 mm Dicke
 - Bohrbild und Stackverbinder-Positionen **deckungsgleich** mit BOTTOM und MID
-- USB-C, Displaymodul, Taster, Klinkenbuchse und das ToF-Fenster müssen zur
-  Frontplatte passen — Geometrie aus `mechanical/frontplate.py`, Maßprüfung am
-  realen Teil steht aus (Punkte 15c, 25)
+- Das Board ist **quadratisch, 47 × 47 mm mit R 4** — als einziges der drei.
+  Es sitzt vor der Dose im Adapter, weil die Druckkreuze der Zentralscheibe auf
+  r = 26,9 liegen und ein Kreis dort nicht hinreicht. Geometrie und Tiefenkette:
+  [`mechanical/adapter.py`](../../mechanical/adapter.py)
 - Frontorientierung: mathematisch +Y = „oben“, identisch auf allen drei Boards
 
 Exakte Koordinaten: [`../../docs/04-mechanical.md`](../../docs/04-mechanical.md)

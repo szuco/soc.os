@@ -9,7 +9,7 @@ Entscheidungen stehen in [`06-open-decisions.md`](06-open-decisions.md).
 | Phase | Ergebnis |
 |---|---|
 | **1 – Spezifikation** | 13 Dokumente: System, Power-Tree, Motorkonzept, Pinout, Mechanik, Fertigung, Display/MCU, Firmwarestrategie, Motordaten, Altbestand |
-| **2 – Mechanik** | `tools/gen_boards.py` erzeugt alle drei Boards: Ø-52-Outline, gemeinsames Bohrbild, Keepouts. Frontplatte aus `mechanical/frontplate.py` |
+| **2 – Mechanik** | `tools/gen_boards.py` erzeugt die Board-Mechanik (Bottom/Mid rund Ø 52, Top quadratisch 47 × 47); Adapter für die BJ-Zentralscheibe aus `mechanical/adapter.py` |
 | **3 – Leistung und Motorkanal** | 24-V-Schutz, drei DC/DC, USB-ORing, zwei identische H-Brücken aus einer Funktion, Inline-Shunt + INA240A2 + LM393-Fenster + Latch auf `~SD` |
 | **4 – Schaltpläne** | alle drei Boards erzeugt, Netzliste je Board gegen die Sollvorgabe im Quelltext geprüft, Stücklisten daraus |
 | **5 – Layouts** | Platzierung, Netze und Zonen aller drei Boards generiert; Bottom zu ≈ 85 % geroutet (985 Segmente). Mid und Top tragen **keine** Leiterbahnen — der Umbau vom 15.08. hat sie neu erzeugt |

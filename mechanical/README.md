@@ -1,82 +1,84 @@
-# Frontplatte
+# Adapter für die Busch-Jaeger Zentralscheibe
 
-3D-druckbare Zentralplatte für die Rahmen gängiger **55er-Schalterprogramme**
-(Gira System 55, Jung A/AS, Berker S.1/B.x, Merten M-Smart und die 55er-Linien von
-Busch-Jaeger). Version 2: rundes 1,46"-Display in der Mitte, vier **sichelförmige
-Tastenkappen** als Ringsegmente um das Fenster.
+Die Sichtfläche dieses Geräts wird **nicht** mehr selbst gestaltet. Sie ist ein
+Serienteil:
+
+| Teil | Bestellnummer |
+|---|---|
+| Zentralscheibe 6435-914, Aufdruck „Pfeile und OK", Busch-balance SI | 2CKA006430A0402 |
+| Abdeckrahmen 1721-914, 1-fach, Busch-balance SI | 2CKA001725A1555 |
+
+Erzeugt wird nur noch das **Bindeglied** dazwischen: ein 3D-gedruckter Adapter.
+Er bietet der Scheibe an, worauf sie rastet, dem Rahmen, worauf er klemmt, und
+der Top-Leiterplatte, worauf sie sitzt.
+
+> Die frühere Frontplatte mit vier **Sicheltasten** ist am 16.08.2026 gelöscht
+> worden. Sie war eine vollständige Eigenentwicklung samt Tastenkappen und
+> Druckstößeln; mit dem Wechsel auf die Zentralscheibe hat sie ihren Gegenstand
+> verloren. Modell und Exporte liegen in der Git-Historie.
 
 ## Dateien
 
 | Datei | Zweck |
 |---|---|
-| `frontplate.py` | Parametrisches Modell (build123d). **Referenz** — erzeugt alle Exporte und prüft sich selbst |
-| `Frontplate_SwitchStack.FCMacro` | Native FreeCAD-Variante (Objekte `Frontplate` + `ButtonCaps`) |
-| `export/frontplate.step/.stl` | Platte |
-| `export/frontplate_caps.step/.stl` | Die vier Tastenkappen |
-| `export/frontplate_assembly.stl` | Platte + Kappen in Einbaulage (Ansicht/Viewer) |
+| `adapter.py` | Parametrisches Modell (build123d). **Referenz** — erzeugt die Exporte und prüft sich selbst |
+| `export/adapter.step/.stl` | Adapter |
 
 ```bash
 pip install build123d
-python3 mechanical/frontplate.py
+python3 mechanical/adapter.py
 ```
 
-Alle Parameter stehen im `PARAMS`-Block am Dateianfang. Nach jeder Änderung neu laufen
-lassen — die Selbsttests prüfen Durchbrüche, Stege, Blendring, Solid-Anzahl **und die
-Kollisionsfreiheit der Kappen in Einbaulage**.
+Alle Parameter stehen im `PARAMS`-Block. Nach jeder Änderung neu laufen lassen —
+der Selbsttest prüft die rechnerischen Zwangsbedingungen (Rastmaß, Wandstärke,
+Tasterausdehnung, Auflagebreite) **und** nimmt Materialproben an Schnapprand,
+Rastraum, Platinenauflage, Taschenwand und Schraubschlitzen.
+
+## Die Tiefenkette
+
+Sie bestimmt alles Übrige. z zählt von der Sichtfläche der Scheibe nach hinten:
+
+| von … bis | was |
+|---|---|
+| 0,0 … 1,0 | Zentralscheibe, Sichtfläche |
+| 1,0 … 2,5 | Druckkreuz auf ihrer Rückseite |
+| 2,5 … 4,5 | SMD-Taster über der Leiterplatte |
+| 4,5 … 5,5 | Top-Leiterplatte |
+| 7,5 | Rastebene und hinterer Rand der Scheibe |
+
+**Die Rastebene liegt hinter der Leiterplatte.** Der Schnapprand steht deshalb
+hinter ihr und trägt sie zugleich — Rastglied und Auflage in einem.
 
 ## Geometrie
 
 | Merkmal | Wert |
 |---|---|
-| Sichtfläche | 54,6 × 54,6 mm, Ecken R2, Fase 0,5 mm — für das 55er-Fenster des **Busch-Jaeger 1721-914** (Busch-balance SI, 1-fach) |
-| **Status** | **überholt** — die Sichtfläche wird die BJ-Zentralscheibe 6435-914; diese Platte wird zum Adapter umgebaut, siehe docs/06 Punkte 41–47 |
-| Gesamtabmessung | 76,0 × 54,6 × 8,0 mm (Kappenstößel bis −5,0) |
+| Tragring-Flansch | 70,0 × 70,0 × 2,5 mm — darauf klemmen die Doppelstege des Rahmens |
 | Geräteschrauben | Langlöcher 3,9 mm auf **60 mm** Achsabstand (DIN 49073) |
-| Displayfenster | Ø 37,8 mm (ST77916 1,46", aktiv Ø 37,25), Modulfreiraum Ø 42,5 mm |
-| Sicheltasten | 4 Ringsegmente r 22,0–26,2 mm, je ≈ 68°, 0,8 mm Überstand |
-| Tastenstößel | je Kappe 2 × Ø 2,2 mm bei r = 23,2 mm, ±18° um die Diagonalen |
-| Durchbruch oben (12 Uhr) | ToF-Fenster Ø 4,5 vorn / 3,0 hinten bei x = +5,0 |
-| Durchbruch unten (6 Uhr) | Klinkenbuchse Ø 5,6 mm, mittig — Stern wird gesteckt |
-| Zentrierkragen | 50 × 50 mm, 2 mm Wand, 3 mm tief |
+| Schnapprand | außen 49,8 mm; die Scheibe rastet auf lichte 50,0 |
+| Rastraum | springt 1,5 mm zurück, 1,3 mm tief — dort sitzen die vier Nasen |
+| Platinentasche | 47,4 mm für das Top-Board 47,0 × 47,0 |
+| Auflage | 2,0 mm ringsum |
+| Zentrale Durchführung | 43 × 43 mm für die beiden Stackverbinder |
+| Gesamthöhe | 10,0 mm |
 
-Displaywechsel: `disp_active_d` und `disp_module_d` im `PARAMS`-Block setzen und
-neu erzeugen. Fünf Zwangsbedingungen werden dabei geprüft — unter anderem, dass der
-Rückhaltekragen der Kappen das Displaymodul nicht berührt. Verletzt eine Änderung
-eine Bedingung, bricht das Skript mit einer konkreten Ansage ab.
+**Das Maß 47,0 ist keine gewählte Zahl**, sondern liegt zwischen zwei harten
+Grenzen: Nach oben begrenzt der Schnapprand (49,8 außen, 1,4 mm Wand), nach
+unten die Taster — sie stehen auf (±18 · ±20) und reichen mit Footprint bis
+22,2, mit Randabstand also mindestens 45,4.
 
-## Funktionsprinzip der Sicheltasten
+## Was noch fehlt
 
-Die Kappen sind **separate Druckteile**, werden von hinten eingesetzt und von einem
-umlaufenden Rückhaltekragen gehalten. Je zwei Stößel drücken auf SMD-Taster der
-Top-Leiterplatte (8 Taster, elektrisch paarweise parallel → weiterhin 4 Eingänge).
-Die Federung kommt vom Taster, nicht vom Kunststoff — gedruckte Federscharniere
-ermüden über Jahre, Metallkuppel-Taster nicht. `key_post_len` (Stößellänge, Startwert
-4,0 mm) ist an den realen Abstand Platte→Leiterplatte anzupassen.
+- **Bauhöhe des realen Displaymoduls** (Punkt 15c). Zwischen Platinenoberfläche
+  und Innenseite der Scheibe stehen 4,5 mm; ein typisches 1,69″-Modul baut
+  2,5–3,0 mm. Ob es die Scheibe berührt oder eine Unterlage braucht,
+  entscheidet das reale Teil.
+- **Lichtkanal für den ToF.** Die vier Durchbrüche der Scheibe liegen bei
+  (±9 · ±19) und damit innerhalb der zentralen Durchführung — der Adapter steht
+  ihnen nicht im Weg. Ob der Sensor einen eigenen Kanal gegen Streulicht
+  braucht, zeigt der reale Aufbau.
+- **Sicherung der Platine gegen Herausfallen.** Heute hält sie die Scheibe, die
+  über die Taster auf sie drückt. Ob das reicht, zeigt der erste Druck.
 
-## Druckhinweise
-
-- **Platte:** Sichtfläche nach unten, keine Stützen nötig.
-- **Kappen:** Bedienfläche nach unten (im Slicer um 180° drehen), keine Stützen.
-- **Material:** ASA oder PETG. PLA kriecht bei Dauerlast und vergilbt im Sonnenlicht.
-- **Layer:** 0,15 mm für saubere Sichtflächen.
-- **Toleranz:** Platte 0,4 mm untermaßig (54,6), Kappenspalt 0,25 mm je Seite.
-  Klemmt eine Kappe, `key_gap` erhöhen — nicht nachschleifen.
-
-## Vor dem ersten echten Druck
-
-> Der Rahmen wird bei den Herstellern unterschiedlich befestigt: teils Rastnasen am
-> Tragring, teils Klemmung an der Zentralplatte. Diese Platte kombiniert Tragring und
-> Zentralplatte in einem Teil — das funktioniert nicht bei jedem Programm gleich gut.
->
-> **Erst einen Testdruck nur der Platte** (ohne Elektronik) in den vorhandenen Rahmen
-> einsetzen und prüfen, ob er sauber sitzt. Erst danach die Ausschnitte für die
-> tatsächlich gekauften Bauteile festziehen.
-
-Ebenfalls noch zu bestätigen:
-
-- Die Ausschnittmaße gelten für ein 1,28"-GC9A01-Modul der gängigen Bauform. Das real
-  gekaufte Modul vermessen — die Modulränder variieren zwischen Anbietern.
-- Ob der Kabelausgang für den Weihnachtsstern vorne sitzen soll, ist eine
-  Gestaltungsentscheidung. `star_exit = False` entfernt ihn.
-- USB-C ist bewusst **nicht** von vorn zugänglich (`usb_slot = False`). Programmiert
-  wird bei abgenommener Blende, im Betrieb per OTA.
+Herleitung und Messprotokoll: [`../docs/04-mechanical.md`](../docs/04-mechanical.md),
+Abschnitte 1b bis 1e.

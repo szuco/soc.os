@@ -14,7 +14,7 @@ Legende: ✅ fertig und geprüft · 🟡 begonnen, Rest benannt · ⛔ nicht vor
 | Ebene | Stand |
 |---|---|
 | **Spezifikation** | ✅ vollständig — 13 Dokumente, alle Entscheidungen entweder getroffen oder als Punkt 1–40 offen benannt |
-| **Mechanik** | 🟡 Boards generiert; die **Frontplatte ist überholt** — die Front wird auf die Busch-Jaeger Zentralscheibe 6435-914 umgestellt (Punkte 41–47) |
+| **Mechanik** | ✅ Boards generiert; Front = BJ-Zentralscheibe 6435-914, **Adapter erzeugt und selbstgeprüft**; 🔒 offen ist die Bauhöhe des realen Displaymoduls |
 | **Schaltpläne** | ✅ alle drei Boards erzeugt und netzlistengeprüft; ⛔ **keine Schaltungsreview gegen Datenblätter** |
 | **Layouts** | 🟡 alle drei platziert; **geroutet ist nur Bottom** (≈ 85 %), Mid und Top haben null Leiterbahnen |
 | **Fertigungsdaten** | ⛔ **keine** — der frühere Top-Export war überholt und ist gelöscht; der Nutzen ist als Boarddatei erzeugt |
@@ -34,7 +34,7 @@ Soft-Limit und der einzige noch offene Leistungshalbleiter provisorisch.
 |---|---|---|---|
 | **BOTTOM** `bottom_power_motor` | ✅ 102 Bauteile, 105 Netze, Netzlistenvergleich bestanden | 🟡 **985 Segmente, 102 Vias**, 43 offene Verbindungen im Motor-/Leistungsteil, 0 Kupferfehler | ⛔ wartet auf das Rest-Routing |
 | **MID** `mid_logic` | ✅ 37 Bauteile, 57 Netze | ⛔ platziert, **0 Leiterbahnen** | ⛔ |
-| **TOP** `top_ui` | ✅ 25 Bauteile, 53 Netze | ⛔ platziert, **0 Leiterbahnen** — Stand 16.08.2026: **quadratisch 49 × 49**, vier Ecktaster unter den Druckkreuzen der Zentralscheibe | ⛔ |
+| **TOP** `top_ui` | ✅ 25 Bauteile, 53 Netze | ⛔ platziert, **0 Leiterbahnen** — Stand 16.08.2026: **quadratisch 47 × 47**, vier Ecktaster unter den Druckkreuzen der Zentralscheibe | ⛔ |
 | **Nutzen** `fab/panel` | — (Build-Ergebnis) | ⛔ **gelöscht** — `gen_panel.py` kann nur Kreise, das Top-Board ist jetzt quadratisch | ⛔ Werkzeug auf gemischte Geometrie erweitern |
 
 Die 43 offenen Verbindungen auf Bottom sind **kein Rückstand des Autorouters**,
@@ -128,7 +128,7 @@ stimmt, ist damit *nicht* gezeigt.
 | Teil | Stand |
 |---|---|
 | Board-Outline, Bohrbild, Keepouts (3 ×) | ✅ generiert, deckungsgleich, selbstgeprüft |
-| Frontplatte mit vier Sicheltasten | ✅ `mechanical/frontplate.py` → STEP + STL, mit Selbsttest |
+| Adapter für die BJ-Zentralscheibe | ✅ `mechanical/adapter.py` → STEP + STL, Selbsttest bestanden |
 | Tiefenbudget 61 mm | 🟡 gerechnet, 🔒 mit realen Bauteilhöhen nachzurechnen (Punkte 26, 14) |
 | Passung im realen 55er-Rahmen | ⛔ 🔒 Punkt 25 — Testdruck steht aus |
 | Bohrbild gegen reale Dose | ⛔ 🔒 Punkt 28 |
@@ -148,7 +148,7 @@ Alles Generierte ist reproduzierbar; die Werkzeuge prüfen ihr Ergebnis selbst.
 | `tools/route_boards.py`, `gnd_stitch.py`, `gnd_connect.py`, `gnd_iterate.py` | Routing-Pipeline und Masseanbindung |
 | `tools/gen_fab.py` | Gerber/Drill/Pos + Stücklisten, **nur nach bestandenem DRC-Gate** |
 | `tools/gen_panel.py` | Fertigungsnutzen aus den drei Quellprojekten |
-| `mechanical/frontplate.py` | Frontplatte |
+| `mechanical/adapter.py` | Adapter für die BJ-Zentralscheibe |
 
 ---
 

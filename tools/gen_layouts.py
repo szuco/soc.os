@@ -55,9 +55,13 @@ HOLE_R = 21.5
 # ausserhalb einer Oe52-Platine. Ein Kreis hat keine Ecken; das BJ-System ist um
 # einen quadratischen Einsatz von 54 x 54 gebaut. Das Top-Board wird deshalb ein
 # abgerundetes Quadrat und sitzt VOR der Dose, so wie der BJ-Einsatz auch.
-# Kantenmitte 24,5 liegt 0,5 mm innerhalb der Rastnasenlinie der Scheibe (50,0).
-# Siehe docs/04-mechanical.md Abschnitt 1d und Punkt 48 in docs/06.
-TOP_SQ = 49.0          # Kantenlaenge
+# 47,0 und nicht mehr, weil der Schnapprand des Adapters HINTER der Platine
+# liegt und sie zugleich traegt: Die Scheibe rastet auf 50,0, der Rand ist
+# aussen 49,8, und bei 1,4 mm Wand bleiben innen genau 47,0. Nach unten
+# begrenzen die Taster - ihre Ausdehnung reicht bis 22,2, mit 0,5 mm
+# Randabstand braucht es mindestens 45,4. Herleitung der Tiefenkette in
+# mechanical/adapter.py und docs/04-mechanical.md Abschnitt 1e.
+TOP_SQ = 47.0          # Kantenlaenge - siehe Tiefenkette unten
 TOP_CR = 4.0           # Eckradius
 # Bohrbild v2: ZWEI Bohrungen bei 0/180 Grad. Die alten Winkel 120/240
 # kollidierten mit den Sicheltasten-Stoesseln (117/243 Grad, nur ~2 mm

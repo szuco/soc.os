@@ -83,11 +83,11 @@ python3 tools/gen_layouts.py         # 3 Layouts: Platzierung, Netze, Zonen, DRC
 python3 tools/route_boards.py        # Freerouting-Pipeline, Nacharbeit mit gnd_*.py
 python3 tools/gen_fab.py [board]     # Gerber/Drill/Pos + BOMs, nur nach DRC-Gate
 python3 tools/gen_panel.py           # Fertigungsnutzen aus den drei Quellprojekten
-python3 mechanical/frontplate.py     # Frontplatte → STEP + STL, mit Selbsttest
+python3 mechanical/adapter.py        # Adapter für die BJ-Zentralscheibe, mit Selbsttest
 ```
 
 Beide Skripte prüfen ihr Ergebnis und melden Abweichungen. `gen_boards.py` braucht die
-`pcbnew`-Python-API aus einer KiCad-Installation, `frontplate.py` braucht `build123d`
+`pcbnew`-Python-API aus einer KiCad-Installation, `adapter.py` braucht `build123d`
 (`pip install build123d`).
 
 Auch der Bottom-Schaltplan wird erzeugt: Die Konnektivität steht als Quelltext, und
@@ -104,7 +104,7 @@ Vollständige Gegenüberstellung von umgesetzten und fehlenden Funktionen:
 |---|---|
 | Systemspezifikation, Power-Tree, Pinmapping | dokumentiert |
 | Mechanik der drei Boards | erzeugt und verifiziert |
-| Frontplatte | **überholt** — die Front wird auf die Busch-Jaeger Zentralscheibe 6435-914 umgestellt (docs/06, Punkte 41–47) |
+| Front | **Serienteil**: BJ-Zentralscheibe 6435-914 im Rahmen 1721-914. Der **Adapter** dazwischen ist erzeugt und selbstgeprüft (`mechanical/adapter.py`) |
 | Schaltpläne aller drei Boards + Stücklisten | **erzeugt und netzlistengeprüft** — Schaltungsreview gegen Datenblätter steht aus |
 | Layouts aller drei Boards: Platzierung + Zonen | **erzeugt, DRC ohne Platzierungsfehler** |
 | **Routing BOTTOM** | 985 Segmente, 102 Vias, **43 Verbindungen offen** — Rest Handarbeit (docs/05 verlangt das für Leistungspfade ohnehin) |
