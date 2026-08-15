@@ -105,6 +105,57 @@ Die Fensterkante des Rahmens fällt also mit der Dosenwand zusammen. Alles
 außerhalb — der gesamte Rand — liegt **auf der Wand**. Hinter einem Loch dort
 ist Putz, keine Platine. Aufgenommen als Punkt 47.
 
+## 1d. Messprotokoll F1–F13: Zentralscheibe und Abdeckrahmen
+
+Diese Maße geben das Top-Layout und den Adapter frei. Ein Maßbild ist öffentlich
+nicht zu bekommen, deshalb werden sie am realen Teil genommen. Benötigt werden
+nur **Zentralscheibe 6435-914** und **Abdeckrahmen 1721-914** — der Einsatz
+6422 U ist bequem, aber nicht nötig.
+
+**Bezugssystem:** Blick auf die Sichtfläche. Ursprung ist die Mitte der
+Zentralscheibe, **x nach rechts, y nach oben**. Weil die Mitte nicht direkt
+messbar ist, wird alles gegen die **Plattenkanten** gemessen; die Umrechnung
+mache ich. Messschieber, 0,1 mm genügt.
+
+### A – Zentralscheibe, Sichtseite
+
+| # | Maß | Warum |
+|---|---|---|
+| **F1** | Außenmaß Breite × Höhe, und die Dicke der Sichtfläche | Prüft die 55-mm-Annahme und gibt die Materialstärke für die vier Durchbrüche |
+| **F2** | Gesamttiefe: Sichtfläche bis zur hintersten Kante (Rastnasen eingerechnet) | Obergrenze für alles, was zwischen Platine und Scheibe steht — Display, USB-C-Buchse, Klinke |
+| **F3** | Fensterausschnitt: Breite × Höhe, dazu der Eckradius | **Bestimmt das Display** (Punkt 43) |
+| **F4** | Lage des Fensters: Abstand linke Fensterkante ↔ linke Plattenkante, obere Fensterkante ↔ obere Plattenkante | Sitzt das Fenster mittig? Falls nicht, ist genau das die entscheidende Zahl |
+
+### B – Die vier Symbolfelder
+
+| # | Maß | Warum |
+|---|---|---|
+| **F5** | Je Symbol: Abstand seiner Mitte zur **linken** und zur **oberen** Plattenkante | **Entscheidet Punkt 42.** Liegen die vier auf den Achsen oder auf den Diagonalen? Daran hängt, ob die acht Taster wandern müssen — und damit das Bohrbild aller drei Boards |
+| **F6** | Sind die Symbolfelder **beweglich**? Draufdrücken: federt es, klickt es, oder ist es starres Material? Gibt es Trennfugen oder Schlitze rings um das Feld? | Entscheidet, ob die Scheibe selbst die Taste ist oder ob der Adapter Tastenkappen tragen muss |
+| **F7** | Falls beweglich: Breite × Höhe der beweglichen Fläche, und wo sie angebunden ist (umlaufender Steg, Filmscharnier auf einer Seite?) | Bestimmt, wo der Druck ankommt und wie viel Hub zur Verfügung steht |
+
+### C – Zentralscheibe, Rückseite (das eigentliche Interface)
+
+| # | Maß | Warum |
+|---|---|---|
+| **F8** | **Rastnasen:** Anzahl, Lage (Abstand zu den Plattenkanten), Höhe über der Rückfläche — und das **lichte Innenmaß zwischen gegenüberliegenden Nasen**, in x und in y | Das ist das Maß, auf das der Adapter geklemmt wird. Die wichtigste Zahl für Punkt 41 |
+| **F9** | Umlaufender Kragen oder Rand auf der Rückseite: lichte Innenmaße und Tiefe | Der Adapter muss hineinpassen, ohne die Scheibe aufzudrücken |
+| **F10** | **Druckstößel oder Dome hinter den Symbolfeldern:** vorhanden? Wenn ja Ø, Höhe über der Rückfläche und Lage | Falls vorhanden, sind **das** die Punkte, auf die unsere SMD-Taster müssen — dann ist F5 nur die Kontrollrechnung |
+
+### D – Abdeckrahmen und Zusammenbau
+
+| # | Maß | Warum |
+|---|---|---|
+| **F11** | Lichtes Fenstermaß des Rahmens und dessen Eckradius; Tiefe von der Sichtfläche bis zur Rückkante | Gegenprobe zu den 55 × 55 aus dem Katalog |
+| **F12** | Scheibe in den Rahmen setzen: **Hält sie von allein?** Und wie tief liegt ihre Sichtfläche hinter der Rahmenvorderkante? | Klärt, ob der Rahmen die Scheibe hält oder der Adapter — und wie weit die Tastenfelder vorstehen dürfen |
+| **F13** | Klemmelemente des Rahmens auf seiner Rückseite: Lage und lichtes Maß — worauf klemmt er? | Punkt 25: Der Adapter muss dem Rahmen anbieten, was sonst der Tragring bietet |
+
+### Ergebnisse eintragen
+
+Werte hier ergänzen, sobald gemessen. Vier davon geben das Layout frei: **F3**
+(Displaygröße), **F5** oder **F10** (Tastenpositionen), **F8** (Rastmaß) und
+**F2** (Bauhöhe).
+
 Board-Outline in KiCad: Kreis auf `Edge.Cuts`, Mittelpunkt (0,0), Radius 26,0 mm.
 Board-Dicke über *Board Setup → Physical Stackup*.
 

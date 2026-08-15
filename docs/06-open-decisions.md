@@ -152,13 +152,11 @@ Jalousiesteuerung**. Die Symbolbelegung der Scheibe ist also für genau unseren
 Anwendungsfall entworfen worden, und die Bedienlogik des Originals ist der
 naheliegende Maßstab für Punkt 37 (verbindliche Tastenbelegung).
 
-Zu messen ist dann:
+Der Einsatz ist dabei **bequem, aber nicht nötig**: Die Rückseite der
+Zentralscheibe ist das Negativ dessen, was der Adapter anbieten muss. Mit
+Scheibe und Rahmen allein lässt sich alles abnehmen.
 
-1. **Wo drückt die Scheibe?** Vier Druckpunkte in Winkel und Radius — Achsen
-   oder Diagonalen. Das ist die Antwort auf Punkt 42.
-2. **Fensterausschnitt** in Breite, Höhe und Eckradius → bestimmt das Display
-   (Punkt 43).
-3. **Rastgeometrie** auf der Rückseite: Woran hält die Scheibe, mit welchem
-   Übermaß, in welcher Tiefe → der Adapter muss genau das anbieten (Punkt 41).
-4. **Bauhöhe** von der Platinenoberkante bis zur Innenseite der Scheibe →
-   Grenze für Display, USB-C-Buchse und Klinke.
+Das ausgearbeitete Messprotokoll **F1–F13** steht in
+[`04-mechanical.md`](04-mechanical.md) Abschnitt 1d. Vier Werte daraus geben das
+Layout frei: **F3** (Fensterausschnitt → Display), **F5/F10** (Tastenpositionen
+→ Punkt 42), **F8** (Rastmaß → Adapter) und **F2** (Bauhöhe).
