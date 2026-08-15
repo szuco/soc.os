@@ -112,3 +112,20 @@ sobald ihre Restarbeiten (oben) erledigt sind.
 Die Stücklisten aller drei Boards liegen als `bom_bottom/mid/top.csv`
 neben den Schaltplänen — erzeugt aus derselben Quelle wie die Schaltpläne
 selbst (`tools/gen_*_sch.py`).
+
+## Fertigungsnutzen
+
+Die drei Platinen werden als **ein Nutzen** bestellt:
+[`../hardware/fab/panel/`](../hardware/fab/panel/README.md), erzeugt mit
+`tools/gen_panel.py`. 178,4 × 64,4 mm, drei Kreise Ø 52 in einer Reihe, je vier
+Stege von 4 mm auf den Diagonalen mit Mausbissen.
+
+Der Nutzen ist ein **Build-Ergebnis**, keine Quelle. Die drei Projekte unter
+`hardware/` bleiben führend und einzeln revidierbar; erst im Nutzen bekommen
+Referenzen (`B_`, `M_`, `T_`) und Netze (`BOT_`, `MID_`, `TOP_`) ein Präfix,
+weil beides dort eindeutig sein muss. Die Designregeln werden aus den drei
+Quellprojekten übernommen, sonst meldet KiCad die 0,15-mm-Leiterbahnen des
+Bottom-Boards gegen seine 0,2-mm-Vorgabe als Fehler.
+
+**Nach dem Ausbrechen ist jede Platine am Steg zu verputzen** — der Grat steht
+rund 0,5 mm über, und in der Dose stehen nur 1,5–2,5 mm Luft zur Verfügung.
