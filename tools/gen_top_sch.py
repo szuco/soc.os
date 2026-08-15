@@ -48,9 +48,16 @@ def build():
     # =====================================================================
     # 1. USB-C (Device/UFP, nur USB 2.0)
     # =====================================================================
+    # STEHENDE Buchse: Der Stecker geht nach VORN, nicht radial nach aussen.
+    # Damit liegt der Anschluss unter der Zentralscheibe und ist erst nach
+    # deren Abnahme erreichbar - Punkt 45. Gewaehlt: G-Switch GT-USB-7051x,
+    # SMT, vertikal, 22 Pads (A- und B-Reihe vollstaendig, also drehbar),
+    # Footprint 9,94 x 6,40 mm. Die liegende GCT USB4085 hatte 8,95 x 9,17 und
+    # zeigte radial nach aussen gegen die Dosenwand.
     s.add("J1", "Connector:USB_C_Receptacle_USB2.0_16P", "USB-C",
-          "Connector_USB:USB_C_Receptacle_GCT_USB4085",
-          MPN="16-Pin-Typ, nur USB 2.0")
+          "Connector_USB:USB_C_Receptacle_G-Switch_GT-USB-7051x",
+          MPN="G-Switch GT-USB-7051A/B, vertikal SMT (LCSC C2843970) - "
+              "Bauhoehe gegen die 4,5 mm bis zur Scheibe pruefen")
     s.connect("USB_VBUS", ("J1", "A4"), ("J1", "B4"), ("J1", "A9"), ("J1", "B9"))
     # Schirm: KiCad 9 nannte den Pin S1, KiCad 10 nennt ihn SH - Symbol und
     # Footprint sind innerhalb einer Version konsistent, deshalb hier abfragen.

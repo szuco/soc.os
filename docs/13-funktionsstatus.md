@@ -35,7 +35,7 @@ Soft-Limit und der einzige noch offene Leistungshalbleiter provisorisch.
 | **BOTTOM** `bottom_power_motor` | ✅ 102 Bauteile, 105 Netze, Netzlistenvergleich bestanden | 🟡 **985 Segmente, 102 Vias**, 43 offene Verbindungen im Motor-/Leistungsteil, 0 Kupferfehler | ⛔ wartet auf das Rest-Routing |
 | **MID** `mid_logic` | ✅ 37 Bauteile, 57 Netze | ⛔ platziert, **0 Leiterbahnen** | ⛔ |
 | **TOP** `top_ui` | ✅ 25 Bauteile, 53 Netze | ⛔ platziert, **0 Leiterbahnen** — Stand 16.08.2026: **quadratisch 47 × 47**, vier Ecktaster unter den Druckkreuzen der Zentralscheibe | ⛔ |
-| **Nutzen** `fab/panel` | — (Build-Ergebnis) | ⛔ **gelöscht** — `gen_panel.py` kann nur Kreise, das Top-Board ist jetzt quadratisch | ⛔ Werkzeug auf gemischte Geometrie erweitern |
+| **Nutzen** `fab/panel` | — (Build-Ergebnis) | ✅ **173,4 × 64,4 mm**, zwei Kreise + ein Quadrat, DRC deckungsgleich mit der Summe der Einzelboards | 🟡 bestellbar, sobald geroutet |
 
 Die 43 offenen Verbindungen auf Bottom sind **kein Rückstand des Autorouters**,
 sondern Absicht: [`05-manufacturing.md`](05-manufacturing.md) Abschnitt 3 verlangt
@@ -118,7 +118,7 @@ stimmt, ist damit *nicht* gezeigt.
 | Meldekontakt Dunstabzugshaube | ✅ PhotoMOS AQY282GS, potentialfrei, **nur SELV** | ✅ Schalter-Entität, LOW = geschlossen | ✅ |
 | **RS-485 (primärer Weg)** | ✅ MAX3485, Fail-Safe-Bias, Terminierung als DNP, JST-XH | ⛔ UART definiert, **aber ungenutzt**; `RS485_DIR` (GPIO48) unbelegt | ⛔ 🔒 Punkte 15b/16/38 — Transceiver-Auswahl und Registerkarte offen |
 | WLAN / Home Assistant | ✅ ESP32-S3-WROOM-1-N16R8 | ✅ API, OTA, Fallback-AP | ✅ ausdrücklich **sekundär** |
-| USB-C Programmierung | 🟡 nativer USB des S3, ESD-Schutz, D+/D− über den Stack — **die Buchse wird von liegend auf stehend umgebaut** | ✅ Logging über USB-Serial-JTAG | 🔒 Punkt 45 — nach vorn zeigend, verdeckt von der Zentralscheibe, nutzbar nach deren Abnahme |
+| USB-C Programmierung | ✅ **stehende Buchse** (G-Switch GT-USB-7051x), zeigt nach vorn, verdeckt von der Zentralscheibe | ✅ Logging über USB-Serial-JTAG | ✅ nutzbar nach Abnahme der Scheibe — 🔒 Bauhöhe gegen 4,5 mm prüfen |
 | Feldstecker für Reed + Haube | 🟡 JST-SH 6-polig auf der Mid-Rückseite, 0,4 mm neben einem Keepout | — | 🔒 **Punkt 29, P0** — es ist schlicht kein Platz |
 
 ---

@@ -23,6 +23,7 @@ Was dieses Skript leistet - und was nicht:
 
 import json
 import math
+import re as _re2
 import os
 import subprocess
 import sys
@@ -601,11 +602,10 @@ FIXED_TOP = dict(
     J6=(-9.0, 19.0, 180, "F"),         # Klinkenbuchse Stern, unten links
     U3=(-9.0, -19.0, 0, "F"),          # VL53L1X, oben links
     U2=(9.0, -19.0, 0, "F"),           # SHT4x unter dem oberen Lueftungsschlitz
-    # USB-C mittig oben, vollstaendig von der Zentralscheibe verdeckt.
-    # ACHTUNG: Der Footprint ist noch die LIEGENDE Buchse. Punkt 45 verlangt
-    # eine STEHENDE (Top-Mount), damit der Stecker nach vorn geht und nach
-    # Abnahme der Scheibe erreichbar ist. Bauteilauswahl steht aus.
-    J1=(0.0, -19.0, 180, "F"),
+    # USB-C mittig oben, vollstaendig von der Zentralscheibe verdeckt und erst
+    # nach deren Abnahme erreichbar (Punkt 45). Die Buchse steht jetzt - der
+    # Stecker geht nach vorn, nicht radial gegen die Dosenwand.
+    J1=(0.0, -19.0, 0, "F"),
     # F1 (PTC) hat keine mechanische Bindung mehr - auf dem quadratischen Board
     # ist jede feste Position entweder unter dem Stackverbinder oder unter dem
     # Klinken-Platzhalter. Die Automatik findet ihn.
@@ -647,10 +647,21 @@ def main():
         vio = dict(res["violations"])
         # beabsichtigte Randverletzungen (z. B. USB-C-Steckerueberhang)
         edge_ok = plan.get("edge_ok", ())
+
+        def _only(detail, refs):
+            """Betrifft die Meldung ausschliesslich Bauteile aus refs?
+
+            KiCad nennt in der Zeile jedes beteiligte Element mit "of <REF>".
+            Gewaivert wird nur, wenn ALLE Beteiligten in refs stehen - sonst
+            wuerde ein Waiver fuer J1 auch eine Kollision J1 gegen U3
+            verschlucken."""
+            found = _re2.findall(r'\bof ([A-Z]+\d+[A-Z]?)\b', detail)
+            return bool(found) and all(f in refs for f in found)
+
         if edge_ok and "copper_edge_clearance" in vio:
             waived = sum(1 for d in res.get("details", [])
                          if d.startswith("copper_edge_clearance")
-                         and any(d.rstrip().endswith("of " + r) for r in edge_ok))
+                         and _only(d, edge_ok))
             if waived:
                 vio["copper_edge_clearance"] -= waived
                 if vio["copper_edge_clearance"] <= 0:
@@ -659,8 +670,7 @@ def main():
                       % (waived, "/".join(edge_ok)))
             res["details"] = [d for d in res.get("details", [])
                               if not (d.startswith("copper_edge_clearance")
-                                      and any(d.rstrip().endswith("of " + r)
-                                              for r in edge_ok))]
+                                      and _only(d, edge_ok))]
         # kosmetische Klassen getrennt ausweisen
         cosmetic = {k: vio.pop(k) for k in list(vio)
                     if k.startswith("silk") or k in

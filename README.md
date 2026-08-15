@@ -109,8 +109,8 @@ Vollständige Gegenüberstellung von umgesetzten und fehlenden Funktionen:
 | Layouts aller drei Boards: Platzierung + Zonen | **erzeugt, DRC ohne Platzierungsfehler** |
 | **Routing BOTTOM** | 985 Segmente, 102 Vias, **43 Verbindungen offen** — Rest Handarbeit (docs/05 verlangt das für Leistungspfade ohnehin) |
 | **Routing MID** | **keines** — platziert, Leiterbahnen fehlen |
-| **Routing TOP** | **keines** — am 15.08.2026 neu platziert (Klinke nach 6 Uhr, ToF 12 Uhr, USB-C-Drehung korrigiert) |
-| Fertigungsnutzen (3 Platinen in einer Boarddatei) | **erzeugt:** `hardware/fab/panel/` |
+| **Routing TOP** | **keines** — am 16.08.2026 neu aufgebaut: quadratisch 47 × 47, vier Ecktaster, stehende USB-C-Buchse. **DRC ohne Fehler** |
+| Fertigungsnutzen (3 Platinen in einer Boarddatei) | **erzeugt:** `hardware/fab/panel/` — 173,4 × 64,4 mm, zwei Kreise + ein Quadrat |
 | Fertigungsdaten | **keine** — `python3 tools/gen_fab.py` nach dem Routing, mit DRC-Gate |
 | ESPHome-Konfiguration | auf ST7789 und Tastenpaare umgestellt — ⚠️ **seit dem Umbau nicht mehr validiert** (kein ESPHome auf dem Rechner). Motoren fahren **auf Zeit** |
 | Lasterkennung, ToF-Distanz, Menü, RS-485-Protokoll | **fehlen** — eigene C++-Komponente, s. docs/13 |

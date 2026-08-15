@@ -132,8 +132,11 @@ selbst (`tools/gen_*_sch.py`).
 
 Die drei Platinen werden als **ein Nutzen** bestellt:
 [`../hardware/fab/panel/`](../hardware/fab/panel/README.md), erzeugt mit
-`tools/gen_panel.py`. 178,4 × 64,4 mm, drei Kreise Ø 52 in einer Reihe, je vier
-Stege von 4 mm auf den Diagonalen mit Mausbissen.
+`tools/gen_panel.py`. **173,4 × 64,4 mm = 112 cm²**, gemischte Geometrie: zwei
+Kreise Ø 52 (Bottom, Mid) und ein abgerundetes Quadrat 47 × 47 (Top). Je vier
+Stege von 4 mm mit fünf Mausbissen — am Kreis auf den Diagonalen, am Quadrat je
+einer pro Kante, um 10 mm aus der Kantenmitte versetzt. Mittig wäre dort
+entweder eine Befestigungsbohrung oder der überstehende Klinken-Platzhalter.
 
 Der Nutzen ist ein **Build-Ergebnis**, keine Quelle. Die drei Projekte unter
 `hardware/` bleiben führend und einzeln revidierbar; erst im Nutzen bekommen

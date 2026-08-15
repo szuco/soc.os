@@ -1,11 +1,10 @@
 # Fertigungsnutzen
 
-> **⚠ Der erzeugte Nutzen ist am 16.08.2026 gelöscht worden.** Das Top-Board ist
-> seither **quadratisch** (49 × 49 mm, Punkt 48) — `gen_panel.py` setzt aber drei
-> Kreise Ø 52 nebeneinander und würde um das quadratische Board herum eine runde
-> Fräsbahn legen. Das Werkzeug ist auf gemischte Geometrie zu erweitern: zwei
-> Kreise und ein abgerundetes Quadrat, mit je eigener Stegberechnung. Bis dahin
-> beschreibt dieses Dokument den **Aufbau**, nicht einen vorhandenen Stand.
+> **Gemischte Geometrie seit dem 16.08.2026.** Bottom und Mid sind Kreise
+> Ø 52, das Top-Board ist ein abgerundetes Quadrat 47 × 47 (Punkt 48). Der
+> Generator behandelt beide Formen: die Kreise über die Bogenlogik, das Quadrat
+> über eine Parallelkurve seiner Kontur. **173,4 × 64,4 mm = 112 cm²**, vier
+> Stege je Platine.
 
 `switchstack_panel.kicad_pcb` enthält alle drei Platinen in einer Datei —
 Bottom, Mid und Top nebeneinander, gehalten von Trennstegen in einem Rahmen.
