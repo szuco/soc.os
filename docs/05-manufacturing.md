@@ -83,7 +83,7 @@ gefüllt (Vollanbindung, Zonen-Clearance 0,15 mm). Der Stand im Einzelnen:
 
 | Board | Stand | Rest |
 |---|---|---|
-| **TOP** | vollständig, Kupfer-DRC sauber | — (Randabstands-Waiver: USB-Zunge, Pads ragen gewollt über die Kante) |
+| **TOP** | vollständig geroutet, Kupfer-DRC sauber | ⚠️ **Der Randabstands-Waiver war falsch.** Er wurde für die überstehende USB-Steckzunge erteilt — tatsächlich stehen die **Lötpads** über die Kante, weil J1 um 180° verdreht platziert war (Punkt 39). Sechs Bohrungen schneiden die Kontur an. Drehung in `gen_layouts.py` korrigiert, Layout ist nachzuziehen |
 | **MID** | alle Signalnetze verbunden | **10 PGND-Pour-Anbindungen**: Massepins der Stackverbinder hinter eng geführten Signal-Verticals. In KiCad 9 mit dem interaktiven Router (Push-and-Shove) in ~10 min zu schließen — die DRC-Liste (`unconnected_items`) zeigt die Stellen. |
 | **BOTTOM** | ≈ 85 % geroutet (985 Segmente, 102 Vias) | 43 Verbindungen im Motor-/Leistungsteil (SW-Knoten, Gate-Netze, 24V_PROT). Der Autorouter konvergiert dort nicht mehr — die Leistungspfade sind laut Prüfliste (Abschnitt 3) **ohnehin von Hand zu ziehen**: kurze dicke Wege, Buck-Schleifen nach Referenzlayout. |
 
@@ -106,8 +106,9 @@ Werkzeug-Docstrings):
 packt sie nach `hardware/fab/<board>.zip` — aber **nur, wenn das DRC-Gate
 besteht** (keine Kupferfehler, keine offenen Verbindungen).
 
-Aktuell erzeugt: **`hardware/fab/top_ui.zip`**. Mid und Bottom folgen,
-sobald ihre Restarbeiten (oben) erledigt sind.
+Aktuell erzeugt: **`hardware/fab/top_ui.zip`** — **überholt**, weil er die
+verdrehte USB-C-Buchse enthält (Punkt 39). Vor der Bestellung neu erzeugen.
+Mid und Bottom folgen, sobald ihre Restarbeiten (oben) erledigt sind.
 
 Die Stücklisten aller drei Boards liegen als `bom_bottom/mid/top.csv`
 neben den Schaltplänen — erzeugt aus derselben Quelle wie die Schaltpläne

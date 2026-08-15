@@ -45,31 +45,35 @@ Entscheidungen stehen in [`06-open-decisions.md`](06-open-decisions.md).
 
 ### C. Layout fertigstellen
 
-8. **Mid:** 10 PGND-Pour-Anbindungen mit dem interaktiven Router schließen (~10 min).
-9. **Bottom:** 43 offene Verbindungen im Leistungsteil **von Hand** — kurze breite
-   Wege, Buck-Schleifen nach Hersteller-Referenzlayout, Sternpunkt AGND/PGND über R12.
-   [`05-manufacturing.md`](05-manufacturing.md) verlangt das für Leistungspfade ohnehin.
-10. **Schaltungsreview:** IC-Pinbelegungen gegen Datenblätter (besonders INA240A2D mit
+8. **Top: J1 drehen** (Punkt 39). Entweder `gen_layouts.py` neu laufen lassen —
+   dann ist das Top-Board komplett neu zu routen — oder die Buchse in KiCad an
+   Ort und Stelle um 180° drehen und nur die USB-Netze neu ziehen. Danach
+   Fertigungsdaten neu exportieren.
+9. **Mid:** 10 PGND-Pour-Anbindungen mit dem interaktiven Router schließen (~10 min).
+10. **Bottom:** 43 offene Verbindungen im Leistungsteil **von Hand** — kurze breite
+    Wege, Buck-Schleifen nach Hersteller-Referenzlayout, Sternpunkt AGND/PGND über R12.
+    [`05-manufacturing.md`](05-manufacturing.md) verlangt das für Leistungspfade ohnehin.
+11. **Schaltungsreview:** IC-Pinbelegungen gegen Datenblätter (besonders INA240A2D mit
     seinen gestapelten GND-Pins), Reglerdimensionierung, Leiterbahnstromrechnung.
 
 ### D. Fertigen
 
-11. `python3 tools/gen_fab.py` für Mid und Bottom, danach `gen_panel.py` neu erzeugen.
-12. Prüfliste [`05-manufacturing.md`](05-manufacturing.md) Abschnitt 3 abarbeiten,
+12. `python3 tools/gen_fab.py` für Mid und Bottom, danach `gen_panel.py` neu erzeugen.
+13. Prüfliste [`05-manufacturing.md`](05-manufacturing.md) Abschnitt 3 abarbeiten,
     Git-Tag je Fertigungsstand setzen, Nutzen bestellen.
 
 ### E. Firmware
 
-13. **External Component in C++** — der größte zusammenhängende Brocken. Drei Dinge
+14. **External Component in C++** — der größte zusammenhängende Brocken. Drei Dinge
     fallen hinein, die alle am selben Problem hängen (ESPHomes Polling-Modell):
     PWM-synchrone Strommessung mit Lasterkennung (Punkt 4 in
     [`09-display-and-mcu.md`](09-display-and-mcu.md)), der VL53L1X-Distanzwert samt
     ROI-Umschaltung (Punkt 31) und die Blendungsauswertung (Punkt 32).
-14. **Bedienkonzept:** Menü-Zustandsmaschine mit der Belegung OK / Hoch / Runter /
+15. **Bedienkonzept:** Menü-Zustandsmaschine mit der Belegung OK / Hoch / Runter /
     Home (Punkt 37) — heute sind die vier Tasten fest auf Auf/Zu verdrahtet.
-15. **Verschlusskontakte in die Motorlogik ziehen:** Verschlusslage erreicht ⇒ Fahrt
+16. **Verschlusskontakte in die Motorlogik ziehen:** Verschlusslage erreicht ⇒ Fahrt
     beenden. Sie sind der einzige absolute Positionsbezug im System.
-16. **BIST und Heartbeat** nach [`../firmware/README.md`](../firmware/README.md).
-17. **RS-485 in Betrieb nehmen** (Punkte 15b, 16, 38): Transceiver bestätigen,
+17. **BIST und Heartbeat** nach [`../firmware/README.md`](../firmware/README.md).
+18. **RS-485 in Betrieb nehmen** (Punkte 15b, 16, 38): Transceiver bestätigen,
     Modbus-Registerkarte festlegen. RS-485 ist der *primäre* Weg — heute ist der
     UART zwar konfiguriert, aber ungenutzt.

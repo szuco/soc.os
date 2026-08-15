@@ -13,11 +13,11 @@ Legende: ✅ fertig und geprüft · 🟡 begonnen, Rest benannt · ⛔ nicht vor
 
 | Ebene | Stand |
 |---|---|
-| **Spezifikation** | ✅ vollständig — 13 Dokumente, alle Entscheidungen entweder getroffen oder als Punkt 1–38 offen benannt |
+| **Spezifikation** | ✅ vollständig — 13 Dokumente, alle Entscheidungen entweder getroffen oder als Punkt 1–40 offen benannt |
 | **Mechanik** | ✅ Boards und Frontplatte generiert und selbstgeprüft; 🔒 Maßprüfung am realen Rahmen und am realen Displaymodul steht aus |
 | **Schaltpläne** | ✅ alle drei Boards erzeugt und netzlistengeprüft; ⛔ **keine Schaltungsreview gegen Datenblätter** |
-| **Layouts** | 🟡 Top fertig, Mid bis auf 10 Masseanbindungen fertig, Bottom-Leistungsteil zu ~85 % |
-| **Fertigungsdaten** | 🟡 Top exportiert, Nutzen erzeugt; Mid und Bottom fehlen noch |
+| **Layouts** | 🟡 Top geroutet, **aber mit verdrehter USB-C-Buchse (Punkt 39)**; Mid bis auf 10 Masseanbindungen fertig; Bottom-Leistungsteil zu ~85 % |
+| **Fertigungsdaten** | ⛔ Top exportiert, aber durch Punkt 39 **überholt**; Nutzen erzeugt; Mid und Bottom fehlen noch |
 | **Firmware** | 🟡 ESPHome-Konfiguration validiert und funktionsfähig, aber **ohne Lasterkennung, ohne Bedienmenü, ohne RS-485-Protokoll** |
 | **Bestellt / gebaut** | ⛔ nichts — kein Board gefertigt, kein Motor vermessen |
 
@@ -34,12 +34,20 @@ Soft-Limit und der einzige noch offene Leistungshalbleiter provisorisch.
 |---|---|---|---|
 | **BOTTOM** `bottom_power_motor` | ✅ 102 Bauteile, 105 Netze, Netzlistenvergleich bestanden | 🟡 985 Segmente, 102 Vias, **43 offene Verbindungen** im Motor-/Leistungsteil, 0 Kupferfehler | ⛔ wartet auf das Rest-Routing |
 | **MID** `mid_logic` | ✅ 37 Bauteile, 57 Netze | 🟡 alle Signalnetze verbunden, **10 PGND-Pour-Anbindungen offen** | ⛔ wartet auf das Rest-Routing |
-| **TOP** `top_ui` | ✅ 29 Bauteile, 53 Netze | ✅ vollständig, Kupfer-DRC sauber | ✅ [`hardware/fab/top_ui.zip`](../hardware/fab/top_ui.zip) |
+| **TOP** `top_ui` | ✅ 29 Bauteile, 53 Netze | 🟡 vollständig geroutet, aber **J1 um 180° verdreht** (Punkt 39) | ⛔ `top_ui.zip` existiert, ist aber **überholt** |
 | **Nutzen** `fab/panel` | — (Build-Ergebnis) | ✅ 178,4 × 64,4 mm, drei Ø-52-Kreise, Stege + Mausbisse | 🟡 erst mit allen drei Boards bestellbar |
 
 Die 43 offenen Verbindungen auf Bottom sind **kein Rückstand des Autorouters**,
 sondern Absicht: [`05-manufacturing.md`](05-manufacturing.md) Abschnitt 3 verlangt
 für Leistungspfade und Buck-Schleifen ohnehin Handarbeit nach Referenzlayout.
+
+**Die USB-C-Buchse steht falsch herum.** Die Stecköffnung zeigt zur
+Platinenmitte statt nach außen, damit stehen die Lötpads über die Platinenkante
+und sechs Bohrungen schneiden die Kontur an. Der Randabstands-Waiver in docs/05
+wurde unter falscher Annahme erteilt. Drehung im Generator korrigiert, Layout
+nachzuziehen: 🔒 Punkt 39, P0. Getrennt davon die Nutzungsfrage: **im
+eingebauten Zustand ist USB-C nicht erreichbar** (Punkt 40) — Erstflash auf dem
+Tisch, danach OTA.
 
 **Die Stackverbinder sind noch kein Verbinderpaar.** Auf allen drei Boards sitzt
 derselbe Footprint (`PinSocket_2x20_P1.27mm_Vertical`) — dreimal die Buchse. Als
@@ -139,10 +147,13 @@ Alles Generierte ist reproduzierbar; die Werkzeuge prüfen ihr Ergebnis selbst.
 1. **Blockierstrom messen** (M6, Multimeter, 5 min) → Punkte 1, 8, 2 werden entscheidbar.
 2. **Punkt 34 entscheiden**: Sabotagekontakte nachrüsten oder schriftlich streichen.
    Zusammen mit Punkt 29 (Feldstecker) — beide betreffen dieselbe Ecke des Mid-Boards.
-3. **Rest-Routing** Mid (10 Anbindungen) und Bottom (43 Verbindungen, Leistungsteil von Hand).
-4. **Schaltungsreview** gegen Datenblätter, Reglerlayouts gegen Referenzdesign.
-5. **Fertigungsdaten** für Mid und Bottom, dann den Nutzen bestellen.
-6. **Firmware**: External Component für Strommessung, Lasterkennung und VL53L1X-Distanz —
+3. **USB-C-Buchse drehen** (Punkt 39) und das Top-Layout nachziehen — entweder
+   `gen_layouts.py` neu laufen lassen und komplett neu routen oder J1 in KiCad an
+   Ort und Stelle drehen und nur die USB-Netze neu ziehen.
+4. **Rest-Routing** Mid (10 Anbindungen) und Bottom (43 Verbindungen, Leistungsteil von Hand).
+5. **Schaltungsreview** gegen Datenblätter, Reglerlayouts gegen Referenzdesign.
+6. **Fertigungsdaten** für Mid und Bottom, dann den Nutzen bestellen.
+7. **Firmware**: External Component für Strommessung, Lasterkennung und VL53L1X-Distanz —
    der größte zusammenhängende Brocken, und alle drei Funktionen fallen in dieselbe Komponente.
 
 Detaillierte Arbeitsschritte: [`07-roadmap.md`](07-roadmap.md).

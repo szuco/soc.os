@@ -107,10 +107,10 @@ Vollständige Gegenüberstellung von umgesetzten und fehlenden Funktionen:
 | Frontplatte, druckfertig | erzeugt und verifiziert |
 | Schaltpläne aller drei Boards + Stücklisten | **erzeugt und netzlistengeprüft** — Schaltungsreview gegen Datenblätter steht aus |
 | Layouts aller drei Boards: Platzierung + Zonen | **erzeugt, DRC ohne Platzierungsfehler** |
-| **Routing TOP** | **vollständig** — alle Netze verbunden, Kupfer-DRC sauber |
+| **Routing TOP** | geroutet, aber **J1 (USB-C) steht um 180° verdreht** — Pads schneiden die Kontur an, Layout nachzuziehen (Punkt 39) |
 | **Routing MID** | Signale vollständig; **10 PGND-Pour-Anbindungen offen** (Handgriff in KiCad, s. docs/05) |
 | **Routing BOTTOM** | Leistungsteil ≈ 85 %, 43 Verbindungen offen — **Rest Handarbeit** (docs/05 verlangt das für Leistungspfade ohnehin) |
-| Fertigungsdaten TOP (Gerber/Drill/Pos) | **erzeugt:** `hardware/fab/top_ui.zip` |
+| Fertigungsdaten TOP (Gerber/Drill/Pos) | erzeugt, aber durch Punkt 39 **überholt**: `hardware/fab/top_ui.zip` |
 | Fertigungsnutzen (3 Platinen in einer Boarddatei) | **erzeugt:** `hardware/fab/panel/` |
 | Fertigungsdaten Mid + Bottom | nach Rest-Routing: `python3 tools/gen_fab.py` |
 | ESPHome-Konfiguration inkl. ST77916-Display | validiert (`esphome config`) — Motoren fahren **auf Zeit** |

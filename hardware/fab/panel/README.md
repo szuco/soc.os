@@ -75,7 +75,8 @@ Variante zusammengefasst.
 ## Stand der Prüfung
 
 Der DRC des Nutzens ist **deckungsgleich mit der Summe der Einzelboards** —
-28 Clearance-Meldungen (allesamt die USB-C-Pads des Top-Boards), 342
+28 Clearance-Meldungen (allesamt die USB-C-Pads des Top-Boards — **keine
+Harmlosigkeit**, sondern die um 180° verdrehte Buchse, Punkt 39), 342
 unverbundene Elemente. Letztere sind erwartet: Mid und Top sind platziert, aber
 noch nicht geroutet, und die Massefläche wird erst beim Öffnen in KiCad
 gefüllt.

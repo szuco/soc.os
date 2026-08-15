@@ -525,7 +525,12 @@ FIXED_TOP = dict(
            -23.2 * math.sin(math.radians(a)),
            "AUTO_TANGENTIAL", "F")
      for ref, a in BTN_ANGLES.items()},
-    J1=(0.0, 21.6, 180, "F"),          # USB-C, Steckgesicht ueberhaengt
+    # USB-C auf 6 Uhr, Steckgesicht nach AUSSEN. Die Drehung ist 0, nicht 180:
+    # Im Footprint liegen die THT-Pins am Ende y = 0 und die Steckoeffnung am
+    # Ende y = +8,61 (auf F.Fab als Schlitz bei y = 6,1 markiert). Mit 180 Grad
+    # schaut die Oeffnung zur Platinenmitte, und die Pins stehen ueber die Kante
+    # - genau falsch herum. Siehe Punkt 39 in docs/06-open-decisions.md.
+    J1=(0.0, 21.6, 0, "F"),            # USB-C, Steckgesicht ueberhaengt
     J5=(0.0, 3.0, 0, "F"),             # Displayanschluss unterm Modul
     # 12 Uhr: die beiden einzigen Durchbrueche der Frontplatte. Koordinaten
     # muessen zu jack_x/jack_y bzw. tof_x/tof_y in frontplate.py passen

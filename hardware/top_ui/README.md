@@ -63,8 +63,13 @@ Kupfer-DRC sauber, Fertigungsdaten exportiert nach
 [`../fab/top_ui.zip`](../fab/top_ui.zip) (Gerber, Excellon mit PDF-Karte,
 Positionsdatei).
 
-Ein bewusster DRC-Waiver bleibt: die Pads der USB-C-Zunge ragen gewollt über die
-Platinenkante hinaus (28 Randabstandsmeldungen).
+**Ein Fehler ist offen und macht diesen Stand unfertigbar:** J1 stand um 180°
+verdreht, die Stecköffnung zeigt zur Platinenmitte und die **Lötpads** stehen über
+die Kante — sechs Bohrungen schneiden die Ø-52-Kontur an (Schirmbeine 0,22 mm,
+A-Reihe 0,15 mm). Die 28 Randabstandsmeldungen sind also kein Waiver, sondern der
+Befund. Die Drehung ist in `tools/gen_layouts.py` korrigiert; Layout und
+`../fab/top_ui.zip` sind nachzuziehen. Punkt 39 in
+[`docs/06`](../../docs/06-open-decisions.md).
 
 **Zwei Footprints sind Platzhalter** und vor der Bestellung zu ersetzen:
 die Displaystiftleiste (Punkt 15c) und die Klinkenbuchse (Punkt 30, 3,5 mm
