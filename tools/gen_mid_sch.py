@@ -53,7 +53,9 @@ NC_ALLOWED = {
     ("U1", "29"),   # IO36  PSRAM
     ("U1", "30"),   # IO37  PSRAM
     ("U1", "36"),   # RXD0/IO44 ungenutzt
-    ("U3", "13"),   # PCF8574 ~INT - optional, ESPHome pollt
+    ("U3", "1"),    # PCF8575 ~INT - optional, ESPHome pollt
+    ("U3", "15"), ("U3", "16"), ("U3", "17"),   # P12..P17 Reserve
+    ("U3", "18"), ("U3", "19"), ("U3", "20"),
 }
 
 
@@ -183,23 +185,33 @@ def build():
     s.connect("3V3_SYS", ("R7", "1"))
     s.connect("I2C_SCL", ("R7", "2"))
 
-    s.add("U3", "Interface_Expansion:PCF8574", "PCF8574",
-          "Package_SO:SOIC-16_3.9x9.9mm_P1.27mm",
+    # PCF8575 statt PCF8574: Der 8-Bit-Expander war mit P0..P7 restlos
+    # belegt, und die Sabotageueberwachung beider Fenster (Punkt 34, am
+    # 16.08.2026 entschieden) braucht ZWEI weitere Eingaenge. Ein zweiter
+    # PCF8574 auf eigener Adresse waere die Alternative gewesen - der
+    # 16-Bit-Typ ist derselbe Treiber, dieselbe Adresse, ein Bauteil statt
+    # zwei und im SSOP-24 (5,3 x 8,2) kaum groesser als das alte SOIC-16
+    # (3,9 x 9,9). ESPHome kennt ihn als pcf8574 mit pcf8575: true.
+    s.add("U3", "Interface_Expansion:PCF8575DBR", "PCF8575",
+          "Package_SO:SSOP-24_5.3x8.2mm_P0.65mm",
           MPN="Adresse 0x20: A0=A1=A2=GND - muss zur YAML passen")
-    s.connect("PGND",     ("U3", "1"), ("U3", "2"), ("U3", "3"), ("U3", "8"))
-    s.connect("3V3_SYS",  ("U3", "16"))
-    s.connect("I2C_SCL",  ("U3", "14"))
-    s.connect("I2C_SDA",  ("U3", "15"))
+    s.connect("PGND",     ("U3", "2"), ("U3", "3"), ("U3", "12"), ("U3", "21"))
+    s.connect("3V3_SYS",  ("U3", "24"))
+    s.connect("I2C_SCL",  ("U3", "22"))
+    s.connect("I2C_SDA",  ("U3", "23"))
     # Portbelegung == YAML: P0/P1 Trip-Eingaenge, P2 Reset, P3 Stern,
-    # P4 Praesenz, P5 Haubenkontakt, P6/P7 Reed-Eingaenge
+    # P4 Praesenz, P5 Haubenkontakt, P6/P7 Verschlusskontakte,
+    # P10/P11 (= ESPHome 8/9) Sabotagekontakte. P12..P17 sind Reserve.
     s.connect("HW_TRIP1",  ("U3", "4"))
     s.connect("HW_TRIP2",  ("U3", "5"))
     s.connect("TRIP_RST",  ("U3", "6"))
     s.connect("STAR_EN",   ("U3", "7"))
-    s.connect("PRESENCE_INT", ("U3", "9"))
-    s.connect("RELAY_CTL", ("U3", "10"))
-    s.connect("EXP_P6",    ("U3", "11"))
-    s.connect("EXP_P7",    ("U3", "12"))
+    s.connect("PRESENCE_INT", ("U3", "8"))
+    s.connect("RELAY_CTL", ("U3", "9"))
+    s.connect("EXP_P6",    ("U3", "10"))
+    s.connect("EXP_P7",    ("U3", "11"))
+    s.connect("EXP_P8",    ("U3", "13"))
+    s.connect("EXP_P9",    ("U3", "14"))
     s.add("C6", "Device:C", "100n", C0603)
     s.connect("3V3_SYS", ("C6", "1"))
     s.connect("PGND",    ("C6", "2"))
@@ -223,7 +235,9 @@ def build():
     # =====================================================================
     for i, (net_in, net_exp, rp, rs, cc, dd) in enumerate(
             [("REED1_IN", "EXP_P6", "R9", "R11", "C7", "D2"),
-             ("REED2_IN", "EXP_P7", "R10", "R12", "C8", "D3")], start=1):
+             ("REED2_IN", "EXP_P7", "R10", "R12", "C8", "D3"),
+             ("SAB1_IN", "EXP_P8", "R14", "R16", "C9", "D5"),
+             ("SAB2_IN", "EXP_P9", "R15", "R17", "C10", "D6")], start=1):
         s.add(rp, "Device:R", "10k", R0603, MPN="Pullup Reed %d" % i)
         s.connect("3V3_SYS", (rp, "1"))
         s.connect(net_exp,   (rp, "2"))
@@ -260,14 +274,28 @@ def build():
     # das Kabel wird wie bei J4 vor dem Stapeln gesteckt.
     # PRUEFPUNKT: 1-mm-Raster ist fuer mehrere Meter Feldleitung filigran;
     # Alternative waere ein Stecker auf dem Bottom-Board ueber RSV_A2/RSV_A4.
-    s.add("J5", "Connector_Generic:Conn_01x06", "Feld: Reed 1/2, Haube",
+    # Belegung fensterweise gruppiert, damit eine falsch aufgelegte Ader
+    # nicht zwei Fenster durcheinanderbringt: je Fenster Verschluss,
+    # Sabotage und die gemeinsame Masse nebeneinander.
+    # ZWEI Stecker statt einem: Ein 8-poliger JST-SH ist 11,9 mm lang, und
+    # dafuer ist auf dem Mid-Board nachweislich kein Platz (nachgerechnet
+    # gegen alle Courtyards). Zwei kleinere finden beide einen - und die
+    # Trennung ist ohnehin sauberer: J5 sind Eingaenge, J6 ist ein
+    # potentialfreier Schaltausgang.
+    s.add("J5", "Connector_Generic:Conn_01x06", "Feld: 4 Reed",
           "Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical",
-          MPN="1 REED1 2 GND 3 REED2 4 GND 5 HAUBE_A 6 HAUBE_B")
+          MPN="1 REED1 2 SAB1 3 GND | 4 REED2 5 SAB2 6 GND")
     s.connect("REED1_IN", ("J5", "1"))
-    s.connect("PGND",     ("J5", "2"), ("J5", "4"))
-    s.connect("REED2_IN", ("J5", "3"))
-    s.connect("HOOD_A",   ("J5", "5"))
-    s.connect("HOOD_B",   ("J5", "6"))
+    s.connect("SAB1_IN",  ("J5", "2"))
+    s.connect("PGND",     ("J5", "3"), ("J5", "6"))
+    s.connect("REED2_IN", ("J5", "4"))
+    s.connect("SAB2_IN",  ("J5", "5"))
+
+    s.add("J6", "Connector_Generic:Conn_01x02", "Haubenkontakt",
+          "Connector_JST:JST_SH_BM02B-SRSS-TB_1x02-1MP_P1.00mm_Vertical",
+          MPN="potentialfrei ueber den PhotoMOS - NUR SELV")
+    s.connect("HOOD_A",   ("J6", "1"))
+    s.connect("HOOD_B",   ("J6", "2"))
 
     # =====================================================================
     # 4. Piezo-Treiber (passiver Signalgeber an 5V_SYS)
@@ -279,9 +307,13 @@ def build():
     s.connect("AUDIO_B",   ("Q2", "1"))
     s.connect("AUDIO_LOW", ("Q2", "2"))
     s.connect("PGND",      ("Q2", "3"))
-    s.add("BZ1", "Device:Buzzer", "Piezo passiv",
-          "Buzzer_Beeper:Buzzer_12x9.5RM7.6",
-          MPN="passiv - aktiver Summer kann keine rtttl-Melodien")
+    s.add("BZ1", "Device:Buzzer", "Piezo passiv SMD",
+          "Buzzer_Beeper:Buzzer_Murata_PKMCS0909E",
+          MPN="Murata PKMCS0909E o.ae., 9 x 9 x 3 mm SMD - passiv, ein "
+              "aktiver Summer kann keine rtttl-Melodien. SMD statt des "
+              "frueheren THT-Typs (12 x 9,5): der blockierte beide "
+              "Platinenseiten, und auf der Rueckseite fehlte danach der "
+              "Platz fuer den 16-Bit-Expander")
     s.connect("5V_SYS",   ("BZ1", "1"))
     s.connect("AUDIO_LOW", ("BZ1", "2"))
     # Freilauf ueber dem Piezo (induktive Anteile der Membran)

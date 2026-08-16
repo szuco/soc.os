@@ -580,11 +580,26 @@ FIXED_BOTTOM = dict(_FET_GRID,
 FIXED_MID = {
     "U1":  (0.0, -12.5, 0, "F"),       # ESP32, Antenne zur Frontkante
     "J4":  (0.0, 20.5, 0, "F"),        # RS485-Anschluss unten
-    "J5":  (-19.75, 4.5, 90, "B"),     # Feldstecker Reed/Haube, Rueckseite 9 Uhr
+    # Feldstecker, seit dem 16.08.2026 GETEILT: Mit vier Reed-Kontakten
+    # (Verschluss und Sabotage je Fenster, Punkt 34) waere ein 8-poliger
+    # JST-SH 11,9 mm lang - dafuer ist auf dem Mid-Board nachweislich kein
+    # Platz mehr. Zwei Stecker finden dagegen beide einen: die Sensoren
+    # zusammen, der potentialfreie Haubenkontakt getrennt. Das trennt
+    # nebenbei Eingaenge und Schaltausgang sauber.
+    "J5":  (-9.0, 3.8, 90, "B"),       # 6-pol: 4 Reed + 2 GND
+    "J6":  (-20.8, 6.6, 90, "B"),      # 2-pol: Haubenkontakt
     "U4":  (12.0, 17.5, 0, "F"),       # PhotoMOS, freie Flaeche rechts unten
     "BZ1": (5.5, 8.0, 0, "F"),         # Piezo
+    # PCF8575 auf die RUECKSEITE: Der 16-Bit-Typ im SSOP-24 findet vorn
+    # keinen Platz mehr - dort sitzen ESP32, MAX3485, PhotoMOS und Piezo.
+    # Hinten ist ausser den Stackverbindern nichts, und I2C mit ein paar
+    # hundert Kilohertz ist der unkritischste Bus auf diesem Board.
+    # Der Platz auf der Rueckseite entstand erst dadurch, dass der Piezo von
+    # THT auf SMD gewechselt ist - vorher blockierte er beide Seiten und der
+    # 16-Bit-Expander fand auf dem ganzen Board keine Stelle. Nach oben
+    # begrenzt das ESP32-Modul, das als THT-Teil ebenfalls durchblockiert.
+    "U3":  (0.0, 1.8, 0, "B"),         # PCF8575
     "U2":  (-8.0, 12.0, 0, "F"),       # MAX3485
-    "U3":  (-5.6, 3.5, 0, "F"),        # PCF8574
 }
 
 FIXED_TOP = dict(

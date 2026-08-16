@@ -113,9 +113,13 @@ uart:
     baud_rate: 115200
 
 # GPIO-Expander fuer die langsamen Signale - entlastet das knappe Pinbudget.
+# PCF8575 (16 Bit) statt PCF8574: Mit vier Reed-Kontakten - Verschluss UND
+# Sabotage je Fenster - reichen acht Portpins nicht mehr. Gleiche Adresse,
+# gleicher Treiber, ein Bauteil statt zwei.
 pcf8574:
   - id: expander
     address: 0x20
+    pcf8575: true
 
 # -----------------------------------------------------------------------------
 # Ausgaenge
@@ -202,6 +206,172 @@ rtttl:
   id: alarmton
 
 # -----------------------------------------------------------------------------
+# Einstellbare Werte - alles, was am realen Fenster nachgezogen werden muss
+# -----------------------------------------------------------------------------
+# Fahrzeit und Stromskalierung gehoeren an die Anlage angepasst, nicht in den
+# Quelltext. Alle Werte ueberleben einen Neustart (restore_value) und sind in
+# Home Assistant direkt einstellbar.
+number:
+  - platform: template
+    name: Fahrzeit 1 Auf
+    id: t_auf_1
+    unit_of_measurement: s
+    min_value: 5
+    max_value: 60
+    step: 0.5
+    initial_value: 18
+    restore_value: true
+    optimistic: true
+    entity_category: config
+  - platform: template
+    name: Fahrzeit 1 Zu
+    id: t_zu_1
+    unit_of_measurement: s
+    min_value: 5
+    max_value: 60
+    step: 0.5
+    initial_value: 18
+    restore_value: true
+    optimistic: true
+    entity_category: config
+  - platform: template
+    name: Fahrzeit 2 Auf
+    id: t_auf_2
+    unit_of_measurement: s
+    min_value: 5
+    max_value: 60
+    step: 0.5
+    initial_value: 18
+    restore_value: true
+    optimistic: true
+    entity_category: config
+  - platform: template
+    name: Fahrzeit 2 Zu
+    id: t_zu_2
+    unit_of_measurement: s
+    min_value: 5
+    max_value: 60
+    step: 0.5
+    initial_value: 18
+    restore_value: true
+    optimistic: true
+    entity_category: config
+
+  # Sanftauslauf: ab wieviel Prozent der Fahrzeit auf welche PWM gerampt wird.
+  - platform: template
+    name: Sanftauslauf ab
+    id: sanft_ab
+    unit_of_measurement: '%'
+    min_value: 50
+    max_value: 95
+    step: 5
+    initial_value: 80
+    restore_value: true
+    optimistic: true
+    entity_category: config
+  - platform: template
+    name: Sanftauslauf PWM
+    id: sanft_pwm
+    unit_of_measurement: '%'
+    min_value: 20
+    max_value: 100
+    step: 5
+    initial_value: 40
+    restore_value: true
+    optimistic: true
+    entity_category: config
+
+  # Skalierung der Strommessung: 1 / (R_shunt * Verstaerkung). Rechnerisch
+  # 1/(0,001 * 50) = 20 A/V, aber erst die Messung am realen Aufbau sagt,
+  # was der interne ADC daraus macht. Deshalb einstellbar statt fest.
+  - platform: template
+    name: Stromskalierung
+    id: strom_faktor
+    unit_of_measurement: A/V
+    min_value: 1
+    max_value: 50
+    step: 0.1
+    initial_value: 20
+    restore_value: true
+    optimistic: true
+    entity_category: config
+
+# -----------------------------------------------------------------------------
+# Fahrskripte: Anlauf - Fahrt - Sanftauslauf - aus
+# -----------------------------------------------------------------------------
+# time_based-Cover koennen ihre Dauer nur zur Compilezeit lesen. Damit die
+# Fahrzeit im Betrieb einstellbar bleibt, faehrt jede Bewegung als Skript mit
+# Lambda-Verzoegerungen. mode: restart heisst: ein neuer Befehl bricht den
+# laufenden ab, ohne dass ein Zweig haengenbleibt.
+#
+# ACHTUNG, das ist NICHT die Lasterkennung. Der Sanftauslauf laeuft hier auf
+# Zeit; erst die C++-Komponente kann ihn am Stromverlauf festmachen.
+script:
+  - id: fahrt1_auf
+    mode: restart
+    then:
+      - output.set_level: {id: m1_ina, level: 0%}
+      - output.set_level: {id: m1_inb, level: 0%}
+      - delay: ${reversal_pause}
+      - output.set_level: {id: m1_ina, level: 100%}
+      - delay: !lambda 'return (uint32_t)(id(t_auf_1).state * 10.0 * id(sanft_ab).state);'
+      - output.set_level: !lambda |-
+          id(m1_ina).set_level(id(sanft_pwm).state / 100.0);
+          return;
+      - delay: !lambda 'return (uint32_t)(id(t_auf_1).state * 400.0);'
+      - output.set_level: {id: m1_ina, level: 0%}
+  - id: fahrt1_zu
+    mode: restart
+    then:
+      - output.set_level: {id: m1_ina, level: 0%}
+      - output.set_level: {id: m1_inb, level: 0%}
+      - delay: ${reversal_pause}
+      - output.set_level: {id: m1_inb, level: 100%}
+      - delay: !lambda 'return (uint32_t)(id(t_zu_1).state * 10.0 * id(sanft_ab).state);'
+      - output.set_level: !lambda |-
+          id(m1_inb).set_level(id(sanft_pwm).state / 100.0);
+          return;
+      - delay: !lambda 'return (uint32_t)(id(t_zu_1).state * 400.0);'
+      - output.set_level: {id: m1_inb, level: 0%}
+  - id: fahrt2_auf
+    mode: restart
+    then:
+      - output.set_level: {id: m2_ina, level: 0%}
+      - output.set_level: {id: m2_inb, level: 0%}
+      - delay: ${reversal_pause}
+      - output.set_level: {id: m2_ina, level: 100%}
+      - delay: !lambda 'return (uint32_t)(id(t_auf_2).state * 10.0 * id(sanft_ab).state);'
+      - output.set_level: !lambda |-
+          id(m2_ina).set_level(id(sanft_pwm).state / 100.0);
+          return;
+      - delay: !lambda 'return (uint32_t)(id(t_auf_2).state * 400.0);'
+      - output.set_level: {id: m2_ina, level: 0%}
+  - id: fahrt2_zu
+    mode: restart
+    then:
+      - output.set_level: {id: m2_ina, level: 0%}
+      - output.set_level: {id: m2_inb, level: 0%}
+      - delay: ${reversal_pause}
+      - output.set_level: {id: m2_inb, level: 100%}
+      - delay: !lambda 'return (uint32_t)(id(t_zu_2).state * 10.0 * id(sanft_ab).state);'
+      - output.set_level: !lambda |-
+          id(m2_inb).set_level(id(sanft_pwm).state / 100.0);
+          return;
+      - delay: !lambda 'return (uint32_t)(id(t_zu_2).state * 400.0);'
+      - output.set_level: {id: m2_inb, level: 0%}
+  - id: halt_alle
+    then:
+      - script.stop: fahrt1_auf
+      - script.stop: fahrt1_zu
+      - script.stop: fahrt2_auf
+      - script.stop: fahrt2_zu
+      - output.set_level: {id: m1_ina, level: 0%}
+      - output.set_level: {id: m1_inb, level: 0%}
+      - output.set_level: {id: m2_ina, level: 0%}
+      - output.set_level: {id: m2_inb, level: 0%}
+
+
+# -----------------------------------------------------------------------------
 # Display
 # -----------------------------------------------------------------------------
 
@@ -273,7 +443,7 @@ sensor:
     unit_of_measurement: A
     accuracy_decimals: 2
     filters:
-      - multiply: 5.0          # Platzhalter: 1/(Rshunt * Gain), nach Kalibrierung setzen
+      - lambda: return x * id(strom_faktor).state;
       - sliding_window_moving_average:
           window_size: 5
           send_every: 1
@@ -287,7 +457,7 @@ sensor:
     unit_of_measurement: A
     accuracy_decimals: 2
     filters:
-      - multiply: 5.0
+      - lambda: return x * id(strom_faktor).state;
       - sliding_window_moving_average:
           window_size: 5
           send_every: 1
@@ -345,7 +515,7 @@ binary_sensor:
     lambda: 'return id(ecke_or).state && id(ecke_ur).state;'
     filters: [delayed_on: 30ms]
     on_press:
-      then: [cover.stop: jalousie1, cover.stop: jalousie2]
+      then: [script.execute: halt_alle]
   - platform: template
     name: Taste Play
     id: taste_play
@@ -396,9 +566,13 @@ binary_sensor:
     device_class: problem
     pin: {pcf8574: expander, number: 1, mode: {input: true}}
 
-  # Fensterkontakte. Reed schliesst gegen Masse, der externe 10k-Pullup zieht
+  # Feldkontakte. Reed schliesst gegen Masse, der externe 10k-Pullup zieht
   # den Eingang sonst hoch - geschlossenes Fenster ist also LOW, deshalb
   # inverted. 300 ms Entprellung zusaetzlich zum RC-Glied auf dem Board.
+  #
+  # Je Fenster ZWEI Kontakte: Verschluss (P6/P7) und Sabotage (P10/P11, in
+  # ESPHome die Nummern 8 und 9). Mit den Endlagen der Klapplaeden hat keiner
+  # von beiden etwas zu tun - die kommen aus Fahrzeit und Strom.
   - platform: gpio
     name: Fenster 1
     id: fenster1
@@ -411,6 +585,18 @@ binary_sensor:
     device_class: window
     pin: {pcf8574: expander, number: 7, mode: {input: true}, inverted: true}
     filters: [delayed_on_off: 300ms]
+  - platform: gpio
+    name: Sabotage Fenster 1
+    id: sabotage1
+    device_class: tamper
+    pin: {pcf8574: expander, number: 8, mode: {input: true}, inverted: true}
+    filters: [delayed_on_off: 300ms]
+  - platform: gpio
+    name: Sabotage Fenster 2
+    id: sabotage2
+    device_class: tamper
+    pin: {pcf8574: expander, number: 9, mode: {input: true}, inverted: true}
+    filters: [delayed_on_off: 300ms]
 
 # -----------------------------------------------------------------------------
 # Jalousien
@@ -419,45 +605,42 @@ binary_sensor:
 # Richtungswechsel immer ueber Stop mit ${reversal_pause} Pause.
 
 cover:
-  - platform: time_based
+  # Template statt time_based: Die Fahrzeit soll im Betrieb einstellbar sein
+  # (siehe number oben), und time_based liest seine Dauer nur zur Compilezeit.
+  # optimistic/assumed_state, weil es keine Positionsrueckmeldung gibt - die
+  # Reed-Kontakte sichern das Fenster und sagen nichts ueber den Laden.
+  - platform: template
     name: Jalousie 1
     id: jalousie1
     device_class: shutter
+    optimistic: true
+    assumed_state: true
     open_action:
-      - output.set_level: {id: m1_ina, level: 0%}
-      - output.set_level: {id: m1_inb, level: 0%}
-      - delay: ${reversal_pause}
-      - output.set_level: {id: m1_ina, level: 100%}
+      - script.execute: fahrt1_auf
     close_action:
-      - output.set_level: {id: m1_ina, level: 0%}
-      - output.set_level: {id: m1_inb, level: 0%}
-      - delay: ${reversal_pause}
-      - output.set_level: {id: m1_inb, level: 100%}
+      - script.execute: fahrt1_zu
     stop_action:
+      - script.stop: fahrt1_auf
+      - script.stop: fahrt1_zu
       - output.set_level: {id: m1_ina, level: 0%}
       - output.set_level: {id: m1_inb, level: 0%}
-    open_duration: ${travel_time}
-    close_duration: ${travel_time}
 
-  - platform: time_based
+  - platform: template
     name: Jalousie 2
     id: jalousie2
     device_class: shutter
+    optimistic: true
+    assumed_state: true
     open_action:
-      - output.set_level: {id: m2_ina, level: 0%}
-      - output.set_level: {id: m2_inb, level: 0%}
-      - delay: ${reversal_pause}
-      - output.set_level: {id: m2_ina, level: 100%}
+      - script.execute: fahrt2_auf
     close_action:
-      - output.set_level: {id: m2_ina, level: 0%}
-      - output.set_level: {id: m2_inb, level: 0%}
-      - delay: ${reversal_pause}
-      - output.set_level: {id: m2_inb, level: 100%}
+      - script.execute: fahrt2_zu
     stop_action:
+      - script.stop: fahrt2_auf
+      - script.stop: fahrt2_zu
       - output.set_level: {id: m2_ina, level: 0%}
       - output.set_level: {id: m2_inb, level: 0%}
-    open_duration: ${travel_time}
-    close_duration: ${travel_time}
+
 
 button:
   - platform: template

@@ -75,13 +75,13 @@ stimmt, ist damit *nicht* gezeigt.
 
 | Funktion | Hardware | Firmware | Stand |
 |---|---|---|---|
-| Zwei Motoren auf/zu fahren | ✅ 2 H-Brücken, je 2 × IR2104 + 4 N-FET | ✅ `cover: time_based`, Umpolung über INA/INB, 300 ms Stoppause | 🟡 **fährt auf Zeit** (30 s Timeout), keine Positionsrückmeldung |
+| Zwei Motoren auf/zu fahren | ✅ 2 H-Brücken, je 2 × IR2104 + 4 N-FET | ✅ `cover: template` + Fahrskripte, Umpolung über INA/INB, 300 ms Stoppause | 🟡 **fährt auf Zeit**, aber die Zeit ist **je Kanal und Richtung in HA einstellbar** |
 | Hardware-Überstromabschaltung | ✅ INA240A2 → LM393-Fenster → 74AUP1G74 auf `~SD` | ✅ meldet `HW_TRIP1/2` nach Home Assistant, Reset-Taste vorhanden | ✅ wirkt firmwareunabhängig — 🔒 **Schwelle ist eine Annahme** (Punkt 1) |
-| Strommessung anzeigen | ✅ 1 mΩ Inline-Shunt, Kelvin, INA240A2 | 🟡 zwei ADC-Sensoren, Skalierung `multiply: 5.0` ist **Platzhalter** | 🟡 taugt zur Anzeige, nicht zur Auswertung |
+| Strommessung anzeigen | ✅ 1 mΩ Inline-Shunt, Kelvin, INA240A2 | ✅ zwei ADC-Sensoren mit **in HA einstellbarer Skalierung** (rechnerisch 20 A/V) | 🟡 taugt zur Anzeige und zum Kalibrieren, nicht zur Stall-Erkennung |
 | **Lasterkennung / Stall** | ✅ Hardware vorhanden | ⛔ **fehlt vollständig** | ⛔ braucht PWM-synchrones Sampling → eigene C++-External-Component ([`09`](09-display-and-mcu.md) Abschnitt 4) |
 | Endlagenerkennung | — **bewusst keine Hardware** | ⛔ | ⛔ Endlage ausschließlich über Fahrzeit + Strom. Die Reed-Kontakte gehören **nicht** dazu (Festlegung 15.08.2026) — es gibt damit **keine** absolute Positionsrückmeldung |
-| **Sanftauslauf vor der Endlage** | ✅ PWM-fähige Brücken vorhanden | ⛔ | ⛔ Ab ≈ 80 % der Fahrzeit auf ≈ 40 % PWM rampen: schont die Mechanik und macht den Stromanstieg früher auswertbar ([`../firmware/README.md`](../firmware/README.md)) |
-| Interlock „nur ein Motor gleichzeitig" | — | ⛔ | 🔒 Punkt 3 — Nutzungsentscheidung, kostet nichts, entschärft Punkt 2 |
+| **Sanftauslauf vor der Endlage** | ✅ PWM-fähige Brücken | 🟡 **umgesetzt, aber auf Zeit**: ab einstellbaren % der Fahrzeit auf einstellbare PWM | 🟡 Am Stromverlauf festmachen kann ihn erst die C++-Komponente |
+| Beide Motoren gleichzeitig | ✅ Auslegung auf ≈ 9 A Summenpfad | ✅ kein Interlock nötig | ✅ **entschieden 16.08.2026** — verschärft aber Punkt 2 (Steckverbinder muss 9 A können) |
 | Konkreter N-Kanal-MOSFET | ⛔ einziges Leistungsbauteil ohne Teilenummer | — | 🔒 Punkt 8, hängt am Blockierstrom |
 
 ### 3.2 Bedienung und Anzeige
@@ -108,7 +108,7 @@ stimmt, ist damit *nicht* gezeigt.
 | Durchstiegsmeldung durchs Fenster | ✅ derselbe Sensor | ⛔ | 🔒 Punkt 31 — braucht Distanzwert und ROI-Umschaltung, also eine External Component |
 | Blendungserkennung (Sonne) | ✅ Statusflags des Sensors | ⛔ | 🔒 Punkt 32 — am realen Fenster zu messen |
 | **Fensterkontakte (Reed)** | ✅ 2 × Reed, Pull-up, RC, ESD | ✅ als `window`-Sensoren in HA | ✅ Zweck ist die **Fensterabsicherung**, nicht die Ladenposition |
-| **Sabotagekontakte** | ⛔ keine Eingänge frei (PCF8574 P0–P7 belegt) | ⛔ | 🔒 **Punkt 34, P0** — im Ursprungsentwurf vorhanden, hier verloren; entweder zweiter Expander oder schriftlich streichen |
+| **Sabotagekontakte** | ✅ 2 × Reed über **PCF8575** (P10/P11), gleiche Beschaltung wie die Verschlusskontakte | ✅ als `tamper`-Sensoren in HA | ✅ **entschieden 16.08.2026: bleiben** |
 
 ### 3.4 Ausgänge und Kommunikation
 

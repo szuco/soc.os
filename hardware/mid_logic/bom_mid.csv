@@ -1,15 +1,16 @@
 Menge,Designator,Wert,Footprint,Hinweis
-1,BZ1,Piezo passiv,Buzzer_Beeper:Buzzer_12x9.5RM7.6,passiv - aktiver Summer kann keine rtttl-Melodien
+1,BZ1,Piezo passiv SMD,Buzzer_Beeper:Buzzer_Murata_PKMCS0909E,"Murata PKMCS0909E o.ae., 9 x 9 x 3 mm SMD - passiv, ein aktiver Summer kann keine rtttl-Melodien. SMD statt des frueheren THT-Typs (12 x 9,5): der blockierte beide Platinenseiten, und auf der Rueckseite fehlte danach der Platz fuer den 16-Bit-Expander"
 1,C1,10u,Capacitor_SMD:C_0805_2012Metric,
-5,"C2,C5,C6,C7,C8",100n,Capacitor_SMD:C_0603_1608Metric,
+7,"C2,C5,C6,C7,C8,C9,C10",100n,Capacitor_SMD:C_0603_1608Metric,
 2,"C3,C4",1u,Capacitor_SMD:C_0603_1608Metric,
 1,D1,40V,Diode_SMD:D_SOD-123,
-2,"D2,D3",5V6,Diode_SMD:D_SOD-123,ESD am Feldstecker
+4,"D2,D3,D5,D6",5V6,Diode_SMD:D_SOD-123,ESD am Feldstecker
 1,D4,33V,Diode_SMD:D_SOD-123,Klemmung am Haubenausgang
 1,J2,J_STK_A,Connector_PinSocket_1.27mm:PinSocket_2x20_P1.27mm_Vertical,
 1,J3,J_STK_B,Connector_PinSocket_1.27mm:PinSocket_2x20_P1.27mm_Vertical,
 1,J4,RS485 A/B/GND,Connector_JST:JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical,Kabel VOR dem Stapeln stecken - Zugaenglichkeit im Review pruefen
-1,J5,"Feld: Reed 1/2, Haube",Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical,1 REED1 2 GND 3 REED2 4 GND 5 HAUBE_A 6 HAUBE_B
+1,J5,Feld: 4 Reed,Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical,1 REED1 2 SAB1 3 GND | 4 REED2 5 SAB2 6 GND
+1,J6,Haubenkontakt,Connector_JST:JST_SH_BM02B-SRSS-TB_1x02-1MP_P1.00mm_Vertical,potentialfrei ueber den PhotoMOS - NUR SELV
 1,Q2,BC847,Package_TO_SOT_SMD:SOT-23,
 2,"R1,R2",10k,Resistor_SMD:R_0603_1608Metric,
 1,R3,560R,Resistor_SMD:R_0603_1608Metric,Fail-Safe-Bias A
@@ -22,9 +23,13 @@ Menge,Designator,Wert,Footprint,Hinweis
 1,R11,1k,Resistor_SMD:R_0603_1608Metric,Serie Reed 1
 1,R12,1k,Resistor_SMD:R_0603_1608Metric,Serie Reed 2
 1,R13,330R,Resistor_SMD:R_0603_1608Metric,"LED-Strom PhotoMOS, ca. 6 mA"
+1,R14,10k,Resistor_SMD:R_0603_1608Metric,Pullup Reed 3
+1,R15,10k,Resistor_SMD:R_0603_1608Metric,Pullup Reed 4
+1,R16,1k,Resistor_SMD:R_0603_1608Metric,Serie Reed 3
+1,R17,1k,Resistor_SMD:R_0603_1608Metric,Serie Reed 4
 1,SW1,RESET,Button_Switch_SMD:SW_SPST_TL3342,
 1,SW2,BOOT,Button_Switch_SMD:SW_SPST_TL3342,
 1,U1,ESP32-S3-WROOM-1-N16R8,RF_Module:ESP32-S3-WROOM-1,"Antenne zeigt zur Front (+Y), Keepout auf allen Lagen"
 1,U2,MAX3485,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,"3,3-V-Typ; Pinbelegung gegen Datenblatt pruefen"
-1,U3,PCF8574,Package_SO:SOIC-16_3.9x9.9mm_P1.27mm,Adresse 0x20: A0=A1=A2=GND - muss zur YAML passen
+1,U3,PCF8575,Package_SO:SSOP-24_5.3x8.2mm_P0.65mm,Adresse 0x20: A0=A1=A2=GND - muss zur YAML passen
 1,U4,PhotoMOS 60V,Package_SO:SOP-4_4.4x2.6mm_P1.27mm,"1 Form A, SELV - NICHT fuer Netzspannung"

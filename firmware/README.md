@@ -19,6 +19,26 @@ Haubenkontakt, zwei Cover und vier Tasten.
 | **Bedienmenü** | Die vier Tasten sind fest auf Auf/Zu verdrahtet. Die Belegung unten ist Anforderung, nicht Implementierung. |
 | **RS-485-Protokoll** | UART ist konfiguriert, aber ungenutzt; `RS485_DIR` unbelegt. Das ist der *primäre* Kommunikationsweg. |
 
+### Einstellbar statt einkompiliert
+
+Seit dem 16.08.2026 stehen die Werte, die an der Anlage nachgezogen werden
+müssen, als `number`-Entitäten in Home Assistant — sie überleben einen Neustart
+und brauchen keinen neuen Flash:
+
+| Entität | Bedeutung |
+|---|---|
+| Fahrzeit 1/2 Auf und Zu | je Kanal **und Richtung** getrennt, 5–60 s |
+| Sanftauslauf ab | ab wieviel Prozent der Fahrzeit gerampt wird |
+| Sanftauslauf PWM | auf welchen Wert |
+| Stromskalierung | A/V für die ADC-Sensoren, rechnerisch 20 (= 1/(1 mΩ × 50)) |
+
+Möglich wird das, weil die Jalousien nicht mehr als `time_based`-Cover laufen —
+deren Dauer steht zur Compilezeit fest — sondern als `template`-Cover mit
+Fahrskripten, deren Verzögerungen Lambdas sind.
+
+**Das ersetzt die Lasterkennung nicht.** Der Sanftauslauf läuft hier auf Zeit;
+ihn am Stromverlauf festzumachen kann erst die C++-Komponente.
+
 > **Die Konfiguration ist seit dem Displaywechsel nicht mehr mit `esphome config`
 > geprüft** — auf dem Rechner, auf dem er entstand, war ESPHome nicht
 > installiert. Vor dem ersten Flash validieren, besonders die Offsets des
