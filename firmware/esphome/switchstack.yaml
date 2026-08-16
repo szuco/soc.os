@@ -527,12 +527,17 @@ display:
       it.line(20, 82, 260, 82);
 
       // --- Fenster: Verschluss und Sabotage je Seite -------------------
-      it.printf(20, 92, id(font_small), TextAlign::TOP_LEFT, "Fenster 1: %s%s",
-                id(fenster1).state ? "offen" : "zu",
-                id(sabotage1).state ? "  SABOTAGE" : "");
-      it.printf(20, 112, id(font_small), TextAlign::TOP_LEFT, "Fenster 2: %s%s",
-                id(fenster2).state ? "offen" : "zu",
-                id(sabotage2).state ? "  SABOTAGE" : "");
+      // Sabotage in Rot an fester Spalte - eine Farbe faellt im Vorbeigehen
+      // auf, ein angehaengtes Wort nicht.
+      auto rot = Color(255, 90, 90);
+      it.printf(20, 92, id(font_small), TextAlign::TOP_LEFT, "Fenster 1: %s",
+                id(fenster1).state ? "offen" : "zu");
+      it.printf(20, 112, id(font_small), TextAlign::TOP_LEFT, "Fenster 2: %s",
+                id(fenster2).state ? "offen" : "zu");
+      if (id(sabotage1).state)
+        it.print(150, 92, id(font_small), rot, TextAlign::TOP_LEFT, "SABOTAGE");
+      if (id(sabotage2).state)
+        it.print(150, 112, id(font_small), rot, TextAlign::TOP_LEFT, "SABOTAGE");
 
       // --- Motorstroeme, nur wenn nennenswert --------------------------
       if (id(i_sense1).has_state() && id(i_sense1).state > 0.05f)

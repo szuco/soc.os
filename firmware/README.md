@@ -49,6 +49,21 @@ Ein Detail, das leicht übersehen wird: Schriften brauchen ein `glyphs`-Feld,
 sonst fehlen Umlaute und das Gradzeichen. ESPHome bettet nur die aufgezählten
 Zeichen ein.
 
+### Das Display vorher ansehen
+
+`python3 tools/display_mock.py` zeichnet den Bildschirminhalt in Originalgröße
+(280 × 240) als PNG — in drei Zuständen (Ruhe, Fahrt, Alarm) plus Menü, mit
+einer Markierung dort, wo die Zentralscheibe oben und unten je gut vier Pixel
+verdeckt.
+
+**Das ist kein Emulator.** Es führt die Firmware nicht aus, sondern zeichnet
+nach, was das Lambda zeichnet. Der Nutzen ist die Bildaufteilung: Passt der Text
+in die Zeilen, kollidiert nichts, ist die große Zahl groß genug? Sonst ließe
+sich das erst nach Kompilieren, Flashen und Blende-Abnehmen beurteilen.
+
+Der Preis: Wer die Aufteilung ändert, ändert **beides** — das Lambda und den
+Mock. Die Alternative wäre, es gar nicht vorher zu sehen.
+
 ### Einstellbar statt einkompiliert
 
 Seit dem 16.08.2026 stehen die Werte, die an der Anlage nachgezogen werden
