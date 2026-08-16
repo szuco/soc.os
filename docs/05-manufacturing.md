@@ -81,7 +81,7 @@ rekonstruierbar ist.
 |---|---:|---|
 | **BOTTOM** | **985** (102 Vias) | ≈ 85 % geroutet, 0 Kupferfehler. Offen sind 43 Verbindungen im Motor-/Leistungsteil (SW-Knoten, Gate-Netze, `24V_PROT`). Der Autorouter konvergiert dort nicht mehr — die Leistungspfade sind laut Prüfliste (Abschnitt 3) **ohnehin von Hand zu ziehen**. |
 | **MID** | **746** (104 Vias) | Am 16.08.2026 im Container geroutet. Offen: 59 Masseanbindungen (schließt die Zonenfüllung) und **18 Signalverbindungen** auf 16 Netzen. Dazu **fünf Kupferfehler, alle an derselben Stelle**: `HOOD_B` kreuzt `RELAY_LED` bei (12,2 / 19,2), also am PhotoMOS. |
-| **TOP** | **0** | nur platziert, Stand vom 15.08.2026 mit Klinke auf 6 Uhr, ToF auf 12 Uhr und korrigierter USB-C-Drehung. |
+| **TOP** | **197** (12 Vias) | Am 16.08.2026 im Container geroutet. Offen: 57 Masseanbindungen (schließt die Zonenfüllung) und **14 Signale** — darunter `BTN1`–`BTN4` vollständig sowie `USB_VBUS` (3×), `USB_DP_C` (2×) und `USB_CC2`. Der Router hat zusätzlich **eine Bahn (`STAR_OUT`, B.Cu) durch das Befestigungsloch der USB-Buchse gelegt** — zwei DRC-Meldungen aus derselben Ursache. |
 
 > **Korrektur vom 15.08.2026.** Hier stand, Top sei vollständig und Mid bis auf
 > zehn Masseanbindungen geroutet. Das galt für einen Arbeitsstand, der nie im
