@@ -16,7 +16,7 @@ Legende: ✅ fertig und geprüft · 🟡 begonnen, Rest benannt · ⛔ nicht vor
 | **Spezifikation** | ✅ vollständig — 13 Dokumente, alle Entscheidungen entweder getroffen oder als Punkt 1–52 offen benannt |
 | **Mechanik** | ✅ Boards generiert; Front = BJ-Zentralscheibe 6435-914, **Adapter erzeugt und selbstgeprüft**; 🔒 offen ist die Bauhöhe des realen Displaymoduls |
 | **Schaltpläne** | ✅ alle drei Boards erzeugt und netzlistengeprüft; ⛔ **keine Schaltungsreview gegen Datenblätter** |
-| **Layouts** | 🟡 alle drei platziert; **Bottom und Mid geroutet** (985 bzw. 746 Segmente, beide mit Restarbeit), **Top hat null Leiterbahnen** |
+| **Layouts** | 🟡 alle drei geroutet — 985 / 746 / 197 Segmente —, **alle drei mit Restarbeit**: offene Verbindungen und je eine lokale Kupferkollision auf Mid und Top |
 | **Fertigungsdaten** | ⛔ **keine** — der frühere Top-Export war überholt und ist gelöscht; der Nutzen ist als Boarddatei erzeugt |
 | **Firmware** | 🟡 **fertig übersetzt** (RAM 35 %, Flash 56 %), mit Menü und einstellbaren Fahrzeiten — aber **ohne Lasterkennung und ohne RS-485-Protokoll** |
 | **Bestellt / gebaut** | ⛔ nichts — kein Board gefertigt, kein Motor vermessen |
@@ -34,7 +34,7 @@ Soft-Limit und der einzige noch offene Leistungshalbleiter provisorisch.
 |---|---|---|---|
 | **BOTTOM** `bottom_power_motor` | ✅ 102 Bauteile, 105 Netze, Netzlistenvergleich bestanden | 🟡 **985 Segmente, 102 Vias**, 43 offene Verbindungen im Motor-/Leistungsteil, 0 Kupferfehler | ⛔ wartet auf das Rest-Routing |
 | **MID** `mid_logic` | ✅ 46 Bauteile, 61 Netze | 🟡 **746 Segmente, 104 Vias**; 18 Signale offen, ein lokaler Kurzschluss | ⛔ DRC-Gate sperrt |
-| **TOP** `top_ui` | ✅ 25 Bauteile, 53 Netze | ⛔ platziert, **0 Leiterbahnen** — Stand 16.08.2026: **quadratisch 47 × 47**, vier Ecktaster unter den Druckkreuzen der Zentralscheibe | ⛔ |
+| **TOP** `top_ui` | ✅ 25 Bauteile, 53 Netze | 🟡 **197 Segmente, 12 Vias**; 14 Signale offen (alle vier Tasten, drei USB-Netze), eine Bahn im Befestigungsloch der USB-Buchse | ⛔ DRC-Gate sperrt |
 | **Nutzen** `fab/panel` | — (Build-Ergebnis) | ✅ **173,4 × 64,4 mm**, zwei Kreise + ein Quadrat, DRC deckungsgleich mit der Summe der Einzelboards | 🟡 bestellbar, sobald geroutet |
 
 Die 43 offenen Verbindungen auf Bottom sind **kein Rückstand des Autorouters**,

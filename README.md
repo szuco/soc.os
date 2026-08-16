@@ -116,7 +116,7 @@ Vollständige Gegenüberstellung von umgesetzten und fehlenden Funktionen:
 | Layouts aller drei Boards: Platzierung + Zonen | **erzeugt, DRC ohne Platzierungsfehler** |
 | **Routing BOTTOM** | 985 Segmente, 102 Vias, **43 Verbindungen offen** — Rest Handarbeit (docs/05 verlangt das für Leistungspfade ohnehin) |
 | **Routing MID** | **746 Segmente, 104 Vias** (16.08.2026, Container). Offen: 18 Signalverbindungen und **ein Kurzschluss** `HOOD_B`/`RELAY_LED` an einer Stelle — Handarbeit, s. docs/05 |
-| **Routing TOP** | **keines** — am 16.08.2026 neu aufgebaut: quadratisch 47 × 47, vier Ecktaster, stehende USB-C-Buchse. **DRC ohne Fehler** |
+| **Routing TOP** | **197 Segmente, 12 Vias** (16.08.2026, Container). Offen: 14 Signale, darunter **alle vier Tastenleitungen und drei USB-Netze**; dazu **eine neue Kollision** einer Leiterbahn mit dem Befestigungsloch der USB-Buchse |
 | Fertigungsnutzen (3 Platinen in einer Boarddatei) | **erzeugt:** `hardware/fab/panel/` — 173,4 × 64,4 mm, zwei Kreise + ein Quadrat |
 | Fertigungsdaten | **keine** — `python3 tools/gen_fab.py` nach dem Routing, mit DRC-Gate |
 | ESPHome-Firmware | **übersetzt** (`esphome compile`, 2026.7.4 / IDF 5.5.5): RAM 35 %, Flash 56 %. Alle Lambdas geprüft. Motoren fahren **auf Zeit** |
