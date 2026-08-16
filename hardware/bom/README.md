@@ -22,9 +22,9 @@ Bestellung zu prüfen — beides ändert sich laufend.
 | Funktion | Empfehlung | Warum |
 |---|---|---|
 | MCU | **ESP32-S3-WROOM-1-N16R8** | PSRAM für den Framebuffer (466² × 16 bit ≈ 434 kB), **nativer USB** spart den USB-UART-Baustein, 16 MB Flash für OTA |
-| Display | **1,46" LCD rund, ST77916, 360×360, QSPI** | entschieden. Kein Einbrennen, kein Treiberaufwand — ESPHome `mipi_spi` mit `model: CUSTOM` und der Hersteller-Init-Sequenz. **Modul-Außendurchmesser vor dem Layout messen** |
+| Display | **1,69" LCD rechteckig, ST7789, 240×280, quer** | Das Fenster der Zentralscheibe (32,70 × 27,00) gibt die Form vor; die aktive Fläche 32,63 × 27,97 füllt es randlos. ESPHome-nativ. **Modulaußenmaß vor dem Layout messen** (Punkt 15c) |
 | Taster | **4 ×** SMD-Kurzhubtaster, niedrig (z. B. Panasonic EVQP2 3,9×2,9 mm) | einer je Ecke, exakt unter den Druckkreuzen der Zentralscheibe bei (±18 · ±20). Bauhöhe ≤ 2,0 mm — sie steht in der Tiefenkette, siehe `docs/04` 1e |
-| GPIO-Expander | **TCA9534** oder **PCF8574** | entlastet das knappe GPIO-Budget, ESPHome-nativ |
+| GPIO-Expander | **PCF8575** (16 Bit, SSOP-24) | Acht Portpins reichten mit vier Reed-Kontakten nicht mehr. Gleiche Adresse, gleicher ESPHome-Treiber (`pcf8574` mit `pcf8575: true`) |
 
 Begründung der Displaywahl im Detail: [`../../docs/09-display-and-mcu.md`](../../docs/09-display-and-mcu.md).
 
@@ -110,3 +110,51 @@ Prototypen oft günstiger, als sie durch den Bestückungsservice zu treiben.
 > Bei JLCPCB-Bestückung: die Bauteilauswahl wird faktisch vom LCSC-Katalog
 > vorgegeben. Wer dort bestücken lassen will, sollte die Verfügbarkeit **vor** dem
 > Schaltplan prüfen, nicht danach — sonst wird das halbe Design nochmal angefasst.
+
+## 6. Bestellung: Fertiger und Bestückung
+
+**Stand 16.08.2026: bestellbar ist noch nichts.** Was zuerst erledigt sein muss,
+steht in [`../../docs/13-funktionsstatus.md`](../../docs/13-funktionsstatus.md);
+die harten Blocker sind der ungemessene Blockierstrom (damit der N-FET,
+Punkt 8), zwei Platzhalter-Footprints (Klinke Punkt 30, Displaystiftleiste
+Punkt 15c), der Stapelverbinder ohne Teilenummer (Punkt 23) und das fehlende
+Routing von Mid und Bottom.
+
+### Was der Nutzen für eine Bestückung noch braucht
+
+Der Nutzen ist für die **Leiterplattenfertigung** ausgelegt, nicht für die
+Bestückung. Drei Dinge fehlen und sind vor der PCBA-Bestellung zu ergänzen
+(Punkt 52):
+
+| fehlt | warum |
+|---|---|
+| **Passermarken** (Fiducials) | Der Bestücker richtet den Nutzen daran aus. Üblich sind drei global, diagonal versetzt, plus lokale Marken an feinpoligen Bauteilen — hier ESP32-Modul, PCF8575 (0,65 mm) und USB-C |
+| **Breitere Ränder** | 4,0 mm reichen zum Fräsen, nicht zum Transport durch die Bestückungslinie. Üblich sind 5–10 mm an zwei gegenüberliegenden Seiten |
+| **Werkzeugbohrungen** | zwei bis drei unbelegte Ø-3-mm-Löcher im Rand |
+
+### Anbieterwahl
+
+Für **5 Stück** und für **25 Stück** liegen beide noch im Prototypentarif —
+die Losgröße ist nicht das, was die Wahl entscheidet. Entscheidend sind drei
+andere Dinge:
+
+1. **Bauteilabdeckung.** Der günstigste Tarif bei JLCPCB verlangt, dass die
+   *gesamte* Stückliste aus dem LCSC-Lager kommt. Was dort fehlt, muss
+   beigestellt werden — und Beistellung ist bei Kleinserien der teuerste Teil.
+   **Konsequenz für die noch offene Bauteilauswahl: Wo es die Wahl gibt, ein
+   LCSC-gelistetes Teil nehmen.** Die USB-C-Buchse ist mit C2843970 bereits so
+   gewählt; beim N-FET (Punkt 8) ist das jetzt zu berücksichtigen.
+2. **Doppelseitige Bestückung plus Durchsteckteile.** Das Mid-Board trägt
+   Bauteile auf beiden Seiten (Expander und Feldstecker hinten), dazu kommen
+   THT-Teile: Stapelverbinder, Leistungsstecker, Klinke. Beides zusammen
+   schließt die billigsten Stufen aus.
+3. **Wohin die Rechnung zeigt.** Aus der EU (AISLER, Eurocircuits) entfallen
+   Zoll, Wartezeit und Einfuhrumsatzsteuer, und man bekommt brauchbares
+   DFM-Feedback; aus China (JLCPCB, PCBWay) ist der reine Preis in dieser
+   Stückzahl deutlich niedriger.
+
+**Ein Mittelweg, der für dieses Projekt gut passt:** Leiterplatten und
+**SMD-Bestückung** fertigen lassen, die **Durchsteckteile selbst löten**. Das
+sind genau die Teile, die schwer zu beschaffen sind (Micro-Fit, Stapelverbinder,
+Klinke) — und die man beim Prototyp ohnehin noch tauschen will.
+

@@ -173,3 +173,8 @@ Layout frei: **F3** (Fensterausschnitt → Display), **F5/F10** (Tastenpositione
 | # | Prio | Entscheidung | Bemerkung |
 |---|---|---|---|
 | 51 | **P1** | **Halten die gedruckten Schraubaugen?** Der Adapter trägt die Geräteschrauben in Kunststoff — 2,5 mm Flansch, Langlöcher 3,9 mm auf 60 mm. Das ist der Schwachpunkt des Ein-Teil-Konzepts | Zu prüfen am ersten Druck: Zieht die Schraube das Auge durch, reißt der Flansch ein, hält er das Anziehen eines Elektrikers aus? Wege bei Problemen: Flansch dicker, Einlegemuttern, Metallscheiben unterlegen — oder als Rückfallweg doch ein Blech-Tragring, auf den der Adapter nur aufgesetzt wird. Die Bauhöhe von 10,0 mm hat dafür Luft: Der Rahmen ist 12 mm tief, das prüft der Selbsttest jetzt mit |
+
+| # | Prio | Entscheidung | Bemerkung |
+|---|---|---|---|
+| 52 | P2 | **Der Nutzen ist für die Leiterplattenfertigung ausgelegt, nicht für die Bestückung.** Es fehlen Passermarken, breitere Ränder und Werkzeugbohrungen | Drei Fiducials global (diagonal versetzt) plus lokale an ESP32-Modul, PCF8575 (0,65 mm Raster) und USB-C; Ränder von 4,0 auf 5–10 mm an zwei gegenüberliegenden Seiten; zwei bis drei unbelegte Ø-3-Löcher. `gen_panel.py` erzeugt das alles noch nicht. Erst nötig, wenn bestückt bestellt wird — die reine Leiterplattenfertigung geht auch so |
+
