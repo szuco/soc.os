@@ -112,7 +112,7 @@ Vollständige Gegenüberstellung von umgesetzten und fehlenden Funktionen:
 | **Routing TOP** | **keines** — am 16.08.2026 neu aufgebaut: quadratisch 47 × 47, vier Ecktaster, stehende USB-C-Buchse. **DRC ohne Fehler** |
 | Fertigungsnutzen (3 Platinen in einer Boarddatei) | **erzeugt:** `hardware/fab/panel/` — 173,4 × 64,4 mm, zwei Kreise + ein Quadrat |
 | Fertigungsdaten | **keine** — `python3 tools/gen_fab.py` nach dem Routing, mit DRC-Gate |
-| ESPHome-Konfiguration | **validiert** (`esphome config`, 2026.7.4): ST7789, Menü, Tastenpaare, einstellbare Fahrzeiten. Motoren fahren **auf Zeit** |
+| ESPHome-Firmware | **übersetzt** (`esphome compile`, 2026.7.4 / IDF 5.5.5): RAM 35 %, Flash 56 %. Alle Lambdas geprüft. Motoren fahren **auf Zeit** |
 | Lasterkennung, ToF-Distanz, Menü, RS-485-Protokoll | **fehlen** — eigene C++-Komponente, s. docs/13 |
 | Gefertigt oder gemessen | **nichts** |
 

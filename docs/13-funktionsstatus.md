@@ -18,7 +18,7 @@ Legende: ✅ fertig und geprüft · 🟡 begonnen, Rest benannt · ⛔ nicht vor
 | **Schaltpläne** | ✅ alle drei Boards erzeugt und netzlistengeprüft; ⛔ **keine Schaltungsreview gegen Datenblätter** |
 | **Layouts** | 🟡 alle drei platziert; **geroutet ist nur Bottom** (≈ 85 %), Mid und Top haben null Leiterbahnen |
 | **Fertigungsdaten** | ⛔ **keine** — der frühere Top-Export war überholt und ist gelöscht; der Nutzen ist als Boarddatei erzeugt |
-| **Firmware** | 🟡 ESPHome-Konfiguration validiert und funktionsfähig, aber **ohne Lasterkennung, ohne Bedienmenü, ohne RS-485-Protokoll** |
+| **Firmware** | 🟡 **fertig übersetzt** (RAM 35 %, Flash 56 %), mit Menü und einstellbaren Fahrzeiten — aber **ohne Lasterkennung und ohne RS-485-Protokoll** |
 | **Bestellt / gebaut** | ⛔ nichts — kein Board gefertigt, kein Motor vermessen |
 
 **Der kritische Pfad ist nicht das Routing, sondern die Messung.** Solange der

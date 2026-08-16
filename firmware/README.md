@@ -84,12 +84,27 @@ Fahrskripten, deren Verzögerungen Lambdas sind.
 **Das ersetzt die Lasterkennung nicht.** Der Sanftauslauf läuft hier auf Zeit;
 ihn am Stromverlauf festzumachen kann erst die C++-Komponente.
 
-> **Mit `esphome config` geprüft (ESPHome 2026.7.4): gültig.** Die Prüfung hat
-> drei echte Fehler gefunden — eine als Ganzes gelambdate `output.set_level`-
-> Aktion (der Wert gehört an `level:`), und `format`-Strings der Menü-Zahlen
-> mit Einheit, die genau eine Konversion enthalten dürfen. Nicht geprüft ist
-> damit die *Laufzeit*: Die Offsets des 240×280-Panels (0/20) zeigen sich erst
-> am realen Display.
+> **Vollständig übersetzt (ESPHome 2026.7.4, ESP-IDF 5.5.5): erfolgreich.**
+> Nicht nur `esphome config`, sondern `esphome compile` — der echte Compiler
+> über den erzeugten C++-Code. Damit sind auch **alle Lambdas geprüft**:
+> Displayzeichnung, Menü-Abfragen, die Zeitberechnungen in den Fahrskripten und
+> die Tastenpaare.
+>
+> | | |
+> |---|---|
+> | RAM | 35,1 % — 120 kB von 342 kB |
+> | Flash | 55,6 % — 1 020 kB von 1 835 kB (ein OTA-Slot) |
+>
+> Der Weg dahin fand zwei echte Fehler: eine als Ganzes gelambdate
+> `output.set_level`-Aktion (der Wert gehört an `level:`) und `format`-Strings
+> der Menü-Zahlen mit Einheit, die genau eine Konversion enthalten dürfen.
+>
+> Was **nicht** geprüft ist, bleibt die Laufzeit: die Offsets des
+> 240×280-Panels (0/20) und ob die Zentralscheibe die Taster sauber trifft.
+>
+> Eine Falle auf diesem Rechner, unabhängig vom Projekt: `ccache` aus Homebrew
+> ist gegen `libfmt.11` gelinkt, installiert ist `libfmt.12` — jeder
+> Compileraufruf stirbt sofort. Umgehung: `IDF_CCACHE_ENABLE=0`.
 
 Die ersten beiden fallen in **dieselbe** External Component. Vollständige
 Gegenüberstellung: [`../docs/13-funktionsstatus.md`](../docs/13-funktionsstatus.md).
