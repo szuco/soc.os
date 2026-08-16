@@ -25,6 +25,7 @@ gehoeren die Motorpfade und die Buck-Schleifen von Hand nachgezogen
 
 import os
 import re
+import shutil
 import subprocess
 import sys
 
@@ -41,10 +42,46 @@ SCRATCH = os.environ.get("SWITCHSTACK_SCRATCH", "/tmp/switchstack_route")
 # obwohl das Log 0 unrouted meldete). Version 1.9.0 routet klassisch und
 # exportiert die SES vollstaendig - braucht aber ein X-Display, daher
 # xvfb-run.
-JAR = os.environ.get(
-    "FREEROUTING_JAR",
-    "/tmp/claude-0/-home-user-soc-os/65292af4-35bb-586e-b8d7-4f67d74efa42/"
-    "scratchpad/freerouting-1.9.0.jar")
+JAR = os.environ.get("FREEROUTING_JAR", "")
+
+# Freerouting braucht ein X-Display. Unter Linux loest das xvfb-run, auf macOS
+# gibt es kein Xvfb - dort uebernimmt ein Container. Beide Wege rufen dasselbe
+# Jar mit denselben Argumenten auf; der Unterschied ist nur die Huelle.
+DOCKER_IMAGE = os.environ.get("FREEROUTING_IMAGE", "switchstack-freerouting")
+
+
+def freerouting_cmd(dsn, ses, passes):
+    """Aufrufkommando fuer Freerouting - lokal oder im Container.
+
+    Vorrang hat ein lokales Jar mit xvfb-run (so lief die Pipeline unter
+    Linux). Fehlt eines von beiden, wird der Container benutzt; dann muessen
+    die Pfade in dessen Sicht umgeschrieben werden, weil SCRATCH dort unter
+    /work haengt.
+
+    Gebaut wird das Image mit
+        docker build -f tools/freerouting.Dockerfile -t switchstack-freerouting tools/
+    """
+    lokal = JAR and os.path.exists(JAR) and shutil.which("xvfb-run")
+    if lokal:
+        return ["xvfb-run", "-a", "java", "-jar", JAR,
+                "-de", dsn, "-do", ses, "-mp", str(passes),
+                "-dct", "0", "-oit", "0.5"], "lokal (xvfb-run)"
+
+    if not shutil.which("docker"):
+        raise RuntimeError(
+            "Weder ein lokales Freerouting-Jar mit xvfb-run noch Docker "
+            "gefunden. Entweder FREEROUTING_JAR setzen (Linux mit xvfb-run) "
+            "oder das Image bauen:\n"
+            "  docker build -f tools/freerouting.Dockerfile -t %s tools/"
+            % DOCKER_IMAGE)
+
+    return (["docker", "run", "--rm",
+             "-v", "%s:/work" % os.path.abspath(SCRATCH),
+             DOCKER_IMAGE,
+             "-de", "/work/" + os.path.basename(dsn),
+             "-do", "/work/" + os.path.basename(ses),
+             "-mp", str(passes), "-dct", "0", "-oit", "0.5"],
+            "Container %s" % DOCKER_IMAGE)
 
 # Netzklassen: (Breite um, Clearance um, Vianame)
 VIA_STD = 'Via[0-1]_600:300_um'
@@ -299,8 +336,8 @@ def route(name, passes=200, timeout=2400):
     # sobald ein Durchlauf weniger als 1 % Verbesserung bringt.
     # -dct 0: kein Bestaetigungsdialog; -oit 0.5: Optimierung beenden,
     # sobald ein Durchlauf weniger als 0,5 % Verbesserung bringt
-    cmd = ["xvfb-run", "-a", "java", "-jar", JAR, "-de", dsn, "-do", ses,
-           "-mp", str(passes), "-dct", "0", "-oit", "0.5"]
+    cmd, wie = freerouting_cmd(dsn, ses, passes)
+    print("%-20s Freerouting %s, %d Passes" % (name, wie, passes))
     with open(log, "w") as lf:
         r = subprocess.run(cmd, stdout=lf, stderr=subprocess.STDOUT,
                            text=True, timeout=timeout)

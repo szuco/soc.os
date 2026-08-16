@@ -80,7 +80,7 @@ python3 tools/gen_bottom_sch.py      # Bottom-Schaltplan + BOM, mit Netzlistenpr
 python3 tools/gen_mid_sch.py         # Mid-Schaltplan (ESP32, RS-485, Expander)
 python3 tools/gen_top_sch.py         # Top-Schaltplan (USB-C, Taster, Sensorik)
 python3 tools/gen_layouts.py         # 3 Layouts: Platzierung, Netze, Zonen, DRC
-python3 tools/route_boards.py        # Freerouting-Pipeline, Nacharbeit mit gnd_*.py
+python3 tools/route_boards.py        # Freerouting-Pipeline (Container, s. docs/05)
 python3 tools/gen_fab.py [board]     # Gerber/Drill/Pos + BOMs, nur nach DRC-Gate
 python3 tools/gen_panel.py           # Fertigungsnutzen aus den drei Quellprojekten
 python3 mechanical/adapter.py        # Adapter für die BJ-Zentralscheibe, mit Selbsttest

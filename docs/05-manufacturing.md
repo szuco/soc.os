@@ -92,6 +92,24 @@ rekonstruierbar ist.
 > Dokumentation („Mid und Top sind platziert, aber noch nicht geroutet") waren
 > die richtigen.
 
+### Routing auf macOS: der Container
+
+Freerouting 1.9.0 ist keine echte Konsolenanwendung — es instanziiert
+AWT-Klassen auch im Batchbetrieb und braucht deshalb ein X-Display. Unter Linux
+löst das `xvfb-run`; auf macOS gibt es kein Xvfb. Dafür gibt es jetzt
+[`../tools/freerouting.Dockerfile`](../tools/freerouting.Dockerfile) — eine JRE,
+Xvfb und das Jar, sonst nichts:
+
+```bash
+docker build -f tools/freerouting.Dockerfile -t switchstack-freerouting tools/
+python3 tools/route_boards.py mid
+```
+
+`route_boards.py` wählt selbst: Liegt ein lokales Jar **und** `xvfb-run` vor,
+läuft es wie bisher direkt; sonst nimmt es den Container und schreibt die Pfade
+auf dessen Sicht um. Der Rest der Pipeline — DSN-Export und SES-Import — läuft
+über die `pcbnew`-API und braucht keinen Container.
+
 **Erfahrungswerte aus der Automatisierung, die weiter gelten:**
 
 - Freerouting 2.1.0 headless ist unbrauchbar (SES vom falschen Stand);
