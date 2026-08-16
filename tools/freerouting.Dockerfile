@@ -37,7 +37,26 @@ RUN chmod 0444 /opt/freerouting.jar
 
 WORKDIR /work
 
+# XVFB-RUN DARF NICHT PID 1 SEIN
+# ------------------------------
+# xvfb-run startet Xvfb im Hintergrund und wartet dann auf ein SIGUSR1, mit
+# dem Xvfb seine Bereitschaft meldet (Zeile 180 des Skripts: "trap : USR1",
+# darunter "(trap '' USR1; exec Xvfb ...)"). Als PID 1 eines Containers kommt
+# dieses Signal nicht an - der Kernel stellt an PID 1 nur Signale zu, fuer die
+# ein Handler installiert ist, und die Zustellung durch das wait des Shell-
+# Interpreters verhaelt sich dort anders. Ergebnis: Xvfb laeuft, xvfb-run
+# steht, und java wird NIE gestartet. Der Container haengt bei 0 % CPU, bis
+# irgendein Timeout zuschlaegt - genau das ist am 16.08.2026 zweimal passiert.
+#
+# Der Ausweg ist ein Wrapper OHNE exec: Dann ist das Wrapper-Skript PID 1 und
+# xvfb-run ein gewoehnliches Kind mit normaler Signalzustellung.
+RUN printf '%s\n' \
+      '#!/bin/sh' \
+      '# Kein exec - xvfb-run muss ein Kind bleiben, sonst haengt es als PID 1.' \
+      'xvfb-run -a java -jar /opt/freerouting.jar "$@"' \
+      > /usr/local/bin/freerouting \
+ && chmod +x /usr/local/bin/freerouting
+
 # Die Argumente kommen von route_boards.py: -de <dsn> -do <ses> -mp <passes>
-# -dct 0 -oit 0.5. Der Container ist damit ein reiner Ersatz fuer den
-# lokalen Aufruf "xvfb-run -a java -jar freerouting.jar ...".
-ENTRYPOINT ["xvfb-run", "-a", "java", "-jar", "/opt/freerouting.jar"]
+# -dct 0 -oit 0.5.
+ENTRYPOINT ["/usr/local/bin/freerouting"]

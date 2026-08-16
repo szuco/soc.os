@@ -310,7 +310,13 @@ def import_ses(board, ses_path):
     return n_wires, n_vias
 
 
-def route(name, passes=200, timeout=2400):
+# Zeitgrenzen sind ueber die Umgebung uebersteuerbar - im Container laeuft
+# alles langsamer, und ein abgelaufener Timeout kostet den ganzen Lauf: Der
+# Client wird abgeraeumt, der Container laeuft weiter, und Java stirbt beim
+# Aufraeumen. Das Zwischenergebnis ist dann verloren.
+def route(name, passes=None, timeout=None):
+    passes = passes or int(os.environ.get("SWITCHSTACK_ROUTE_PASSES", 200))
+    timeout = timeout or int(os.environ.get("SWITCHSTACK_ROUTE_TIMEOUT", 2400))
     os.makedirs(SCRATCH, exist_ok=True)
     pcb = os.path.join(ROOT, "hardware", name, name + ".kicad_pcb")
     dsn = os.path.join(SCRATCH, name + ".dsn")
@@ -378,8 +384,10 @@ def main():
         if which not in ("all", key):
             continue
         # Bottom: 102 Bauteile und breite Leistungsbahnen - braucht laenger
-        pcb = route(name, timeout=7200 if name == "bottom_power_motor"
-                    else 2400)
+        pcb = route(name,
+                    timeout=int(os.environ.get(
+                        "SWITCHSTACK_ROUTE_TIMEOUT",
+                        7200 if name == "bottom_power_motor" else 2400)))
         res, errs = run_drc(pcb)
         if errs:
             print("  DRC-FEHLER:", errs[0])

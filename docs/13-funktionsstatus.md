@@ -33,7 +33,7 @@ Soft-Limit und der einzige noch offene Leistungshalbleiter provisorisch.
 | Board | Schaltplan | Layout / Routing | Fertigungsdaten |
 |---|---|---|---|
 | **BOTTOM** `bottom_power_motor` | ✅ 102 Bauteile, 105 Netze, Netzlistenvergleich bestanden | 🟡 **985 Segmente, 102 Vias**, 43 offene Verbindungen im Motor-/Leistungsteil, 0 Kupferfehler | ⛔ wartet auf das Rest-Routing |
-| **MID** `mid_logic` | ✅ 37 Bauteile, 57 Netze | ⛔ platziert, **0 Leiterbahnen** | ⛔ |
+| **MID** `mid_logic` | ✅ 46 Bauteile, 61 Netze | 🟡 **746 Segmente, 104 Vias**; 18 Signale offen, ein lokaler Kurzschluss | ⛔ DRC-Gate sperrt |
 | **TOP** `top_ui` | ✅ 25 Bauteile, 53 Netze | ⛔ platziert, **0 Leiterbahnen** — Stand 16.08.2026: **quadratisch 47 × 47**, vier Ecktaster unter den Druckkreuzen der Zentralscheibe | ⛔ |
 | **Nutzen** `fab/panel` | — (Build-Ergebnis) | ✅ **173,4 × 64,4 mm**, zwei Kreise + ein Quadrat, DRC deckungsgleich mit der Summe der Einzelboards | 🟡 bestellbar, sobald geroutet |
 

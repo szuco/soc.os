@@ -80,7 +80,7 @@ rekonstruierbar ist.
 | Board | Segmente im Repository | Stand |
 |---|---:|---|
 | **BOTTOM** | **985** (102 Vias) | ≈ 85 % geroutet, 0 Kupferfehler. Offen sind 43 Verbindungen im Motor-/Leistungsteil (SW-Knoten, Gate-Netze, `24V_PROT`). Der Autorouter konvergiert dort nicht mehr — die Leistungspfade sind laut Prüfliste (Abschnitt 3) **ohnehin von Hand zu ziehen**. |
-| **MID** | **0** | nur platziert. |
+| **MID** | **746** (104 Vias) | Am 16.08.2026 im Container geroutet. Offen: 59 Masseanbindungen (schließt die Zonenfüllung) und **18 Signalverbindungen** auf 16 Netzen. Dazu **fünf Kupferfehler, alle an derselben Stelle**: `HOOD_B` kreuzt `RELAY_LED` bei (12,2 / 19,2), also am PhotoMOS. |
 | **TOP** | **0** | nur platziert, Stand vom 15.08.2026 mit Klinke auf 6 Uhr, ToF auf 12 Uhr und korrigierter USB-C-Drehung. |
 
 > **Korrektur vom 15.08.2026.** Hier stand, Top sei vollständig und Mid bis auf
@@ -91,6 +91,23 @@ rekonstruierbar ist.
 > null. Nur das Bottom-Board trägt Leiterbahnen. Die Angaben in der Nutzen-
 > Dokumentation („Mid und Top sind platziert, aber noch nicht geroutet") waren
 > die richtigen.
+
+### Was der Mid-Lauf gezeigt hat
+
+Der frühere Lauf unter Linux endete mit 655 Segmenten, 73 Vias und **null**
+offenen Signalverbindungen. Der Lauf vom 16.08.2026 kommt auf 746 Segmente,
+104 Vias — aber 18 offene Signale und fünf Kupferfehler. Das Board ist in der
+Zwischenzeit dichter geworden: 46 statt 39 Bauteile, 61 statt 57 Netze, der
+Expander auf der Rückseite und vier Reed-Netzwerke statt zwei.
+
+Die Kupferfehler sind **nicht verstreut**: Alle fünf betreffen dasselbe
+Netzpaar an derselben Stelle. Das ist eine lokale Reparatur, kein neuer Lauf.
+
+> **Der Kurzschluss bleibt bewusst im Board stehen.** Ihn automatisch
+> herauszuschneiden hieße, Leiterbahnen zu löschen, ohne zu wissen welche —
+> und ein stillschweigend entfernter Fehler ist schlimmer als ein sichtbarer.
+> Das DRC-Gate von `gen_fab.py` verhindert, dass daraus versehentlich
+> Fertigungsdaten entstehen.
 
 ### Routing auf macOS: der Container
 

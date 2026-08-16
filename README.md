@@ -115,7 +115,7 @@ Vollständige Gegenüberstellung von umgesetzten und fehlenden Funktionen:
 | Schaltpläne aller drei Boards + Stücklisten | **erzeugt und netzlistengeprüft** — Schaltungsreview gegen Datenblätter steht aus |
 | Layouts aller drei Boards: Platzierung + Zonen | **erzeugt, DRC ohne Platzierungsfehler** |
 | **Routing BOTTOM** | 985 Segmente, 102 Vias, **43 Verbindungen offen** — Rest Handarbeit (docs/05 verlangt das für Leistungspfade ohnehin) |
-| **Routing MID** | **keines** — platziert, Leiterbahnen fehlen |
+| **Routing MID** | **746 Segmente, 104 Vias** (16.08.2026, Container). Offen: 18 Signalverbindungen und **ein Kurzschluss** `HOOD_B`/`RELAY_LED` an einer Stelle — Handarbeit, s. docs/05 |
 | **Routing TOP** | **keines** — am 16.08.2026 neu aufgebaut: quadratisch 47 × 47, vier Ecktaster, stehende USB-C-Buchse. **DRC ohne Fehler** |
 | Fertigungsnutzen (3 Platinen in einer Boarddatei) | **erzeugt:** `hardware/fab/panel/` — 173,4 × 64,4 mm, zwei Kreise + ein Quadrat |
 | Fertigungsdaten | **keine** — `python3 tools/gen_fab.py` nach dem Routing, mit DRC-Gate |
