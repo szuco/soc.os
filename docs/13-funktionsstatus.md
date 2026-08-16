@@ -88,7 +88,7 @@ stimmt, ist damit *nicht* gezeigt.
 
 | Funktion | Hardware | Firmware | Stand |
 |---|---|---|---|
-| Display | ✅ **ST7789, 1,69″ 240 × 280, quer** — füllt das Fenster der Zentralscheibe (0,07 mm Luft in der Breite); Footprint von J5 noch Platzhalter | ✅ `st7789v` nativ, Initsequenz entfallen — ⚠️ **nicht mit `esphome config` geprüft**, ESPHome fehlte auf dem Rechner | 🔒 Punkt 15c: Modul-Außenmaß messen; Panel-Offsets prüfen |
+| Display | ✅ **ST7789, 1,69″ 240 × 280, quer** — füllt das Fenster der Zentralscheibe (0,07 mm Luft in der Breite); Footprint von J5 noch Platzhalter | ✅ `st7789v` nativ, Initsequenz entfallen, **Konfiguration validiert** | 🔒 Punkt 15c: Modul-Außenmaß messen; Panel-Offsets am realen Display prüfen |
 | Anzeigeinhalt | — | ✅ Startbildschirm mit **allen Messwerten**: Raumklima, beide Fenster mit Sabotagezustand, Motorströme, Präsenz, Stern | ✅ frei gestaltbar im Display-Lambda |
 | Vier Tasten | ✅ **4 SMD-Taster auf (±18 · ±20)**, exakt unter den Druckkreuzen | ⛔ noch fest auf Jalousie auf/zu verdrahtet, **ohne Paarauswertung** | ⛔ Die Firmware muss Paare auflösen: ↑ = SW1+SW2, ↓ = SW3+SW4, ▷ = SW2+SW3, OK = SW1+SW4 |
 | Bedienmenü | — | ✅ `graphical_display_menu` mit sechs Untermenüs; Fahrzeiten am Gerät einstellbar | ✅ Punkt 37 erledigt |

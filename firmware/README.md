@@ -69,10 +69,12 @@ Fahrskripten, deren Verzögerungen Lambdas sind.
 **Das ersetzt die Lasterkennung nicht.** Der Sanftauslauf läuft hier auf Zeit;
 ihn am Stromverlauf festzumachen kann erst die C++-Komponente.
 
-> **Die Konfiguration ist seit dem Displaywechsel nicht mehr mit `esphome config`
-> geprüft** — auf dem Rechner, auf dem er entstand, war ESPHome nicht
-> installiert. Vor dem ersten Flash validieren, besonders die Offsets des
-> 240×280-Panels (0/20) und die Tastenpaar-Templates.
+> **Mit `esphome config` geprüft (ESPHome 2026.7.4): gültig.** Die Prüfung hat
+> drei echte Fehler gefunden — eine als Ganzes gelambdate `output.set_level`-
+> Aktion (der Wert gehört an `level:`), und `format`-Strings der Menü-Zahlen
+> mit Einheit, die genau eine Konversion enthalten dürfen. Nicht geprüft ist
+> damit die *Laufzeit*: Die Offsets des 240×280-Panels (0/20) zeigen sich erst
+> am realen Display.
 
 Die ersten beiden fallen in **dieselbe** External Component. Vollständige
 Gegenüberstellung: [`../docs/13-funktionsstatus.md`](../docs/13-funktionsstatus.md).

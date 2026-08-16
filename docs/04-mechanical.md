@@ -9,8 +9,8 @@
 | Leiterplattendicke | **1,0 mm** |
 | Unterputzdose | massiv, Ø 60 mm außen, **61 mm tief** |
 | **Abdeckrahmen** | **Busch-Jaeger 1721-914, Busch-balance SI, 1-fach** (2CKA001725A1555) |
-| Stack-Abstand Bottom ↔ Mid | ≈ 10 mm |
-| Stack-Abstand Mid ↔ Top | ≈ 9 mm |
+| Stack-Abstand Bottom ↔ Mid | **10 mm** |
+| Stack-Abstand Mid ↔ Top | **10 mm** — bewusst gleich wie unten |
 
 > **Revision: Ø 55,0 mm → Ø 52,0 mm.**
 > Eine Gerätedose mit 60 mm Außendurchmesser hat je nach Hersteller nur etwa

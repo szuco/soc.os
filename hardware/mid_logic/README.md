@@ -37,7 +37,7 @@ Präsenzsensor sitzt als VL53L1X auf dem Top-Board.
 
 - Ø 52,0 mm, 1,0 mm Dicke
 - Bohrbild und Stackverbinder-Positionen **deckungsgleich** mit BOTTOM und TOP
-- Abstand nach unten ≈ 10 mm, nach oben ≈ 8–10 mm
+- Abstand nach unten und nach oben je **10 mm** — gleicher Verbinder, gleicher Abstand
 
 Exakte Koordinaten: [`../../docs/04-mechanical.md`](../../docs/04-mechanical.md)
 

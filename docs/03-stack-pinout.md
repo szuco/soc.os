@@ -19,7 +19,11 @@
   anhand Stackhöhe und Verfügbarkeit auszuwählen.
 - **Der Plattenabstand soll aus dem Verbinder kommen**, nicht aus Distanzhülsen oder
   abgelängten Pins: Stapelverbinder gibt es in gestuften Steckhöhen. Gesucht ist ein
-  Paar für gesteckt 10 mm (Bottom↔Mid) und 8–10 mm (Mid↔Top).
+  Teil für gesteckt **10 mm — in beiden Spalten gleich**. Festlegung vom
+  16.08.2026: Mid↔Top war mit 8–10 mm angesetzt, aber ein einziger Abstand
+  heißt **ein einziges Bauteil auf allen drei Boards**, und genau das erlaubt
+  es, den Stapel direkt zusammenzustecken. Den einen zusätzlichen Millimeter
+  trägt das freie Tiefenbudget mühelos.
   **Achtung:** In den Layouts sitzt derzeit auf *allen drei* Boards dieselbe Buchse
   (`PinSocket_2x20_P1.27mm_Vertical`) — ein Platzhalter für die Mechanik, kein
   steckbares Paar. Punkt 23 in [`06-open-decisions.md`](06-open-decisions.md).
@@ -130,17 +134,24 @@ Die Pinlage bleibt unverändert, nur die Namen sind jetzt ehrlich:
 Neu belegt sind zwei bisher freie Expanderpins — **nicht** am Stackverbinder,
 sondern nur auf dem Mid-Board:
 
-| PCF8574 | Signal | Funktion |
+| PCF8575 | Signal | Funktion |
 |---|---|---|
-| P6 | `REED1_IN` | Fensterkontakt 1 |
-| P7 | `REED2_IN` | Fensterkontakt 2 |
 | P5 | `RELAY_CTL` | PhotoMOS zur Dunstabzugshaube (LOW = geschlossen) |
+| P6 | `REED1_IN` | Verschlusskontakt Fenster 1 |
+| P7 | `REED2_IN` | Verschlusskontakt Fenster 2 |
+| P10 (ESPHome 8) | `SAB1_IN` | **Sabotagekontakt Fenster 1** |
+| P11 (ESPHome 9) | `SAB2_IN` | **Sabotagekontakt Fenster 2** |
+| P12–P17 | — | Reserve |
+
+Seit dem 16.08.2026 ist es ein **PCF8575** (16 Bit) statt des PCF8574: Mit vier
+Reed-Kontakten reichten acht Portpins nicht mehr. Gleiche Adresse, gleicher
+Treiber, ein Bauteil statt zwei.
 
 ## 5. Prüfliste vor dem Footprint-Freeze
 
 - [ ] Stromrating des gewählten Verbinders gegen Abschnitt 2 geprüft
-- [ ] Stapelhöhe passt zu 10 mm (Bottom↔Mid) und 8–10 mm (Mid↔Top)
-- [ ] Buchse/Stecker-Zuordnung je Board eindeutig festgelegt
+- [ ] Stapelhöhe des gewählten Teils ist **10 mm**, identisch in beiden Spalten
+- [ ] Durchsteckbar: dasselbe Teil auf allen drei Boards, keine Buchse/Stecker-Zuordnung nötig
 - [ ] Pin 1 auf allen drei Boards identisch orientiert
 - [ ] Verpolungssicherheit: mechanisch unmöglich, A und B zu vertauschen
 - [ ] Verfügbarkeit und Second Source geprüft

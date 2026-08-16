@@ -316,9 +316,9 @@ script:
       - delay: ${reversal_pause}
       - output.set_level: {id: m1_ina, level: 100%}
       - delay: !lambda 'return (uint32_t)(id(t_auf_1).state * 10.0 * id(sanft_ab).state);'
-      - output.set_level: !lambda |-
-          id(m1_ina).set_level(id(sanft_pwm).state / 100.0);
-          return;
+      - output.set_level:
+          id: m1_ina
+          level: !lambda 'return id(sanft_pwm).state / 100.0;'
       - delay: !lambda 'return (uint32_t)(id(t_auf_1).state * 400.0);'
       - output.set_level: {id: m1_ina, level: 0%}
   - id: fahrt1_zu
@@ -329,9 +329,9 @@ script:
       - delay: ${reversal_pause}
       - output.set_level: {id: m1_inb, level: 100%}
       - delay: !lambda 'return (uint32_t)(id(t_zu_1).state * 10.0 * id(sanft_ab).state);'
-      - output.set_level: !lambda |-
-          id(m1_inb).set_level(id(sanft_pwm).state / 100.0);
-          return;
+      - output.set_level:
+          id: m1_inb
+          level: !lambda 'return id(sanft_pwm).state / 100.0;'
       - delay: !lambda 'return (uint32_t)(id(t_zu_1).state * 400.0);'
       - output.set_level: {id: m1_inb, level: 0%}
   - id: fahrt2_auf
@@ -342,9 +342,9 @@ script:
       - delay: ${reversal_pause}
       - output.set_level: {id: m2_ina, level: 100%}
       - delay: !lambda 'return (uint32_t)(id(t_auf_2).state * 10.0 * id(sanft_ab).state);'
-      - output.set_level: !lambda |-
-          id(m2_ina).set_level(id(sanft_pwm).state / 100.0);
-          return;
+      - output.set_level:
+          id: m2_ina
+          level: !lambda 'return id(sanft_pwm).state / 100.0;'
       - delay: !lambda 'return (uint32_t)(id(t_auf_2).state * 400.0);'
       - output.set_level: {id: m2_ina, level: 0%}
   - id: fahrt2_zu
@@ -355,9 +355,9 @@ script:
       - delay: ${reversal_pause}
       - output.set_level: {id: m2_inb, level: 100%}
       - delay: !lambda 'return (uint32_t)(id(t_zu_2).state * 10.0 * id(sanft_ab).state);'
-      - output.set_level: !lambda |-
-          id(m2_inb).set_level(id(sanft_pwm).state / 100.0);
-          return;
+      - output.set_level:
+          id: m2_inb
+          level: !lambda 'return id(sanft_pwm).state / 100.0;'
       - delay: !lambda 'return (uint32_t)(id(t_zu_2).state * 400.0);'
       - output.set_level: {id: m2_inb, level: 0%}
   - id: halt_alle
@@ -403,11 +403,11 @@ graphical_display_menu:
         - type: number
           text: Fahrzeit Auf
           number: t_auf_1
-          format: "%.1f s"
+          format: "%.1f"
         - type: number
           text: Fahrzeit Zu
           number: t_zu_1
-          format: "%.1f s"
+          format: "%.1f"
     - type: menu
       text: Jalousie 2
       items:
@@ -422,22 +422,22 @@ graphical_display_menu:
         - type: number
           text: Fahrzeit Auf
           number: t_auf_2
-          format: "%.1f s"
+          format: "%.1f"
         - type: number
           text: Fahrzeit Zu
           number: t_zu_2
-          format: "%.1f s"
+          format: "%.1f"
     - type: menu
       text: Sanftauslauf
       items:
         - type: number
           text: Ab
           number: sanft_ab
-          format: "%.0f %%"
+          format: "%.0f"
         - type: number
           text: PWM
           number: sanft_pwm
-          format: "%.0f %%"
+          format: "%.0f"
     - type: switch
       text: Weihnachtsstern
       switch: stern
