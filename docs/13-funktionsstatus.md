@@ -1,6 +1,6 @@
 # 13 – Funktionsstatus: was steht, was fehlt
 
-Stand **15.08.2026**. Diese Datei ist die einzige Stelle, an der Hardware-,
+Stand **16.08.2026**. Diese Datei ist die einzige Stelle, an der Hardware-,
 Firmware- und Mechanikstand nebeneinander stehen. Sie beantwortet genau eine
 Frage: *Was kann das Gerät heute, und was fehlt bis zum fertigen Produkt?*
 
@@ -13,10 +13,10 @@ Legende: ✅ fertig und geprüft · 🟡 begonnen, Rest benannt · ⛔ nicht vor
 
 | Ebene | Stand |
 |---|---|
-| **Spezifikation** | ✅ vollständig — 13 Dokumente, alle Entscheidungen entweder getroffen oder als Punkt 1–40 offen benannt |
+| **Spezifikation** | ✅ vollständig — 13 Dokumente, alle Entscheidungen entweder getroffen oder als Punkt 1–52 offen benannt |
 | **Mechanik** | ✅ Boards generiert; Front = BJ-Zentralscheibe 6435-914, **Adapter erzeugt und selbstgeprüft**; 🔒 offen ist die Bauhöhe des realen Displaymoduls |
 | **Schaltpläne** | ✅ alle drei Boards erzeugt und netzlistengeprüft; ⛔ **keine Schaltungsreview gegen Datenblätter** |
-| **Layouts** | 🟡 alle drei platziert; **geroutet ist nur Bottom** (≈ 85 %), Mid und Top haben null Leiterbahnen |
+| **Layouts** | 🟡 alle drei platziert; **Bottom und Mid geroutet** (985 bzw. 746 Segmente, beide mit Restarbeit), **Top hat null Leiterbahnen** |
 | **Fertigungsdaten** | ⛔ **keine** — der frühere Top-Export war überholt und ist gelöscht; der Nutzen ist als Boarddatei erzeugt |
 | **Firmware** | 🟡 **fertig übersetzt** (RAM 35 %, Flash 56 %), mit Menü und einstellbaren Fahrzeiten — aber **ohne Lasterkennung und ohne RS-485-Protokoll** |
 | **Bestellt / gebaut** | ⛔ nichts — kein Board gefertigt, kein Motor vermessen |
@@ -41,12 +41,12 @@ Die 43 offenen Verbindungen auf Bottom sind **kein Rückstand des Autorouters**,
 sondern Absicht: [`05-manufacturing.md`](05-manufacturing.md) Abschnitt 3 verlangt
 für Leistungspfade und Buck-Schleifen ohnehin Handarbeit nach Referenzlayout.
 
-**Zum Routing-Stand, korrigiert am 15.08.2026:** Frühere Fassungen dieser Datei
-und der README meldeten Top als vollständig und Mid als fast fertig geroutet.
-Das galt für einen Arbeitsstand, der nie eingecheckt wurde — der Umbau auf
-Reed-Kontakte, Haubenkontakt und ToF hat beide Layouts neu erzeugt und ihre
-Verdrahtung dabei verworfen. Nachzählbar: `grep -c '(segment'` liefert für Mid
-und Top null, für Bottom 985.
+**Zum Routing-Stand.** Am 15.08.2026 war zu korrigieren, dass frühere Fassungen
+Top als vollständig und Mid als fast fertig geroutet meldeten — der Umbau auf
+Reed-Kontakte, Haubenkontakt und ToF hatte beide Layouts neu erzeugt und ihre
+Verdrahtung verworfen. Mid ist seit dem 16.08.2026 wieder geroutet (im
+Container, siehe [`05-manufacturing.md`](05-manufacturing.md)), Top noch nicht.
+Nachzählbar bleibt es: `grep -c '(segment'` liefert 985 / 746 / 0.
 
 **Die USB-C-Buchse stand falsch herum** (Punkt 39) — die Stecköffnung zeigte zur
 Platinenmitte, die Lötpads standen über die Kante. Korrigiert: das engste Pad
@@ -90,7 +90,7 @@ stimmt, ist damit *nicht* gezeigt.
 |---|---|---|---|
 | Display | ✅ **ST7789, 1,69″ 240 × 280, quer** — füllt das Fenster der Zentralscheibe (0,07 mm Luft in der Breite); Footprint von J5 noch Platzhalter | ✅ `st7789v` nativ, Initsequenz entfallen, **Konfiguration validiert** | 🔒 Punkt 15c: Modul-Außenmaß messen; Panel-Offsets am realen Display prüfen |
 | Anzeigeinhalt | — | ✅ Startbildschirm mit **allen Messwerten**: Raumklima, beide Fenster mit Sabotagezustand, Motorströme, Präsenz, Stern | ✅ frei gestaltbar im Display-Lambda |
-| Vier Tasten | ✅ **4 SMD-Taster auf (±18 · ±20)**, exakt unter den Druckkreuzen | ⛔ noch fest auf Jalousie auf/zu verdrahtet, **ohne Paarauswertung** | ⛔ Die Firmware muss Paare auflösen: ↑ = SW1+SW2, ↓ = SW3+SW4, ▷ = SW2+SW3, OK = SW1+SW4 |
+| Vier Tasten | ✅ **4 SMD-Taster auf (±18 · ±20)**, exakt unter den Druckkreuzen | ✅ **Paarauswertung umgesetzt**: ↑ = ol+or, ↓ = ul+ur, OK = or+ur, ▷ = ol+ul | ✅ jede Taste hat zwei Bedeutungen — im Menü navigieren, sonst fahren |
 | Bedienmenü | — | ✅ `graphical_display_menu` mit sechs Untermenüs; Fahrzeiten am Gerät einstellbar | ✅ Punkt 37 erledigt |
 | Displayhelligkeit | ✅ PWM-Backlight auf GPIO43 | ✅ dimmbar, Präsenz weckt auf 80 %, 120 s Nachlauf | ✅ |
 | Helligkeit nach Umgebungslicht | ⛔ kein Sensor bestückt | ⛔ | 🔒 Punkt 36 — evtl. kostenlos über den Ambient-Zähler des VL53L1X |
