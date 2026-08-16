@@ -8,6 +8,26 @@ ist jetzt ein Serienteil: Zentralscheibe 6435-914 (2CKA006430A0402) im Rahmen
 es bietet der Scheibe an, worauf sie rastet, dem Rahmen, worauf er klemmt, und
 der Top-Leiterplatte, worauf sie sitzt.
 
+EIN TEIL STATT ZWEI (Festlegung 16.08.2026)
+-------------------------------------------
+Zwischenzeitlich stand die Ueberlegung, einen fertigen Blech-Tragring zu
+verwenden und den Adapter nur darauf zu setzen. Verworfen: Der Blechring baut
+zusaetzlich auf, und seine Krallen werden nicht gebraucht - das Geraet haengt
+an den zwei Geraeteschrauben, wie jeder Serieneinsatz auch. Dieses gedruckte
+Teil uebernimmt daher ALLE drei Aufgaben:
+
+    1. Tragring   - wird mit zwei Schrauben auf 60 mm in die Dose geschraubt
+    2. Rahmenhalt - der Abdeckrahmen klemmt auf seinen 70,0 mm
+    3. Traeger    - Leiterplatte in der Tasche, Zentralscheibe rastet auf
+
+Montagereihenfolge: Adapter anschrauben, Rahmen aufsetzen, Zentralscheibe
+aufstecken. Die Scheibe ist damit das einzige Teil, das man ohne Werkzeug
+abnimmt - und darunter liegt der USB-Anschluss (Punkt 45).
+
+VORBEHALT: Das Teil traegt die Schraubkraefte in gedrucktem Kunststoff. Die
+Schraubaugen sind der Schwachpunkt; ob 2,5 mm Flansch reichen, zeigt der erste
+Druck. Ein Blechring bleibt der Rueckfallweg, falls sie ausreissen.
+
     python3 mechanical/adapter.py
 
 Erzeugt:
@@ -53,8 +73,10 @@ PARAMS = dict(
     cross_h           = 1.5,    # Hoehe der vier Druckkreuze
     snap_inner        = 50.0,   # lichtes Mass zwischen den vier Rastnasen
 
-    # --- Gemessen am Abdeckrahmen 1721-914 (F13) --------------------------
+    # --- Gemessen am Abdeckrahmen 1721-914 (F11, F13) ---------------------
     frame_grip        = 70.0,   # darauf klemmen die Doppelstege des Rahmens
+    frame_depth       = 12.0,   # Bautiefe des Rahmens - der Adapter muss
+                                # vollstaendig darunter verschwinden
 
     # --- Leiterplatte und Bestueckung -------------------------------------
     pcb_sq            = 47.0,   # Kantenlaenge Top-Board (= TOP_SQ)
@@ -179,6 +201,10 @@ def check_adapter(part, p=PARAMS):
     if p["frame_grip"] <= rim_out:
         errs.append("Flansch %.1f ist nicht breiter als der Schnapprand"
                     % p["frame_grip"])
+    # Der Adapter baut vor der Wand - aber der Rahmen muss ihn verdecken.
+    if z["total"] > p["frame_depth"]:
+        errs.append("Bauhoehe %.1f ueberragt den Rahmen (%.1f tief)"
+                    % (z["total"], p["frame_depth"]))
     if abs(z["total"] - (p["plate_depth"] + p["flange_t"])) > 0.01:
         errs.append("Tiefenkette inkonsistent")
 

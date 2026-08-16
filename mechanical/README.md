@@ -8,9 +8,21 @@ Serienteil:
 | Zentralscheibe 6435-914, Aufdruck „Pfeile und OK", Busch-balance SI | 2CKA006430A0402 |
 | Abdeckrahmen 1721-914, 1-fach, Busch-balance SI | 2CKA001725A1555 |
 
-Erzeugt wird nur noch das **Bindeglied** dazwischen: ein 3D-gedruckter Adapter.
-Er bietet der Scheibe an, worauf sie rastet, dem Rahmen, worauf er klemmt, und
-der Top-Leiterplatte, worauf sie sitzt.
+Erzeugt wird nur noch das **Bindeglied** dazwischen: ein 3D-gedruckter Adapter,
+der **alle drei Aufgaben in einem Teil** übernimmt:
+
+1. **Tragring** — wird mit zwei Schrauben auf 60 mm in die Dose geschraubt
+2. **Rahmenhalt** — der Abdeckrahmen klemmt auf seinen 70,0 mm
+3. **Träger** — Leiterplatte in der Tasche, Zentralscheibe rastet auf
+
+Montagereihenfolge: Adapter anschrauben, Rahmen aufsetzen, Zentralscheibe
+aufstecken. Die Scheibe ist das einzige Teil, das ohne Werkzeug abgeht — und
+darunter liegt der USB-Anschluss.
+
+> Ein fertiger **Blech-Tragring** war zwischenzeitlich im Gespräch, ist aber
+> verworfen: Er baut zusätzlich auf, und seine Krallen werden nicht gebraucht.
+> Er bleibt der Rückfallweg, falls die gedruckten Schraubaugen nicht halten
+> (Punkt 51).
 
 > Die frühere Frontplatte mit vier **Sicheltasten** ist am 16.08.2026 gelöscht
 > worden. Sie war eine vollständige Eigenentwicklung samt Tastenkappen und
