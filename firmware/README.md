@@ -16,8 +16,38 @@ Haubenkontakt, zwei Cover und vier Tasten.
 |---|---|
 | **Lasterkennung / Stall** | Braucht PWM-synchrones ADC-Sampling; ESPHomes Polling-Modell kann das nicht. Die Cover fahren deshalb **auf Zeit**. |
 | **ToF-Distanz, ROI, Blendung** | ESPHome hat nur `vl53l0x` nativ; heute wird nur der Interrupt-Pin gelesen („da / nicht da"). |
-| **Bedienmenü** | Die vier Tasten sind fest auf Auf/Zu verdrahtet. Die Belegung unten ist Anforderung, nicht Implementierung. |
+| ~~Bedienmenü~~ | **erledigt** — `graphical_display_menu`, siehe unten |
 | **RS-485-Protokoll** | UART ist konfiguriert, aber ungenutzt; `RS485_DIR` unbelegt. Das ist der *primäre* Kommunikationsweg. |
+
+### Anzeige und Menü
+
+**Der Startbildschirm zeigt die Messwerte**, gezeichnet im `lambda` des
+Displays — also in C++, das bei jedem Refresh läuft: Raumtemperatur groß,
+Feuchte darunter, dann je Fenster Verschluss- und Sabotagezustand, die
+Motorströme (nur wenn sie nennenswert sind), und in der Fußzeile Präsenz und
+Stern. Alles frei gestaltbar; ESPHome bietet `printf`, Linien, Rechtecke,
+Kreise, Bilder und beliebig viele Schriften.
+
+**Das Menü bringt ESPHome mit.** `graphical_display_menu` kann Untermenüs,
+Zahlenwerte, Schalter und Kommandos und wird über `display_menu.up/down/enter/
+left` bedient — genau die vier Bedienrichtungen der Zentralscheibe. Damit ist
+Punkt 37 ohne eigene Zustandsmaschine erledigt.
+
+Jede Taste hat zwei Bedeutungen:
+
+| Taste | im Menü | sonst |
+|---|---|---|
+| ↑ | nach oben | beide Jalousien auf |
+| ↓ | nach unten | beide Jalousien zu |
+| OK | auswählen | **Menü öffnen** |
+| ▷ | eine Ebene zurück | alles anhalten |
+
+Im Menü stehen unter anderem die **Fahrzeiten** — sie lassen sich also am
+Fenster einstellen, ohne Home Assistant und ohne Flash.
+
+Ein Detail, das leicht übersehen wird: Schriften brauchen ein `glyphs`-Feld,
+sonst fehlen Umlaute und das Gradzeichen. ESPHome bettet nur die aufgezählten
+Zeichen ein.
 
 ### Einstellbar statt einkompiliert
 

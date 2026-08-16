@@ -160,6 +160,7 @@ output:
 switch:
   - platform: gpio
     name: Weihnachtsstern
+    id: stern
     icon: mdi:star-four-points
     pin:
       pcf8574: expander
@@ -372,16 +373,121 @@ script:
 
 
 # -----------------------------------------------------------------------------
+# Bedienmenue
+# -----------------------------------------------------------------------------
+# ESPHome bringt das Menue mit: graphical_display_menu kann Untermenues,
+# Zahlenwerte, Schalter und Kommandos und wird ueber display_menu.up/down/
+# enter/left bedient. Genau darauf passen die vier Bedienrichtungen der
+# Zentralscheibe. Damit ist Punkt 37 ohne eigene Zustandsmaschine erledigt.
+#
+# Wichtig fuer die Praxis: Die Fahrzeiten stehen HIER im Menue - man kann sie
+# also am Fenster einstellen, ohne Home Assistant und ohne Flash.
+graphical_display_menu:
+  id: hauptmenu
+  display: panel
+  font: font_mid
+  active: false
+  mode: rotary
+  items:
+    - type: menu
+      text: Jalousie 1
+      items:
+        - type: command
+          text: Auf
+          on_value:
+            then: [script.execute: fahrt1_auf]
+        - type: command
+          text: Zu
+          on_value:
+            then: [script.execute: fahrt1_zu]
+        - type: number
+          text: Fahrzeit Auf
+          number: t_auf_1
+          format: "%.1f s"
+        - type: number
+          text: Fahrzeit Zu
+          number: t_zu_1
+          format: "%.1f s"
+    - type: menu
+      text: Jalousie 2
+      items:
+        - type: command
+          text: Auf
+          on_value:
+            then: [script.execute: fahrt2_auf]
+        - type: command
+          text: Zu
+          on_value:
+            then: [script.execute: fahrt2_zu]
+        - type: number
+          text: Fahrzeit Auf
+          number: t_auf_2
+          format: "%.1f s"
+        - type: number
+          text: Fahrzeit Zu
+          number: t_zu_2
+          format: "%.1f s"
+    - type: menu
+      text: Sanftauslauf
+      items:
+        - type: number
+          text: Ab
+          number: sanft_ab
+          format: "%.0f %%"
+        - type: number
+          text: PWM
+          number: sanft_pwm
+          format: "%.0f %%"
+    - type: switch
+      text: Weihnachtsstern
+      switch: stern
+      on_text: an
+      off_text: aus
+    - type: switch
+      text: Dunstabzugshaube
+      switch: haube_kontakt
+      on_text: an
+      off_text: aus
+    - type: menu
+      text: Messwerte
+      items:
+        - type: label
+          text: !lambda 'return "Strom 1: " + to_string((int)(id(i_sense1).state * 100) / 100.0) + " A";'
+        - type: label
+          text: !lambda 'return "Strom 2: " + to_string((int)(id(i_sense2).state * 100) / 100.0) + " A";'
+        - type: number
+          text: Skalierung
+          number: strom_faktor
+          format: "%.1f"
+    - type: command
+      text: Alles stoppen
+      on_value:
+        then: [script.execute: halt_alle]
+    - type: back
+      text: Zurueck
+
+# -----------------------------------------------------------------------------
 # Display
 # -----------------------------------------------------------------------------
+
+# glyphs muss angegeben werden, sonst fehlen Umlaute und das Gradzeichen -
+# ESPHome bettet nur die aufgezaehlten Zeichen ein.
+.glyphs: &glyphs "!\"%()+=,-_.:*/°|'0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ
+  abcdefghijklmnopqrstuvwxyzÄÖÜäöüß"
 
 font:
   - file: "gfonts://Roboto"
     id: font_big
-    size: 28
+    size: 34
+    glyphs: *glyphs
+  - file: "gfonts://Roboto"
+    id: font_mid
+    size: 18
+    glyphs: *glyphs
   - file: "gfonts://Roboto"
     id: font_small
-    size: 14
+    size: 13
+    glyphs: *glyphs
 
 # ST7789 ist in ESPHome nativ enthalten - die 214-Kommando-Initsequenz des
 # ST77916 entfaellt ersatzlos. Das 240x280-Panel sitzt auf einem 240x320-
@@ -404,17 +510,43 @@ display:
     update_interval: 1s
     lambda: |-
       // Quer: 280 breit, 240 hoch. Mitte x = 140.
+      // Solange das Menue offen ist, zeichnet es selbst - dann haelt sich der
+      // Startbildschirm heraus.
+      if (id(hauptmenu).is_active()) return;
+
       it.fill(Color::BLACK);
-      if (id(raum_temp).has_state()) {
-        it.printf(140, 90, id(font_big), TextAlign::CENTER,
+
+      // --- Raumklima, die grosse Zahl ---------------------------------
+      if (id(raum_temp).has_state())
+        it.printf(140, 8, id(font_big), TextAlign::TOP_CENTER,
                   "%.1f°C", id(raum_temp).state);
-      }
-      if (id(raum_hum).has_state()) {
-        it.printf(140, 140, id(font_small), TextAlign::CENTER,
+      if (id(raum_hum).has_state())
+        it.printf(140, 50, id(font_mid), TextAlign::TOP_CENTER,
                   "%.0f %% rF", id(raum_hum).state);
-      }
-      it.printf(140, 180, id(font_small), TextAlign::CENTER,
+
+      it.line(20, 82, 260, 82);
+
+      // --- Fenster: Verschluss und Sabotage je Seite -------------------
+      it.printf(20, 92, id(font_small), TextAlign::TOP_LEFT, "Fenster 1: %s%s",
+                id(fenster1).state ? "offen" : "zu",
+                id(sabotage1).state ? "  SABOTAGE" : "");
+      it.printf(20, 112, id(font_small), TextAlign::TOP_LEFT, "Fenster 2: %s%s",
+                id(fenster2).state ? "offen" : "zu",
+                id(sabotage2).state ? "  SABOTAGE" : "");
+
+      // --- Motorstroeme, nur wenn nennenswert --------------------------
+      if (id(i_sense1).has_state() && id(i_sense1).state > 0.05f)
+        it.printf(20, 138, id(font_small), TextAlign::TOP_LEFT,
+                  "Motor 1: %.2f A", id(i_sense1).state);
+      if (id(i_sense2).has_state() && id(i_sense2).state > 0.05f)
+        it.printf(20, 158, id(font_small), TextAlign::TOP_LEFT,
+                  "Motor 2: %.2f A", id(i_sense2).state);
+
+      // --- Fusszeile: Praesenz und Stern ------------------------------
+      it.printf(20, 216, id(font_small), TextAlign::BASELINE_LEFT, "%s",
                 id(bewegung).state ? "anwesend" : "");
+      it.printf(260, 216, id(font_small), TextAlign::BASELINE_RIGHT, "%s",
+                id(stern).state ? "Stern an" : "");
 
 # -----------------------------------------------------------------------------
 # Sensorik
@@ -495,33 +627,55 @@ binary_sensor:
   #
   # Die Zuordnung Richtung -> Aktion ist VORLAEUFIG. Verbindlich wird sie
   # erst mit der Menue-Zustandsmaschine, Punkt 37.
+  # Jede Taste hat zwei Bedeutungen: im Menue navigiert sie, sonst fährt sie.
+  # OK oeffnet das Menue, wenn keines offen ist - das ist der einzige Weg
+  # hinein, und die Scheibe beschriftet ihn passend.
   - platform: template
     name: Taste Hoch
     id: taste_hoch
     lambda: 'return id(ecke_ol).state && id(ecke_or).state;'
     filters: [delayed_on: 30ms]
     on_press:
-      then: [cover.open: jalousie1, cover.open: jalousie2]
+      then:
+        - if:
+            condition: {lambda: 'return id(hauptmenu).is_active();'}
+            then: [display_menu.up: hauptmenu]
+            else: [cover.open: jalousie1, cover.open: jalousie2]
   - platform: template
     name: Taste Runter
     id: taste_runter
     lambda: 'return id(ecke_ul).state && id(ecke_ur).state;'
     filters: [delayed_on: 30ms]
     on_press:
-      then: [cover.close: jalousie1, cover.close: jalousie2]
+      then:
+        - if:
+            condition: {lambda: 'return id(hauptmenu).is_active();'}
+            then: [display_menu.down: hauptmenu]
+            else: [cover.close: jalousie1, cover.close: jalousie2]
   - platform: template
     name: Taste OK
     id: taste_ok
     lambda: 'return id(ecke_or).state && id(ecke_ur).state;'
     filters: [delayed_on: 30ms]
     on_press:
-      then: [script.execute: halt_alle]
+      then:
+        - if:
+            condition: {lambda: 'return id(hauptmenu).is_active();'}
+            then: [display_menu.enter: hauptmenu]
+            else: [display_menu.show: hauptmenu]
   - platform: template
     name: Taste Play
     id: taste_play
     lambda: 'return id(ecke_ol).state && id(ecke_ul).state;'
     filters: [delayed_on: 30ms]
-    # noch ohne Funktion - vorgesehen fuer den Automatikbetrieb
+    on_press:
+      then:
+        # Im Menue: eine Ebene zurueck. Ausserhalb: alles anhalten - die
+        # naheliegendste Funktion fuer eine Taste, die man im Dunkeln trifft.
+        - if:
+            condition: {lambda: 'return id(hauptmenu).is_active();'}
+            then: [display_menu.left: hauptmenu]
+            else: [script.execute: halt_alle]
 
   # Praesenz vor dem Display. Der VL53L1X sitzt auf dem Top-Board und schaut
   # durch das Fenster im oberen Steg der Frontplatte. Der Interrupt GPIO1
