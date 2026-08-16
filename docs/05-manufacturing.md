@@ -92,6 +92,34 @@ rekonstruierbar ist.
 > Dokumentation („Mid und Top sind platziert, aber noch nicht geroutet") waren
 > die richtigen.
 
+### Bottom: der frische Lauf war schlechter, der alte Stand bleibt
+
+Am 17.08.2026 wurde das Bottom-Board auf ausdrücklichen Wunsch neu geroutet,
+obwohl davon abgeraten war. Das Ergebnis bestätigt den Einwand:
+
+| | Segmente | Vias | offene Verbindungen | Kupferfehler |
+|---|---:|---:|---:|---:|
+| **alter Stand** | **985** | 102 | 61 | **0** |
+| frischer Lauf | 835 | 89 | 78 | **602** |
+
+Der neue Lauf ist auf jeder Achse schlechter — weniger Verdrahtung, mehr
+offene Verbindungen, und 503 Abstands- plus 99 Bohrungsverletzungen, wo vorher
+keine einzige war. **Der alte Stand ist wiederhergestellt** (er lag ohnehin im
+Git), der neue liegt zum Nachsehen im Scratchpad.
+
+Der Grund ist kein Zufall und kein Fehler des Containers: Der 985er-Stand ist
+laut Git-Historie **das ausgewählte beste Ergebnis aus mehreren Anläufen**
+(„Fortsetzungsstand übernommen", „frischer Lauf gestartet", „bester
+Routing-Stand übernommen"). Ein einzelner frischer Lauf kann das nicht
+zuverlässig schlagen — Freerouting ist nicht deterministisch gut.
+
+> **Methodenfehler, der dabei fast durchgegangen wäre:** Der erste Vergleich
+> maß den alten Stand als Kopie *außerhalb* seines Projektverzeichnisses. Ohne
+> `.kicad_pro` fällt `kicad-cli drc` auf KiCads Standardregeln zurück — 0,2 mm
+> statt der hier gültigen 0,15 mm — und meldete 508 Verletzungen für ein Board,
+> das in Wahrheit keine hat. **Ein DRC-Vergleich ist nur im Projektverzeichnis
+> gültig.**
+
 ### Was der Mid-Lauf gezeigt hat
 
 Der frühere Lauf unter Linux endete mit 655 Segmenten, 73 Vias und **null**
