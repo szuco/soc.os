@@ -1,8 +1,10 @@
 # KiCad SwitchStack
 
 Dreistufiges ESP32-Steuerungsmodul für eine massive Schalter-Unterputzdose (61 mm tief).
-Drei runde, gestapelte Leiterplatten à Ø 52,0 mm steuern zwei 24-V-Jalousiemotoren,
-lesen Sensorik aus und kommunizieren primär über RS-485.
+Drei gestapelte Leiterplatten steuern zwei 24-V-Jalousiemotoren, lesen Sensorik aus und
+kommunizieren primär über RS-485. **Bottom und Mid sind rund (Ø 52 mm) und sitzen in der
+Dose; Top ist quadratisch (47 × 47 mm) und sitzt davor** — hinter der Busch-Jaeger
+Zentralscheibe 6435-914, deren Drucktasten in den Ecken liegen.
 
 ## Zentrale Designregel
 
@@ -53,11 +55,11 @@ EMV, Messqualität und Wartbarkeit zentral.
 hardware/
   bottom_power_motor/   KiCad BOTTOM (24 V, Motor, DC/DC)
   mid_logic/            KiCad MID (ESP32-S3, RS-485, Expander, PhotoMOS, Piezo)
-  top_ui/               KiCad TOP (USB-C, Runddisplay, 8 Taster, SHT4x, ToF, Stern)
+  top_ui/               KiCad TOP (USB-C, Display 1,69", 4 Ecktaster, SHT4x, ToF, Stern)
   lib/                  Gemeinsame Symbol-/Footprint-/3D-Bibliotheken
   bom/                  Beschaffung und Fertigerempfehlung
   fab/                  Erzeugte Fertigungsdaten und der Nutzen (Build-Ergebnis)
-mechanical/             Frontplatte: build123d-Modell, FreeCAD-Makro, STEP/STL
+mechanical/             Adapter zur BJ-Zentralscheibe: build123d-Modell, STEP/STL
 tools/                  Generatoren (Mechanik, Schaltpläne, Layouts, Routing, Fertigung)
 firmware/
   esphome/              ESPHome-Konfiguration für Home Assistant
@@ -86,9 +88,14 @@ python3 tools/gen_panel.py           # Fertigungsnutzen aus den drei Quellprojek
 python3 mechanical/adapter.py        # Adapter für die BJ-Zentralscheibe, mit Selbsttest
 ```
 
-Beide Skripte prüfen ihr Ergebnis und melden Abweichungen. `gen_boards.py` braucht die
-`pcbnew`-Python-API aus einer KiCad-Installation, `adapter.py` braucht `build123d`
-(`pip install build123d`).
+Jedes dieser Skripte prüft sein Ergebnis und meldet Abweichungen. `gen_boards.py`,
+`gen_layouts.py`, `gen_fab.py` und `gen_panel.py` brauchen die `pcbnew`-Python-API aus
+einer KiCad-Installation, `adapter.py` braucht `build123d` (`pip install build123d`),
+`route_boards.py` einen Container (siehe `docs/05`).
+
+Dazu zwei Werkzeuge ohne Hardware: `python3 tools/display_mock.py` zeichnet den
+Displayinhalt als PNG, und `esphome compile firmware/esphome/switchstack.yaml`
+übersetzt die Firmware vollständig.
 
 Auch der Bottom-Schaltplan wird erzeugt: Die Konnektivität steht als Quelltext, und
 nach dem Schreiben liest `kicad-cli` die Netzliste zurück und vergleicht sie gegen
@@ -113,7 +120,7 @@ Vollständige Gegenüberstellung von umgesetzten und fehlenden Funktionen:
 | Fertigungsnutzen (3 Platinen in einer Boarddatei) | **erzeugt:** `hardware/fab/panel/` — 173,4 × 64,4 mm, zwei Kreise + ein Quadrat |
 | Fertigungsdaten | **keine** — `python3 tools/gen_fab.py` nach dem Routing, mit DRC-Gate |
 | ESPHome-Firmware | **übersetzt** (`esphome compile`, 2026.7.4 / IDF 5.5.5): RAM 35 %, Flash 56 %. Alle Lambdas geprüft. Motoren fahren **auf Zeit** |
-| Lasterkennung, ToF-Distanz, Menü, RS-485-Protokoll | **fehlen** — eigene C++-Komponente, s. docs/13 |
+| Lasterkennung, ToF-Distanz, RS-485-Protokoll | **fehlen** — die ersten beiden brauchen eine eigene C++-Komponente, s. docs/13 |
 | Gefertigt oder gemessen | **nichts** |
 
 Nächste Schritte: [`docs/07-roadmap.md`](docs/07-roadmap.md).
