@@ -178,3 +178,7 @@ Layout frei: **F3** (Fensterausschnitt → Display), **F5/F10** (Tastenpositione
 |---|---|---|---|
 | 52 | P2 | **Der Nutzen ist für die Leiterplattenfertigung ausgelegt, nicht für die Bestückung.** Es fehlen Passermarken, breitere Ränder und Werkzeugbohrungen | Drei Fiducials global (diagonal versetzt) plus lokale an ESP32-Modul, PCF8575 (0,65 mm Raster) und USB-C; Ränder von 4,0 auf 5–10 mm an zwei gegenüberliegenden Seiten; zwei bis drei unbelegte Ø-3-Löcher. `gen_panel.py` erzeugt das alles noch nicht. Erst nötig, wenn bestückt bestellt wird — die reine Leiterplattenfertigung geht auch so |
 
+| # | Prio | Entscheidung | Bemerkung |
+|---|---|---|---|
+| 53 | **P1** | **Versatz beim Schließen — welcher Flügel zuerst?** Der Original-Controller K0000230 startet Flügel 2 beim Schließen **6 Sekunden später**. Zweiflügelige Klappläden überlappen geschlossen; ohne Versatz schlagen sie aufeinander. Die jetzige Firmware schließt beide gleichzeitig | Zu klären ist nur, **welcher** Flügel überdeckt — er muss zuletzt schließen und zuerst öffnen. Danach zwei Zeilen Firmware: eine `number`-Entität für den Versatz (Vorgabe 6 s) und ein `delay` im Schließskript des überdeckenden Kanals. Beim Öffnen gilt es spiegelbildlich |
+

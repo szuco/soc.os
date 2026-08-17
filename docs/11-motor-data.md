@@ -15,6 +15,31 @@ Fensterläden), ergänzt um Angaben des Nutzers zum realen Motor.
 > zwei Adern**. Die Konsequenzen stehen in Abschnitt 3 und gehen in die
 > unangenehme Richtung.
 
+## 0. Das Original ist identifiziert
+
+Der Antrieb ist ein **MANTION SMT „URANUS"**, der Steuerung liegt der Controller
+**K0000230** bei (24 V DC, Made in France, Klemmen `1A/1B` = Motor 1,
+`2A/2B` = Motor 2, dazu ein Prog-Taster). Das Datenblatt bestätigt die bisher
+angenommenen Werte — 24 V DC ±10 %, 100 W, 25 Nm, 1,9 U/min, 18 s Fahrzeit,
+−20/+60 °C, 50 kg je Flügel — und liefert zwei Angaben, die vorher fehlten:
+
+**„Type de fin de course: Dynamique (arrêt sur obstacle)."** Der Hersteller
+selbst kennt keine Endschalter, sondern erkennt den Anschlag am Widerstand.
+Das ist die externe Bestätigung für den ganzen Ansatz dieses Projekts: Die
+Endlage über Fahrzeit und Stromverlauf zu bestimmen ist nicht der Notbehelf,
+für den es aussehen könnte, sondern genau das, was das Original auch tut.
+
+**Beim Schließen fährt Flügel 2 um 6 Sekunden versetzt.** Wörtlich aus der
+Anleitung: *„Lors de la fermeture le battant 2 démarre avec un décalage de 6 s."*
+Zweiflügelige Klappläden überlappen im geschlossenen Zustand — der überdeckende
+Flügel muss zuletzt schließen und zuerst öffnen, sonst schlagen sie aufeinander.
+Das ist **keine Komfortfunktion, sondern eine Kollisionsvermeidung**, und in
+dieser Firmware fehlt sie: `taste_runter` schließt heute beide gleichzeitig.
+Aufgenommen als Punkt 53.
+
+Der Controller lernt seine Fahrzeiten übrigens selbst — ein Zyklus „ganz auf,
+dann zu" auf Knopfdruck. Das ist das Vorbild für eine spätere Einlernfunktion.
+
 ## 1. Gesicherte Daten
 
 | Angabe | Wert | Bedeutung fürs Design |
