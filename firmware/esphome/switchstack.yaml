@@ -303,8 +303,8 @@ number:
   # der interne ADC daraus macht. Deshalb einstellbar statt fest.
   #
   # Der Shunt ist am 17.08.2026 von 1 auf 5 mOhm gewachsen, weil der gemessene
-  # Blockierstrom nur 1,6 A betraegt statt der angenommenen 25 A. Der Abstand
-  # zwischen Fahrt (0,3-1,0 A) und Anschlag (1,6 A) ist damit klein, und die
+  # Blockierstrom nur 1,7 A betraegt statt der angenommenen 25 A. Der Abstand
+  # zwischen Fahrt (0,3-1,0 A) und Anschlag (1,7 A) ist damit klein, und die
   # Endlagenerkennung haengt genau an diesem Abstand - siehe docs/11.
   - platform: template
     name: Stromskalierung

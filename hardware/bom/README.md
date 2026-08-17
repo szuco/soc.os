@@ -33,9 +33,9 @@ Begründung der Displaywahl im Detail: [`../../docs/09-display-and-mcu.md`](../.
 | Funktion | Kandidat | Kernkriterium bei der Auswahl |
 |---|---|---|
 | Gate-Treiber ×4 | **IR2104** (Halbbrücke, `~SD`-Eingang) | zwei je Motorkanal; `~SD` ist der Eingriffspunkt des Hardware-Trips |
-| Shunt ×2 | **5 mΩ**, 1 W, 4-Terminal (Kelvin), 2512 | 4-Terminal ist Pflicht. 5 statt 1 mΩ seit der Blockierstrommessung (1,6 A): ergibt mit INA240-Verstärkung 50 genau 0,25 V/A und ±6,6 A Messbereich |
+| Shunt ×2 | **5 mΩ**, 1 W, 4-Terminal (Kelvin), 2512 | 4-Terminal ist Pflicht. 5 statt 1 mΩ seit der Blockierstrommessung (1,7 A): ergibt mit INA240-Verstärkung 50 genau 0,25 V/A und ±6,6 A Messbereich |
 | Current-Sense-Amp ×2 | **INA240A2D** | bidirektional, hoher Gleichtaktbereich, PWM-tauglich |
-| Comparator + Latch ×2 | **LM393** (Fenster) + **74AUP1G74** | wirkt ohne Firmware |
+| Comparator + Latch ×2 | **TLV3702** (Fenster) + **74AUP1G74** | wirkt ohne Firmware. **Kein LM393** — dessen Gleichtakt-Eingangsbereich reicht bei 3,3 V nur bis 1,8 V, die obere Trip-Schwelle liegt bei 2,752 V. Pflicht sind **Rail-to-Rail-Eingang** und **Open-Drain-Ausgang** (das Wire-OR hängt daran), SOIC-8 im Standard-Pinout. Vor der Bestellung gegen das Datenblatt prüfen — siehe Punkt 57 |
 | Buck 24→5 V | **TPS54360DDA** | strikt nach Referenzlayout aufbauen |
 | Buck 5→3,3 V | **TLV62569DBV** | |
 | Buck 24→6,2 V | **TPS54360DDA** (gleiches Teil wie oben) | für den Weihnachtsstern |
@@ -60,7 +60,7 @@ Begründung der Displaywahl im Detail: [`../../docs/09-display-and-mcu.md`](../.
 
 | Position | Kandidat | Prüfpunkt |
 |---|---|---|
-| Bottom, 6-polig | **Micro-Fit 3.0 2×3 reicht** | Pin 1/2 führen ≈ 3,9 A Spitze, nicht die früher angenommenen 9 A. Mini-Fit Jr. ist nicht mehr nötig — siehe [`../../docs/01-power-tree.md`](../../docs/01-power-tree.md) |
+| Bottom, 6-polig | **Micro-Fit 3.0 2×3 reicht** | Pin 1/2 führen ≈ 4,1 A Spitze, nicht die früher angenommenen 9 A. Mini-Fit Jr. ist nicht mehr nötig — siehe [`../../docs/01-power-tree.md`](../../docs/01-power-tree.md) |
 | Stern-Ausgang | **2,5-mm-Klinkenbuchse** an der Front | 80 mA, unkritisch; Bauhöhe max. 10,5 mm, Footprint noch Platzhalter (Punkt 30) |
 | Stack ×2 | 2×20, 1,27 mm | **≈ 1 A pro Kontakt** — `5V_SYS` braucht mehrere Pins |
 

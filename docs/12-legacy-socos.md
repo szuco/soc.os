@@ -128,7 +128,7 @@ Blatt `SocTemperature` mit **beiden** ausgearbeiteten Varianten —
 - **NTC 10k, MF52-103, B = 3435, 1 %** als Analogvariante.
 
 Der aktuelle Stand hat nur den **On-Board**-Sensor SHT4x. Der misst die Temperatur
-*in der Unterputzdose*, direkt über einer Endstufe mit bis zu 3,9 A — als Raum- oder
+*in der Unterputzdose*, direkt über einer Endstufe mit bis zu 4,1 A — als Raum- oder
 Fensterlaibungstemperatur ist er damit systematisch falsch. Ein externer Fühler ist
 keine Zusatzfunktion, sondern die Voraussetzung dafür, dass der Messwert überhaupt
 etwas bedeutet. Aufgenommen als Punkt 35.

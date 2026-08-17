@@ -21,15 +21,15 @@ Fensterläden), ergänzt um Angaben des Nutzers zum realen Motor.
 > |---|---|---:|---:|
 > | M7 | 2 V anlegen, Strom messen | 0,116 A | 17,2 Ω |
 > | M3 | 24 V, Abtrieb blockiert | **1,6 A** | **15,0 Ω** |
-> | M6 | Multimeter direkt an den Motoradern | — | **16,5 / 20 Ω** |
+> | M6 | Multimeter direkt an den Motoradern | — | **14 … 20 Ω** |
 >
 > Drei völlig verschiedene Verfahren, Spannungen zwölffach auseinander, und alle
-> drei landen zwischen 15 und 17,2 Ω. Damit ist die Sache entschieden.
+> landen zwischen 14 und 20 Ω. Damit ist die Sache entschieden.
 >
 > Für die Auslegung zählt der **kleinste** Wert, denn er ergibt den größten
-> Strom: **R = 15 Ω, I_Blockier = 1,6 A.** Ausgelegt wird auf **2 A**.
+> Strom: **R = 14 Ω, I_Blockier = 1,7 A.** Ausgelegt wird auf **2 A**.
 >
-> (M6 streut mit 16,5 und 20 Ω sichtbar — genau das erwartet man, denn der
+> (M6 streut mit 14, 16,5 und 20 Ω sichtbar — genau das erwartet man, denn der
 > Bürstenübergang macht den Widerstand von der Läuferstellung abhängig. **Alle
 > Streuung liegt nach oben**, und höher heißt weniger Strom. Der Nullpunkt der
 > Messleitungen liegt bei 0,2 Ω und ist damit unter 1,5 %; die Warnung weiter
@@ -38,7 +38,7 @@ Fensterläden), ergänzt um Angaben des Nutzers zum realen Motor.
 > **Das ist ein Sechzehntel der zuvor angenommenen 25 A.** Abschnitt 5 ist
 > daraufhin komplett neu gerechnet.
 >
-> Und das Typenschild? 24 V an 15 Ω sind **maximal 38 W** — der Motor *kann*
+> Und das Typenschild? 24 V an 14 Ω sind **maximal 41 W** — der Motor *kann*
 > keine 100 W aufnehmen, in keinem Zustand. Zwei Motoren blockiert ergeben
 > 76 W, plus Reserve rund 100 W. Die Zahl auf dem Schild ist mit hoher
 > Wahrscheinlichkeit die **empfohlene Netzteilgröße der Anlage**, nicht die
@@ -106,20 +106,20 @@ P_mech = 25 Nm × (1,9 U/min × 2π/60) = 25 × 0,199 rad/s ≈ 4,97 W
 **Der Laufstrom liegt also bei etwa 0,3–1,0 A.**
 
 Der Blockierstrom folgt aus `I = U / R_Anker` — ohne interne Elektronik begrenzt
-ihn nichts anderes. Gemessen sind 15 Ω, also **1,6 A**. Damit ergibt sich das
+ihn nichts anderes. Gemessen sind 14 Ω, also **1,7 A**. Damit ergibt sich das
 vollständige Strombild eines Motors:
 
 | Zustand | Strom bei 24 V | Herkunft |
 |---|---:|---|
 | Leerlauf, nur Getriebereibung | ≈ 0,12 A | gemessen (0,116 A bei 2 V) |
 | Fahrt unter Last | 0,3–1,0 A | aus Moment und Drehzahl gerechnet |
-| **Anschlag / blockiert** | **1,6 A** | **gemessen** |
-| theoretisches Maximum | 1,6 A | `24 V / 15 Ω` — mehr geht physikalisch nicht |
+| **Anschlag / blockiert** | **1,7 A** | **gemessen** |
+| theoretisches Maximum | 1,7 A | `24 V / 14 Ω` — mehr geht physikalisch nicht |
 
 > **Die kleine Spreizung ist die eigentliche Nachricht — und sie geht in die
 > unangenehme Richtung.** Die erste Fassung dieses Abschnitts rechnete mit
 > Laufstrom 0,5 A gegen Blockierstrom 20 A, einem **Faktor 40**, und nannte das
-> „für die Lasterkennung ideal". Tatsächlich stehen 0,3–1,0 A gegen 1,6 A —
+> „für die Lasterkennung ideal". Tatsächlich stehen 0,3–1,0 A gegen 1,7 A —
 > **Faktor 1,6 bis 5**, im ungünstigen Fall also gerade einmal 60 % Anstieg.
 >
 > Für die **Leistungsauslegung** ist das eine große Erleichterung: Sicherung,
@@ -143,7 +143,7 @@ hinfällig:
 | Stall-Erkennung redundant | **Stall-Erkennung ist Kernfunktion.** Ohne sie fährt der Antrieb gegen ein Hindernis, bis der Timeout greift |
 | PWM-synchrone Messung entfällt | **Bleibt in voller Schärfe** — samt Konflikt mit ESPHomes Polling-Modell und dem Bedarf an einer C++-Komponente |
 | Hard-Trip evtl. 6–7 A ausreichend | seit der Messung: **4,4 A** genügt und ergibt sich ohne Bauteiländerung |
-| Steckverbinder-Engpass entschärft | **stimmt wieder** — der Blockierstrom ist mit 1,6 A je Motor unkritisch |
+| Steckverbinder-Engpass entschärft | **stimmt wieder** — der Blockierstrom ist mit 1,7 A je Motor unkritisch |
 
 Damit gelten [`02-motor-control.md`](02-motor-control.md) und
 [`09-display-and-mcu.md`](09-display-and-mcu.md) Abschnitt 4 wieder unverändert.
@@ -156,7 +156,7 @@ wirken — deshalb bleibt der Comparator-plus-Latch pro Kanal zwingend.
 
 > **Was die Messung an dieser Stelle verschiebt: die Gefahr ist mechanisch, nicht
 > elektrisch.** Bei der Blockiermessung am 17.08.2026 wurde am Antrieb etwas
-> verbogen — bei 1,6 A. Das Getriebe macht aus einem elektrisch harmlosen Strom
+> verbogen — bei 1,7 A. Das Getriebe macht aus einem elektrisch harmlosen Strom
 > ein Moment, das Beschläge verformt.
 >
 > Daraus folgt unmittelbar: **Sicherung und Hardware-Trip schützen die Mechanik
@@ -168,7 +168,7 @@ wirken — deshalb bleibt der Comparator-plus-Latch pro Kanal zwingend.
 > damit keine Komfortfunktion, sondern die wirksamste Kraftbegrenzung, die das
 > Gerät hat.
 >
-> Elektrisch bleibt der Dauerblockierfall dagegen entspannt: 38 W im Motor, für
+> Elektrisch bleibt der Dauerblockierfall dagegen entspannt: 41 W im Motor, für
 > die Elektronik ein Nichtereignis. Nur der Motor selbst wird auf Dauer heiß —
 > deshalb der Timeout.
 
@@ -183,7 +183,7 @@ Stromzange oder Shunt am Oszilloskop. Für den Anlaufstrom reicht ein Multimeter
 | # | Messung | Wie | Status |
 |---|---|---|---|
 | **M1** | **Laufstrom** | Laden komplett auf und zu fahren, montiert | 🟡 offen — gerechnet 0,3–1,0 A, misst später das Gerät selbst |
-| **M2** | **Anlaufstrom** | Einschaltmoment | ✅ **erledigt durch M3.** Beim Einschalten steht der Läufer, es fließt also genau der Blockierstrom. Mehr als 1,6 A kann nie fließen — ein Einschaltstoß existiert bei diesem Motor nicht |
+| **M2** | **Anlaufstrom** | Einschaltmoment | ✅ **erledigt durch M3.** Beim Einschalten steht der Läufer, es fließt also genau der Blockierstrom. Mehr als 1,7 A kann nie fließen — ein Einschaltstoß existiert bei diesem Motor nicht |
 | **M3** | **Blockierstrom** | Abtrieb blockieren, U und I **gleichzeitig** ablesen, `R = U/I`. **Bei 2–4 V, nicht bei 24 V** — siehe Warnung unten | ✅ **1,6 A bei 24 V** (17.08.2026) |
 | **M6** | **Ankerwiderstand** | Motor **stromlos**, Multimeter an die zwei Adern. Welle **nicht** von Hand drehbar (Schneckengetriebe selbsthemmend) — stattdessen: messen, Motor kurz ein Stück fahren, erneut messen, **10×** wiederholen | ✅ **16,5 Ω** (17.08.2026, erste Messung) |
 | **M7** | **Kleinspannungsmethode** | Labornetzteil auf **2 V**, Strom messen. Der Motor dreht dabei mit 0,16 U/min noch minimal weiter, der Fehler ist aber klein | ✅ **0,116 A bei 2 V** (16.08.2026) |
@@ -198,7 +198,7 @@ Stromzange oder Shunt am Oszilloskop. Für den Anlaufstrom reicht ein Multimeter
 > 0,2–0,5 Ω mit, also bis zur Hälfte des Messwerts. Deshalb **zuerst die
 > Messspitzen gegeneinander halten** und diesen Wert abziehen.
 >
-> Bei den tatsächlich gemessenen **15 Ω** fällt das nicht mehr ins Gewicht — die
+> Bei den tatsächlich gemessenen **14 bis 20 Ω** fällt das nicht ins Gewicht — die
 > Zuleitungen machen keine 3 % aus. M6 wäre also einfacher gewesen als gedacht,
 > ist durch M3 und M7 aber ohnehin erledigt.
 
@@ -212,9 +212,10 @@ Stromzange oder Shunt am Oszilloskop. Für den Anlaufstrom reicht ein Multimeter
 > Zwei Betriebspunkte, Faktor zwölf in der Spannung, dasselbe Ergebnis. Das
 > Netzteil kann 5 A, war bei 1,6 A also nicht in der Begrenzung.
 >
-> **Ergebnis: R_Anker ≈ 15 Ω, Blockierstrom ≈ 1,6 A.** Weil eine unbemerkte
-> Restdrehung `U/I` immer nach oben verfälscht, ist 15 Ω eine Obergrenze und
-> 1,6 A eine Untergrenze. Ausgelegt wird auf 2 A.
+> **Ergebnis: R_Anker 14 … 20 Ω je nach Läuferstellung.** Weil eine unbemerkte
+> Restdrehung `U/I` immer nach oben verfälscht, ist der M3-Wert eine Obergrenze
+> und sein Strom eine Untergrenze. Maßgeblich ist das Minimum aus allen drei
+> Verfahren: **14 Ω, also 1,7 A.** Ausgelegt wird auf 2 A.
 >
 > **Zwischendurch stand hier, die M7-Messung sei unbrauchbar.** Begründung war
 > der Widerspruch zum Typenschild: 100 W / 24 V = 4,17 A, und ein Motor, der
@@ -225,13 +226,13 @@ Stromzange oder Shunt am Oszilloskop. Für den Anlaufstrom reicht ein Multimeter
 > Richtig an der damaligen Analyse bleibt der physikalische Teil: Bei 2 V dreht
 > der Abtrieb tatsächlich mit 0,16 U/min weiter, eine Umdrehung in gut sechs
 > Minuten. Deshalb sind die 0,116 A etwas kleiner als die 0,133 A, die 2 V an
-> 15 Ω blockiert ergäben — die Differenz ist die Gegenspannung. Der Effekt ist
+> 15 Ω blockiert ergäben (0,133 A) — die Differenz ist die Gegenspannung. Der Effekt ist
 > nur klein, nicht groß, und ändert die Größenordnung nicht.
 >
 > **Der Leerlaufstrom ist damit ebenfalls bekannt:** ≈ 0,12 A, die reine Reibung
 > des Schneckengetriebes. Er gehört als Untergrenze in die Lasterkennung.
 >
-> ⚠️ **Bei der Blockiermessung wurde am Antrieb etwas verbogen.** 1,6 A sind
+> ⚠️ **Bei der Blockiermessung wurde am Antrieb etwas verbogen.** 1,7 A sind
 > elektrisch harmlos, das Getriebe macht daraus aber ein Moment, das Beschläge
 > verformt. Wer die Messung wiederholt, tut das bei **2 bis 4 V**, nicht bei
 > 24 V — die Auswertung über `R = U/I` funktioniert bei jeder Spannung gleich
@@ -259,7 +260,7 @@ messabhängigen Größen waren bewusst als tauschbare Widerstände ausgeführt.
 Jetzt liegt die Messung vor, und sie ist um den Faktor 16 günstiger als die
 Annahme. Geändert wurde daraufhin genau das, was ohne Layoutänderung geht:
 
-| Bauteil | vorher (Annahme 25 A) | jetzt (gemessen 1,6 A) | Layout betroffen? |
+| Bauteil | vorher (Annahme 25 A) | jetzt (gemessen 1,7 A) | Layout betroffen? |
 |---|---|---|---|
 | **Shunt** `R_M1_SH` / `R_M2_SH` | 1 mΩ, 1 W, 2512 Kelvin | **5 mΩ**, sonst gleich | nein — gleicher Footprint |
 | **Trip-Teiler** `R7`/`R8`/`R9` | 10k0/40k2/10k0 → ± 22 A | **unverändert → ± 4,4 A** | nein — der Shunt verschiebt die Schwelle mit |
@@ -279,11 +280,11 @@ Gegenteil richtig, denn der Shunt bestimmt nicht die Belastbarkeit, sondern die
 **Auflösung**.
 
 ```
-1 mΩ:  1,6 A → 1,6 mV am Shunt → 80 mV am INA240-Ausgang
-5 mΩ:  1,6 A → 8,0 mV am Shunt → 400 mV am INA240-Ausgang
+1 mΩ:  1,7 A → 1,7 mV am Shunt → 85 mV am INA240-Ausgang
+5 mΩ:  1,7 A → 8,5 mV am Shunt → 425 mV am INA240-Ausgang
 ```
 
-Der Unterschied zwischen Fahrt (0,3–1,0 A) und Anschlag (1,6 A) beträgt am alten
+Der Unterschied zwischen Fahrt (0,3–1,0 A) und Anschlag (1,7 A) beträgt am alten
 Shunt nur 30–65 mV — in der Größenordnung des ADC-Rauschens des ESP32. Am neuen
 Shunt sind es 150–325 mV, und genau daran hängt die Endlagenerkennung.
 
@@ -294,7 +295,7 @@ Shunt sind es 150–325 mV, und genau daran hängt die Endlagenerkennung.
 | Auflösung ESP32-ADC | ≈ 3 mA je LSB |
 | Verlustleistung bei 2 A | 20 mW — im 1-W-Bauteil ein Nichts |
 | Verlustleistung bei 6,6 A | 0,22 W |
-| Spannungsabfall bei 1,6 A | 8 mV |
+| Spannungsabfall bei 1,7 A | 9 mV |
 
 ### Warum der Hardware-Trip bei 4 A liegt
 
@@ -305,7 +306,7 @@ Schließen auslösen.
 
 ```
 Leerlauf   Fahrt      Anschlag    Soft-Limit   HW-Trip    Sicherung   FET-Grenze
- 0,12 A   0,3-1,0 A    1,6 A       ~2,0 A      4,4 A      6,3 A traege  >30 A
+ 0,12 A   0,3-1,0 A    1,7 A       ~2,0 A      4,4 A      6,3 A traege  >30 A
 ```
 
 Mit `R7 = R9 = 10k0` und `R8 = 40k2` an 3,3 V ergibt sich `V_TRIP_HI = 2,752 V`
@@ -330,14 +331,14 @@ löst sofort aus. Genau dafür ist der Trip noch da; die Mechanik schützt er ni
 ### Was bewusst *nicht* geändert wurde
 
 **Die diskrete H-Brücke bleibt.** Sie wurde nur deshalb diskret aufgebaut, weil
-der Blockierstrom unbekannt war — bei 1,6 A wäre ein monolithischer Treiber wie
+der Blockierstrom unbekannt war — bei 1,7 A wäre ein monolithischer Treiber wie
 der DRV8871 (3,6 A Spitze) heute die naheliegende Wahl und würde die
 Bottom-Platine erheblich entlasten. Dagegen steht, dass die Platine bereits
 geroutet ist. Der Umbau wäre ein vollständiges Neulayout, der Gewinn nur Fläche,
 die ohnehin schon vergeben ist. Aufgenommen als Option in
 [`06-open-decisions.md`](06-open-decisions.md), nicht als Aufgabe.
 
-**Die 2-oz-Frage ist erledigt, nicht geändert:** Bei 3,9 A Summenstrom im
+**Die 2-oz-Frage ist erledigt, nicht geändert:** Bei 4,1 A Summenstrom im
 ungünstigsten Fall reicht Standard-1-oz-Kupfer, die vorhandenen breiten Bahnen
 schaden nicht. Siehe [`05-manufacturing.md`](05-manufacturing.md).
 
@@ -359,14 +360,14 @@ I = (U - E) / R          E = Gegenspannung, proportional zur Drehzahl
 Bei blockiertem Läufer ist `E = 0`, also `I = U / R` — das ist das Maximum. **Ein
 Drehmoment taucht in dieser Gleichung nicht auf.** Egal wie stark die Last ist,
 mehr als `U/R` kann nicht fließen. Wind kann den Motor nur langsamer machen, und
-langsamer heißt: näher an 1,6 A, nie darüber.
+langsamer heißt: näher an 1,7 A, nie darüber.
 
 Es gibt genau drei Wege, die Grenze doch zu überschreiten:
 
 | Weg | Rechnung | Bewertung |
 |---|---|---|
-| Netzspannung am oberen Toleranzrand | 26,4 V / 15 Ω = **1,76 A** | eingerechnet |
-| **Umpolen bei drehendem Motor** — die Gegenspannung addiert sich | bis 2 × 24 V / 15 Ω = **3,2 A** | der eigentliche Worst Case; die Firmware hält 300 ms Stoppause, und das selbsthemmende Schneckengetriebe bremst den Läufer in wenigen Millisekunden |
+| Netzspannung am oberen Toleranzrand | 26,4 V / 14 Ω = **1,89 A** | eingerechnet |
+| **Umpolen bei drehendem Motor** — die Gegenspannung addiert sich | bis 2 × 24 V / 14 Ω = **3,4 A** | der eigentliche Worst Case; die Firmware hält 300 ms Stoppause, und das selbsthemmende Schneckengetriebe bremst den Läufer in wenigen Millisekunden |
 | Motor wird mechanisch angetrieben (Generatorbetrieb) | — | durch die Selbsthemmung praktisch ausgeschlossen |
 
 **Der Hardware-Trip liegt mit 4,4 A über allen dreien.** Das ist der Grund für
@@ -377,15 +378,15 @@ dieser Platine ohnehin nichts gefährdet ist.
 
 Die Messung ist durch zwei Betriebspunkte gestützt (2 V und 24 V, Faktor zwölf
 auseinander, Abweichung 13 %). Trotzdem die Gegenprobe — angenommen, der wahre
-Ankerwiderstand wäre nur 7,5 Ω und der Blockierstrom **3,2 A statt 1,6 A**:
+Ankerwiderstand wäre nur 7 Ω und der Blockierstrom **3,4 A statt 1,7 A**:
 
 | Bauteil | hält das? |
 |---|---|
 | MOSFETs (> 60 A), IR2104, Leiterbahnen | ✅ um Größenordnungen |
-| Shunt 5 mΩ, 1 W | ✅ 51 mW bei 3,2 A |
+| Shunt 5 mΩ, 1 W | ✅ 58 mW bei 3,4 A |
 | Messbereich ± 6,6 A | ✅ |
-| **Hardware-Trip 4,4 A** | ✅ noch 38 % Abstand |
-| Steckverbinder Micro-Fit 3.0 (2 × 3,2 A + 0,7 A = 7,1 A) | ⚠️ grenzwertig |
+| **Hardware-Trip 4,4 A** | ✅ noch 29 % Abstand |
+| Steckverbinder Micro-Fit 3.0 (2 × 3,4 A + 0,7 A = 7,5 A) | ⚠️ grenzwertig |
 | **Sicherung 6,3 A träge** | ❌ **fliegt beim beidseitigen Anschlag** |
 
 Nur zwei Positionen reagieren überhaupt, und die Sicherung ist dabei kein Risiko,
@@ -397,7 +398,7 @@ damit gegen einen Faktor-2-Irrtum abgesichert, ohne dass etwas kaputtgeht.
 
 `M6` — Multimeter direkt an die zwei Motoradern, Motor stromlos — galt bisher als
 unzuverlässig, weil bei erwarteten 1 Ω die Messleitungen selbst 0,2–0,5 Ω
-beitragen. **Bei 15 Ω sind das keine 3 %.** Die Messung ist damit auf einen
+beitragen. **Bei 14 bis 20 Ω sind das keine 1,5 %.** Die Messung ist damit auf einen
 Schlag aussagekräftig:
 
 1. Motor **abklemmen**, beide Adern frei.
@@ -406,18 +407,18 @@ Schlag aussagekräftig:
 4. Motor ein Stück verfahren, erneut messen — der Bürstenübergang macht den Wert
    winkelabhängig. **Fünfmal, kleinsten Wert nehmen.**
 
-**Erwartet waren 14–17 Ω — gemessen wurden 16,5 und 20 Ω.** Damit ist die Auslegung
+**Erwartet waren 14–17 Ω — gemessen wurden 14, 16,5 und 20 Ω.** Damit ist die Auslegung
 dreifach bestätigt und der Faktor-2-Irrtum aus Abschnitt 6.2 ausgeschlossen. Die
 Sicherung bleibt bei 6,3 A, der Steckverbinder bei Micro-Fit 3.0.
 
-Die Streuung zwischen 16,5 und 20 Ω ist kein Widerspruch, sondern der erwartete
+Die Streuung zwischen 14 und 20 Ω ist kein Widerspruch, sondern der erwartete
 Bürsteneffekt: Je nach Läuferstellung liegen unterschiedlich viele Lamellen im
-Strompfad. **Für die Auslegung zählt das Minimum**, und das liefert nicht M6,
-sondern M3 mit 15,0 Ω — eine echte Strommessung bei voller Spannung. Auf diesen
-15 Ω steht die Auslegung, sie ist also die konservativste der drei Messungen.
+Strompfad. **Für die Auslegung zählt das Minimum**, und das sind die **14 Ω**
+der letzten M6-Messung — knapp unter den 15,0 Ω, die M3 als Strommessung bei
+voller Spannung ergeben hat. Auf diesen 14 Ω steht die Auslegung.
 
-Selbst wenn eine ungünstige Läuferstellung noch einmal 15 % darunter läge —
-13 Ω, 1,85 A — bleibt bis zum Trip bei 4,4 A ein Faktor 2,4.
+Selbst wenn eine noch ungünstigere Stellung 15 % darunter läge — 12 Ω, 2,0 A —
+bliebe bis zum Trip bei 4,4 A ein Faktor 2,2.
 
 ### 6.4 Wind: das Problem ist mechanisch, nicht elektrisch
 
@@ -433,11 +434,11 @@ Für eine Überschlagsrechnung ein Flügel von 0,6 × 1,4 m (0,84 m²), Hebelarm
 Das Motormoment beträgt **25 Nm**. Schon bei rund 40 km/h ist der Antrieb also am
 Anschlag seines Vermögens, bei 90 km/h steht ihm das Fünffache entgegen.
 
-Elektrisch ändert das nichts — der Strom bleibt bei 1,6 A gedeckelt. **Das Gerät
+Elektrisch ändert das nichts — der Strom bleibt bei 1,7 A gedeckelt. **Das Gerät
 merkt vom Wind nur, dass der Motor langsamer wird.** Und genau daraus entstehen
 die beiden realen Fehlerbilder:
 
-**Gegenwind** bremst den Flügel, der Strom steigt Richtung 1,6 A, und die
+**Gegenwind** bremst den Flügel, der Strom steigt Richtung 1,7 A, und die
 Lasterkennung hält das für den Anschlag. Der Laden bleibt auf halbem Weg stehen,
 das Gerät meldet „geschlossen".
 

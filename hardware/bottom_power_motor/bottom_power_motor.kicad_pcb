@@ -7985,7 +7985,7 @@
 				)
 			)
 		)
-		(property "Value" "LM393"
+		(property "Value" "TLV3702"
 			(at 0 3.4 0)
 			(layer "F.Fab")
 			(uuid "63f65aa5-cff9-4fff-9197-5323138a4b59")
@@ -25161,7 +25161,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "LM393"
+		(property "Value" "TLV3702"
 			(at 0 -3.4 -90)
 			(layer "B.Fab")
 			(uuid "0c93d29f-343e-4c89-82c1-a17c2b6cc04c")

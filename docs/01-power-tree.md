@@ -34,7 +34,7 @@ Pfad zu USB-VBUS. Diese Eigenschaft beim Schaltplanentwurf nicht versehentlich a
 
 > **Vollständig neu gerechnet am 17.08.2026.** Die frühere Bilanz setzte
 > 4,17 A je Motor an — abgeleitet aus dem Typenschild (100 W / 24 V) — und kam
-> auf ≈ 9 A. Die Messung des Ankerwiderstands ergibt **15 Ω und damit 1,6 A
+> auf ≈ 9 A. Die Messung des Ankerwiderstands ergibt **14 Ω und damit 1,7 A
 > Blockierstrom je Motor**; mehr kann physikalisch nicht fließen. Die 100 W sind
 > die Netzteilempfehlung der Anlage, nicht die Aufnahme eines Motors. Herleitung
 > in [`11-motor-data.md`](11-motor-data.md).
@@ -48,10 +48,10 @@ weil das Gerät ohne Endschalter arbeitet:
 | 2 × Motor | 0,6–2,0 A | **3,2 A** |
 | 5-V-Rail 3 A bei η ≈ 0,9 | 0,69 A | 0,69 A |
 | 6,2-V-Rail 80 mA | ≈ 0,02 A | ≈ 0,02 A |
-| **Summe** | **≈ 1,7 A** | **≈ 3,9 A** |
+| **Summe** | **≈ 1,7 A** | **≈ 4,1 A** |
 
 Eine Anlaufspitze darüber hinaus gibt es nicht: Beim Einschalten steht der
-Läufer, es fließt also genau der Blockierstrom von 1,6 A. Bei einem Motor ohne
+Läufer, es fließt also genau der Blockierstrom von 1,7 A. Bei einem Motor ohne
 eigene Elektronik ist der Einschaltstrom identisch mit dem Blockierstrom und
 kann ihn nicht überschreiten.
 
@@ -63,7 +63,7 @@ kann ihn nicht überschreiten.
 > Interlock oder ein anderes Pinout.
 >
 > **Alle drei sind hinfällig.** Der Summenstrom beträgt im ungünstigsten Fall
-> 3,9 A, im Fahrbetrieb 1,7 A. Die Motorpins führen je 1,6 A. Micro-Fit 3.0
+> 4,1 A, im Fahrbetrieb 1,7 A. Die Motorpins führen je 1,7 A. Micro-Fit 3.0
 > trägt das auch bei voll bestücktem Gehäuse und benachbart stromführenden
 > Kontakten mit deutlicher Reserve.
 >
@@ -99,14 +99,14 @@ kann ihn nicht überschreiten.
 ## 5. Schutz und EMV
 
 ### Eingang
-- Sicherung `F1` am 24-V-Eingang, träge, **6,3 A**. Sie muss die 3,9 A des
+- Sicherung `F1` am 24-V-Eingang, träge, **6,3 A**. Sie muss die 4,1 A des
   beidseitigen Anschlags dauerhaft tragen — das ist ein normaler Betriebszustand,
   kein Fehler — und darf im Unterputzgehäuse auch bei Wärme nicht zum
   Fehlauslöser werden. 5 A wäre nach Derating zu knapp. Ein echter Kurzschluss
   liegt weit darüber und löst sicher aus.
 - TVS-Diode gegen Transienten, Durchbruchspannung oberhalb 24 V +10 % plus Toleranz.
 - Optionaler Verpolschutz. Ein P-FET in der Plusleitung oder ein N-FET in der
-  Rückleitung bleibt die bessere Wahl; bei nur 3,9 A wäre eine Serien-Diode
+  Rückleitung bleibt die bessere Wahl; bei nur 4,1 A wäre eine Serien-Diode
   inzwischen aber vertretbar (≈ 1,6 W Verlust).
 - Je Motorzweig eigene Sicherung bzw. eigenes Schutzkonzept.
 

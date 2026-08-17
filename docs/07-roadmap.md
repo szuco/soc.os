@@ -10,7 +10,7 @@ Entscheidungen stehen in [`06-open-decisions.md`](06-open-decisions.md).
 |---|---|
 | **1 – Spezifikation** | 13 Dokumente: System, Power-Tree, Motorkonzept, Pinout, Mechanik, Fertigung, Display/MCU, Firmwarestrategie, Motordaten, Altbestand, Funktionsstatus |
 | **2 – Mechanik** | Board-Mechanik aus `tools/gen_boards.py`: Bottom und Mid rund Ø 52, **Top quadratisch 47 × 47**. Adapter für die BJ-Zentralscheibe aus `mechanical/adapter.py`, Selbsttest bestanden |
-| **3 – Leistung und Motorkanal** | 24-V-Schutz, drei DC/DC, USB-ORing, zwei identische H-Brücken aus einer Funktion, Inline-Shunt + INA240A2 + LM393-Fenster + Latch auf `~SD` |
+| **3 – Leistung und Motorkanal** | 24-V-Schutz, drei DC/DC, USB-ORing, zwei identische H-Brücken aus einer Funktion, Inline-Shunt + INA240A2 + TLV3702-Fenster + Latch auf `~SD` |
 | **4 – Schaltpläne** | alle drei Boards erzeugt, Netzliste je Board gegen die Sollvorgabe im Quelltext geprüft, Stücklisten daraus |
 | **5 – Layouts** | Platzierung, Netze und Zonen aller drei Boards. **Top ist DRC-frei**; Bottom zu ≈ 85 % geroutet (985 Segmente); Mid und Top tragen **keine** Leiterbahnen |
 | **6 – Fertigungsvorbereitung** | `gen_fab.py` mit DRC-Gate; `gen_panel.py` erzeugt den Nutzen aus gemischter Geometrie (173,4 × 64,4 mm) |
@@ -20,8 +20,9 @@ Entscheidungen stehen in [`06-open-decisions.md`](06-open-decisions.md).
 
 ### A. Messen (blockiert am meisten, kostet am wenigsten)
 
-1. ✅ **Blockierstrom gemessen (17.08.2026): 1,6 A je Motor**, Ankerwiderstand
-   15 Ω, bestätigt durch zwei Messpunkte bei 2 V und 24 V. Damit sind die Punkte
+1. ✅ **Blockierstrom gemessen (17.08.2026): 1,7 A je Motor**, Ankerwiderstand
+   14 Ω, bestätigt durch drei Verfahren (2 V, 24 V blockiert, Multimeter).
+   Damit sind die Punkte
    1, 2 und 3 erledigt und drei Werte angepasst — Shunt 5 mΩ, Trip 4,4 A,
    Sicherung 6,3 A, Firmware-Skalierung 4 A/V.
    Offen bleibt daraus **Punkt 54**: Der Signalabstand für die Endlagenerkennung
@@ -41,7 +42,7 @@ Entscheidungen stehen in [`06-open-decisions.md`](06-open-decisions.md).
    Mid-Boards, und der PCF8574 ist restlos belegt.
 5. ✅ **Punkt 3: Interlock** entfällt — beide Motoren dürfen gleichzeitig laufen,
    und seit der Strommessung interessiert das den Steckverbinder nicht mehr
-   (3,9 A statt 9 A). Punkt 2 ist damit ebenfalls erledigt: Micro-Fit 3.0 reicht.
+   (4,1 A statt 9 A). Punkt 2 ist damit ebenfalls erledigt: Micro-Fit 3.0 reicht.
 6. **Punkt 23 (P0): Stackverbinder-Paar** auswählen — heute sitzt auf allen drei
    Boards dieselbe Buchse. Die Steckhöhe des Paares soll den Plattenabstand
    ergeben, damit keine Distanzhülsen nötig werden.

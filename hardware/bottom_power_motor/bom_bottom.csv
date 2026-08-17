@@ -48,5 +48,5 @@ Menge,Designator,Wert,Footprint,Hinweis
 1,U4_RL,10k0,Resistor_SMD:R_0603_1608Metric,
 4,"UM1A_DRV,UM1B_DRV,UM2A_DRV,UM2B_DRV",IR2104,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,
 2,"UM1_CS,UM2_CS",INA240A2,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,Pinbelegung gegen Datenblatt pruefen
-2,"UM1_CMP,UM2_CMP",LM393,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,
+2,"UM1_CMP,UM2_CMP",TLV3702,Package_SO:SOIC-8_3.9x4.9mm_P1.27mm,Rail-to-Rail-Eingang + Open-Drain PFLICHT - kein LM393
 2,"UM1_FF,UM2_FF",74AUP1G74,Package_TO_SOT_SMD:SOT-353_SC-70-5,D-FF mit PRE und CLR

@@ -21,7 +21,7 @@ bekannt sind:
 
 - **≥ 5 A Dauerstrom**
 - **≈ 10–15 A kurzzeitige Peak-Fähigkeit** — seit der Messung vom 17.08.2026
-  weit mehr als nötig (Blockierstrom 1,6 A), aber bereits geroutet und deshalb
+  weit mehr als nötig (Blockierstrom 1,7 A), aber bereits geroutet und deshalb
   unverändert
 
 Die 100 W des Datenblatts sind die **Maximalleistung** (≈ 4,63 A bei 21,6 V), nicht der
@@ -74,7 +74,7 @@ Motor eine **getrennte** analoge Strommessung.
 **Umgesetzt im Schaltplan:** **Inline-Shunt 5 mΩ**, 4-Terminal (Kelvin), 1 W, im
 Zweig A jeder Brücke — plus **INA240A2** (Verstärkung 50, bidirektional). Der
 Shunt war bis zum 17.08.2026 mit 1 mΩ ausgelegt; nach der Messung des
-Blockierstroms (1,6 A statt angenommener 25 A) wurde er verfünffacht, weil es
+Blockierstroms (1,7 A statt angenommener 25 A) wurde er verfünffacht, weil es
 jetzt auf Auflösung ankommt und nicht mehr auf Belastbarkeit — Begründung in
 [`11-motor-data.md`](11-motor-data.md) Abschnitt 5. Die
 Inline-Position löst das Freilaufproblem im Prüfpunkt unten; INA240 ist genau für
@@ -137,7 +137,7 @@ Auslegungsregel für die Reihenfolge der Schwellen:
 
 ```
 Laufstrom  <  Anlaufstrom  <  Soft-Limit  <  Hard-Trip  <  Sicherung  <  FET-/Treiber-Grenze
- 0,3-1,0 A      1,6 A         ~2,0 A        ±4,4 A      6,3 A traege    >30 A
+ 0,3-1,0 A      1,7 A         ~2,0 A        ±4,4 A      6,3 A traege    >30 A
 ```
 
 Anlaufstrom und Soft-Limit sind die einzigen noch offenen Glieder. Bis zur Messung

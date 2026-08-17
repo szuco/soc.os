@@ -15,7 +15,7 @@ WICHTIG - was dieser Schaltplan ist und was nicht:
     Regler nach Hersteller-Referenzlayout aufbauen.
 
 Auslegung nach docs/11-motor-data.md Abschnitt 5. Der Blockierstrom ist seit
-dem 17.08.2026 gemessen: 1,6 A je Motor (24 V an 15 Ohm Ankerwiderstand), nicht
+dem 17.08.2026 gemessen: 1,7 A je Motor (24 V an 14 Ohm Ankerwiderstand), nicht
 die zuvor angenommenen 25 A. Shunt und Trip-Teiler sind entsprechend neu
 gerechnet - siehe die Kommentare bei R_*_SH und R7/R8/R9.
 """
@@ -266,9 +266,9 @@ def build():
             s.connect("PGND",           ("Q_%s_L" % tag, "3"))
 
         # Inline-Shunt im Zweig A - misst in JEDEM PWM-Zustand.
-        # 5 mOhm, nicht 1 mOhm: Der gemessene Blockierstrom von 1,6 A haette
+        # 5 mOhm, nicht 1 mOhm: Der gemessene Blockierstrom von 1,7 A haette
         # am 1-mOhm-Shunt nur 1,6 mV erzeugt, verstaerkt 80 mV - zu wenig, um
-        # Lauf (0,3-1,0 A) von Anschlag (1,6 A) zu trennen. Mit 5 mOhm und
+        # Lauf (0,3-1,0 A) von Anschlag (1,7 A) zu trennen. Mit 5 mOhm und
         # INA240A2 (Verstaerkung 50) sind es 0,25 V/A, Messbereich +/-6,6 A,
         # Verlustleistung bei 2 A nur 20 mW.
         s.add("R_%s_SH" % p, "Device:R_Shunt", "5m0 1W",
@@ -306,7 +306,39 @@ def build():
         # Fensterkomparator: Trip in beide Stromrichtungen, Ausgaenge offen
         # -> Wire-OR auf eine aktiv-low Leitung
         cmp_ = "U%s_CMP" % p
-        s.add(cmp_, "Comparator:LM393", "LM393", SOIC8)
+        # KEIN LM393 - der Gleichtakt-Eingangsbereich reicht bei 3,3 V nicht.
+        #
+        # Der klassische LM393 ist fuer 0 bis V+ minus 1,5 V spezifiziert, an
+        # 3,3 V also bis 1,8 V. V_TRIP_HI liegt bei 2,752 V, der Sensepegel im
+        # Trip-Fall ebenso: Die obere Haelfte des Fensterkomparators arbeitete
+        # ausserhalb ihres Bereichs, der Hardware-Trip haette nur in EINER
+        # Stromrichtung gewirkt. Gefunden am 17.08.2026; der Fehler war aelter
+        # als die Strommessung, die alte Schwelle lag genauso hoch.
+        #
+        # Verlangt wird deshalb ein Komparator mit Rail-to-Rail-Eingang. Die
+        # Alternative - Versorgung aus 5V_SYS - scheiterte an der Geometrie:
+        # Das Netz liegt 27 bzw. 36 mm entfernt auf der anderen Boardhaelfte.
+        #
+        # ANFORDERUNG an den bestellten Typ, gegen das Datenblatt zu pruefen:
+        #   dual, SOIC-8, Standard-Pinout (1=OUT_A 2=IN_A- 3=IN_A+ 4=V-
+        #                                  5=IN_B+ 6=IN_B- 7=OUT_B 8=V+)
+        #   OPEN-DRAIN-Ausgang  - das Wire-OR auf Mx_TRIP haengt daran,
+        #                         ein Push-Pull-Typ zerstoert die Verknuepfung
+        #   Gleichtaktbereich bis mindestens 2,9 V bei 3,3 V Versorgung
+        #
+        # Kandidat TLV3702: Rail-to-Rail-Eingang, Open-Drain, SOIC-8. Mit rund
+        # 5 us ist er LANGSAMER als der LM393 (1,3 us) - hier ein Vorteil, denn
+        # der Komparator sieht das ungefilterte Sense-Signal und haengt an
+        # einem Latch (Punkt 59). Wer Geschwindigkeit braucht, nimmt den
+        # TLV1702 (560 ns), handelt sich dafuer aber mehr Stoerempfindlichkeit
+        # ein. Fuer einen Kurzschluss-Trip sind 5 us reichlich schnell.
+        #
+        # Das Symbol bleibt Comparator:LM393 - KiCad 10 bringt fuer den TLV
+        # keines mit, und das LM393-Symbol IST das Standard-Pinout eines
+        # dualen Komparators. Wert und MPN nennen den echten Typ, damit
+        # Stueckliste und Bestueckdruck stimmen.
+        s.add(cmp_, "Comparator:LM393", "TLV3702", SOIC8,
+              MPN="Rail-to-Rail-Eingang + Open-Drain PFLICHT - kein LM393")
         s.connect("3V3_SYS", (cmp_, "8"))
         s.connect("AGND",    (cmp_, "4"))
         s.connect("V_TRIP_HI", (cmp_, "3"))
@@ -341,7 +373,7 @@ def build():
     #
     # Die Schwelle muss ueber dem Blockierstrom liegen, denn der Anschlag ist
     # hier ein NORMALER Betriebszustand - ohne Endschalter faehrt der Laden bei
-    # jeder Fahrt kurz dagegen. 1,6 A gemessen, 4,4 A Trip: Faktor 2,75.
+    # jeder Fahrt kurz dagegen. 1,7 A gemessen, 4,4 A Trip: Faktor 2,75.
     # Die Reserve ist bewusst grosszuegig, weil sie NICHTS kostet: Zwischen
     # 4 und 5 A ist auf dieser Platine nichts gefaehrdet (FETs >60 A, Shunt
     # 1 W). Ein hoeherer Trip schuetzt also genauso gut vor dem Einzigen,
