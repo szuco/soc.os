@@ -432,9 +432,20 @@ class BoardBuilder:
             zone.SetLocalClearance(mm(0.3))
             zone.SetMinThickness(mm(0.25))
             self.board.Add(zone)
-        # ZONE_FILLER.Fill() stuerzt in der headless pcbnew-API 7.0.11 ab
-        # (reproduzierbarer Segfault, isoliert getestet). Die Zonen bleiben
-        # deshalb ungefuellt - KiCad fuellt beim Oeffnen mit "B".
+        # Zonen sofort fuellen.
+        #
+        # Hier stand jahrelang, ZONE_FILLER.Fill() stuerze in der headless
+        # pcbnew-API ab (Segfault, 7.0.11, isoliert getestet) - die Zonen
+        # blieben deshalb leer, und KiCad sollte sie beim Oeffnen mit "B"
+        # fuellen. Das ist nie passiert: Am 17.08.2026 hatten Mid und Top
+        # NULL filled_polygon-Bloecke, und allein daraus stammten 76 der 209
+        # gemeldeten offenen Verbindungen.
+        #
+        # Mit KiCad 10 laeuft der Filler headless durch. Also fuellen wir
+        # selbst - und zwar VOR dem DSN-Export, denn was der Autorouter als
+        # gefuellte Flaeche sieht, muss er nicht als Netz routen.
+        filler = pcbnew.ZONE_FILLER(self.board)
+        filler.Fill(self.board.Zones())
 
     def save(self, path):
         pcbnew.SaveBoard(path, self.board)

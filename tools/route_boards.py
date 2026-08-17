@@ -13,9 +13,14 @@ Pipeline je Board:
   3. Freerouting headless (Java), begrenzte Passzahl
   4. SES-Import zurueck ins Board, speichern
   5. DRC: Clearance-Verletzungen muessen 0 sein; unverbundene Reste werden
-     nach Netz klassifiziert - PGND-Reste sind erwartet, weil die
-     Masseflaechen erst beim Oeffnen in KiCad gefuellt werden
-     (ZONE_FILLER stuerzt headless ab, dokumentiert in gen_layouts.py).
+     nach Netz klassifiziert.
+
+WICHTIG - die Zonen muessen VOR dem Export gefuellt sein. Bis zum 17.08.2026
+liefen die Boards ungefuellt in den Router, weil ZONE_FILLER headless
+angeblich abstuerzte (galt fuer pcbnew 7, unter KiCad 10 nicht mehr). Der
+Router musste PGND deshalb als gewoehnliches Netz mit Leiterbahnen aufloesen
+statt es der Flaeche zu ueberlassen - und verbrauchte einen Grossteil seines
+Aufwands dafuer. gen_layouts.py fuellt jetzt selbst.
 
 Freerouting ist ein Autorouter: Das Ergebnis ist elektrisch korrekt und
 DRC-sauber, aber KEIN handoptimiertes Leistungslayout. Vor der Fertigung
@@ -356,6 +361,17 @@ def route(name, passes=None, timeout=None):
     n_wires, n_vias = import_ses(board, ses)
     if n_wires == 0:
         raise RuntimeError("SES-Import ergab keine Leiterbahnen")
+
+    # Zonen fuellen - der fehlende Schritt bis zum 17.08.2026.
+    #
+    # KiCads Specctra-Export kennt keine Kupferflaechen (im DSN steht kein
+    # einziges "plane"), der Router loest PGND also mit Leiterbahnen auf. Was
+    # er dabei nicht schafft, faengt die Flaeche auf - aber nur, wenn sie
+    # gefuellt wird. Ungefuellt meldet die DRC jede Masseverbindung als offen,
+    # und genau so sahen Mid und Top monatelang aus: 76 der 209 gemeldeten
+    # offenen Verbindungen waren nur diese fehlende Fuellung.
+    filler = pcbnew.ZONE_FILLER(board)
+    filler.Fill(board.Zones())
     pcbnew.SaveBoard(pcb, board)
 
     # board.GetTracks() liefert nach SaveBoard gelegentlich ein nicht
