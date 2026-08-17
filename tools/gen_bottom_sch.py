@@ -333,11 +333,12 @@ def build():
         # TLV1702 (560 ns), handelt sich dafuer aber mehr Stoerempfindlichkeit
         # ein. Fuer einen Kurzschluss-Trip sind 5 us reichlich schnell.
         #
-        # Das Symbol bleibt Comparator:LM393 - KiCad 10 bringt fuer den TLV
-        # keines mit, und das LM393-Symbol IST das Standard-Pinout eines
-        # dualen Komparators. Wert und MPN nennen den echten Typ, damit
-        # Stueckliste und Bestueckdruck stimmen.
-        s.add(cmp_, "Comparator:LM393", "TLV3702", SOIC8,
+        # Das Symbol liegt in der Projektbibliothek: KiCad 10 bringt fuer den
+        # TLV3702 keines mit, und ein Schaltplan mit lib_id "LM393" und Wert
+        # "TLV3702" waere eine Falle fuer den naechsten Leser. Erzeugt aus dem
+        # geometrisch identischen LM393-Symbol, Pinbelegung also nachweislich
+        # das Standard-Pinout. Siehe hardware/lib/SwitchStack.kicad_sym.
+        s.add(cmp_, "SwitchStack:TLV3702", "TLV3702", SOIC8,
               MPN="Rail-to-Rail-Eingang + Open-Drain PFLICHT - kein LM393")
         s.connect("3V3_SYS", (cmp_, "8"))
         s.connect("AGND",    (cmp_, "4"))
