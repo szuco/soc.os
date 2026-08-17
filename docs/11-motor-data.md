@@ -156,7 +156,8 @@ wirken — deshalb bleibt der Comparator-plus-Latch pro Kanal zwingend.
 
 > **Was die Messung an dieser Stelle verschiebt: die Gefahr ist mechanisch, nicht
 > elektrisch.** Bei der Blockiermessung am 17.08.2026 wurde am Antrieb etwas
-> verbogen — bei 1,7 A. Das Getriebe macht aus einem elektrisch harmlosen Strom
+> verbogen — bei 1,7 A. (Der Motor selbst blieb unbeschädigt, geprüft am selben
+> Tag. Am Befund ändert das nichts: Verformt wurde trotzdem etwas.) Das Getriebe macht aus einem elektrisch harmlosen Strom
 > ein Moment, das Beschläge verformt.
 >
 > Daraus folgt unmittelbar: **Sicherung und Hardware-Trip schützen die Mechanik
