@@ -120,20 +120,26 @@ CLASSES = {
         # 0,6er-Vias tragen 2-3 A - fuer Laufstrom und kurze Transienten
         # ausreichend; Leistungspfade werden vor der Fertigung ohnehin
         # von Hand nachgezogen (docs/05).
-        "PWR": (800, 150, VIA_STD, [
+        #
+        # CLEARANCE MIT RESERVE. Freerouting unterschreitet die Vorgabe: Bei
+        # 150 um Anweisung kamen auf In1.Cu real 114 bis 144 um heraus - fuenf
+        # Verletzungen gegen die 150-um-Regel. Deshalb steht hier 200 um, damit
+        # auch das Ergebnis ueber 150 bleibt. Die Bahnbreiten sind davon
+        # unberuehrt.
+        "PWR": (800, 200, VIA_STD, [
             "24V_IN", "24V_F", "24V_PROT", "M1_A", "M1_B", "M2_A", "M2_B",
             "M1_SWA", "M1_SWB", "M2_SWA", "M2_SWB",
         ]),
-        "RAIL": (500, 150, VIA_STD, [
+        "RAIL": (500, 200, VIA_STD, [
             "5V_BUCK", "5V_SYS", "3V3_SYS", "6V2_STAR", "6V2_STAR_F",
             "12V_RAW", "12V_GATE", "U2_SW", "U3_SW", "U4_SW", "USB_VBUS",
         ]),
     },
     "mid_logic": {
-        "RAIL": (500, 200, VIA_PWR, ["3V3_SYS", "5V_SYS", "6V2_STAR_F"]),
+        "RAIL": (500, 250, VIA_PWR, ["3V3_SYS", "5V_SYS", "6V2_STAR_F"]),
     },
     "top_ui": {
-        "RAIL": (500, 200, VIA_PWR, ["3V3_SYS", "6V2_STAR_F", "USB_VBUS",
+        "RAIL": (500, 250, VIA_PWR, ["3V3_SYS", "6V2_STAR_F", "USB_VBUS",
                                      "STAR_OUT"]),
     },
 }
@@ -183,9 +189,16 @@ def _edge_ring(src, slit=None):
         s0, s1 = slit
         arcs = [(s1, (s0 + 360.0 + s1) / 2.0 + 2.5),
                 ((s0 + 360.0 + s1) / 2.0 - 2.5, s0 + 360.0)]
+    # Alle Kupferlagen aus dem DSN, nicht nur F/B. Bis zum 17.08.2026 stand
+    # hier ("F.Cu", "B.Cu") fest - mit der Umstellung auf vier Lagen routete
+    # Freerouting auf In1/In2 bis an die Kante und erzeugte vier
+    # copper_edge_clearance-Verletzungen, die es auf den Aussenlagen nicht gab.
+    layers = re.findall(r'\(layer (\S+)\s*\n\s*\(type signal\)', src)
+    if not layers:
+        layers = ["F.Cu", "B.Cu"]
     blocks = []
     for i, (a0, a1) in enumerate(arcs):
-        for layer in ("F.Cu", "B.Cu"):
+        for layer in layers:
             blocks.append('    (keepout "ring_%d_%s" (polygon %s 0 %s))'
                           % (i, layer, layer, _ring_polygon(a0, a1)))
     m = re.search(r'\(boundary', src)
