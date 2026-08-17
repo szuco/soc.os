@@ -4,7 +4,7 @@
 
 | Board | Lagen | Kupfer | Begründung |
 |---|---|---|---|
-| BOTTOM | 2 oder 4 | **2 oz außen prüfen** | Motorströme bis ≈ 9 A, breite Leiterbahnen nötig |
+| BOTTOM | 2 oder 4 | **1 oz genügt** | Summenstrom ≈ 3,9 A im ungünstigsten Fall — seit der Blockierstrommessung vom 17.08.2026, siehe [`11-motor-data.md`](11-motor-data.md). Die vorhandenen breiten Bahnen bleiben, schaden nicht und kosten nichts |
 | MID | 4 empfohlen | 1 oz | ESP32-Routingdichte, durchgehende GND-Referenz |
 | TOP | 2 ausreichend | 1 oz | wenig Strom, geringe Dichte |
 
@@ -26,7 +26,7 @@ schätzen. Zu prüfende Netze auf dem Bottom-Board:
 
 | Netz | Strom | Bemerkung |
 |---|---|---|
-| `24V_IN+` / `24V_IN−` | ≈ 9 A nominal | Summenpfad beider Motoren, kritischster Pfad |
+| `24V_IN+` / `24V_IN−` | ≈ 3,9 A Spitze, 1,7 A im Fahrbetrieb | Summenpfad beider Motoren; weiterhin der stärkste Pfad, aber unkritisch |
 | `M1_A` / `M1_B` | ≈ 4,17 A nominal, Peak offen | je ein Motor |
 | `M2_A` / `M2_B` | ≈ 4,17 A nominal, Peak offen | je ein Motor |
 | Shunt-Rückpfad | wie Motorzweig | Kelvin-Abgriff nicht in den Strompfad legen |

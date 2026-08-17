@@ -20,10 +20,12 @@ Entscheidungen stehen in [`06-open-decisions.md`](06-open-decisions.md).
 
 ### A. Messen (blockiert am meisten, kostet am wenigsten)
 
-1. **Ankerwiderstand der Motoren messen (M6).** Multimeter an die zwei Adern, Welle
-   langsam drehen, kleinsten Wert nehmen → Blockierstrom = 24 V / R. Fünf Minuten
-   Arbeit, und aus Annahmen werden Zahlen: Comparator-Referenz, Soft-Limit,
-   Sicherung, N-FET-Auswahl (Punkte 1 und 8).
+1. ✅ **Blockierstrom gemessen (17.08.2026): 1,6 A je Motor**, Ankerwiderstand
+   15 Ω, bestätigt durch zwei Messpunkte bei 2 V und 24 V. Damit sind die Punkte
+   1, 2 und 3 erledigt und vier Werte angepasst — Shunt 5 mΩ, Trip 4,0 A,
+   Sicherung 6,3 A, Firmware-Skalierung 4 A/V.
+   Offen bleibt daraus **Punkt 54**: Der Signalabstand für die Endlagenerkennung
+   ist kleiner als gedacht.
    Protokoll: [`11-motor-data.md`](11-motor-data.md) Abschnitt 4.
 2. **Displaymodul 1,69″ kaufen und vermessen** (Punkt 15c): Außenmaß, Bauhöhe,
    FPC-Abgang. Bestimmt den Footprint von J5, die Sperrfläche auf dem Top-Board
@@ -37,9 +39,9 @@ Entscheidungen stehen in [`06-open-decisions.md`](06-open-decisions.md).
 4. **Punkt 34 (P0): Sabotagekontakte** nachrüsten oder schriftlich streichen.
    Zusammen mit **Punkt 29 (P0): Feldstecker** — beide betreffen dieselbe Ecke des
    Mid-Boards, und der PCF8574 ist restlos belegt.
-5. **Punkt 3: Interlock** — dürfen beide Motoren gleichzeitig laufen? Kostet nichts
-   und halbiert den Eingangsstrom, von dem Sicherung, Leiterbahnen und Punkt 2
-   (Hochstrom-Steckverbinder) abhängen.
+5. ✅ **Punkt 3: Interlock** entfällt — beide Motoren dürfen gleichzeitig laufen,
+   und seit der Strommessung interessiert das den Steckverbinder nicht mehr
+   (3,9 A statt 9 A). Punkt 2 ist damit ebenfalls erledigt: Micro-Fit 3.0 reicht.
 6. **Punkt 23 (P0): Stackverbinder-Paar** auswählen — heute sitzt auf allen drei
    Boards dieselbe Buchse. Die Steckhöhe des Paares soll den Plattenabstand
    ergeben, damit keine Distanzhülsen nötig werden.

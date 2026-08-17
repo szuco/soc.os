@@ -10,20 +10,20 @@ Welche Funktionen diese Punkte blockieren, zeigt
 
 | # | Prio | Entscheidung | Abhängig davon |
 |---|---|---|---|
-| 1 | **P1** | **Blockierstrom je Motor** — Datenblatt nennt ihn nicht, und ohne Motorelektronik begrenzt ihn nichts | Comparator-Referenz, Soft-Limit, Sicherung. **Nur drei Werte, keiner layoutrelevant** — der Schaltplan kann vorher beginnen, siehe [`11-motor-data.md`](11-motor-data.md) Abschnitt 5. Einfachste Messung: **M6, Ankerwiderstand mit dem Multimeter** |
+| ~~1~~ | ✅ | **Blockierstrom gemessen: 1,6 A je Motor** (17.08.2026), Ankerwiderstand 15 Ω. Zwei unabhängige Messpunkte bei 2 V und 24 V stimmen überein | Shunt 1 → **5 mΩ**, Trip-Schwelle 22 → **4,0 A** (R8 40k2 → 30k9), Sicherung 15 → **6,3 A**, Firmware-Skalierung 20 → **4 A/V**. Kein Layout betroffen. Siehe [`11-motor-data.md`](11-motor-data.md) Abschnitt 5 |
 | ~~1a~~ | ✅ | **PWM ist erlaubt** — der Motor hat keine eigene Elektronik, die gestört werden könnte | erledigt |
 | ~~1b~~ | ✅ | **2 Adern je Motor ⇒ H-Brücke zwingend**, 6-poliger Bottom-Connector bestätigt | erledigt |
-| 2 | **P0** | Hochstrom-Steckverbinder: Micro-Fit 3.0 vs. stromstärkeres System | Footprint Bottom, Tiefenbudget, Layout-Start |
-| ~~3~~ | ✅ | **Beide Motoren dürfen gleichzeitig laufen** (16.08.2026). Kein Interlock | Damit gilt der Summenpfad von **≈ 9 A** — also genau die Auslegung, die Sicherung, Leiterbahnen und Steckverbinder ohnehin schon zugrunde legen. Die Entscheidung kostet nichts, weil defensiv gerechnet wurde; sie **verschärft aber Punkt 2**: Der Hochstrom-Steckverbinder muss die 9 A wirklich können, es gibt keinen Rückzug auf 4,9 A mehr |
+| ~~2~~ | ✅ | **Micro-Fit 3.0 genügt** (17.08.2026). Der Summenstrom beträgt 3,9 A statt der angenommenen 9 A, damit ist kein stromstärkeres System nötig | Spart Bauhöhe und Grundfläche auf dem Bottom-Board gegenüber Mini-Fit Jr. |
+| ~~3~~ | ✅ | **Beide Motoren dürfen gleichzeitig laufen** (16.08.2026). Kein Interlock | Summenpfad **3,9 A** im ungünstigsten Fall (beide am Anschlag). Die anfangs vermerkte Verschärfung von Punkt 2 hat sich mit der Messung vom 17.08.2026 erledigt — der Interlock war nie nötig |
 
-**Punkt 1 blockiert den Schaltplan nicht mehr.** Die defensive Auslegung in
-[`11-motor-data.md`](11-motor-data.md) Abschnitt 5 (Annahme: 25 A Blockierstrom) hält
-alle messabhängigen Größen in drei nachträglich änderbaren Werten — Comparator-
-Referenz, Soft-Limit, Sicherung. Die Messung muss **vor der Bestellung** vorliegen,
-nicht vor dem Schaltplan.
+**Die Punkte 1, 2 und 3 sind seit dem 17.08.2026 alle erledigt** — und zwar
+durch eine einzige Messung. Die defensive Auslegung hat sich dabei genau so
+bewährt, wie sie gedacht war: Alle messabhängigen Größen steckten in
+Widerstandswerten, keine im Layout. Der Blockierstrom fiel um den Faktor 16
+niedriger aus als angenommen, geändert wurden trotzdem nur vier Bauteilwerte.
 
-Punkt 3 ist eine reine Nutzungsentscheidung, kostet nichts und entschärft Punkt 2
-erheblich. Für Klappläden ist sequenzieller Betrieb meist unproblematisch.
+Was aus der Messung **neu** folgt, steht als Punkt 54 unten: Die Endlagenerkennung
+hat weniger Signalabstand als gedacht.
 
 ## Bauteilauswahl Leistung
 
@@ -35,7 +35,7 @@ erheblich. Für Klappläden ist sequenzieller Betrieb meist unproblematisch.
 | ~~7~~ | ✅ | **Diskret: 2× IR2104 + 4 N-FET je Kanal.** Begründung in [`02-motor-control.md`](02-motor-control.md) Abschnitt 2 | |
 | 8 | **P1** | **Konkreter N-FET-Typ** (40 V, ≥ 60 A, PowerPAK SO-8, Rds < 5 mΩ) | einziges Leistungsbauteil ohne Teilenummer; hängt am Blockierstrom |
 | ~~9~~ | ✅ | **INA240A2D**, Verstärkung 50, aus 3,3 V versorgt | Pinbelegung gegen Datenblatt prüfen |
-| ~~10~~ | ✅ | **Inline-Messung**, 1 mΩ Kelvin-Shunt im Motorzweig | löst das Freilaufproblem vollständig |
+| ~~10~~ | ✅ | **Inline-Messung**, Kelvin-Shunt im Motorzweig — **5 mΩ** seit dem 17.08.2026 (vorher 1 mΩ) | löst das Freilaufproblem vollständig; der größere Wert bringt die Auflösung, die die Endlagenerkennung braucht |
 | ~~11~~ | ✅ | **LM393 als Fensterkomparator + 74AUP1G74**, wirkt auf `~SD` der IR2104 | |
 | 12 | P2 | USB-ORing: aktuell **zwei Schottky-Dioden** (D4/D5) | einfach und richtig; bei > 1,5 A auf `5V_SYS` durch Ideal-Diode ersetzen |
 | ~~13~~ | ✅ | **BOTTOM**, `USB_VBUS` kommt über `J_STK_A` Pin 18 herunter | |
@@ -180,5 +180,12 @@ Layout frei: **F3** (Fensterausschnitt → Display), **F5/F10** (Tastenpositione
 
 | # | Prio | Entscheidung | Bemerkung |
 |---|---|---|---|
-| 53 | **P1** | **Versatz beim Schließen — welcher Flügel zuerst?** Der Original-Controller K0000230 startet Flügel 2 beim Schließen **6 Sekunden später**. Zweiflügelige Klappläden überlappen geschlossen; ohne Versatz schlagen sie aufeinander. Die jetzige Firmware schließt beide gleichzeitig | Zu klären ist nur, **welcher** Flügel überdeckt — er muss zuletzt schließen und zuerst öffnen. Danach zwei Zeilen Firmware: eine `number`-Entität für den Versatz (Vorgabe 6 s) und ein `delay` im Schließskript des überdeckenden Kanals. Beim Öffnen gilt es spiegelbildlich |
+| ~~53~~ | ✅ **umgesetzt 16.08.2026** | **Versatz beim Schließen — welcher Flügel zuerst?** Gelöst als Laufzeiteinstellung: `select` „Ueberdeckender Fluegel" plus `number` „Versatz" (0–20 s, Vorgabe 6 s), wirksam als `delay` am Anfang aller vier Fahrskripte, dazu ein Menüpunkt „Fluegelversatz". Damit muss die Frage gar nicht vorab beantwortet werden. Ursprünglich: Der Original-Controller K0000230 startet Flügel 2 beim Schließen **6 Sekunden später**. Zweiflügelige Klappläden überlappen geschlossen; ohne Versatz schlagen sie aufeinander. Die jetzige Firmware schließt beide gleichzeitig | Zu klären ist nur, **welcher** Flügel überdeckt — er muss zuletzt schließen und zuerst öffnen. Danach zwei Zeilen Firmware: eine `number`-Entität für den Versatz (Vorgabe 6 s) und ein `delay` im Schließskript des überdeckenden Kanals. Beim Öffnen gilt es spiegelbildlich |
 
+## Aus der Blockierstrommessung vom 17.08.2026
+
+| # | Prio | Entscheidung | Bemerkung |
+|---|---|---|---|
+| 54 | **P0** | **Reicht der Signalabstand für die Endlagenerkennung?** Das war bisher der bequemste Teil des Konzepts: Laufstrom ≈ 0,5 A gegen Blockierstrom ≈ 20 A, ein Faktor 40. Tatsächlich sind es **0,3–1,0 A gegen 1,6 A**, im ungünstigsten Fall also 60 % Anstieg. Ohne Reed-Endlagen hängt die gesamte Positionsbestimmung an diesem Abstand | Drei Maßnahmen sind schon getroffen: Der Shunt wurde auf 5 mΩ verfünffacht (0,25 V/A, ≈ 3 mA je LSB), der Nullpunkt wird in der Firmware jetzt korrekt abgezogen, und die Verlangsamung vor der Endlage senkt die Kraft. Was fehlt, ist die **PWM-synchrone Abtastung** — der gemittelte ADC-Wert taugt zur Anzeige, nicht zur Stall-Erkennung (siehe [`09-display-and-mcu.md`](09-display-and-mcu.md) Abschnitt 4). Beruhigend: Der Original-Controller K0000230 löst dieselbe Aufgabe am selben Motor mit derselben Physik |
+| 55 | P2 | **Integrierter H-Brücken-Treiber statt diskretem Aufbau?** Die diskrete Brücke aus 2× IR2104 und 4 N-FET je Kanal wurde allein wegen des unbekannten Blockierstroms gewählt (Punkt 7). Bei 1,6 A wäre ein DRV8871 oder DRV8873 die naheliegende Wahl und würde das Bottom-Board erheblich entlasten | **Vorschlag: nicht umsetzen.** Die Platine ist geroutet, der Gewinn wäre Fläche, die ohnehin schon vergeben ist, und der Preis ein vollständiges Neulayout samt neuer Strommessung. Sinnvoll nur, falls das Bottom-Board aus anderem Grund neu entsteht |
+| 56 | **P1** | **Mechanischer Schaden am Antrieb.** Bei der Blockiermessung am 17.08.2026 wurde etwas verbogen. 1,6 A sind elektrisch harmlos, das Getriebe macht daraus aber ein Moment, das Beschläge verformt | Zu prüfen: **was** verbogen ist und ob der Antrieb noch sauber durchläuft. Für das Gerät folgt daraus eine Festlegung, die in [`11-motor-data.md`](11-motor-data.md) Abschnitt 3 steht: **Sicherung und Hardware-Trip schützen die Mechanik nicht und können es nicht** — sie liegen bei 6,3 A und 4,0 A, also weit über dem, was zum Verbiegen reicht. Der Mechanikschutz ist allein Sache der Software |

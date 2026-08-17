@@ -17,8 +17,8 @@ Schalter-Unterputzdose mit 61 mm Tiefe.
 
 | Verbraucher | Spannung | Leistung | Strom | Anmerkung |
 |---|---|---|---|---|
-| Klappladenmotor 1 | 24 V DC ±10 % | 100 W (Typenschild) | Dauer ≈ 0,3–1,0 A, **Blockierstrom offen** | 2 Adern, Umpolung, keine Elektronik |
-| Klappladenmotor 2 | 24 V DC ±10 % | 100 W (Typenschild) | Dauer ≈ 0,3–1,0 A, **Blockierstrom offen** | 2 Adern, Umpolung, keine Elektronik |
+| Klappladenmotor 1 | 24 V DC ±10 % | max. 38 W (24 V an 15 Ω) | Dauer ≈ 0,3–1,0 A, **Blockierstrom 1,6 A gemessen** | 2 Adern, Umpolung, keine Elektronik |
+| Klappladenmotor 2 | 24 V DC ±10 % | max. 38 W (24 V an 15 Ω) | Dauer ≈ 0,3–1,0 A, **Blockierstrom 1,6 A gemessen** | 2 Adern, Umpolung, keine Elektronik |
 | Weihnachtsstern | 6,0–6,5 V | 0,5 W | ≈ 80 mA | nur im 24-V-Normalbetrieb |
 
 Antrieb: Drehflügelmotor für Fensterläden, 25 Nm bei 1,9 U/min, Fahrzeit **18 s**
@@ -26,8 +26,13 @@ Antrieb: Drehflügelmotor für Fensterläden, 25 Nm bei 1,9 U/min, Fahrzeit **18
 
 Die mechanische Abtriebsleistung beträgt nur ≈ 5 W, der Laufstrom entsprechend
 ≈ 0,3–1,0 A. **Der Motor hat keine eigene Elektronik** — die Hinderniserkennung ist
-Aufgabe dieses Geräts, und den Blockierstrom begrenzt nichts. Herleitung und
-Messprotokoll: [`11-motor-data.md`](11-motor-data.md).
+Aufgabe dieses Geräts.
+
+Den Blockierstrom begrenzt allein der Ankerwiderstand, und der ist seit dem
+17.08.2026 gemessen: **15 Ω, also 1,6 A**. Die 100 W auf dem Typenschild sind
+demnach die Netzteilempfehlung der Anlage — 24 V an 15 Ω ergeben höchstens 38 W,
+mehr kann der Motor gar nicht aufnehmen. Herleitung und Messprotokoll:
+[`11-motor-data.md`](11-motor-data.md).
 
 **Externe Verkabelung:** `24V_IN+` und `24V_IN−` kommen herein. Je Motor gehen zwei
 Leitungen heraus: `M1_A`/`M1_B` und `M2_A`/`M2_B`. Insgesamt sechs Leistungsadern am
@@ -54,7 +59,7 @@ Frontanschluss** — eine 2,5-mm-Klinkenbuchse, Punkt 30 — und hängt nicht am
 | Meldekontakt Haube | PhotoMOS AQY282GS (SELV) | 1 | Expander P5 | MID |
 | Verschlusskontakte | Reed, Pull-up + RC + ESD, JST-SH | 2 | Expander P6/P7 | MID |
 | Motorendstufe / H-Brücke | 2 × IR2104 + 4 N-FET je Kanal | 2 | 2 × PWM (INA/INB) | BOTTOM |
-| Strommessung je Motor | 1 mΩ Inline-Shunt + INA240A2 | 2 | analog | BOTTOM |
+| Strommessung je Motor | 5 mΩ Inline-Shunt + INA240A2 | 2 | analog | BOTTOM |
 | Hardware-Überstromabschaltung | LM393 + 74AUP1G74 auf `~SD` | 2 | Expander P0–P2 | BOTTOM |
 
 Der frühere **Mini-Radar** ist durch den ToF-Sensor ersetzt (Punkt 17), das

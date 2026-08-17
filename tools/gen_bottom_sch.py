@@ -14,9 +14,10 @@ WICHTIG - was dieser Schaltplan ist und was nicht:
   * Vor Fertigung: Pinbelegung jedes ICs gegen das Datenblatt pruefen, die
     Regler nach Hersteller-Referenzlayout aufbauen.
 
-Auslegung nach docs/11-motor-data.md Abschnitt 5: 25 A Blockierstrom
-angenommen. Messabhaengig sind nur R_TRIP*, das Software-Soft-Limit und die
-Sicherung F1.
+Auslegung nach docs/11-motor-data.md Abschnitt 5. Der Blockierstrom ist seit
+dem 17.08.2026 gemessen: 1,6 A je Motor (24 V an 15 Ohm Ankerwiderstand), nicht
+die zuvor angenommenen 25 A. Shunt und Trip-Teiler sind entsprechend neu
+gerechnet - siehe die Kommentare bei R_*_SH und R7/R8/R9.
 """
 
 import os
@@ -264,8 +265,13 @@ def build():
             s.connect(sw,               ("Q_%s_L" % tag, "2"))
             s.connect("PGND",           ("Q_%s_L" % tag, "3"))
 
-        # Inline-Shunt im Zweig A - misst in JEDEM PWM-Zustand
-        s.add("R_%s_SH" % p, "Device:R_Shunt", "1m0 1W",
+        # Inline-Shunt im Zweig A - misst in JEDEM PWM-Zustand.
+        # 5 mOhm, nicht 1 mOhm: Der gemessene Blockierstrom von 1,6 A haette
+        # am 1-mOhm-Shunt nur 1,6 mV erzeugt, verstaerkt 80 mV - zu wenig, um
+        # Lauf (0,3-1,0 A) von Anschlag (1,6 A) zu trennen. Mit 5 mOhm und
+        # INA240A2 (Verstaerkung 50) sind es 0,25 V/A, Messbereich +/-6,6 A,
+        # Verlustleistung bei 2 A nur 20 mW.
+        s.add("R_%s_SH" % p, "Device:R_Shunt", "5m0 1W",
               "Resistor_SMD:R_2512_6332Metric",
               MPN="4-Terminal, Kelvin - Pflicht")
         s.connect(p + "_SWA", ("R_%s_SH" % p, "1"), ("R_%s_SH" % p, "3"))
@@ -327,16 +333,26 @@ def build():
     motor_channel(1, "M1_A", "M1_B")
     motor_channel(2, "M2_A", "M2_B")
 
-    # Gemeinsame Trip-Schwellen. DIES SIND DIE MESSABHAENGIGEN WERTE.
-    # 3,3 V ueber 10k / 40k2 / 10k  ->  HI = 2,75 V, LO = 0,55 V
-    # Mit 1 mOhm Shunt und Verstaerkung 50 entspricht das ca. +/- 22 A.
-    s.add("R7", "Device:R", "10k0", R0603, MPN="Trip-Schwelle - messabhaengig")
+    # Gemeinsame Trip-Schwellen.
+    # 3,3 V ueber 10k / 30k9 / 10k  ->  HI = 2,652 V, LO = 0,648 V
+    # Mit 5 mOhm Shunt und Verstaerkung 50 entspricht das +/- 4,0 A.
+    #
+    # Die Schwelle muss ueber dem Blockierstrom liegen, denn der Anschlag ist
+    # hier ein NORMALER Betriebszustand - ohne Endschalter faehrt der Laden bei
+    # jeder Fahrt kurz dagegen. 1,6 A gemessen, 4,0 A Trip: Faktor 2,5 Reserve.
+    # Ein echter Kurzschluss liegt um Groessenordnungen darueber und loest
+    # sofort aus.
+    #
+    # Nuetzliche Eigenschaft: Teiler und INA240-Referenz haengen beide an
+    # 3V3_SYS. Driftet die Versorgung, driften Nullpunkt und Schwelle
+    # gemeinsam - die Schwelle bleibt ratiometrisch stabil.
+    s.add("R7", "Device:R", "10k0", R0603, MPN="Trip-Schwelle 4,0 A")
     s.connect("3V3_SYS",   ("R7", "1"))
     s.connect("V_TRIP_HI", ("R7", "2"))
-    s.add("R8", "Device:R", "40k2", R0603, MPN="Trip-Schwelle - messabhaengig")
+    s.add("R8", "Device:R", "30k9", R0603, MPN="Trip-Schwelle 4,0 A")
     s.connect("V_TRIP_HI", ("R8", "1"))
     s.connect("V_TRIP_LO", ("R8", "2"))
-    s.add("R9", "Device:R", "10k0", R0603, MPN="Trip-Schwelle - messabhaengig")
+    s.add("R9", "Device:R", "10k0", R0603, MPN="Trip-Schwelle 4,0 A")
     s.connect("V_TRIP_LO", ("R9", "1"))
     s.connect("AGND",      ("R9", "2"))
 

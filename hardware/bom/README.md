@@ -33,7 +33,7 @@ Begründung der Displaywahl im Detail: [`../../docs/09-display-and-mcu.md`](../.
 | Funktion | Kandidat | Kernkriterium bei der Auswahl |
 |---|---|---|
 | Gate-Treiber ×4 | **IR2104** (Halbbrücke, `~SD`-Eingang) | zwei je Motorkanal; `~SD` ist der Eingriffspunkt des Hardware-Trips |
-| Shunt ×2 | **1 mΩ**, 1 W, 4-Terminal (Kelvin), 2512 | 4-Terminal ist Pflicht; Wert folgt aus INA240-Verstärkung 50 |
+| Shunt ×2 | **5 mΩ**, 1 W, 4-Terminal (Kelvin), 2512 | 4-Terminal ist Pflicht. 5 statt 1 mΩ seit der Blockierstrommessung (1,6 A): ergibt mit INA240-Verstärkung 50 genau 0,25 V/A und ±6,6 A Messbereich |
 | Current-Sense-Amp ×2 | **INA240A2D** | bidirektional, hoher Gleichtaktbereich, PWM-tauglich |
 | Comparator + Latch ×2 | **LM393** (Fenster) + **74AUP1G74** | wirkt ohne Firmware |
 | Buck 24→5 V | **TPS54360DDA** | strikt nach Referenzlayout aufbauen |
@@ -60,7 +60,7 @@ Begründung der Displaywahl im Detail: [`../../docs/09-display-and-mcu.md`](../.
 
 | Position | Kandidat | Prüfpunkt |
 |---|---|---|
-| Bottom, 6-polig | **Mini-Fit Jr. 2×3** statt Micro-Fit 3.0 | Pin 1/2 führen ≈ 9 A — siehe [`../../docs/01-power-tree.md`](../../docs/01-power-tree.md) |
+| Bottom, 6-polig | **Micro-Fit 3.0 2×3 reicht** | Pin 1/2 führen ≈ 3,9 A Spitze, nicht die früher angenommenen 9 A. Mini-Fit Jr. ist nicht mehr nötig — siehe [`../../docs/01-power-tree.md`](../../docs/01-power-tree.md) |
 | Stern-Ausgang | **2,5-mm-Klinkenbuchse** an der Front | 80 mA, unkritisch; Bauhöhe max. 10,5 mm, Footprint noch Platzhalter (Punkt 30) |
 | Stack ×2 | 2×20, 1,27 mm | **≈ 1 A pro Kontakt** — `5V_SYS` braucht mehrere Pins |
 

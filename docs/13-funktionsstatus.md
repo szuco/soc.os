@@ -76,13 +76,13 @@ stimmt, ist damit *nicht* gezeigt.
 | Funktion | Hardware | Firmware | Stand |
 |---|---|---|---|
 | Zwei Motoren auf/zu fahren | ✅ 2 H-Brücken, je 2 × IR2104 + 4 N-FET | ✅ `cover: template` + Fahrskripte, Umpolung über INA/INB, 300 ms Stoppause | 🟡 **fährt auf Zeit**, aber die Zeit ist **je Kanal und Richtung in HA einstellbar** |
-| Hardware-Überstromabschaltung | ✅ INA240A2 → LM393-Fenster → 74AUP1G74 auf `~SD` | ✅ meldet `HW_TRIP1/2` nach Home Assistant, Reset-Taste vorhanden | ✅ wirkt firmwareunabhängig — 🔒 **Schwelle ist eine Annahme** (Punkt 1) |
-| Strommessung anzeigen | ✅ 1 mΩ Inline-Shunt, Kelvin, INA240A2 | ✅ zwei ADC-Sensoren mit **in HA einstellbarer Skalierung** (rechnerisch 20 A/V) | 🟡 taugt zur Anzeige und zum Kalibrieren, nicht zur Stall-Erkennung |
+| Hardware-Überstromabschaltung | ✅ INA240A2 → LM393-Fenster → 74AUP1G74 auf `~SD` | ✅ meldet `HW_TRIP1/2` nach Home Assistant, Reset-Taste vorhanden | ✅ wirkt firmwareunabhängig, **Schwelle ± 4,0 A ist gemessen begründet** (17.08.2026). ⚠️ Sie schützt die Elektronik, **nicht die Mechanik** — zum Verbiegen reichen 1,6 A |
+| Strommessung anzeigen | ✅ **5 mΩ** Inline-Shunt, Kelvin, INA240A2 → 0,25 V/A, ± 6,6 A | ✅ zwei ADC-Sensoren, **Skalierung (4 A/V) und Nullpunkt (1,65 V) in HA einstellbar**, Betrag über beide Fahrtrichtungen | 🟡 taugt zur Anzeige und zum Kalibrieren, nicht zur Stall-Erkennung |
 | **Lasterkennung / Stall** | ✅ Hardware vorhanden | ⛔ **fehlt vollständig** | ⛔ braucht PWM-synchrones Sampling → eigene C++-External-Component ([`09`](09-display-and-mcu.md) Abschnitt 4) |
-| Endlagenerkennung | — **bewusst keine Hardware** | ⛔ | ⛔ Endlage ausschließlich über Fahrzeit + Strom. Die Reed-Kontakte gehören **nicht** dazu (Festlegung 15.08.2026) — es gibt damit **keine** absolute Positionsrückmeldung |
-| **Sanftauslauf vor der Endlage** | ✅ PWM-fähige Brücken | 🟡 **umgesetzt, aber auf Zeit**: ab einstellbaren % der Fahrzeit auf einstellbare PWM | 🟡 Am Stromverlauf festmachen kann ihn erst die C++-Komponente |
-| Beide Motoren gleichzeitig | ✅ Auslegung auf ≈ 9 A Summenpfad | ✅ kein Interlock nötig | ✅ **entschieden 16.08.2026** — verschärft aber Punkt 2 (Steckverbinder muss 9 A können) |
-| Konkreter N-Kanal-MOSFET | ⛔ einziges Leistungsbauteil ohne Teilenummer | — | 🔒 Punkt 8, hängt am Blockierstrom |
+| Endlagenerkennung | — **bewusst keine Hardware** | ⛔ | ⛔ Endlage ausschließlich über Fahrzeit + Strom. Die Reed-Kontakte gehören **nicht** dazu (Festlegung 15.08.2026) — es gibt damit **keine** absolute Positionsrückmeldung. ⚠️ **Seit 17.08.2026 schwieriger als gedacht**: Fahrt 0,3–1,0 A gegen Anschlag 1,6 A, nicht der erhoffte Faktor 40 (Punkt 54) |
+| **Sanftauslauf vor der Endlage** | ✅ PWM-fähige Brücken | 🟡 **umgesetzt, aber auf Zeit**: ab einstellbaren % der Fahrzeit auf einstellbare PWM | 🟡 Am Stromverlauf festmachen kann ihn erst die C++-Komponente. **Wichtiger als gedacht**: Bei 50 % PWM liegen am Anschlag nur 0,8 A und halbes Moment an — das ist der einzige wirksame Mechanikschutz des Geräts |
+| Beide Motoren gleichzeitig | ✅ Summenpfad **3,9 A** im ungünstigsten Fall | ✅ kein Interlock nötig | ✅ **entschieden 16.08.2026**, seit der Messung vom 17.08.2026 auch ohne jede Auflage an den Steckverbinder |
+| Konkreter N-Kanal-MOSFET | ⛔ einziges Leistungsbauteil ohne Teilenummer | — | 🟢 Punkt 8 — **nicht mehr blockiert**: bei 1,6 A Blockierstrom genügt praktisch jeder 40-V-Typ im PowerPAK SO-8, die Auswahl ist reine Beschaffungsfrage |
 
 ### 3.2 Bedienung und Anzeige
 

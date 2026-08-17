@@ -6700,7 +6700,7 @@
 				)
 			)
 		)
-		(property "Value" "1m0 1W"
+		(property "Value" "5m0 1W"
 			(at 0 2.62 90)
 			(layer "F.Fab")
 			(uuid "f2af7966-1ce9-4a61-bac2-94d851819deb")
@@ -12406,7 +12406,7 @@
 				)
 			)
 		)
-		(property "Value" "40k2"
+		(property "Value" "30k9"
 			(at 0 1.43 0)
 			(layer "F.Fab")
 			(uuid "aa31f807-f1e9-481f-a704-b2c4e639f336")
@@ -20555,7 +20555,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "1m0 1W"
+		(property "Value" "5m0 1W"
 			(at 0 -2.62 180)
 			(layer "B.Fab")
 			(uuid "841b28a8-0c62-45e9-85be-fc1867139545")

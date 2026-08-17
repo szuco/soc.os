@@ -32,37 +32,46 @@ Pfad zu USB-VBUS. Diese Eigenschaft beim Schaltplanentwurf nicht versehentlich a
 
 ## 3. Strombilanz am 24-V-Eingang
 
-Worst Case bei gleichzeitigem Lauf beider Motoren, ohne Anlaufspitze:
+> **Vollständig neu gerechnet am 17.08.2026.** Die frühere Bilanz setzte
+> 4,17 A je Motor an — abgeleitet aus dem Typenschild (100 W / 24 V) — und kam
+> auf ≈ 9 A. Die Messung des Ankerwiderstands ergibt **15 Ω und damit 1,6 A
+> Blockierstrom je Motor**; mehr kann physikalisch nicht fließen. Die 100 W sind
+> die Netzteilempfehlung der Anlage, nicht die Aufnahme eines Motors. Herleitung
+> in [`11-motor-data.md`](11-motor-data.md).
 
-| Pfad | Rückgerechnet auf 24 V |
-|---|---|
-| 2 × Motor nominal | 8,33 A |
-| 5-V-Rail 3 A bei η ≈ 0,9 | 0,69 A |
-| 6,2-V-Rail 80 mA | ≈ 0,02 A |
-| **Summe nominal** | **≈ 9,0 A** |
+Der ungünstigste Fall ist **nicht** der gleichzeitige Lauf, sondern der
+gleichzeitige **Anschlag** beider Motoren — und der tritt bei jeder Fahrt auf,
+weil das Gerät ohne Endschalter arbeitet:
 
-> **Wichtiger Prüfpunkt — Steckverbinder-Rating.**
-> Am Bottom-Connector führen die Adern `M1_A/B` und `M2_A/B` jeweils nur *einen* Motor
-> (≈ 4,17 A). Die Pins `24V_IN+` und `24V_IN−` führen dagegen die **Summe beider Motoren
-> plus Logik**, also ≈ 9 A nominal und im Anlauf deutlich mehr. Diese beiden Pins sind
-> damit der eigentliche Engpass, nicht die Motorpins.
+| Pfad | Fahrt | Anschlag (Worst Case) |
+|---|---:|---:|
+| 2 × Motor | 0,6–2,0 A | **3,2 A** |
+| 5-V-Rail 3 A bei η ≈ 0,9 | 0,69 A | 0,69 A |
+| 6,2-V-Rail 80 mA | ≈ 0,02 A | ≈ 0,02 A |
+| **Summe** | **≈ 1,7 A** | **≈ 3,9 A** |
+
+Eine Anlaufspitze darüber hinaus gibt es nicht: Beim Einschalten steht der
+Läufer, es fließt also genau der Blockierstrom von 1,6 A. Bei einem Motor ohne
+eigene Elektronik ist der Einschaltstrom identisch mit dem Blockierstrom und
+kann ihn nicht überschreiten.
+
+> **Erledigt — der Steckverbinder ist kein Engpass mehr.**
+> Dieser Abschnitt beschrieb bis zum 17.08.2026 das schwierigste Problem des
+> Power-Trees: `24V_IN+` und `24V_IN−` führen die Summe beider Motoren, damals
+> ≈ 9 A, und ein einzelner Micro-Fit-3.0-Kontakt trägt derated kaum mehr. Drei
+> unangenehme Auswege standen zur Wahl — größeres Steckersystem, Software-
+> Interlock oder ein anderes Pinout.
 >
-> Molex Micro-Fit 3.0 wird oft mit „bis 8,5 A“ angegeben — dieser Wert gilt für dicken
-> Leiterquerschnitt und wird bei voll bestückten Gehäusen mit benachbart stromführenden
-> Kontakten derated. 9 A Dauerstrom auf einem einzelnen Micro-Fit-Kontakt ist damit
-> grenzwertig bis unzulässig.
+> **Alle drei sind hinfällig.** Der Summenstrom beträgt im ungünstigsten Fall
+> 3,9 A, im Fahrbetrieb 1,7 A. Die Motorpins führen je 1,6 A. Micro-Fit 3.0
+> trägt das auch bei voll bestücktem Gehäuse und benachbart stromführenden
+> Kontakten mit deutlicher Reserve.
 >
-> Drei Auswege, vor der Footprint-Wahl zu entscheiden:
-> 1. **Stromstärkeres System**, z. B. Molex Mini-Fit Jr. (4,20 mm Raster, 2×3), das
->    pro Kontakt deutlich mehr Reserve bietet. Kostet Bauhöhe und Grundfläche.
-> 2. **Software-Interlock**, der beide Motoren nie gleichzeitig laufen lässt. Für
->    Jalousien meist akzeptabel und halbiert den Dauerstrom auf ≈ 4,9 A. Muss dann als
->    verbindliche Firmware-Anforderung dokumentiert und im Datenblatt vermerkt werden.
-> 3. Anderes Pinout mit doppelt belegten Versorgungskontakten — kollidiert mit dem in
->    [`00-system-overview.md`](00-system-overview.md) festgelegten 6-poligen Pinout und
->    ist deshalb nur die letzte Wahl.
->
-> Siehe [`06-open-decisions.md`](06-open-decisions.md).
+> Insbesondere ist der **Software-Interlock endgültig vom Tisch** — beide
+> Motoren dürfen gleichzeitig laufen, ohne dass es den Steckverbinder
+> interessiert. Das war Punkt 3 in [`06-open-decisions.md`](06-open-decisions.md)
+> und dort noch als „verschärft Punkt 2" vermerkt; die Verschärfung existiert
+> nicht mehr.
 
 ## 4. USB-Power-ORing
 
@@ -90,11 +99,15 @@ Worst Case bei gleichzeitigem Lauf beider Motoren, ohne Anlaufspitze:
 ## 5. Schutz und EMV
 
 ### Eingang
-- Sicherung `F1` am 24-V-Eingang, träge. Startwert nach Klärung der Anlaufströme;
-  Größenordnung 12–15 A bei Zweimotorbetrieb, 8–10 A bei Interlock-Variante.
+- Sicherung `F1` am 24-V-Eingang, träge, **6,3 A**. Sie muss die 3,9 A des
+  beidseitigen Anschlags dauerhaft tragen — das ist ein normaler Betriebszustand,
+  kein Fehler — und darf im Unterputzgehäuse auch bei Wärme nicht zum
+  Fehlauslöser werden. 5 A wäre nach Derating zu knapp. Ein echter Kurzschluss
+  liegt weit darüber und löst sicher aus.
 - TVS-Diode gegen Transienten, Durchbruchspannung oberhalb 24 V +10 % plus Toleranz.
-- Optionaler Verpolschutz. Ein P-FET in der Plusleitung oder ein N-FET in der Rückleitung
-  ist gegenüber einer Serien-Diode bei 9 A klar vorzuziehen.
+- Optionaler Verpolschutz. Ein P-FET in der Plusleitung oder ein N-FET in der
+  Rückleitung bleibt die bessere Wahl; bei nur 3,9 A wäre eine Serien-Diode
+  inzwischen aber vertretbar (≈ 1,6 W Verlust).
 - Je Motorzweig eigene Sicherung bzw. eigenes Schutzkonzept.
 
 ### Bulk und Layout

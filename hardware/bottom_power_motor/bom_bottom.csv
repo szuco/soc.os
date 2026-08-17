@@ -24,13 +24,13 @@ Menge,Designator,Wert,Footprint,Hinweis
 1,R4,88k7,Resistor_SMD:R_0603_1608Metric,
 1,R5,180k,Resistor_SMD:R_0603_1608Metric,
 1,R6,40k2,Resistor_SMD:R_0603_1608Metric,
-2,"R7,R9",10k0,Resistor_SMD:R_0603_1608Metric,Trip-Schwelle - messabhaengig
-1,R8,40k2,Resistor_SMD:R_0603_1608Metric,Trip-Schwelle - messabhaengig
+2,"R7,R9",10k0,Resistor_SMD:R_0603_1608Metric,"Trip-Schwelle 4,0 A"
+1,R8,30k9,Resistor_SMD:R_0603_1608Metric,"Trip-Schwelle 4,0 A"
 1,R11,1k,Resistor_SMD:R_0603_1608Metric,Reset vom I2C-Expander
 1,R12,0R,Resistor_SMD:R_0603_1608Metric,einziger Verbindungspunkt Signal- und Leistungsmasse
 4,"R_M1_PU,R_M2_PU,U2_RC,U4_RC",10k,Resistor_SMD:R_0603_1608Metric,
 8,"R_M1A_HO,R_M1A_LO,R_M1B_HO,R_M1B_LO,R_M2A_HO,R_M2A_LO,R_M2B_HO,R_M2B_LO",10R,Resistor_SMD:R_0603_1608Metric,
-2,"R_M1_SH,R_M2_SH",1m0 1W,Resistor_SMD:R_2512_6332Metric,"4-Terminal, Kelvin - Pflicht"
+2,"R_M1_SH,R_M2_SH",5m0 1W,Resistor_SMD:R_2512_6332Metric,"4-Terminal, Kelvin - Pflicht"
 2,"R_M1_LNK,R_M2_LNK",0R,Resistor_SMD:R_0603_1608Metric,"Bruecke, erlaubt spaeteres Auftrennen zur Messung"
 2,"R_M1_F,R_M2_F",1k,Resistor_SMD:R_0603_1608Metric,
 1,U1,L78L12,Package_TO_SOT_SMD:SOT-89-3,30 mA Gate-Ladestrom

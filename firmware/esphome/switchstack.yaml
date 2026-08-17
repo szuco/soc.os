@@ -299,16 +299,40 @@ number:
     entity_category: config
 
   # Skalierung der Strommessung: 1 / (R_shunt * Verstaerkung). Rechnerisch
-  # 1/(0,001 * 50) = 20 A/V, aber erst die Messung am realen Aufbau sagt,
-  # was der interne ADC daraus macht. Deshalb einstellbar statt fest.
+  # 1/(0,005 * 50) = 4 A/V, aber erst die Messung am realen Aufbau sagt, was
+  # der interne ADC daraus macht. Deshalb einstellbar statt fest.
+  #
+  # Der Shunt ist am 17.08.2026 von 1 auf 5 mOhm gewachsen, weil der gemessene
+  # Blockierstrom nur 1,6 A betraegt statt der angenommenen 25 A. Der Abstand
+  # zwischen Fahrt (0,3-1,0 A) und Anschlag (1,6 A) ist damit klein, und die
+  # Endlagenerkennung haengt genau an diesem Abstand - siehe docs/11.
   - platform: template
     name: Stromskalierung
     id: strom_faktor
     unit_of_measurement: A/V
-    min_value: 1
-    max_value: 50
-    step: 0.1
-    initial_value: 20
+    min_value: 0.5
+    max_value: 20
+    step: 0.05
+    initial_value: 4
+    restore_value: true
+    optimistic: true
+    entity_category: config
+
+  # Nullpunkt der Strommessung. Der INA240A2 misst bidirektional: Bei 0 A gibt
+  # er nicht 0 V aus, sondern seine Referenz - nominell 3,3/2 = 1,65 V. Ohne
+  # Abzug meldet der Sensor im Stillstand 6,6 A statt 0 A.
+  #
+  # Einstellbar, weil der wahre Wert am Teiler haengt und nicht am Datenblatt.
+  # Kalibrieren im Stillstand: den Wert so lange verschieben, bis beide
+  # Stromsensoren 0,00 A zeigen.
+  - platform: template
+    name: Strom-Nullpunkt
+    id: strom_null
+    unit_of_measurement: V
+    min_value: 1.0
+    max_value: 2.5
+    step: 0.005
+    initial_value: 1.65
     restore_value: true
     optimistic: true
     entity_category: config
@@ -512,7 +536,11 @@ graphical_display_menu:
         - type: number
           text: Skalierung
           number: strom_faktor
-          format: "%.1f"
+          format: "%.2f"
+        - type: number
+          text: Nullpunkt
+          number: strom_null
+          format: "%.3f"
     - type: command
       text: Alles stoppen
       on_value:
@@ -634,7 +662,10 @@ sensor:
     unit_of_measurement: A
     accuracy_decimals: 2
     filters:
-      - lambda: return x * id(strom_faktor).state;
+      # Betrag, weil der Strom durch den Inline-Shunt bei Umpolung die
+      # Richtung wechselt - "Auf" und "Zu" wuerden sonst verschiedene
+      # Vorzeichen liefern.
+      - lambda: return fabsf(x - id(strom_null).state) * id(strom_faktor).state;
       - sliding_window_moving_average:
           window_size: 5
           send_every: 1
@@ -648,7 +679,10 @@ sensor:
     unit_of_measurement: A
     accuracy_decimals: 2
     filters:
-      - lambda: return x * id(strom_faktor).state;
+      # Betrag, weil der Strom durch den Inline-Shunt bei Umpolung die
+      # Richtung wechselt - "Auf" und "Zu" wuerden sonst verschiedene
+      # Vorzeichen liefern.
+      - lambda: return fabsf(x - id(strom_null).state) * id(strom_faktor).state;
       - sliding_window_moving_average:
           window_size: 5
           send_every: 1
