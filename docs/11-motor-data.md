@@ -111,6 +111,13 @@ Stromzange oder Shunt am Oszilloskop. Für den Anlaufstrom reicht ein Multimeter
 > macht den Messwert trotzdem winkelabhängig — deshalb mehrfach messen und den
 > Motor dazwischen mit eigener Kraft ein Stück versetzen.
 
+> **Nullpunkt nicht vergessen — sonst ist M6 wertlos.** Erwartet werden rund
+> **1 Ω** (24 V / 25 A). Messleitungen und Messgerät bringen selbst 0,2–0,5 Ω
+> mit, also bis zur Hälfte des Messwerts. Deshalb **zuerst die Messspitzen
+> gegeneinander halten**, diesen Wert notieren und vom Ergebnis abziehen. Wer
+> das auslässt, misst den doppelten Widerstand und damit den halben
+> Blockierstrom — und legt die Sicherung zu klein aus.
+
 > **M7 ist die verlässlichste einfache Messung.** Sie umgeht das Bürstenproblem
 > vollständig, weil der Strom über mehrere Lamellen mittelt, und braucht kein
 > Oszilloskop. Wenn du nur eine Messung machst, mach diese.
