@@ -10,9 +10,9 @@
 #                Symbole stehen auf den Achsen, die Kraft kommt an den Ecken
 #                an - jede Richtung ist ein PAAR. Aufloesung siehe unten.
 #
-# NICHT mit `esphome config` geprueft: Auf dem Rechner, auf dem der
-# Displaywechsel entstand, war ESPHome nicht installiert. Vor dem ersten Flash
-# validieren; besonders die Offsets des 240x280-Panels.
+# Geprueft mit `esphome compile` (2026.7.4 / IDF 5.5.5): uebersetzt, RAM 35 %,
+# Flash 56 %. Ungeprueft bleibt die Laufzeit - besonders die Offsets des
+# 240x280-Panels (0/20) und ob die Zentralscheibe die Taster sauber trifft.
 #
 # Die Praesenz-Dunkeltastung unten (VL53L1X, kein Radar mehr) ist beim LCD
 # reiner Komfort und Stromsparen, keine Schutzmassnahme (kein Einbrennen).

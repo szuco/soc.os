@@ -143,7 +143,39 @@ Stromzange oder Shunt am Oszilloskop. Für den Anlaufstrom reicht ein Multimeter
 > das auslässt, misst den doppelten Widerstand und damit den halben
 > Blockierstrom — und legt die Sicherung zu klein aus.
 
-> **M7 ist die verlässlichste einfache Messung.** Sie umgeht das Bürstenproblem
+> **M7, erster Versuch am 17.08.2026: 0,116 A bei 2 V — und der Wert ist
+> unbrauchbar.** Daraus errechnet sich R = 17,2 Ω und ein Blockierstrom von
+> 1,4 A. Die Gegenprobe am Typenschild erledigt das sofort: 100 W / 24 V sind
+> 4,17 A **Nennstrom**. Ein Motor, der blockiert 1,4 A zieht, kann im Betrieb
+> keine 4,17 A ziehen.
+>
+> **Die Annahme in diesem Protokoll war falsch.** Hier stand, der Motor stehe
+> bei 2 V, weil er die Haftreibung des Schneckengetriebes nicht überwinde. Er
+> steht nicht — er dreht, nur unsichtbar langsam: 1,9 U/min × 2/24 ergibt
+> **0,16 U/min, also eine Umdrehung in gut sechs Minuten**. Sobald er dreht,
+> baut er Gegenspannung auf, und der Strom bricht auf den Leerlaufwert
+> zusammen. Genau der wurde gemessen.
+>
+> **Korrigiertes Vorgehen: die Welle mechanisch blockieren.** Am einfachsten
+> über den Anschlag — Laden ganz zufahren, dann bei stromlosem Motor 2 V *in
+> Schließrichtung* anlegen. Der Laden drückt gegen den Anschlag, die Welle
+> steht wirklich, und erst dann gilt `I_Blockier ≈ 24 V × I / 2 V`.
+>
+> | Ankerwiderstand | Strom bei 2 V blockiert | Blockierstrom bei 24 V |
+> |---|---|---|
+> | 1,0 Ω | 2,00 A | 24 A |
+> | 1,5 Ω | 1,33 A | 16 A |
+> | 2,0 Ω | 1,00 A | 12 A |
+> | 3,0 Ω | 0,67 A | 8 A |
+>
+> Ein Wert **unter 0,5 A ist wieder ein Zeichen, dass sich etwas dreht.** Wer
+> mehr Signalabstand will, nimmt 4 V statt 2 V und teilt entsprechend durch 6.
+>
+> **Der gemessene Wert ist trotzdem nicht wertlos:** 0,116 A bei 2 V ist der
+> **Leerlaufstrom** — die reine Reibung des Schneckengetriebes. Er gehört als
+> Untergrenze in die Lasterkennung (M4).
+
+> **M7 ist die verlässlichste einfache Messung**, sofern die Welle wirklich steht. Sie umgeht das Bürstenproblem
 > vollständig, weil der Strom über mehrere Lamellen mittelt, und braucht kein
 > Oszilloskop. Wenn du nur eine Messung machst, mach diese.
 
