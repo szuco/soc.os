@@ -192,6 +192,22 @@ class BoardBuilder:
         self.name = name
         self.sch = schematic
         self.board = pcbnew.CreateEmptyBoard()
+        # VIER LAGEN, seit 17.08.2026.
+        #
+        # Zweilagig kam der Autorouter nicht durch: Auf Top blieben 14
+        # Signalnetze offen, auf Mid 18, auf Bottom 43, und Freerouting
+        # meldete nach 180 wirkungslosen Passes selbst, es koenne "not improve
+        # the result much further". Nicht die Masseflaechen waren schuld - die
+        # stehen gar nicht im DSN, der Router sieht sie nie -, sondern schlicht
+        # der Platz: zwei Lagen, ein dicht bestuecktes Rund von 52 mm, und die
+        # Taster in den vier Ecken, deren Netze quer ueber das Board muessen.
+        #
+        # Vier Lagen verdoppeln den Routingraum. Die Masseflaechen liegen auf
+        # allen vier Lagen und werden wie bisher nach dem Routing gefuellt -
+        # KEINE durchgehende Massefl. auf einer eigenen Lage. Das waere fuer
+        # die EMV besser, kostet aber eine der vier Routinglagen; erst
+        # Vollstaendigkeit, EMV danach (docs/06, Punkt 60).
+        self.board.SetCopperLayerCount(4)
         ds = self.board.GetDesignSettings()
         ds.SetBoardThickness(mm(1.0))
         ds.m_CopperEdgeClearance = mm(EDGE_CLEAR)
@@ -291,8 +307,8 @@ class BoardBuilder:
         # Das ESP32-Modul selbst DARF hier liegen - nur Kupfer ist verboten.
         zone.SetDoNotAllowFootprints(False)
         lset = pcbnew.LSET()
-        lset.addLayer(pcbnew.F_Cu)
-        lset.addLayer(pcbnew.B_Cu)
+        for lay in (pcbnew.F_Cu, pcbnew.In1_Cu, pcbnew.In2_Cu, pcbnew.B_Cu):
+            lset.addLayer(lay)
         zone.SetLayerSet(lset)
         # Nur der echte Antennenabschnitt: Das WROOM-Modul (25,5 mm lang,
         # Mitte y=-16,27) ragt 3 mm ueber die Boardkante - die Antenne
@@ -417,17 +433,29 @@ class BoardBuilder:
     # -- Flaechen ---------------------------------------------------------
 
     def gnd_zones(self, net="PGND"):
-        for layer in (pcbnew.F_Cu, pcbnew.B_Cu):
+        for layer in (pcbnew.F_Cu, pcbnew.In1_Cu, pcbnew.In2_Cu, pcbnew.B_Cu):
             zone = pcbnew.ZONE(self.board)
             zone.SetLayer(layer)
             zone.SetNet(self.nets[net])
             o = zone.Outline()
             o.NewOutline()
-            n = 48
-            for k in range(n):
-                a = 2 * math.pi * k / n
-                o.Append(mm((BOARD_R - 0.6) * math.cos(a)),
-                         mm((BOARD_R - 0.6) * math.sin(a)))
+            if self.square:
+                # Das Top-Board ist ein abgerundetes Quadrat. Ein Kreis als
+                # Zonenumriss haette die vier Ecken ausgespart - und genau
+                # dort sitzen die Taster.
+                h = TOP_SQ / 2.0 - 0.6
+                r = max(TOP_CR - 0.6, 0.1)
+                for cx, cy, a0 in ((h - r, h - r, 0.0), (-(h - r), h - r, 90.0),
+                                   (-(h - r), -(h - r), 180.0), (h - r, -(h - r), 270.0)):
+                    for k in range(7):
+                        a = math.radians(a0 + 90.0 * k / 6.0)
+                        o.Append(mm(cx + r * math.cos(a)), mm(cy + r * math.sin(a)))
+            else:
+                n = 48
+                for k in range(n):
+                    a = 2 * math.pi * k / n
+                    o.Append(mm((BOARD_R - 0.6) * math.cos(a)),
+                             mm((BOARD_R - 0.6) * math.sin(a)))
             zone.SetPadConnection(pcbnew.ZONE_CONNECTION_THERMAL)
             zone.SetLocalClearance(mm(0.3))
             zone.SetMinThickness(mm(0.25))

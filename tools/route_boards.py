@@ -89,8 +89,21 @@ def freerouting_cmd(dsn, ses, passes):
             "Container %s" % DOCKER_IMAGE)
 
 # Netzklassen: (Breite um, Clearance um, Vianame)
+# Die Namen der Via-Padstacks tragen den Lagenbereich: zweilagig "Via[0-1]",
+# vierlagig "Via[0-3]". Seit der Umstellung auf vier Lagen (17.08.2026) darf
+# das nicht mehr fest verdrahtet sein - patch_dsn liest den Bereich aus dem
+# erzeugten DSN und setzt die beiden Namen daraus zusammen.
 VIA_STD = 'Via[0-1]_600:300_um'
 VIA_PWR = 'Via[0-1]_800:400_um'
+
+
+def _via_names(src):
+    """Via-Padstacknamen aus dem DSN, unabhaengig von der Lagenzahl."""
+    m = re.search(r'padstack "Via\[(\d+)-(\d+)\]_600:300_um"', src)
+    if not m:
+        raise RuntimeError("Standard-Via nicht im DSN gefunden")
+    span = "Via[%s-%s]" % (m.group(1), m.group(2))
+    return span + "_600:300_um", span + "_800:400_um"
 
 CLASSES = {
     "bottom_power_motor": {
@@ -191,8 +204,10 @@ def patch_dsn(path, classes, slit=None):
     src = open(path, encoding="utf-8").read()
     src = _edge_ring(src, slit=slit)
 
+    via_std, via_pwr = _via_names(src)
+
     # 1. Groessere Via-Definition ergaenzen (Kopie der Standarddefinition)
-    m = re.search(r'\(padstack "%s"' % re.escape(VIA_STD), src)
+    m = re.search(r'\(padstack "%s"' % re.escape(via_std), src)
     if not m:
         raise RuntimeError("Standard-Via nicht im DSN gefunden")
     depth = 0
@@ -208,8 +223,8 @@ def patch_dsn(path, classes, slit=None):
     src = src[:i + 1] + "\n    " + big + src[i + 1:]
 
     # 2. Grosses Via nutzbar machen
-    src = src.replace('(via "%s")' % VIA_STD,
-                      '(via "%s" "%s")' % (VIA_STD, VIA_PWR), 1)
+    src = src.replace('(via "%s")' % via_std,
+                      '(via "%s" "%s")' % (via_std, via_pwr), 1)
 
     # 3. Netze aus kicad_default entfernen und eigene Klassen anhaengen
     all_nets = [n for spec in classes.values() for n in spec[3]]
@@ -228,6 +243,9 @@ def patch_dsn(path, classes, slit=None):
         nblock = re.sub(r'(?<=[\s"])%s(?=[\s"])' % re.escape(net), "", nblock)
     extra = []
     for cname, (width, clear, via, nets) in classes.items():
+        # Die CLASSES-Tabelle nennt die Vias mit den zweilagigen Namen; hier
+        # auf den tatsaechlichen Lagenbereich des DSN umschreiben.
+        via = {VIA_STD: via_std, VIA_PWR: via_pwr}.get(via, via)
         listed = " ".join('"%s"' % n for n in nets)
         extra.append(
             '    (class %s %s\n'
@@ -266,7 +284,11 @@ def _walk(node, name):
             yield from _walk(ch, name)
 
 
-LAYERS = {"F.Cu": pcbnew.F_Cu, "B.Cu": pcbnew.B_Cu}
+# Seit der Umstellung auf vier Lagen (17.08.2026) liefert die SES auch
+# In1.Cu und In2.Cu. Fehlten sie hier, brach der Import mit KeyError ab -
+# nach zwoelf Minuten Rechenzeit und mit fertiger SES auf der Platte.
+LAYERS = {"F.Cu": pcbnew.F_Cu, "In1.Cu": pcbnew.In1_Cu,
+          "In2.Cu": pcbnew.In2_Cu, "B.Cu": pcbnew.B_Cu}
 
 
 def import_ses(board, ses_path):
