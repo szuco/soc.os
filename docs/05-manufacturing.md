@@ -92,6 +92,35 @@ rekonstruierbar ist.
 > Dokumentation („Mid und Top sind platziert, aber noch nicht geroutet") waren
 > die richtigen.
 
+### Freerouting 2.3.0 geprüft — und wieder verworfen
+
+Am 17.08.2026 gegen 1.9.0 gemessen, an derselben DSN des Top-Boards, importiert
+in dieselbe Ausgangsplatine, DRC mit denselben Regeln:
+
+| | Segmente | unconnected | Verletzungen |
+|---|---:|---:|---|
+| **1.9.0** | 197 | **71** | 5 (davon 3 bekannt und gewollt) |
+| 2.3.0 | 214 | 74 | **26** — darunter 9 `via_dangling` und 5 `track_width` |
+
+Beeindruckend ist sie trotzdem: neun Threads statt einem, eine **Fanout-Stufe**,
+die die SMD-Pads erst ausfädelt, und ein Fortschrittslog mit Score je Durchgang.
+Der ganze Lauf dauerte zwei Minuten statt vierzig.
+
+Nur taugt das Ergebnis nicht. Zwei Befunde:
+
+1. **Sie speichert nicht ihr bestes Ergebnis.** Das Log zeigt es wörtlich: Die
+   Routing-Stufe endet mit *19 unrouted*, die Optimierung startet auf einem
+   Board mit *22 unrouted* und speichert genau das. Das ist derselbe Fehler,
+   wegen dem schon 2.1.0 verworfen wurde — nach einem Jahr unverändert.
+2. **Sie hält die Netzklassen nicht ein.** Fünf `track_width`-Verletzungen und
+   neun freistehende Vias sind kein Randproblem, sondern zeigen, dass die
+   Regeln aus der DSN nicht durchgesetzt werden.
+
+Der Test bleibt reproduzierbar: `tools/freerouting.Dockerfile` nimmt
+`--build-arg FREEROUTING_VERSION` und `--build-arg JRE_TAG` (2.3.0 verlangt
+Java 25, 1.9.0 läuft auf 21). Wenn eine spätere Version erscheint, ist der
+Vergleich eine Viertelstunde Arbeit.
+
 ### Bottom: der frische Lauf war schlechter, der alte Stand bleibt
 
 Am 17.08.2026 wurde das Bottom-Board auf ausdrücklichen Wunsch neu geroutet,

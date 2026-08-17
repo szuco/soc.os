@@ -22,7 +22,10 @@
 # Netze fehlten, obwohl das Log null unrouted meldete. 1.9.0 routet klassisch
 # und exportiert vollstaendig.
 
-FROM eclipse-temurin:21-jre
+# Die JRE-Version haengt an Freerouting: 1.9.0 laeuft auf 21, 2.3.0 verlangt
+# Java 25 (Class-File-Version 69). Deshalb parametriert.
+ARG JRE_TAG=21-jre
+FROM eclipse-temurin:${JRE_TAG}
 
 # xvfb ist das Einzige, was ueber die JRE hinaus gebraucht wird. libxrender
 # und libxtst holt AWT nach, sonst bricht die Klasseninitialisierung ab.
