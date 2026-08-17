@@ -22,7 +22,7 @@ Entscheidungen stehen in [`06-open-decisions.md`](06-open-decisions.md).
 
 1. ✅ **Blockierstrom gemessen (17.08.2026): 1,6 A je Motor**, Ankerwiderstand
    15 Ω, bestätigt durch zwei Messpunkte bei 2 V und 24 V. Damit sind die Punkte
-   1, 2 und 3 erledigt und vier Werte angepasst — Shunt 5 mΩ, Trip 4,0 A,
+   1, 2 und 3 erledigt und drei Werte angepasst — Shunt 5 mΩ, Trip 4,4 A,
    Sicherung 6,3 A, Firmware-Skalierung 4 A/V.
    Offen bleibt daraus **Punkt 54**: Der Signalabstand für die Endlagenerkennung
    ist kleiner als gedacht.

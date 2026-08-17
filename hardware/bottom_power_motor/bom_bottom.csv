@@ -24,8 +24,8 @@ Menge,Designator,Wert,Footprint,Hinweis
 1,R4,88k7,Resistor_SMD:R_0603_1608Metric,
 1,R5,180k,Resistor_SMD:R_0603_1608Metric,
 1,R6,40k2,Resistor_SMD:R_0603_1608Metric,
-2,"R7,R9",10k0,Resistor_SMD:R_0603_1608Metric,"Trip-Schwelle 4,0 A"
-1,R8,30k9,Resistor_SMD:R_0603_1608Metric,"Trip-Schwelle 4,0 A"
+2,"R7,R9",10k0,Resistor_SMD:R_0603_1608Metric,"Trip-Schwelle 4,4 A"
+1,R8,40k2,Resistor_SMD:R_0603_1608Metric,"Trip-Schwelle 4,4 A"
 1,R11,1k,Resistor_SMD:R_0603_1608Metric,Reset vom I2C-Expander
 1,R12,0R,Resistor_SMD:R_0603_1608Metric,einziger Verbindungspunkt Signal- und Leistungsmasse
 4,"R_M1_PU,R_M2_PU,U2_RC,U4_RC",10k,Resistor_SMD:R_0603_1608Metric,

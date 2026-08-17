@@ -84,7 +84,7 @@ diesen Fall gebaut und unterdrückt PWM-Gleichtaktsprünge.
 |---|---|---|---|
 | 0,5 A Lauf | 0,25 mW | 0,5 mV | 1,68 V |
 | 4,17 A | 17 mW | 4,2 mV | 1,86 V |
-| 4,0 A Trip | 0,08 W | 20 mV | 2,65 V |
+| 4,4 A Trip | 0,10 W | 22 mV | 2,75 V |
 | 33 A Vollausschlag | 1,09 W | 33 mV | 3,30 V |
 
 Der Verstärker läuft aus **3,3 V**, damit sein Ausgang den ADC-Eingang bauartbedingt
@@ -122,7 +122,7 @@ zwangsläufig beide Kanäle abschalten.
 | Grenze | Startwert | Wirkung | Realisierung |
 |---|---|---|---|
 | Software-Soft-Limit | noch offen | PWM reduzieren, dann abschalten | Firmware |
-| Hardware-Hard-Trip | **± 4,0 A** | `~SD` der IR2104 → Endstufe aus, **latched** | LM393-Fensterkomparator + 74AUP1G74, Schwelle über R7/R8/R9 (10k0 / 30k9 / 10k0) |
+| Hardware-Hard-Trip | **± 4,4 A** | `~SD` der IR2104 → Endstufe aus, **latched** | Fensterkomparator + 74AUP1G74, Schwelle über R7/R8/R9 (10k0 / 40k2 / 10k0). ⚠️ **Komparatortyp offen** — siehe Punkt 57 |
 
 Der Fensterkomparator trippt in **beiden** Stromrichtungen — bei Umpolung fließt der
 Strom durch den Shunt in die andere Richtung, ein einzelner Komparator würde die
@@ -137,7 +137,7 @@ Auslegungsregel für die Reihenfolge der Schwellen:
 
 ```
 Laufstrom  <  Anlaufstrom  <  Soft-Limit  <  Hard-Trip  <  Sicherung  <  FET-/Treiber-Grenze
- 0,3-1,0 A      1,6 A         ~2,0 A        ±4,0 A      6,3 A traege    >30 A
+ 0,3-1,0 A      1,6 A         ~2,0 A        ±4,4 A      6,3 A traege    >30 A
 ```
 
 Anlaufstrom und Soft-Limit sind die einzigen noch offenen Glieder. Bis zur Messung

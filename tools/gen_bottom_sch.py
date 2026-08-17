@@ -334,25 +334,32 @@ def build():
     motor_channel(2, "M2_A", "M2_B")
 
     # Gemeinsame Trip-Schwellen.
-    # 3,3 V ueber 10k / 30k9 / 10k  ->  HI = 2,652 V, LO = 0,648 V
-    # Mit 5 mOhm Shunt und Verstaerkung 50 entspricht das +/- 4,0 A.
+    # 3,3 V ueber 10k / 40k2 / 10k  ->  HI = 2,752 V, LO = 0,548 V
+    # Mit 5 mOhm Shunt und Verstaerkung 50 entspricht das +/- 4,4 A.
+    # (Mit dem alten 1-mOhm-Shunt waren es +/- 22 A - der Teiler ist
+    # unveraendert, der Shunt hat die Schwelle mitgenommen.)
     #
     # Die Schwelle muss ueber dem Blockierstrom liegen, denn der Anschlag ist
     # hier ein NORMALER Betriebszustand - ohne Endschalter faehrt der Laden bei
-    # jeder Fahrt kurz dagegen. 1,6 A gemessen, 4,0 A Trip: Faktor 2,5 Reserve.
+    # jeder Fahrt kurz dagegen. 1,6 A gemessen, 4,4 A Trip: Faktor 2,75.
+    # Die Reserve ist bewusst grosszuegig, weil sie NICHTS kostet: Zwischen
+    # 4 und 5 A ist auf dieser Platine nichts gefaehrdet (FETs >60 A, Shunt
+    # 1 W). Ein hoeherer Trip schuetzt also genauso gut vor dem Einzigen,
+    # was er ueberhaupt abfangen kann - einem echten Kurzschluss - und
+    # vertraegt zugleich einen Messfehler beim Blockierstrom von Faktor 2,5.
     # Ein echter Kurzschluss liegt um Groessenordnungen darueber und loest
     # sofort aus.
     #
     # Nuetzliche Eigenschaft: Teiler und INA240-Referenz haengen beide an
     # 3V3_SYS. Driftet die Versorgung, driften Nullpunkt und Schwelle
     # gemeinsam - die Schwelle bleibt ratiometrisch stabil.
-    s.add("R7", "Device:R", "10k0", R0603, MPN="Trip-Schwelle 4,0 A")
+    s.add("R7", "Device:R", "10k0", R0603, MPN="Trip-Schwelle 4,4 A")
     s.connect("3V3_SYS",   ("R7", "1"))
     s.connect("V_TRIP_HI", ("R7", "2"))
-    s.add("R8", "Device:R", "30k9", R0603, MPN="Trip-Schwelle 4,0 A")
+    s.add("R8", "Device:R", "40k2", R0603, MPN="Trip-Schwelle 4,4 A")
     s.connect("V_TRIP_HI", ("R8", "1"))
     s.connect("V_TRIP_LO", ("R8", "2"))
-    s.add("R9", "Device:R", "10k0", R0603, MPN="Trip-Schwelle 4,0 A")
+    s.add("R9", "Device:R", "10k0", R0603, MPN="Trip-Schwelle 4,4 A")
     s.connect("V_TRIP_LO", ("R9", "1"))
     s.connect("AGND",      ("R9", "2"))
 
