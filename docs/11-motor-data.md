@@ -15,14 +15,25 @@ Fensterläden), ergänzt um Angaben des Nutzers zum realen Motor.
 > zwei Adern**. Die Konsequenzen stehen in Abschnitt 3 und gehen in die
 > unangenehme Richtung.
 
-> **Gemessen am 17.08.2026 — der Blockierstrom ist geklärt.**
-> **1,6 A bei 24 V an blockiertem Abtrieb**, Labornetzteil mit 5 A Reserve, also
-> ohne Strombegrenzung. Daraus `R_Anker = 24 V / 1,6 A = 15 Ω`.
+> **Gemessen am 17.08.2026 — der Blockierstrom ist geklärt, dreifach.**
 >
-> Die Messung am Vortag — 0,116 A bei 2 V, entsprechend 17,2 Ω — bestätigt das
-> aus einem zwölffach anderen Betriebspunkt. Weil eine Restdrehung den Wert nur
-> nach unten verfälschen kann, gilt streng: **R ≤ 15 Ω, I_Blockier ≥ 1,6 A**.
-> Ausgelegt wird auf **2 A**.
+> | Messung | Verfahren | Ergebnis | daraus R |
+> |---|---|---:|---:|
+> | M7 | 2 V anlegen, Strom messen | 0,116 A | 17,2 Ω |
+> | M3 | 24 V, Abtrieb blockiert | **1,6 A** | **15,0 Ω** |
+> | M6 | Multimeter direkt an den Motoradern | — | **16,5 / 20 Ω** |
+>
+> Drei völlig verschiedene Verfahren, Spannungen zwölffach auseinander, und alle
+> drei landen zwischen 15 und 17,2 Ω. Damit ist die Sache entschieden.
+>
+> Für die Auslegung zählt der **kleinste** Wert, denn er ergibt den größten
+> Strom: **R = 15 Ω, I_Blockier = 1,6 A.** Ausgelegt wird auf **2 A**.
+>
+> (M6 streut mit 16,5 und 20 Ω sichtbar — genau das erwartet man, denn der
+> Bürstenübergang macht den Widerstand von der Läuferstellung abhängig. **Alle
+> Streuung liegt nach oben**, und höher heißt weniger Strom. Der Nullpunkt der
+> Messleitungen liegt bei 0,2 Ω und ist damit unter 1,5 %; die Warnung weiter
+> unten galt für die früher erwarteten 1 Ω.)
 >
 > **Das ist ein Sechzehntel der zuvor angenommenen 25 A.** Abschnitt 5 ist
 > daraufhin komplett neu gerechnet.
@@ -174,7 +185,7 @@ Stromzange oder Shunt am Oszilloskop. Für den Anlaufstrom reicht ein Multimeter
 | **M1** | **Laufstrom** | Laden komplett auf und zu fahren, montiert | 🟡 offen — gerechnet 0,3–1,0 A, misst später das Gerät selbst |
 | **M2** | **Anlaufstrom** | Einschaltmoment | ✅ **erledigt durch M3.** Beim Einschalten steht der Läufer, es fließt also genau der Blockierstrom. Mehr als 1,6 A kann nie fließen — ein Einschaltstoß existiert bei diesem Motor nicht |
 | **M3** | **Blockierstrom** | Abtrieb blockieren, U und I **gleichzeitig** ablesen, `R = U/I`. **Bei 2–4 V, nicht bei 24 V** — siehe Warnung unten | ✅ **1,6 A bei 24 V** (17.08.2026) |
-| **M6** | **Ankerwiderstand** (entbehrlich, seit M3 und M7 übereinstimmen) | Motor **stromlos**, Multimeter an die zwei Adern. Welle **nicht** von Hand drehbar (Schneckengetriebe selbsthemmend) — stattdessen: messen, Motor kurz ein Stück fahren, erneut messen, **10×** wiederholen | ⬜ nicht mehr nötig |
+| **M6** | **Ankerwiderstand** | Motor **stromlos**, Multimeter an die zwei Adern. Welle **nicht** von Hand drehbar (Schneckengetriebe selbsthemmend) — stattdessen: messen, Motor kurz ein Stück fahren, erneut messen, **10×** wiederholen | ✅ **16,5 Ω** (17.08.2026, erste Messung) |
 | **M7** | **Kleinspannungsmethode** | Labornetzteil auf **2 V**, Strom messen. Der Motor dreht dabei mit 0,16 U/min noch minimal weiter, der Fehler ist aber klein | ✅ **0,116 A bei 2 V** (16.08.2026) |
 
 > **Korrektur zu M6:** In der ersten Fassung stand „Welle langsam von Hand drehen".
@@ -395,11 +406,18 @@ Schlag aussagekräftig:
 4. Motor ein Stück verfahren, erneut messen — der Bürstenübergang macht den Wert
    winkelabhängig. **Fünfmal, kleinsten Wert nehmen.**
 
-**Erwartet: 14–17 Ω.** Kommt das heraus, ist die Sache dreifach bestätigt und die
-Auslegung steht. Kommt deutlich weniger heraus — etwa 7 Ω — dann gilt Abschnitt
-6.2, und es sind zwei Werte zu ändern: Sicherung auf 10 A und der Steckverbinder
-neu zu bewerten. **Zwei Minuten Arbeit, kein Blockieren, keine Gefahr für die
-Mechanik.**
+**Erwartet waren 14–17 Ω — gemessen wurden 16,5 und 20 Ω.** Damit ist die Auslegung
+dreifach bestätigt und der Faktor-2-Irrtum aus Abschnitt 6.2 ausgeschlossen. Die
+Sicherung bleibt bei 6,3 A, der Steckverbinder bei Micro-Fit 3.0.
+
+Die Streuung zwischen 16,5 und 20 Ω ist kein Widerspruch, sondern der erwartete
+Bürsteneffekt: Je nach Läuferstellung liegen unterschiedlich viele Lamellen im
+Strompfad. **Für die Auslegung zählt das Minimum**, und das liefert nicht M6,
+sondern M3 mit 15,0 Ω — eine echte Strommessung bei voller Spannung. Auf diesen
+15 Ω steht die Auslegung, sie ist also die konservativste der drei Messungen.
+
+Selbst wenn eine ungünstige Läuferstellung noch einmal 15 % darunter läge —
+13 Ω, 1,85 A — bleibt bis zum Trip bei 4,4 A ein Faktor 2,4.
 
 ### 6.4 Wind: das Problem ist mechanisch, nicht elektrisch
 
