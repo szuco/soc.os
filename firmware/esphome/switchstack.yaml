@@ -282,6 +282,22 @@ number:
     optimistic: true
     entity_category: config
 
+  # Versatz zwischen den beiden Fluegeln. Zweifluegelige Klapplaeden
+  # UEBERLAPPEN im geschlossenen Zustand - der ueberdeckende Fluegel muss
+  # zuletzt schliessen und zuerst oeffnen, sonst schlagen sie aufeinander.
+  # Der Original-Controller K0000230 macht es mit 6 s.
+  - platform: template
+    name: Fluegelversatz
+    id: versatz
+    unit_of_measurement: s
+    min_value: 0
+    max_value: 20
+    step: 0.5
+    initial_value: 6
+    restore_value: true
+    optimistic: true
+    entity_category: config
+
   # Skalierung der Strommessung: 1 / (R_shunt * Verstaerkung). Rechnerisch
   # 1/(0,001 * 50) = 20 A/V, aber erst die Messung am realen Aufbau sagt,
   # was der interne ADC daraus macht. Deshalb einstellbar statt fest.
@@ -297,8 +313,20 @@ number:
     optimistic: true
     entity_category: config
 
+# Welcher Fluegel ueberdeckt den anderen - zur LAUFZEIT umstellbar, weil es
+# vom Fenster abhaengt und nicht vom Geraet.
+select:
+  - platform: template
+    name: Ueberdeckender Fluegel
+    id: ueberdeckung
+    options: ["Jalousie 1", "Jalousie 2"]
+    initial_option: "Jalousie 2"
+    optimistic: true
+    restore_value: true
+    entity_category: config
+
 # -----------------------------------------------------------------------------
-# Fahrskripte: Anlauf - Fahrt - Sanftauslauf - aus
+# Fahrskripte: Versatz - Anlauf - Fahrt - Sanftauslauf - aus
 # -----------------------------------------------------------------------------
 # time_based-Cover koennen ihre Dauer nur zur Compilezeit lesen. Damit die
 # Fahrzeit im Betrieb einstellbar bleibt, faehrt jede Bewegung als Skript mit
@@ -311,6 +339,10 @@ script:
   - id: fahrt1_auf
     mode: restart
     then:
+      # beim Oeffnen wartet der VERDECKTE.
+      - delay: !lambda |-
+          return id(ueberdeckung).state == "Jalousie 2"
+                 ? (uint32_t)(id(versatz).state * 1000.0) : 0;
       - output.set_level: {id: m1_ina, level: 0%}
       - output.set_level: {id: m1_inb, level: 0%}
       - delay: ${reversal_pause}
@@ -324,6 +356,10 @@ script:
   - id: fahrt1_zu
     mode: restart
     then:
+      # beim Schliessen wartet der UEBERDECKENDE.
+      - delay: !lambda |-
+          return id(ueberdeckung).state == "Jalousie 1"
+                 ? (uint32_t)(id(versatz).state * 1000.0) : 0;
       - output.set_level: {id: m1_ina, level: 0%}
       - output.set_level: {id: m1_inb, level: 0%}
       - delay: ${reversal_pause}
@@ -337,6 +373,10 @@ script:
   - id: fahrt2_auf
     mode: restart
     then:
+      # beim Oeffnen wartet der VERDECKTE.
+      - delay: !lambda |-
+          return id(ueberdeckung).state == "Jalousie 1"
+                 ? (uint32_t)(id(versatz).state * 1000.0) : 0;
       - output.set_level: {id: m2_ina, level: 0%}
       - output.set_level: {id: m2_inb, level: 0%}
       - delay: ${reversal_pause}
@@ -350,6 +390,10 @@ script:
   - id: fahrt2_zu
     mode: restart
     then:
+      # beim Schliessen wartet der UEBERDECKENDE.
+      - delay: !lambda |-
+          return id(ueberdeckung).state == "Jalousie 2"
+                 ? (uint32_t)(id(versatz).state * 1000.0) : 0;
       - output.set_level: {id: m2_ina, level: 0%}
       - output.set_level: {id: m2_inb, level: 0%}
       - delay: ${reversal_pause}
@@ -448,6 +492,16 @@ graphical_display_menu:
       switch: haube_kontakt
       on_text: an
       off_text: aus
+    - type: menu
+      text: Fluegelversatz
+      items:
+        - type: select
+          text: Ueberdeckend
+          select: ueberdeckung
+        - type: number
+          text: Versatz
+          number: versatz
+          format: "%.1f"
     - type: menu
       text: Messwerte
       items:
