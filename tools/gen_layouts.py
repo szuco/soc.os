@@ -379,14 +379,32 @@ class BoardBuilder:
         for lay in (pcbnew.F_Cu, pcbnew.In1_Cu, pcbnew.In2_Cu, pcbnew.B_Cu):
             lset.addLayer(lay)
         zone.SetLayerSet(lset)
-        # Nur der echte Antennenabschnitt: Das WROOM-Modul (25,5 mm lang,
-        # Mitte y=-16,27) ragt 3 mm ueber die Boardkante - die Antenne
-        # (oberste 6,5 mm des Moduls) beginnt bei y=-22,5. Die fruehere
-        # Flaeche bis y=-15 hat 9 Signalpads des Moduls eingeschlossen
-        # und sie damit unroutbar gemacht (Freerouting-Plateau, 11 offen).
+        # DAS MODUL RAGT NICHT MEHR UEBER DIE KANTE, seit dem 18.08.2026.
+        #
+        # Es stand mit seiner Koerpermitte bei y = -16,27 und reichte damit bis
+        # -29,02, also 3 mm ueber den Boardrand. Ueber die Ecken gemessen kam
+        # es auf einen Durchmesser von 60,8 mm - in eine Dose mit 54 mm lichter
+        # Weite (gemessen, mit Schrauben) passt das nicht. Genau deshalb war
+        # die Platine seinerzeit von 55 auf 52 mm verkleinert worden; das
+        # ueberstehende Modul hat den Gewinn wieder aufgezehrt, und niemand hat
+        # die beiden Notizen zusammengerechnet.
+        #
+        # Jetzt sitzt die Koerpermitte bei y = -12,17: Die Modulkante endet bei
+        # -24,92, ihre Ecken liegen auf r = 26,5 und damit 0,25 mm innerhalb der
+        # Dose. Vom Board stehen noch 1,08 mm ueber die Antenne hinaus - das
+        # Modul ist also praktisch weiterhin randmontiert.
+        #
+        # Die Sperrflaeche wandert mit und liegt jetzt unter den obersten
+        # 6,5 mm des Moduls, also von -24,92 bis -18,42, verbreitert auf die
+        # volle Boardbreite dort. Kupferfrei auf ALLEN VIER Lagen - das ist
+        # die Massnahme, die den fehlenden Ueberstand ausgleicht.
+        #
+        # Nicht weiter nach innen ziehen: Die frueher bis y=-15 reichende
+        # Flaeche schloss neun Signalpads des Moduls ein und machte sie
+        # unroutbar.
         o = zone.Outline()
         o.NewOutline()
-        for x, y in ((-9, -26.2), (9, -26.2), (9, -22.6), (-9, -22.6)):
+        for x, y in ((-9.5, -25.4), (9.5, -25.4), (9.5, -18.4), (-9.5, -18.4)):
             o.Append(mm(x), mm(y))
         zone.SetZoneName("ESP32_ANTENNA_KEEPOUT")
         self.board.Add(zone)
@@ -608,7 +626,8 @@ class BoardBuilder:
 
 
 def build_board(name, module, fixed, auto_sides=("F", "B"),
-                antenna=False, block_f=None, loose=(), square=False):
+                antenna=False, block_f=None, block_b=None, loose=(),
+                square=False):
     sch = module.build()
     bb = BoardBuilder(name, sch, antenna=antenna, square=square)
     bb.loose = set(loose)
@@ -640,6 +659,8 @@ def build_board(name, module, fixed, auto_sides=("F", "B"),
         bb.occ.block(-9.5, -26.5, 9.5, -22.1)
     if block_f:
         bb.occ.block(*block_f, side="F")
+    if block_b:
+        bb.occ.block(*block_b, side="B")
     # 3. Rest: grosse zuerst, Hinweis = bester Netznachbar
     rest = [c for c in sch.components if c.ref not in bb.placed]
     def area(c):
@@ -753,7 +774,20 @@ FIXED_BOTTOM = dict(_BRIDGES,
 )
 
 FIXED_MID = {
-    "U1":  (0.0, -12.5, 0, "F"),       # ESP32, Antenne zur Frontkante
+    # ACHTUNG, die Zahl ist NICHT die Koerpermitte. place() zentriert auf die
+    # Bounding-Box, und beim ESP32-Footprint ist das der COURTYARD - der deckt
+    # die ganze Antennen-Sperrzone ab und ist 48 x 41 mm gross. Zwischen
+    # Courtyardmitte und Koerpermitte liegen 7,15 mm.
+    #
+    # Genau daran ist es gescheitert: Hier stand -12,5 in der Absicht, den
+    # Koerper dorthin zu setzen - tatsaechlich landete er bei -16,27 und ragte
+    # 3 mm ueber die Boardkante. Die Dose hat aber nur 54 mm lichte Weite, das
+    # Modul misst ueber seine Ecken 60,8 mm.
+    #
+    # Der Versatz betraegt 3,77 mm und geht nach INNEN:
+    #     Koerpermitte = Platzierungswert - 3,77
+    # Gewuenscht ist -12,17, einzutragen ist also -8,40.
+    "U1":  (0.0, -8.40, 0, "F"),       # ESP32, Koerpermitte bei -12,17
     # RS485 vom Bodenmittelpunkt nach links gerueckt: Dort steht seit dem
     # 18.08.2026 die USB-C-Buchse, die durch die Randkerbe des Top-Boards
     # greift. Der Bodenrand ist der einzige Streifen, der beiden passt -
@@ -801,7 +835,7 @@ FIXED_TOP = dict(
     # rund 8 mm Abstand zu Kreuz und Symbol und liegt sicher auf der Platine.
     # Links oben ToF, links unten Klinke; rechts zweimal Lueftung - dort sitzt
     # deshalb der SHT4x (Punkt 46, Raummessung).
-    J6=(0.0, 19.0, 180, "F"),          # Klinkenbuchse Stern, unten MITTIG
+    J6=(-9.0, 19.0, 180, "F"),         # Klinkenbuchse Stern, unten LINKS
     # ToF UND Raumsensor unter EINEM Durchbruch, 18.08.2026.
     #
     # Bisher sassen sie auf den Diagonalen bei (-9 / -19) und (+9 / -19) und
@@ -821,8 +855,12 @@ FIXED_TOP = dict(
     # Flaeche in seinem Sichtfeld haben, sonst misst er Uebersprechen statt
     # Entfernung. Bei 27 Grad Oeffnungswinkel und 2,5 mm bis zur Scheibe ist
     # der Kegel dort erst 1,2 mm breit - 3 mm Abstand liegen sicher daneben.
-    U3=(-3.5, -19.0, 0, "F"),          # VL53L1X, oben Mitte links
-    U2=(3.5, -19.0, 0, "F"),           # SHT4x, oben Mitte rechts
+    # Beide nach RECHTS gerueckt, zwischen Mitte und rechtem Ecktaster
+    # (Wunsch 18.08.2026). Der Abstand von 3 mm zwischen den Bauteilkanten
+    # bleibt - er ist die Bedingung, unter der ein gemeinsamer Durchbruch
+    # ueberhaupt geht.
+    U3=(5.5, -19.0, 0, "F"),           # VL53L1X
+    U2=(12.5, -19.0, 0, "F"),          # SHT4x
     # USB-C mittig oben, vollstaendig von der Zentralscheibe verdeckt und erst
     # nach deren Abnahme erreichbar (Punkt 45). Die Buchse steht jetzt - der
     # Stecker geht nach vorn, nicht radial gegen die Dosenwand.
@@ -840,9 +878,16 @@ def main():
     plans = {
         "bottom": dict(name="bottom_power_motor", module=gen_bottom_sch,
                        fixed=FIXED_BOTTOM, auto_sides=("B", "F")),
+        # Die Antennenzone ist fuer den Platzierer gesperrt - auf BEIDEN
+        # Seiten. Sie ist kupferfrei, und dort ein Bauteil abzulegen hiesse,
+        # genau das Kupfer wieder hineinzubringen, das man ausgespart hat.
+        # Ohne diese Sperre legte der Platzierer am 18.08.2026 eine Diode und
+        # zwei Widerstaende hinein, sobald das Modul nach innen gerueckt war.
         "mid":    dict(name="mid_logic", module=gen_mid_sch,
                        fixed=FIXED_MID, auto_sides=("F", "B"), antenna=True,
-                       loose=("U1",)),
+                       loose=("U1",),
+                       block_f=(-15.0, -25.6, 15.0, -16.5),
+                       block_b=(-15.0, -25.6, 15.0, -16.5)),
         # Top: Vorderseite innerhalb r21 gehoert dem Displaymodul
         # Top: quadratisch (siehe TOP_SQ). Die Vorderseite unter dem
         # Displaymodul bleibt frei - das Fenster misst 32,7 x 27,0, das Modul
