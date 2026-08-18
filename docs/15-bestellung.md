@@ -1,0 +1,142 @@
+# 15 – Bestellen bei JLCPCB: Anleitung
+
+Diese Seite ist die Schritt-für-Schritt-Anleitung für die erste Bestellung.
+Sie steht bewusst getrennt von der Fertigungsdoku ([`05-manufacturing.md`](05-manufacturing.md)),
+die begründet, *warum* die Daten so aussehen.
+
+> **Vor allem anderen: Das DRC-Gate muss grün sein.** `tools/gen_fab.py`
+> schreibt keine Fertigungsdaten, solange auch nur eine Verbindung offen ist.
+> Das ist Absicht — eine unvollständige Platine darf man nicht versehentlich
+> bestellen. Wenn `gen_fab.py` kein ZIP herausgibt, ist die Bestellung noch
+> nicht dran, egal wie fertig alles andere aussieht.
+
+## 1. Was bestellt wird
+
+**Ein Nutzen, nicht drei Platinen.** `hardware/fab/panel/` enthält alle drei
+Boards auf einem Träger von **173,4 × 72,4 mm**, verbunden über Stege mit
+Mausbissen. Das ist billiger als drei Einzelaufträge und für die Bestückung
+ohnehin nötig.
+
+| | Wert | woher |
+|---|---|---|
+| Maße | 173,4 × 72,4 mm | `tools/gen_panel.py` |
+| Lagen | **4** | alle drei Boards vierlagig |
+| Dicke | 1,0 mm | docs/05 |
+| Kupfer | 1 oz | reicht bei 4,1 A Summenstrom |
+| Oberfläche | HASL bleifrei oder ENIG | ENIG bei den 0,65-mm-Rastern besser |
+| Mindeststrukturen | 0,15 mm Abstand, 0,2 mm Bahn | im Regelwerk hinterlegt |
+| kleinste Bohrung | 0,3 mm | Vias 0,6/0,3 |
+
+## 2. Die Dateien
+
+```
+tools/gen_fab.py                    # Gerber + Bohrdaten + ZIP je Board
+tools/gen_assembly.py               # Stückliste, Bestückungsdatei, Plan
+hardware/fab/bestueckung/           # das Ergebnis von gen_assembly
+  switchstack_panel-bom-jlcpcb.csv  #   -> "BOM file" im Portal
+  switchstack_panel-cpl-jlcpcb.csv  #   -> "CPL file" im Portal
+  switchstack_panel-bestueckung.pdf #   -> zum Gegenprüfen, nicht hochladen
+```
+
+Der Gerber-ZIP des Nutzens entsteht mit `gen_fab.py`, sobald das DRC-Gate
+grün ist.
+
+## 3. Ablauf im Portal
+
+### Schritt 1 — Gerber hochladen
+`switchstack_panel.zip` auf jlcpcb.com hochladen. Das Portal liest Maße und
+Lagenzahl selbst aus. **Kontrollieren, dass es 4 Lagen erkennt** — erkennt es
+2, fehlen die Innenlagen im ZIP, und das ist ein Fehler in den Exporteinstellungen,
+kein Portalproblem.
+
+### Schritt 2 — Optionen
+| Feld | Wert | Warum |
+|---|---|---|
+| Layers | 4 | |
+| PCB Thickness | 1,0 mm | Tiefenbudget, docs/04 |
+| Surface Finish | ENIG | 0,65-mm-Raster am PCF8575, feine Pads |
+| Outline Tolerance | ±0,2 mm | der Adapter hat 0,4 mm Spiel |
+| **Panel** | „Panel by Customer" | **wichtig** — der Nutzen ist fertig, JLCPCB soll ihn nicht selbst panelisieren |
+| Remove Order Number | „Specify a location" | sonst druckt das Portal seine Nummer irgendwohin |
+
+### Schritt 3 — Bestückung (PCBA)
+„Assemble your PCB boards" einschalten.
+
+| Feld | Wert |
+|---|---|
+| PCBA Type | Economic reicht; Standard nur, falls Bauteile es verlangen |
+| Assembly Side | **Both sides** — alle drei Boards sind beidseitig bestückt |
+| Tooling holes | „Added by JLCPCB" **abwählen** — der Nutzen bringt eigene mit |
+
+### Schritt 4 — BOM und CPL hochladen
+`…-bom-jlcpcb.csv` als BOM, `…-cpl-jlcpcb.csv` als CPL. Beide sind bereits im
+erwarteten Spaltenformat.
+
+### Schritt 5 — Die Bauteilprüfung, und hier wird es ernst
+Das Portal zeigt jede Position mit dem gefundenen Bauteil und einer Vorschau
+der Drehlage. **Diesen Schritt nicht durchklicken.** Er ist der einzige, bei
+dem Fehler noch nichts kosten.
+
+## 4. Worauf du achten musst
+
+### 4.1 LCSC-Nummern fehlen
+`gen_assembly.py` meldet die Zahl der Positionen ohne LCSC-Nummer. Solange
+die nicht null ist, sucht das Portal die Bauteile selbst aus — und trifft bei
+Widerständen und Kondensatoren meist richtig, bei allem anderen nicht.
+
+**Vorgehen:** Für jede Position ohne Nummer im LCSC-Katalog das Bauteil
+suchen, Nummer notieren, in die BOM-Datei eintragen. Bei Widerständen und
+Kondensatoren genügt: Wert, Bauform, Spannung, Toleranz.
+
+### 4.2 Drehwinkel
+**Das ist die häufigste Fehlerquelle bei JLCPCB.** Die Winkel in der
+CPL-Datei stammen aus KiCad und beziehen sich auf KiCads Footprint. JLCPCB
+rechnet gegen die Lage im eigenen Bauteilkatalog. Für zweipolige Bauteile
+stimmt beides fast immer, für ICs, Dioden, Elkos und Steckverbinder oft nicht.
+
+**Vorgehen:** In der Vorschau jedes gepolte Bauteil einzeln ansehen —
+Pin 1 des ICs, Kathode der Diode, Plus des Elkos. Gegen
+`…-bestueckung.pdf` halten. Falsch gedreht bestückte ICs sind
+der klassische Weg, eine ganze Charge zu verlieren.
+
+Besonders zu prüfen:
+- **U1** ESP32-S3-WROOM (Mid) — die Antenne muss zur Frontkante zeigen
+- **UM1_BR / UM2_BR** DRV8871 (Bottom) — Thermalpad und Pin 1
+- **U2/U4** Buck-Regler (Bottom)
+- die vier **Ecktaster** auf Top — Drehlage egal, Position kritisch
+- **J1** Feldstecker (Bottom) — Codierung des Gehäuses
+
+### 4.3 Durchsteckteile
+Der Feldstecker, die Klinkenbuchse und die Stackverbinder sind THT. JLCPCB
+bestückt die im Economic-Verfahren nicht automatisch; sie werden je nach
+Auftrag von Hand gelötet oder gar nicht. **Vor der Bestellung klären**, ob
+sie mitkommen — sonst lötest du sie selbst, was möglich, aber bei den
+1,27-mm-Stackverbindern mühsam ist.
+
+### 4.4 Was der Fertiger nicht prüft
+- **ob die Bauteile zueinander passen** — die Netzliste ist geprüft, die
+  Schaltung selbst hat nie ein Review gesehen (steht im Kopf jedes
+  Schaltplan-Generators)
+- **ob die Höhen ins Gehäuse passen** — dafür ist die STEP-Baugruppe da
+- **ob die Drehwinkel stimmen** — er baut, was in der CPL steht
+
+## 5. Stückzahlen
+
+| Menge | wofür |
+|---|---|
+| **5** | erste Runde. Fehler kosten dann fünf Nutzen, nicht fünfundzwanzig |
+| **25** | erst, wenn ein aufgebautes Gerät nachweislich läuft |
+
+Jeder Nutzen ergibt drei Boards, ein Satz also ein Gerät. Fünf Nutzen sind
+fünf Geräte.
+
+## 6. Vor dem Absenden — die letzte Liste
+
+- [ ] `gen_fab.py` läuft durch und schreibt das ZIP (DRC-Gate grün)
+- [ ] Portal erkennt **4 Lagen**
+- [ ] „Panel by Customer" gewählt, Tooling holes **nicht** von JLCPCB
+- [ ] Assembly **beidseitig**
+- [ ] **null** Positionen ohne LCSC-Nummer
+- [ ] jedes gepolte Bauteil in der Vorschau gegen den Bestückungsplan geprüft
+- [ ] geklärt, ob die Durchsteckteile mitbestückt werden
+- [ ] Stückzahl **5**, nicht 25

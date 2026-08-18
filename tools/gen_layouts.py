@@ -83,8 +83,22 @@ TOP_CR = 4.0           # Eckradius
 # Ebene des Top-Boards. Der Koerper misst 9,94 x 6,40 und sitzt auf Mid bei
 # (3,5 / 20,3) - weiter nach aussen geht nicht, sonst laufen seine Ecken ueber
 # Mids Radius von 26.
-NOTCH_X0, NOTCH_X1 = -2.0, 9.0     # Kerbenbreite 11,0 mm
-NOTCH_Y            = 16.8          # Kerbengrund; von dort bis zum Rand
+# DIE KERBE LIEGT AM LINKEN RAND, quer, seit dem 18.08.2026.
+#
+# Vorher lag sie unten und musste sich den 30-mm-Streifen zwischen den
+# Ecktastern mit der Klinkenbuchse teilen - die konnte deshalb nicht mittig
+# sitzen. Quergestellt passt die Buchse in den SEITENstreifen: Der ist
+# zwischen Displayfenster (x = -16,35) und Boardrand 7,15 mm breit, und die
+# Buchse ist quer nur 4,3 mm tief.
+#
+# Damit ist der untere Rand wieder frei, und die Klinke sitzt exakt mittig.
+#
+# Die Lage ist durch zwei Grenzen eingeklemmt und hat nur 0,75 mm Spiel:
+#   Mids Radius von 26 erlaubt die Koerperecke bis y = 12,63  -> Mitte <= 8,48
+#   Tops Befestigungsbohrung reicht bis y = 2,98               -> Mitte >= 7,73
+# Gewaehlt ist 8,0.
+NOTCH_X0, NOTCH_X1 = -23.5, -17.25  # von der Kante nach innen, 6,25 mm tief
+NOTCH_Y0, NOTCH_Y1 = 3.25, 12.75    # Kerbenhoehe 9,5 mm
 # Bohrbild v2: ZWEI Bohrungen bei 0/180 Grad. Die alten Winkel 120/240
 # kollidierten mit den Sicheltasten-Stoesseln (117/243 Grad, nur ~2 mm
 # daneben), und bei r21,5 blockieren Stackverbinder (um 45/135/225/315),
@@ -194,8 +208,8 @@ def inside_outline(x, y, square, margin=0.0):
             return math.hypot(dx, dy) <= TOP_CR
         # Die USB-Kerbe ist kein Board. Der Platzierer darf dort nichts
         # ablegen, und der Randabstand gilt auch an ihren Flanken.
-        if (NOTCH_X0 - margin <= x <= NOTCH_X1 + margin
-                and y >= NOTCH_Y - margin):
+        if (x <= NOTCH_X1 + margin
+                and NOTCH_Y0 - margin <= y <= NOTCH_Y1 + margin):
             return False
         return True
     return math.hypot(x, y) <= BOARD_R - margin
@@ -296,15 +310,15 @@ class BoardBuilder:
         # Abgerundetes Quadrat: vier Geraden, vier Eckboegen
         h, cr = TOP_SQ / 2.0, TOP_CR
         k = 0.7071067811865476
-        # Die Bodenkante (y = +h) ist durch die USB-Kerbe unterbrochen:
-        # statt einer Geraden drei Segmente rechts, hinein, links.
+        # Die linke Kante (x = -h) ist durch die USB-Kerbe unterbrochen:
+        # statt einer Geraden fuenf Segmente hinein und wieder heraus.
         for a, b in (((-(h - cr), -h), ((h - cr), -h)),
-                     (((h - cr), h), (NOTCH_X1, h)),
-                     ((NOTCH_X1, h), (NOTCH_X1, NOTCH_Y)),
-                     ((NOTCH_X1, NOTCH_Y), (NOTCH_X0, NOTCH_Y)),
-                     ((NOTCH_X0, NOTCH_Y), (NOTCH_X0, h)),
-                     ((NOTCH_X0, h), (-(h - cr), h)),
-                     ((-h, (h - cr)), (-h, -(h - cr))),
+                     (((h - cr), h), (-(h - cr), h)),
+                     ((-h, (h - cr)), (-h, NOTCH_Y1)),
+                     ((-h, NOTCH_Y1), (NOTCH_X1, NOTCH_Y1)),
+                     ((NOTCH_X1, NOTCH_Y1), (NOTCH_X1, NOTCH_Y0)),
+                     ((NOTCH_X1, NOTCH_Y0), (-h, NOTCH_Y0)),
+                     ((-h, NOTCH_Y0), (-h, -(h - cr))),
                      ((h, -(h - cr)), (h, (h - cr)))):
             seg = pcbnew.PCB_SHAPE(self.board)
             seg.SetShape(pcbnew.SHAPE_T_SEGMENT)
@@ -507,12 +521,17 @@ class BoardBuilder:
                     for k in range(7):
                         a = math.radians(a0 + 90.0 * k / 6.0)
                         o.Append(mm(cx + r * math.cos(a)), mm(cy + r * math.sin(a)))
-                o.Append(mm(NOTCH_X1 + 0.6), mm(h))
-                o.Append(mm(NOTCH_X1 + 0.6), mm(NOTCH_Y - 0.6))
-                o.Append(mm(NOTCH_X0 - 0.6), mm(NOTCH_Y - 0.6))
-                o.Append(mm(NOTCH_X0 - 0.6), mm(h))
-                for cx, cy, a0 in ((-(h - r), h - r, 90.0),
-                                   (-(h - r), -(h - r), 180.0),
+
+                for cx, cy, a0 in ((-(h - r), h - r, 90.0),):
+                    for k in range(7):
+                        a = math.radians(a0 + 90.0 * k / 6.0)
+                        o.Append(mm(cx + r * math.cos(a)), mm(cy + r * math.sin(a)))
+                # an der Kerbe entlang
+                o.Append(mm(-h), mm(NOTCH_Y1 + 0.6))
+                o.Append(mm(NOTCH_X1 + 0.6), mm(NOTCH_Y1 + 0.6))
+                o.Append(mm(NOTCH_X1 + 0.6), mm(NOTCH_Y0 - 0.6))
+                o.Append(mm(-h), mm(NOTCH_Y0 - 0.6))
+                for cx, cy, a0 in ((-(h - r), -(h - r), 180.0),
                                    (h - r, -(h - r), 270.0)):
                     for k in range(7):
                         a = math.radians(a0 + 90.0 * k / 6.0)
@@ -700,29 +719,37 @@ BTN_POS = {"SW1": (18.0, -20.0),      # oben rechts
            "SW3": (-18.0, 20.0),      # unten links
            "SW4": (18.0, 20.0)}       # unten rechts
 
-# FET-Raster Bottom: 4 Spalten (M1-A, M1-B, M2-B, M2-A), oben High-, unten
-# Low-Side. PowerPAK quer (5,5 x 7,5) -> Spaltenteilung 6,1 mm.
-_FET_COLS = {"M1A": -8.85, "M1B": -2.95, "M2B": 2.95, "M2A": 8.85}
-_FET_GRID = {}
-for _leg, _x in _FET_COLS.items():
-    _FET_GRID["Q_%s_H" % _leg] = (_x, -6.2, 90, "F")
-    _FET_GRID["Q_%s_L" % _leg] = (_x, 1.9, 90, "F")
+# DAS FET-RASTER IST AM 18.08.2026 ENTFALLEN. Hier standen acht MOSFETs im
+# PowerPAK SO-8 in vier Spalten, zwei Reihen - die diskrete H-Bruecke. Sie
+# belegten allein rund 240 mm2 der Kabelseite. An ihre Stelle treten zwei
+# integrierte Bruecken DRV8871 im HTSSOP-8, zusammen keine 70 mm2.
+#
+# Der gewonnene Platz ist kein Selbstzweck: Er traegt den Feldstecker, mit
+# dem alle Anschlusskabel auf EINE Flaeche wandern.
+_BRIDGES = {
+    "UM1_BR": (-7.0, -4.0, 0, "F"),    # Bruecke Motor 1
+    "UM2_BR": (7.0, -4.0, 0, "F"),     # Bruecke Motor 2
+}
 
-FIXED_BOTTOM = dict(_FET_GRID,
-    J1=(0.0, 19.5, 0, "F"),            # Leistungsstecker unten
+FIXED_BOTTOM = dict(_BRIDGES,
+    # EIN Feldstecker fuer alles: Leistung, beide Motoren, RS485, vier
+    # Reed-Kontakte und der Haubenkontakt. Micro-Fit 3.0 2x8, stehend auf der
+    # Kabelseite - in der Dose wird ein Kabelbaum vorbereitet und mit einem
+    # Klick aufgesteckt.
+    J1=(0.0, 17.5, 0, "F"),            # Feldstecker 16-polig
     F1=(0.0, 8.4, 0, "F"),             # SMD-Sicherung mittig
     U2=(-4.0, -21.0, 0, "F"),          # Buck 5 V
     U2_L=(-7.3, -13.8, 0, "F"),
     U4=(4.0, -21.0, 0, "F"),           # Buck 6,2 V
     U4_L=(7.3, -13.8, 0, "F"),
-    R_M1_SH=(9.6, 18.0, 90, "F"),      # Shunt M1 nahe am Stecker
+    # Die Shunts sind aus der Fixliste genommen: Ihre alte Position lag im
+    # Band, das jetzt der Feldstecker braucht. Sie gehoeren in den Motorpfad
+    # zwischen Bruecke und Stecker; der Platzierer findet dort selbst eine
+    # Stelle, und weil es 4-Terminal-Shunts sind, sitzt die Messung ohnehin
+    # richtig, egal wie lang die Zuleitung ist.
     C3=(-6.5, 5.6, 0, "B"),            # Bulk, niedrigbauend, Rueckseite
     C4=(6.5, 5.6, 0, "B"),
     # Treiber unter ihren FETs, in zwei Zeilen gestaffelt
-    UM1A_DRV=(-8.85, -4.6, 90, "B"),
-    UM1B_DRV=(-2.95, -12.2, 90, "B"),
-    UM2B_DRV=(2.95, -12.2, 90, "B"),
-    UM2A_DRV=(8.85, -4.6, 90, "B"),
 )
 
 FIXED_MID = {
@@ -732,16 +759,13 @@ FIXED_MID = {
     # greift. Der Bodenrand ist der einzige Streifen, der beiden passt -
     # oben blockiert das ESP32-Modul mit seiner Antenne, links und rechts
     # laesst das Displayfenster des Top-Boards nur 7,2 mm.
-    "J4":  (-11.5, 19.0, 0, "F"),      # RS485-Anschluss unten links
-    "J7":  (3.5, 20.3, 0, "F"),        # USB-C, stehend, greift durch Top
+    "J7":  (-20.0, 8.4, 90, "F"),      # USB-C, stehend quer, greift durch Top
     # Feldstecker, seit dem 16.08.2026 GETEILT: Mit vier Reed-Kontakten
     # (Verschluss und Sabotage je Fenster, Punkt 34) waere ein 8-poliger
     # JST-SH 11,9 mm lang - dafuer ist auf dem Mid-Board nachweislich kein
     # Platz mehr. Zwei Stecker finden dagegen beide einen: die Sensoren
     # zusammen, der potentialfreie Haubenkontakt getrennt. Das trennt
     # nebenbei Eingaenge und Schaltausgang sauber.
-    "J5":  (-9.0, 3.8, 90, "B"),       # 6-pol: 4 Reed + 2 GND
-    "J6":  (-20.8, 6.6, 90, "B"),      # 2-pol: Haubenkontakt
         # PhotoMOS auf die RUECKSEITE: Vorn braucht der Bodenrand jetzt Platz
     # fuer die USB-C-Buchse, und der einzige andere freie Fleck kollidiert
     # mit dem Stackverbinder J3. Hinten ist der Bereich frei - der
@@ -777,16 +801,37 @@ FIXED_TOP = dict(
     # rund 8 mm Abstand zu Kreuz und Symbol und liegt sicher auf der Platine.
     # Links oben ToF, links unten Klinke; rechts zweimal Lueftung - dort sitzt
     # deshalb der SHT4x (Punkt 46, Raummessung).
-    J6=(-9.0, 19.0, 180, "F"),         # Klinkenbuchse Stern, unten links
-    U3=(-9.0, -19.0, 0, "F"),          # VL53L1X, oben links
-    U2=(9.0, -19.0, 0, "F"),           # SHT4x unter dem oberen Lueftungsschlitz
+    J6=(0.0, 19.0, 180, "F"),          # Klinkenbuchse Stern, unten MITTIG
+    # ToF UND Raumsensor unter EINEM Durchbruch, 18.08.2026.
+    #
+    # Bisher sassen sie auf den Diagonalen bei (-9 / -19) und (+9 / -19) und
+    # brauchten zwei getrennte Oeffnungen in der Zentralscheibe. Das war noch
+    # aus der Zeit, als dort keine Taster standen - docs/04 haelt seit dem
+    # Umbau auf die Ecktaster fest, dass die vier Durchbrueche auf den
+    # Diagonalen nicht mehr passen.
+    #
+    # Jetzt stehen beide nebeneinander auf der senkrechten Mittellinie, unter
+    # einem gemeinsamen Schlitz von 14 x 5 mm bei (0 / -19). Der Streifen
+    # zwischen Displayfenster (y = -13,5) und Boardrand (-23,5) ist 10 mm hoch
+    # und ueber die ganze Breite frei - die Stackverbinder enden bei y = -15,2,
+    # die Ecktaster stehen bei x = +/-18.
+    #
+    # ABSTAND 3 mm zwischen den Bauteilkanten. Naeher waere thermisch
+    # schlechter und optisch riskant: Der VL53L1X darf keine spiegelnde
+    # Flaeche in seinem Sichtfeld haben, sonst misst er Uebersprechen statt
+    # Entfernung. Bei 27 Grad Oeffnungswinkel und 2,5 mm bis zur Scheibe ist
+    # der Kegel dort erst 1,2 mm breit - 3 mm Abstand liegen sicher daneben.
+    U3=(-3.5, -19.0, 0, "F"),          # VL53L1X, oben Mitte links
+    U2=(3.5, -19.0, 0, "F"),           # SHT4x, oben Mitte rechts
     # USB-C mittig oben, vollstaendig von der Zentralscheibe verdeckt und erst
     # nach deren Abnahme erreichbar (Punkt 45). Die Buchse steht jetzt - der
     # Stecker geht nach vorn, nicht radial gegen die Dosenwand.
     # F1 (PTC) hat keine mechanische Bindung mehr - auf dem quadratischen Board
     # ist jede feste Position entweder unter dem Stackverbinder oder unter dem
     # Klinken-Platzhalter. Die Automatik findet ihn.
-    J7=(5.2, 8.0, 90, "F"),            # Reserve-UART, DNP
+    # Der Reserve-UART ist NICHT mehr fest platziert. Er ist ohnehin DNP, und
+    # seit die Klinke mittig sitzt, ist jede feste Stelle, die ich ihm gab,
+    # mit etwas anderem kollidiert. Der Platzierer findet selbst eine.
 )
 
 

@@ -202,14 +202,19 @@ def build():
     # J7 bleibt als unbestueckter Reserveanschluss stehen: UART und Interrupt
     # liegen ohnehin auf dem Stack, damit bleibt ein Satellitensensor moeglich,
     # ohne das Pinout zu aendern.
-    s.add("J7", "Connector_Generic:Conn_01x05", "Reserve UART",
-          "Connector_JST:JST_PH_B5B-PH-K_1x05_P2.00mm_Vertical",
-          MPN="DNP - Reserve fuer ein Satellitenmodul")
-    s.connect("3V3_SYS",      ("J7", "1"))
-    s.connect("PGND",         ("J7", "2"))
-    s.connect("UART_AUX_TX",  ("J7", "3"))
-    s.connect("UART_AUX_RX",  ("J7", "4"))
-    s.connect("PRESENCE_INT", ("J7", "5"))
+    # DER RESERVE-UART IST AM 18.08.2026 ENTFALLEN.
+    #
+    # Er war als DNP-Steckplatz fuer eine spaetere serielle Erweiterung
+    # gedacht. Auf einem Board von 47 x 47 mm, das inzwischen Display, vier
+    # Ecktaster, zwei Stackverbinder mit je 40 Kontakten, die mittige
+    # Klinkenbuchse, ToF, Raumsensor und die USB-Randkerbe traegt, findet der
+    # Platzierer fuer ihn keine Stelle mehr - weder fest noch automatisch.
+    #
+    # Reserve gibt es weiterhin, nur an anderer Stelle: J_STK_A haelt nach
+    # der Umwidmung fuer die Feldsignale keine freien Kontakte mehr, aber die
+    # Signale UART_AUX_TX/RX liegen unveraendert auf J_STK_B 18/20 und sind
+    # vom Mid-Board aus erreichbar.
+
 
     # =====================================================================
     # 7. Stackverbinder - identische Quelle wie Bottom/Mid

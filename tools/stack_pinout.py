@@ -1,9 +1,35 @@
 #!/usr/bin/env python3
 """
-Stack-Pinout v0.5 - die EINZIGE Quelle fuer J_STK_A und J_STK_B.
+Stack-Pinout v0.6 - die EINZIGE Quelle fuer J_STK_A und J_STK_B.
 
 Alle drei Schaltplan-Generatoren importieren diese Tabellen; docs/03 wird
 daraus erzeugt. Damit koennen die Boards nicht auseinanderlaufen.
+
+Aenderung v0.5 -> v0.6 (18.08.2026):
+  * ALLE FELDANSCHLUESSE LIEGEN JETZT AUF EINEM STECKER auf der Rueckseite
+    des Bottom-Boards. RS485, die vier Reed-Kontakte und der Haubenkontakt
+    sassen bisher auf dem Mid-Board mitten im Stapel; die Feldkabel zerrten
+    an drei Platinen. Jetzt wird in der Dose ein Kabelbaum vorbereitet und
+    mit einem Klick aufgesteckt.
+
+    Moeglich wurde das erst, als die diskrete H-Bruecke der integrierten wich
+    (docs/14): Die acht MOSFETs belegten genau die Flaeche, die der groessere
+    Stecker braucht.
+
+    Acht Signale mussten dafuer neu durch den Stapel. Fuenf Reservekontakte
+    reichten nicht, drei PGND-Kontakte sind umgewidmet (A25, A38, A39):
+
+      A24  RSV_A2 -> REED2_IN      A36  RSV_A5 -> REED1_IN
+      A25  PGND   -> SAB2_IN       A37  RSV_A6 -> SAB1_IN
+      A34  RSV_A3 -> RS485_A       A38  PGND   -> HOOD_A
+      A35  RSV_A4 -> RS485_B       A39  PGND   -> HOOD_B
+
+    Masse bleibt auf J_STK_A mit 9 und ueber beide Verbinder mit 26 Kontakten
+    reichlich vorhanden.
+
+    NICHT mitgewandert ist die USB-C-Buchse: Sie greift durch die Randkerbe
+    des Top-Boards nach vorn, damit nach Abnehmen der Zentralscheibe frontal
+    gesteckt werden kann.
 
 Aenderung v0.4 -> v0.5 (18.08.2026):
   * TASTEN UND I2C AUF DIE AUSSENREIHE, und die Tasten auf BEIDE Verbinder
@@ -67,10 +93,10 @@ STK_A = {
     7: "PGND", 8: "PGND", 9: "3V3_SYS", 10: "3V3_SYS", 11: "PGND", 12: "PGND",
     13: "6V2_STAR_F", 14: "PGND", 15: "PGND", 16: "M1_INA", 17: "M1_INB",
     18: "USB_VBUS", 19: "PGND", 20: "M2_INA", 21: "PGND", 22: "M2_INB",
-    23: "STAR_EN", 24: "RSV_A2", 25: "PGND", 26: "I_SENSE1", 27: "AGND",
+    23: "STAR_EN", 24: "REED2_IN", 25: "SAB2_IN", 26: "I_SENSE1", 27: "AGND",
     28: "I_SENSE2", 29: "AGND", 30: "HW_TRIP1", 31: "HW_TRIP2",
-    32: "TRIP_RST", 33: "RELAY_CTL", 34: "RSV_A3", 35: "RSV_A4",
-    36: "RSV_A5", 37: "RSV_A6", 38: "PGND", 39: "PGND", 40: "BTN3",
+    32: "TRIP_RST", 33: "RELAY_CTL", 34: "RS485_A", 35: "RS485_B",
+    36: "REED1_IN", 37: "SAB1_IN", 38: "HOOD_A", 39: "HOOD_B", 40: "BTN3",
 }
 
 # J_STK_B - UI und Kommunikation

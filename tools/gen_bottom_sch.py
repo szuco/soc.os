@@ -46,15 +46,51 @@ def build():
     # =====================================================================
     # 1. Leistungseingang und Schutz
     # =====================================================================
-    s.add("J1", "Connector_Generic:Conn_02x03_Odd_Even", "Power/Motor 6p",
-          "Connector_Molex:Molex_Micro-Fit_3.0_43045-0612_2x03_P3.00mm_Vertical",
-          MPN="Micro-Fit 3.0 2x3 - Strombelastbarkeit pruefen")
-    s.connect("24V_IN",  ("J1", "1"))
-    s.connect("PGND",    ("J1", "2"))
-    s.connect("M1_A",    ("J1", "3"))
-    s.connect("M1_B",    ("J1", "4"))
-    s.connect("M2_A",    ("J1", "5"))
-    s.connect("M2_B",    ("J1", "6"))
+    # EIN Steckverbinder fuer die gesamte Feldverdrahtung, 18.08.2026.
+    #
+    # Bisher verteilten sich die Anschluesse auf vier Stecker an zwei
+    # Platinen: Leistung und Motoren hier, RS485, vier Reed-Kontakte und der
+    # Haubenkontakt auf dem Mid-Board mitten im Stapel. Die Feldkabel zerrten
+    # damit an drei Leiterplatten, und der Stapel liess sich nicht als Ganzes
+    # ein- und ausbauen.
+    #
+    # Moeglich wurde die Zusammenfassung erst dadurch, dass die diskrete
+    # H-Bruecke der integrierten gewichen ist - die acht MOSFETs belegten
+    # genau die Flaeche, die dieser Stecker braucht (docs/14).
+    #
+    #   1  24V_IN       9  RS485_B
+    #   2  PGND        10  REED1_IN
+    #   3  M1_A        11  SAB1_IN
+    #   4  M1_B        12  REED2_IN
+    #   5  M2_A        13  SAB2_IN
+    #   6  M2_B        14  HOOD_A
+    #   7  PGND        15  HOOD_B
+    #   8  RS485_A     16  PGND
+    #
+    # Kontakt 7 trennt die PWM-fuehrenden Motorleitungen von RS485 und den
+    # Reed-Eingaengen. Micro-Fit 3.0 traegt 5 A je Kontakt, der Summenstrom
+    # betraegt im unguenstigsten Fall 4,1 A - das traegt der eine 24-V-Kontakt.
+    #
+    # ALLES SELV. Der Haubenkontakt ist ueber den PhotoMOS auf dem Mid-Board
+    # potentialfrei, darf aber nur Kleinspannung schalten - im selben Gehaeuse
+    # wie die 24-V-Zufuehrung ist alles andere unzulaessig.
+    s.add("J1", "Connector_Generic:Conn_02x08_Odd_Even", "Feld 16p",
+          "Connector_Molex:Molex_Micro-Fit_3.0_43045-1612_2x08_P3.00mm_Vertical",
+          MPN="Molex 43045-1612, 2x8, stehend - EIN Stecker fuer alles, SELV")
+    s.connect("24V_IN",   ("J1", "1"))
+    s.connect("PGND",     ("J1", "2"), ("J1", "7"), ("J1", "16"))
+    s.connect("M1_A",     ("J1", "3"))
+    s.connect("M1_B",     ("J1", "4"))
+    s.connect("M2_A",     ("J1", "5"))
+    s.connect("M2_B",     ("J1", "6"))
+    s.connect("RS485_A",  ("J1", "8"))
+    s.connect("RS485_B",  ("J1", "9"))
+    s.connect("REED1_IN", ("J1", "10"))
+    s.connect("SAB1_IN",  ("J1", "11"))
+    s.connect("REED2_IN", ("J1", "12"))
+    s.connect("SAB2_IN",  ("J1", "13"))
+    s.connect("HOOD_A",   ("J1", "14"))
+    s.connect("HOOD_B",   ("J1", "15"))
 
     # Sicherung - Wert messabhaengig
     s.add("F1", "Device:Fuse", "15A traege",
@@ -93,26 +129,15 @@ def build():
         s.connect("PGND",     (ref, "2"))
 
     # =====================================================================
-    # 2. Gate-Versorgung 12 V (IR2104 braucht >= 10 V)
+    # 2. Die 12-V-Gatespannung ist am 18.08.2026 entfallen
     # =====================================================================
-    s.add("R2", "Device:R", "100R", R0603,
-          MPN="begrenzt Strom in D3 bei TVS-Ereignis")
-    s.connect("24V_PROT", ("R2", "1"))
-    s.connect("12V_RAW",  ("R2", "2"))
-    s.add("D3", "Device:D_Zener", "27V", "Diode_SMD:D_SOD-123")
-    s.connect("12V_RAW", ("D3", "1"))
-    s.connect("PGND",    ("D3", "2"))
-    s.add("U1", "Regulator_Linear:L78L12_SOT89", "L78L12",
-          "Package_TO_SOT_SMD:SOT-89-3", MPN="30 mA Gate-Ladestrom")
-    # ACHTUNG Pinbelegung SOT-89: 1 = OUT, 2 = GND, 3 = IN (war anfangs
-    # falsch herum - beim Review gegen das Datenblatt erneut pruefen)
-    s.connect("12V_GATE", ("U1", "1"))
-    s.connect("PGND",     ("U1", "2"))
-    s.connect("12V_RAW",  ("U1", "3"))
-    for ref, net in (("C5", "12V_RAW"), ("C6", "12V_GATE")):
-        s.add(ref, "Device:C", "1u", C0603)
-        s.connect(net,  (ref, "1"))
-        s.connect("PGND", (ref, "2"))
+    # Sie versorgte ausschliesslich die Bootstrap-Treiber IR2104 der diskreten
+    # H-Bruecke. Mit dem Wechsel auf die integrierte Bruecke DRV8871 braucht
+    # niemand mehr eine eigene Gatespannung - der Treiber erzeugt sie intern.
+    #
+    # Entfallen sind damit der Vorwiderstand, die Z-Diode, der Regler L78L12
+    # im SOT-89 und seine beiden Kondensatoren: fuenf Bauteile und eine ganze
+    # Spannungsschiene weniger.
 
     # =====================================================================
     # 3. DC/DC-Wandler
@@ -220,50 +245,86 @@ def build():
     # 4. Motorkanaele
     # =====================================================================
     def motor_channel(n, out_a, out_b):
-        """Vollbruecke aus 2 x IR2104 + 4 N-FET, Inline-Strommessung,
-        Comparator-Fenster und Latch fuer den Hardware-Trip."""
+        """Integrierte Vollbruecke DRV8871, Inline-Strommessung,
+        Comparator-Fenster und Latch fuer den Hardware-Trip.
+
+        BIS ZUM 18.08.2026 STAND HIER EINE DISKRETE BRUECKE aus zwei IR2104
+        und vier N-FETs je Kanal - acht FETs und vier Treiber insgesamt. Sie
+        war so gewaehlt worden, weil der Blockierstrom unbekannt war und ein
+        integrierter Treiber ihn moeglicherweise nicht ausgehalten haette.
+
+        Inzwischen ist der Blockierstrom vierfach belegt: drei eigene
+        Messungen und die Bauteilwahl des Original-Controllers, der genau
+        diesen Weg geht - zwei integrierte Bruecken (Infineon BTM7700G), je
+        eine pro Motor (docs/14). Bei 1,7 A ist die diskrete Bruecke aus
+        60-A-FETs schlicht ueberdimensioniert.
+
+        Der DRV8871 statt des BTM7700G des Originals, aus einem Grund:
+        Spannungsreserve. Der BTM7700G ist bis 28 V kurzschlussfest, unsere
+        Schiene liegt bei 24 V +10 % = 26,4 V - das ist zu knapp. Der DRV8871
+        vertraegt 45 V und 3,6 A Spitze.
+
+        WAS DADURCH ENTFAELLT, je Kanal:
+          4 N-FET PowerPAK SO-8, 2 IR2104, 4 Gate-Widerstaende,
+          2 Bootstrap-Dioden, 2 Bootstrap-Kondensatoren
+        und einmal fuer das ganze Board die 12-V-Gatespannung samt Regler.
+
+        WAS BLEIBT: Shunt, INA240A2, Fensterkomparator und Latch. Der DRV8871
+        bringt zwar eigene Strombegrenzung, Uebertemperatur- und
+        Unterspannungsabschaltung mit, aber keine davon meldet sich nach
+        aussen und keine schuetzt die Mechanik. Die eigene Messkette bleibt
+        also - sie liefert den Messwert fuer die Endlagenerkennung, und der
+        Latch bleibt die firmwareunabhaengige Notbremse.
+
+        WIE DER LATCH JETZT ABSCHALTET: Der DRV8871 hat keinen Enable-Pin.
+        Statt auf ~SD zu wirken, sperrt der Latch die beiden Eingaenge ueber
+        ein UND-Gatter je Leitung; mit IN1 = IN2 = 0 geht die Bruecke in den
+        hochohmigen Zustand.
+        """
         p = "M%d" % n
         sd = p + "_SD"                       # aktiv low: Endstufe aus
 
-        for leg, (inp, sw) in enumerate((("%s_INA" % p, "%s_SWA" % p),
-                                         ("%s_INB" % p, "%s_SWB" % p))):
-            tag = "%s%s" % (p, "AB"[leg])
-            drv = "U%s_DRV" % tag
-            s.add(drv, "Driver_FET:IR2104", "IR2104", SOIC8)
-            s.connect("12V_GATE", (drv, "1"))
-            s.connect(inp,        (drv, "2"))
-            s.connect(sd,         (drv, "3"))
-            s.connect("PGND",     (drv, "4"))
-            s.connect(tag + "_LO_G", (drv, "5"))
-            s.connect(sw,            (drv, "6"))
-            s.connect(tag + "_HO_G", (drv, "7"))
-            s.connect(tag + "_VB",   (drv, "8"))
-            # Bootstrap
-            s.add("D_%s_B" % tag, "Device:D_Schottky", "100V 1A",
-                  "Diode_SMD:D_SOD-123")
-            s.connect("12V_GATE", ("D_%s_B" % tag, "1"))
-            s.connect(tag + "_VB", ("D_%s_B" % tag, "2"))
-            s.add("C_%s_B" % tag, "Device:C", "100n", C0603)
-            s.connect(tag + "_VB", ("C_%s_B" % tag, "1"))
-            s.connect(sw,          ("C_%s_B" % tag, "2"))
-            # Gate-Widerstaende
-            for side in ("HO", "LO"):
-                s.add("R_%s_%s" % (tag, side), "Device:R", "10R", R0603)
-                s.connect("%s_%s_G" % (tag, side), ("R_%s_%s" % (tag, side), "1"))
-                s.connect("%s_%s_GT" % (tag, side), ("R_%s_%s" % (tag, side), "2"))
-            # High-Side- und Low-Side-FET
-            s.add("Q_%s_H" % tag, "SwitchStack:Q_NMOS_GDS", "N-FET 40V 60A",
-                  "Package_SO:PowerPAK_SO-8_Single",
-                  MPN="Rds<5mOhm, z.B. SiR622DP - bestaetigen")
-            s.connect("%s_HO_GT" % tag, ("Q_%s_H" % tag, "1"))
-            s.connect("24V_PROT",       ("Q_%s_H" % tag, "2"))
-            s.connect(sw,               ("Q_%s_H" % tag, "3"))
-            s.add("Q_%s_L" % tag, "SwitchStack:Q_NMOS_GDS", "N-FET 40V 60A",
-                  "Package_SO:PowerPAK_SO-8_Single",
-                  MPN="Rds<5mOhm, z.B. SiR622DP - bestaetigen")
-            s.connect("%s_LO_GT" % tag, ("Q_%s_L" % tag, "1"))
-            s.connect(sw,               ("Q_%s_L" % tag, "2"))
-            s.connect("PGND",           ("Q_%s_L" % tag, "3"))
+        s.add("U%s_BR" % p, "Driver_Motor:DRV8871DDA", "DRV8871",
+              "Package_SO:HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm_ThermalVias",
+              MPN="45 V, 3,6 A Spitze, Strombegrenzung ueber ILIM - "
+                  "Thermalpad an PGND anbinden")
+        s.connect("PGND",      ("U%s_BR" % p, "1"), ("U%s_BR" % p, "7"),
+                  ("U%s_BR" % p, "9"))
+        s.connect(p + "_GB",   ("U%s_BR" % p, "2"))    # IN2, ueber UND-Gatter
+        s.connect(p + "_GA",   ("U%s_BR" % p, "3"))    # IN1, ueber UND-Gatter
+        s.connect(p + "_ILIM", ("U%s_BR" % p, "4"))
+        s.connect("24V_PROT",  ("U%s_BR" % p, "5"))
+        s.connect(p + "_SWA",  ("U%s_BR" % p, "6"))    # OUT1 -> Shunt
+        s.connect(out_b,       ("U%s_BR" % p, "8"))    # OUT2 direkt
+
+        # Strombegrenzung des Treibers. Sie ist die INNERE Grenze und liegt
+        # bewusst UEBER dem Blockierstrom von 1,7 A, damit der Anschlag - ein
+        # normaler Betriebszustand - sie nicht dauernd anspricht. 2,7 A nach
+        # der Datenblattformel I = V_ILIM / (K * R); Wert vor der Bestellung
+        # gegen das Datenblatt nachrechnen.
+        s.add("R_%s_IL" % p, "Device:R", "33k0", R0603,
+              MPN="Strombegrenzung DRV8871 - Wert gegen Datenblatt pruefen")
+        s.connect(p + "_ILIM", ("R_%s_IL" % p, "1"))
+        s.connect("PGND",      ("R_%s_IL" % p, "2"))
+
+        # Bulk direkt an der Bruecke
+        s.add("C_%s_BR" % p, "Device:C", "100u 50V",
+              "Capacitor_SMD:C_1210_3225Metric",
+              MPN="Bulk je Bruecke. Das Original kommt mit 47 uF fuer BEIDE "
+                  "Motoren aus (docs/14) - 100 uF je Kanal ist reichlich")
+        s.connect("24V_PROT", ("C_%s_BR" % p, "1"))
+        s.connect("PGND",     ("C_%s_BR" % p, "2"))
+
+        # UND-Gatter: Der Latch sperrt beide Eingaenge gleichzeitig.
+        for leg, inp in (("A", "%s_INA" % p), ("B", "%s_INB" % p)):
+            g = "U%s_G%s" % (p, leg)
+            s.add(g, "74xGxx:74AHC1G08", "74AHC1G08",
+                  "Package_TO_SOT_SMD:SOT-353_SC-70-5")
+            s.connect(inp,            (g, "1"))
+            s.connect(sd,             (g, "2"))
+            s.connect("PGND",         (g, "3"))
+            s.connect("%s_G%s" % (p, leg), (g, "4"))
+            s.connect("3V3_SYS",      (g, "5"))
 
         # Inline-Shunt im Zweig A - misst in JEDEM PWM-Zustand.
         # 5 mOhm, nicht 1 mOhm: Der gemessene Blockierstrom von 1,7 A haette

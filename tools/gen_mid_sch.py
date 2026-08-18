@@ -213,13 +213,9 @@ def build():
     s.connect("RS485_A", ("R5", "1"))
     s.connect("RS485_B", ("R5", "2"))
 
-    # Busanschluss: steckbar, Feldkabel kommt von hinten durch die Dose
-    s.add("J4", "Connector_Generic:Conn_01x03", "RS485 A/B/GND",
-          "Connector_JST:JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical",
-          MPN="Kabel VOR dem Stapeln stecken - Zugaenglichkeit im Review pruefen")
-    s.connect("RS485_A", ("J4", "1"))
-    s.connect("RS485_B", ("J4", "2"))
-    s.connect("PGND",    ("J4", "3"))
+    # Der Busanschluss sitzt seit dem 18.08.2026 auf dem BOTTOM-Board, auf
+    # dem gemeinsamen Feldstecker. RS485_A und RS485_B kommen ueber
+    # J_STK_A 34/35 herauf.
 
     # =====================================================================
     # 3. I2C: Pull-ups und Expander PCF8574 (Adresse 0x20)
@@ -328,20 +324,9 @@ def build():
     # gegen alle Courtyards). Zwei kleinere finden beide einen - und die
     # Trennung ist ohnehin sauberer: J5 sind Eingaenge, J6 ist ein
     # potentialfreier Schaltausgang.
-    s.add("J5", "Connector_Generic:Conn_01x06", "Feld: 4 Reed",
-          "Connector_JST:JST_SH_BM06B-SRSS-TB_1x06-1MP_P1.00mm_Vertical",
-          MPN="1 REED1 2 SAB1 3 GND | 4 REED2 5 SAB2 6 GND")
-    s.connect("REED1_IN", ("J5", "1"))
-    s.connect("SAB1_IN",  ("J5", "2"))
-    s.connect("PGND",     ("J5", "3"), ("J5", "6"))
-    s.connect("REED2_IN", ("J5", "4"))
-    s.connect("SAB2_IN",  ("J5", "5"))
-
-    s.add("J6", "Connector_Generic:Conn_01x02", "Haubenkontakt",
-          "Connector_JST:JST_SH_BM02B-SRSS-TB_1x02-1MP_P1.00mm_Vertical",
-          MPN="potentialfrei ueber den PhotoMOS - NUR SELV")
-    s.connect("HOOD_A",   ("J6", "1"))
-    s.connect("HOOD_B",   ("J6", "2"))
+    # Reed-Stecker und Haubenkontakt sitzen seit dem 18.08.2026 ebenfalls auf
+    # dem gemeinsamen Feldstecker des Bottom-Boards. REED1/2_IN, SAB1/2_IN
+    # und HOOD_A/B laufen ueber J_STK_A 24/25/36/37 bzw. 38/39.
 
     # =====================================================================
     # 4. Piezo-Treiber (passiver Signalgeber an 5V_SYS)

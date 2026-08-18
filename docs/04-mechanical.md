@@ -83,12 +83,56 @@ wird rechteckig (Punkt 43), USB-C zeigt nach vorn und liegt unter der Scheibe
 Alle vier liegen **auf den Diagonalen**, je einer zwischen einem Pfeil und einer
 Taste — symmetrisch, und alle vier im 55er-Fenster und damit über der Dose:
 
+> **Überholt am 18.08.2026 — aus vier Durchbrüchen sind zwei geworden.**
+> Die vier Diagonalpositionen stammten aus der Zeit vor den Ecktastern; seit
+> die dort stehen, ist auf der Diagonalen kein Platz mehr (siehe unten). Die
+> neue Aufteilung nutzt den waagerechten Streifen zwischen Displayfenster und
+> Platinenrand, der **10 mm hoch und über die ganze Breite frei** ist:
+>
+> | Durchbruch | Lage | Zweck |
+> |---|---|---|
+> | **oben** | (0 / −19), Schlitz 14 × 5 mm | **ToF und Raumsensor gemeinsam** |
+> | **unten** | (4 / +19), Ø 6 | **Klinkenbuchse** Weihnachtsstern |
+>
+> **Ein Loch für zwei Sensoren.** Der VL53L1X sitzt bei (−3,5 / −19), der
+> SHT4x bei (+3,5 / −19) — 3 mm zwischen den Bauteilkanten. Näher wäre
+> schlechter, und zwar aus zwei Gründen: Der ToF darf keine spiegelnde Fläche
+> im Sichtfeld haben, sonst misst er Übersprechen statt Entfernung, und der
+> Raumsensor darf die Eigenwärme des ToF nicht mitmessen. Bei 27° Öffnungs­winkel
+> und 2,5 mm bis zur Scheibe ist der Messkegel dort erst 1,2 mm breit — 3 mm
+> Abstand liegen sicher daneben.
+>
+> **Die Klinke sitzt exakt mittig — weil die USB-Kerbe an den linken Rand
+> gewandert ist.** Zuerst lag sie unten und musste sich den 30-mm-Streifen
+> zwischen den Ecktastern mit der Klinke teilen; die hätte dann 4 mm neben der
+> Mitte sitzen müssen. Quergestellt passt die Buchse aber in den
+> **Seitenstreifen**: Der ist zwischen Displayfenster (x = −16,35) und
+> Boardrand 7,15 mm breit, und die Buchse ist quer nur 4,3 mm tief.
+>
+> Ihre Lage ist zwischen zwei Grenzen eingeklemmt und hat **0,75 mm Spiel**:
+>
+> | Grenze | ergibt |
+> |---|---|
+> | Mids Radius 26 erlaubt die Körperecke bis y = 12,63 | Mitte ≤ 8,48 |
+> | Tops Befestigungsbohrung reicht bis y = 2,98 | Mitte ≥ 7,73 |
+>
+> Gewählt ist **8,4**. Die Kerbe misst 6,25 × 9,5 mm und braucht keine Öffnung
+> in der Scheibe — sie liegt darunter verborgen. Sichtbar sind vorn also genau
+> **zwei Löcher**: der Schlitz oben für ToF und Raumsensor, das Loch unten
+> mittig für die Klinke.
+>
+> **Dafür entfällt der Reserve-UART auf dem Top-Board.** Er war ein
+> DNP-Steckplatz; auf 47 × 47 mm mit Display, vier Tastern, zwei
+> 40-poligen Stackverbindern, Klinke, ToF, Raumsensor und Randkerbe findet der
+> Platzierer für ihn keine Stelle mehr. Die Signale `UART_AUX_TX/RX` liegen
+> unverändert auf `J_STK_B` 18/20 und sind vom Mid-Board aus erreichbar.
+
 | Position | Zweck |
 |---|---|
-| oben links | **ToF-Fenster** (VL53L1X) |
-| unten links | **Klinkenbuchse** Weihnachtsstern |
-| oben rechts | **Lüftungsschlitz** Raumsensor |
-| unten rechts | **Lüftungsschlitz** Raumsensor |
+| oben links | ~~ToF-Fenster (VL53L1X)~~ |
+| unten links | ~~Klinkenbuchse Weihnachtsstern~~ |
+| oben rechts | ~~Lüftungsschlitz Raumsensor~~ |
+| unten rechts | ~~Lüftungsschlitz Raumsensor~~ |
 
 ### Warum nicht im Abdeckrahmen
 
