@@ -239,16 +239,27 @@ def build():
     #
     #   JST GH BM02B-GHS-TBT   5,75 x 4,95 mm, 4,20 mm hoch, 1,25 mm Raster
     #
-    # Sie steht 0,7 mm hoeher als die 3,50 mm, die bis zur Scheibeninnenseite
-    # frei sind - deshalb bekommt die Zentralscheibe unten links eine kleine
-    # Oeffnung von rund 6 x 5 mm. Dafuer kommt man ohne Abnehmen der Scheibe
-    # an den Stecker, und die Verriegelung haelt ihn fest.
+    # SEIT DEM 18.08.2026 SITZT J6 AUF DER RUECKSEITE, und er ist nicht mehr
+    # der Sternanschluss. Der Stern wird ueber einen Magnetkontakt IN der
+    # Frontplatte angeschlossen; J6 ist die interne Verbindung dorthin.
     #
-    # Die einzige Bauform, die ganz unter die Scheibe passt, waere die
-    # LIEGENDE JST SH mit 2,96 mm - verworfen, weil das Kabel dann seitlich
-    # abgeht und der 1,0-mm-Raster fuer einen Steckverbinder, den man in die
-    # Hand nimmt, zu zierlich ist.
-    s.add("J6", "Connector_Generic:Conn_01x02", "Stern",
+    # Vorne ging es nicht mehr auf. Ueber der Platine sind 3,50 mm frei
+    # (Sichtflaeche 1,0 + Druckkreuze 1,5 + Taster 2,0). Das Datenblatt der
+    # GH-Serie nennt fuer die Buchsen 4,05 mm stehend und 4,25 mm liegend -
+    # entscheidend ist aber die GESTECKTE Hoehe:
+    #
+    #   stehend BM02B + GHR-02V-S:  das Gehaeuse stuelpt sich darueber, ~5,7 mm
+    #   liegend SM02B + GHR-02V-S:  das Gehaeuse schiebt sich flach hinein, 4,25 mm
+    #
+    # Liegend ist also die flachere Loesung - das Gegenteil dessen, was die
+    # nackten Buchsenmasse nahelegen. Aber auch 4,25 mm sind 0,75 mm zu viel.
+    # Vorne haette J6 deshalb eine Aussparung in der Sichtflaeche gebraucht,
+    # ausgerechnet neben dem aufgeklebten Displaypanel.
+    #
+    # Hinten sind 10,0 mm frei bis zum Mid-Board. Die stehende Bauform bleibt
+    # damit, wie sie ist - sie passt dort dreifach - und der enge Streifen
+    # neben dem Display wird frei.
+    s.add("J6", "Connector_Generic:Conn_01x02", "Stern (intern)",
           "Connector_JST:JST_GH_BM02B-GHS-TBT_1x02-1MP_P1.25mm_Vertical",
           MPN="JST GH BM02B-GHS-TBT, 2-polig stehend mit Verriegelung")
     s.connect("STAR_OUT", ("J6", "1"))

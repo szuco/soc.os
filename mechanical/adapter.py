@@ -58,7 +58,7 @@ Alle Masse in mm. Aenderungen ausschliesslich im PARAMS-Block.
 from pathlib import Path
 
 from build123d import (
-    BuildPart, BuildSketch, Plane, Rectangle, Locations, SlotOverall,
+    BuildPart, BuildSketch, Plane, Rectangle, Circle, Locations, SlotOverall,
     extrude, fillet, Mode, export_step, export_stl, Pos, Box, Compound,
 )
 
@@ -121,6 +121,47 @@ PARAMS = dict(
     usb_relief_x0     = -1.2,   # Koerper -0,65 minus Spiel
     usb_relief_x1     = 8.2,    # Koerper  7,65 plus Spiel
     usb_relief_y      = 24.0,   # bis hinter die Boardkante (23,5)
+
+    # --- Halter fuer den Magnetkontakt des Sterns, 18.08.2026 -------------
+    # Der Stern wird nicht mehr gesteckt, sondern magnetisch angelegt. Der
+    # Kontakt sitzt in einem Loch der Zentralscheibe - dort, wo bis heute die
+    # 6x5-Oeffnung fuer die JST-GH-Buchse vorgesehen war (docs/04, Durchbruch
+    # unten links). Die Scheibe ist ein Kaufteil und kann den Kontakt nicht
+    # halten; das uebernimmt dieser Halter.
+    #
+    # Aufbau: eine Huelse direkt hinter der Scheibeninnenseite, getragen von
+    # zwei Stuetzen, die auf der Taschenwand stehen. Zwischen den Stuetzen
+    # laeuft eine radiale Nut - durch sie geht das Kabel an der Boardkante
+    # vorbei nach HINTEN zu J6, das seit heute auf der Rueckseite sitzt.
+    # Deshalb braucht die Platine kein Loch und keine Kerbe.
+    #
+    # ACHTUNG - magnet_d und magnet_h sind PLATZHALTER. Sie muessen am
+    # gekauften Teil (Elsaybro, ASIN B0H9Y9NVSV) mit dem Messschieber
+    # genommen werden; ein Datenblatt gibt es zu dieser Handelsmarke nicht.
+    # check_adapter() prueft, ob die gemessenen Werte in die Tiefe passen.
+    magnet_x          = -10.0,  # wie der bisherige Durchbruch unten links
+    magnet_y          = 19.4,
+    # Der freie Streifen zwischen Displaypanel (endet bei y = 15,9) und
+    # Platinenkante (23,5) ist nur 7,6 mm hoch. Mehr als rund 4,8 mm
+    # Aussendurchmesser passen dort mit Huelsenwand nicht hinein - der
+    # Selbsttest rechnet das nach.
+    panel_y1          = 15.9,   # Vorderkante des Panels, aus gen_layouts
+    #
+    # ABGESCHALTET (magnet_d = None), und zwar aus einem guten Grund: Der
+    # Magnetkontakt steckt seit dem 18.08.2026 in einem DURCHBRUCH des
+    # Top-Boards (gen_layouts MAG_X/MAG_Y/MAG_D). Sein Koerper taucht damit
+    # nach hinten in die 10 mm zwischen Top und Mid, und die Platine haelt
+    # ihn - der Adapter muss nichts mehr tragen. Vorn liegt der Durchbruch
+    # innerhalb der zentralen Durchfuehrung, also ohnehin frei.
+    #
+    # Der Halter bleibt als Bauteil erhalten. Er wird gebraucht, sobald ein
+    # FLACHER Kontakt zum Einsatz kaeme (Bauhoehe <= 3,5 mm), der ohne
+    # Durchbruch vor der Platine sitzen kann. Dann genuegt es, hier einen
+    # Durchmesser einzutragen.
+    magnet_d          = None,   # aus; Wert = Aussendurchmesser in mm
+    magnet_h          = 3.0,    # PLATZHALTER - Bauhoehe messen
+    magnet_wall       = 1.2,    # Wandstaerke der Huelse
+    magnet_slot_w     = 2.4,    # Breite der Kabelnut
 )
 
 
@@ -185,6 +226,43 @@ def build_adapter(p=PARAMS):
                 Rectangle(p["usb_relief_x1"] - p["usb_relief_x0"],
                           p["usb_relief_y"] - p["bore_sq"] / 2.0)
         extrude(amount=z["total"], mode=Mode.SUBTRACT)
+
+        # -- Halter fuer den Magnetkontakt des Sterns -----------------------
+        # Huelse + zwei Stuetzen + Kabelnut. Siehe Parameterblock.
+        if p.get("magnet_d"):
+            z_face = z["total"] - p["plate_face_t"]   # Innenseite der Scheibe
+            z_m0 = z_face - p["magnet_h"]             # Rueckseite des Magneten
+            d_out = p["magnet_d"] + 2 * p["magnet_wall"]
+            y_in = pocket_in / 2.0                    # 23,7
+            y_out = rim_out / 2.0                     # 24,9
+
+            # Huelse
+            with BuildSketch(Plane.XY.offset(z_m0)):
+                with Locations((p["magnet_x"], p["magnet_y"])):
+                    Circle(d_out / 2.0)
+                    Circle(p["magnet_d"] / 2.0, mode=Mode.SUBTRACT)
+            extrude(amount=z_face - z_m0)
+
+            # Zwei Stuetzen links und rechts der Kabelnut, von der
+            # Taschenwand nach vorn, und je eine Rippe zur Huelse.
+            for sx in (p["magnet_x"] - d_out / 2.0, p["magnet_x"] + d_out / 2.0):
+                with BuildSketch(Plane.XY.offset(z["pocket"])):
+                    with Locations((sx, (y_in + y_out) / 2.0)):
+                        Rectangle(2.0 * p["magnet_wall"], y_out - y_in)
+                extrude(amount=z_face - z["pocket"])
+
+                with BuildSketch(Plane.XY.offset(z_m0)):
+                    with Locations((sx, (p["magnet_y"] + y_out) / 2.0)):
+                        Rectangle(2.0 * p["magnet_wall"], y_out - p["magnet_y"])
+                extrude(amount=z_face - z_m0)
+
+            # Kabelnut: radial durch Auflage und Taschenwand, damit die
+            # Litzen an der Boardkante vorbei nach hinten zu J6 kommen.
+            with BuildSketch(Plane.XY.offset(z["neck"])):
+                with Locations((p["magnet_x"],
+                                (p["bore_sq"] / 2.0 + y_out) / 2.0)):
+                    Rectangle(p["magnet_slot_w"], y_out - p["bore_sq"] / 2.0)
+            extrude(amount=z["pocket"] - z["neck"], mode=Mode.SUBTRACT)
 
         # -- Schraubschlitze auf 60 mm --------------------------------------
         for sx in (p["screw_pitch"] / 2, -p["screw_pitch"] / 2):
@@ -271,9 +349,40 @@ def check_adapter(part, p=PARAMS):
 
     # Durchfuehrung frei, Auflage vorhanden.
     # Probe deutlich kleiner als die Bohrung - deren Ecken sind verrundet.
-    clear(Pos(0, 0, z["total"] / 2) * Box(p["bore_sq"] - 8, p["bore_sq"] - 8,
-                                          z["total"] - 0.2),
+    #
+    # Die Probe endet bei der Vorderkante des Displaypanels. Der Streifen
+    # dahinter (y = 15,9 bis zur Boardkante) ist KEIN Durchgang, sondern der
+    # Platz, in dem der Magnethalter steht - er wird eigens geprueft. Vor dem
+    # 18.08.2026 lief die Probe ueber die volle Bohrung und meldete den
+    # Halter als Fehler.
+    y_lo, y_hi = -(p["bore_sq"] - 8) / 2.0, p["panel_y1"] - 0.5
+    clear(Pos(0, (y_lo + y_hi) / 2.0, z["total"] / 2)
+          * Box(p["bore_sq"] - 8, y_hi - y_lo, z["total"] - 0.2),
           "zentrale Durchfuehrung")
+
+    # -- Magnethalter ---------------------------------------------------
+    if p.get("magnet_d"):
+        d_out = p["magnet_d"] + 2 * p["magnet_wall"]
+        y_vorn = p["magnet_y"] - d_out / 2.0
+        y_hinten = p["magnet_y"] + d_out / 2.0
+        if y_vorn < p["panel_y1"]:
+            errs.append("Magnethuelse reicht bis y=%.1f und damit unter das "
+                        "Displaypanel (Vorderkante %.1f) - Durchmesser %.1f "
+                        "ist zu gross fuer den freien Streifen"
+                        % (y_vorn, p["panel_y1"], p["magnet_d"]))
+        if y_hinten > p["pcb_sq"] / 2.0:
+            errs.append("Magnethuelse reicht bis y=%.1f, ueber die "
+                        "Platinenkante %.1f hinaus"
+                        % (y_hinten, p["pcb_sq"] / 2.0))
+        z_m0 = z["total"] - p["plate_face_t"] - p["magnet_h"]
+        if z_m0 < z["pocket"]:
+            errs.append("Magnet baut %.1f mm und stoesst gegen die Platine - "
+                        "frei sind nur %.2f mm"
+                        % (p["magnet_h"],
+                           z["total"] - p["plate_face_t"] - z["pocket"]))
+        solid(Pos(p["magnet_x"], p["magnet_y"] + (p["magnet_d"] + d_out) / 4.0,
+                  z["total"] - p["plate_face_t"] - p["magnet_h"] / 2.0)
+              * Box(0.4, 0.4, 0.4), "Magnethuelse")
     solid(Pos(p["bore_sq"] / 2 + 0.6, 0, (z["neck"] + z["seat"]) / 2)
           * Box(0.6, 0.6, 0.4), "Auflage der Leiterplatte")
 

@@ -99,6 +99,25 @@ TOP_CR = 4.0           # Eckradius
 # Gewaehlt ist 8,0.
 NOTCH_X0, NOTCH_X1 = -23.5, -17.25  # von der Kante nach innen, 6,25 mm tief
 NOTCH_Y0, NOTCH_Y1 = 3.25, 12.75    # Kerbenhoehe 9,5 mm
+
+# Durchbruch fuer den Magnetkontakt des Sterns (18.08.2026).
+#
+# Der Kontakt sitzt in der Zentralscheibe und wird magnetisch angelegt. Vor
+# dem Top-Board sind nur 3,50 mm frei - jeder handelsuebliche Magnetkontakt
+# baut mehr. Durch dieses Loch taucht sein Koerper nach HINTEN in die 10 mm
+# zwischen Top und Mid; vorn bleibt nur der Flansch. Damit ist die Bauhoehe
+# kein Kriterium mehr, wohl aber der Durchmesser:
+#
+#   Displaypanel (Sperrflaeche, mit Klebefuge)   endet bei y = 15,90
+#   Platinenkante                                        y = 23,50
+#   freier Streifen                                          7,60 mm
+#   0,3 mm zum Panel, 0,5 mm zur Kante  ->  groesstes Loch    6,80 mm
+#
+# GEPRUEFTES GEGENBEISPIEL: Das Teil DCX-909-(9x8)-H5.2 hat 8,00 mm
+# Koerperdurchmesser und passt damit NICHT. _pruefe_magnetloch() bricht ab,
+# statt ein Loch ins Panel zu schneiden.
+MAG_X, MAG_Y = -10.0, 19.6          # unten links, wie der bisherige Durchbruch
+MAG_D = 6.7                         # Lochdurchmesser = Koerper 6,5 + 0,2 Spiel
 # Bohrbild v2: ZWEI Bohrungen bei 0/180 Grad. Die alten Winkel 120/240
 # kollidierten mit den Sicheltasten-Stoesseln (117/243 Grad, nur ~2 mm
 # daneben), und bei r21,5 blockieren Stackverbinder (um 45/135/225/315),
@@ -171,6 +190,32 @@ def _eigenes_modell(fp, name):
     m.m_Show = True
     fp.Models().push_back(m)
     return True
+
+
+def _pruefe_magnetloch(panel_y1=15.9, rand_panel=0.3, rand_kante=0.5):
+    """Passt der Magnetdurchbruch zwischen Displaypanel und Platinenkante?
+
+    Lieber hier abbrechen als ein Loch unter das aufgeklebte Panel schneiden
+    oder die Kante anschneiden - beides faellt sonst erst am fertigen Board
+    auf.
+    """
+    # Zum Panel genuegt ein kleinerer Abstand: In panel_y1 steckt bereits
+    # die 0,5 mm Klebefuge. Zur Platinenkante bleibt es beim vollen Wert.
+    h = TOP_SQ / 2.0
+    oben = MAG_Y - MAG_D / 2.0
+    unten = MAG_Y + MAG_D / 2.0
+    groesst = h - rand_kante - panel_y1 - rand_panel
+    if oben < panel_y1 + rand_panel:
+        raise RuntimeError(
+            "Magnetdurchbruch reicht bis y=%.2f und damit unter das "
+            "Displaypanel (Sperrflaeche %.2f, Randabstand %.2f). In den "
+            "freien Streifen passen hoechstens %.2f mm Durchmesser."
+            % (oben, panel_y1, rand_panel, groesst))
+    if unten > h - rand_kante:
+        raise RuntimeError(
+            "Magnetdurchbruch reicht bis y=%.2f, die Platinenkante liegt "
+            "bei %.2f (Randabstand %.2f). Groesster Durchmesser %.2f mm."
+            % (unten, h, rand_kante, groesst))
 
 
 def load_fp(fpid):
@@ -361,6 +406,16 @@ class BoardBuilder:
                                pcbnew.VECTOR2I(mm(p2[0]), mm(p2[1])))
             arc.SetWidth(mm(0.1))
             self.board.Add(arc)
+
+        # Durchbruch fuer den Magnetkontakt - ein Kreis auf Edge.Cuts.
+        _pruefe_magnetloch()
+        loch = pcbnew.PCB_SHAPE(self.board)
+        loch.SetShape(pcbnew.SHAPE_T_CIRCLE)
+        loch.SetLayer(pcbnew.Edge_Cuts)
+        loch.SetCenter(pcbnew.VECTOR2I(mm(MAG_X), mm(MAG_Y)))
+        loch.SetEnd(pcbnew.VECTOR2I(mm(MAG_X + MAG_D / 2.0), mm(MAG_Y)))
+        loch.SetWidth(mm(0.1))
+        self.board.Add(loch)
 
     def _holes(self):
         for i, (x, y) in enumerate(HOLES):
@@ -864,7 +919,21 @@ FIXED_TOP = dict(
     # Sternanschluss unten links, im Streifen unter dem Displaypanel.
     # Der ist 8,16 mm hoch (Panelunterkante 15,34 bis Boardrand 23,50); der
     # JST GH misst 4,95 mm in y und laesst damit 1,6 mm nach oben und unten.
-    J6=(-10.0, 19.4, 0, "F"),          # Sternanschluss JST GH, unten links
+    # J6 sass bis zum 18.08.2026 auf der VORDERSEITE - damals war er der
+    # Sternanschluss und musste durch die Scheibe erreichbar sein. Seit der
+    # Stern ueber einen Magnetkontakt IN der Frontplatte angeschlossen wird,
+    # ist J6 nur noch die interne Verbindung dorthin. Vorne waere er damit
+    # ein Fremdkoerper: Ueber der Platine sind nur 3,50 mm frei (Sichtflaeche
+    # 1,0 + Druckkreuze 1,5 + Taster 2,0), und die GH baut gesteckt 4,25 mm
+    # liegend beziehungsweise rund 5,7 mm stehend - beides zu viel, beides
+    # haette ein Loch in der Sichtflaeche gebraucht.
+    # Hinten sind 10,0 mm frei bis zum Mid-Board, und gegenueber liegt dort
+    # nichts: naechstes Bauteil auf Mid ist 6,2 mm entfernt und flach.
+    # Das Kabel geht durch einen Schlitz im Adapter nach vorn zur Magnettasche.
+    # Nicht mehr bei x = -10: Dort sitzt seit heute der Magnetdurchbruch
+    # (MAG_X/MAG_Y), und J6 lag genau darauf. Er rueckt nach links daneben,
+    # bleibt aber in Reichweite der beiden Litzen aus dem Durchbruch.
+    J6=(-17.0, 19.6, 0, "B"),          # Sternanschluss JST GH, unten links
     # ToF UND Raumsensor unter EINEM Durchbruch, 18.08.2026.
     #
     # Bisher sassen sie auf den Diagonalen bei (-9 / -19) und (+9 / -19) und
