@@ -41,8 +41,8 @@ Häkchen bei „Report all errors for each track" aus, dann **Run DRC**. Unter
 | Board | offen | wo |
 |---|---|---|
 | **Top** | 3 Signale | alle drei am Raumsensor **U2** (SHT40) bei (3,5 / −19): Pin 1 `I2C_SDA`, Pin 2 `I2C_SCL`, Pin 3 `3V3_SYS`. Das Bauteil ist gerade dorthin gewandert, der Router kam zwischen ToF und Ecktaster nicht mehr heraus |
-| **Mid** | 3 Signale | `3V3_SYS`, `QSPI_D3`, `USB_DP_C` |
-| **Bottom** | siehe DRC | Motor- und Schutznetze |
+| **Mid** | 3 Signale | `3V3_SYS`, `QSPI_D3`, `USB_DP_C`, dazu 12 Masse-Inseln |
+| **Bottom** | 7 Signale | `3V3_SYS` (3×), `24V_PROT` (2×), `5V_SYS`, `24V_EN`, dazu 10 Masse-Inseln |
 
 ## 3. Masse-Inseln schließen
 

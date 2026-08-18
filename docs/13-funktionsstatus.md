@@ -16,7 +16,7 @@ Legende: ✅ fertig und geprüft · 🟡 begonnen, Rest benannt · ⛔ nicht vor
 | **Spezifikation** | ✅ vollständig — 13 Dokumente, alle Entscheidungen entweder getroffen oder als Punkt 1–52 offen benannt |
 | **Mechanik** | ✅ Boards generiert; Front = BJ-Zentralscheibe 6435-914, **Adapter erzeugt und selbstgeprüft**; 🔒 offen ist die Bauhöhe des realen Displaymoduls |
 | **Schaltpläne** | ✅ alle drei Boards erzeugt und netzlistengeprüft; ⛔ **keine Schaltungsreview gegen Datenblätter** |
-| **Layouts** | 🟡 alle drei **vierlagig** geroutet — 1430 / 641 / 175 Segmente. Offene Signalnetze **4 / 9 / 3**, von ursprünglich 43 / 18 / 14. Mid ohne Kupferfehler; Bottom ein Haarriss im Abstand, Top der dokumentierte Überhang der Klinkenbuchse |
+| **Layouts** | 🟡 alle drei **vierlagig** geroutet — 768 / 795 / 149 Segmente. Offene Signalnetze **7 / 3 / 3**, dazu 10 / 12 / 1 Masse-Inseln. Bottom und Top ohne Kupferfehler, Mid ein Haarriss. Der Rest ist Handarbeit, [`16`](16-kicad-handgriffe.md) |
 | **Fertigungsdaten** | ⛔ **keine** — der frühere Top-Export war überholt und ist gelöscht; der Nutzen ist als Boarddatei erzeugt |
 | **Firmware** | 🟡 **fertig übersetzt** (RAM 35 %, Flash 56 %), mit Menü und einstellbaren Fahrzeiten — aber **ohne Lasterkennung und ohne RS-485-Protokoll** |
 | **Bestellt / gebaut** | ⛔ nichts — kein Board gefertigt, kein Motor vermessen |
@@ -32,10 +32,10 @@ Soft-Limit und der einzige noch offene Leistungshalbleiter provisorisch.
 
 | Board | Schaltplan | Layout / Routing | Fertigungsdaten |
 |---|---|---|---|
-| **BOTTOM** `bottom_power_motor` | ✅ 102 Bauteile, 104 Netze, Netzlistenvergleich bestanden | 🟡 **vierlagig, 1430 Segmente, 137 Vias**; 4 Signale offen (`24V_F`, `24V_PROT` ×2, `M1A_HO_G`), 26 Masse-Inseln, 1 Abstands-Haarriss | ⛔ wartet auf das Rest-Routing |
-| **MID** `mid_logic` | ✅ 50 Bauteile, 67 Netze — jetzt mit USB-C, ESD-Diode und CC-Widerständen | 🟡 **vierlagig, 641 Segmente, 68 Vias, null Kupferfehler**; 9 Signale offen, 12 Masse-Inseln | 🟡 nahezu bestellbar |
-| **TOP** `top_ui` | ✅ 21 Bauteile, 49 Netze — kein USB mehr, dafür eine Randkerbe | 🟡 **vierlagig, 175 Segmente, 15 Vias**; nur noch 3 Signale offen (`3V3_SYS`, `I2C_SCL`, `I2C_SDA`), 1 Masse-Insel | 🟡 nahezu bestellbar |
-| **Nutzen** `fab/panel` | — (Build-Ergebnis) | ✅ **vierlagig, 173,4 × 64,4 mm**, deckungsgleich mit der Summe der Einzelboards (55 offene Verbindungen = 4 + 21 + 30) | 🟡 bestellbar, sobald geroutet |
+| **BOTTOM** `bottom_power_motor` | ✅ **79 Bauteile** statt 102 — integrierte Brücken DRV8871 statt acht MOSFETs, ein Feldstecker statt vier | 🟡 **vierlagig, 768 Segmente, 81 Vias, null Kupferfehler**; 7 Signale offen, 10 Masse-Inseln | ⛔ Handarbeit, siehe [`16`](16-kicad-handgriffe.md) |
+| **MID** `mid_logic` | ✅ 47 Bauteile — Feldstecker abgegeben, USB-C übernommen | 🟡 **vierlagig, 795 Segmente**; 3 Signale offen, 12 Masse-Inseln, 1 Abstandsfehler | ⛔ Handarbeit |
+| **TOP** `top_ui` | ✅ 20 Bauteile — kein USB, kein Reserve-UART; ToF und Raumsensor unter einem Schlitz | 🟡 **vierlagig, 149 Segmente, null Kupferfehler**; nur noch 3 Signale offen (alle am Raumsensor), 1 Masse-Insel | ⛔ Handarbeit |
+| **Nutzen** `fab/panel` | — (Build-Ergebnis) | ✅ **vierlagig, 173,4 × 72,4 mm**, mit Passermarken und Werkzeugbohrungen, deckungsgleich mit der Summe der Einzelboards | 🟡 bestellbar, sobald die Handarbeit erledigt ist |
 
 Die 43 offenen Verbindungen auf Bottom sind **kein Rückstand des Autorouters**,
 sondern Absicht: [`05-manufacturing.md`](05-manufacturing.md) Abschnitt 3 verlangt
