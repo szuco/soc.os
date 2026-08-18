@@ -23,7 +23,7 @@ if not os.environ.get("DISPLAY"):
 import pcbnew  # noqa: E402
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from gen_layouts import run_drc                                 # noqa: E402
+from gen_layouts import run_drc, inside_outline                 # noqa: E402
 from route_boards import classify_unrouted                      # noqa: E402
 from gnd_stitch import (seg_clear, contains_margin, fragments,  # noqa: E402
                         hole_positions, _seg_dist)
@@ -133,6 +133,94 @@ def clusters(items):
     return groups
 
 
+def fremd_frags(items, gruppe):
+    """Alle Flaechenfragmente, die NICHT zu dieser Gruppe gehoeren."""
+    aus = {}
+    drin = set(gruppe)
+    for k, it in enumerate(items):
+        if it.kind != "frag" or k in drin:
+            continue
+        aus.setdefault(it.layer, []).append(it.geom)
+    return aus
+
+
+def _punkte(it):
+    """Repraesentative Punkte eines Items - fuer Pads und Vias einer, fuer
+    Bahnen beide Enden und die Mitte."""
+    if it.kind == "track":
+        (x0, y0), (x1, y1) = it.geom
+        return [(x0, y0), ((x0 + x1) / 2, (y0 + y1) / 2), (x1, y1)]
+    if it.kind == "frag":
+        return []
+    return [it.geom]
+
+
+def _bruecke(board, net, items, gruppe, main_frags, holes, square=False,
+             breite=0.4, max_len=6.0, alle_frags=None):
+    """Kurze Leiterbahn von einem verwaisten Cluster in die Hauptflaeche.
+
+    Das Stitching-Via braucht Eigenkupfer UEBER einem Flaechenfragment der
+    GEGENlage. Wo das nicht zutrifft - und das ist bei den meisten Resten der
+    Fall -, half das Skript bisher gar nicht. Eine gerade Bahn auf DERSELBEN
+    Lage kommt oft trotzdem durch: Die Reste liegen meist wenige Millimeter
+    neben Kupfer, das schon zur Hauptmasse gehoert.
+
+    Gesucht wird radial: vom Rest aus in 24 Richtungen und in 0,25-mm-
+    Schritten, bis ein Punkt in einem Fragment des Hauptclusters derselben
+    Lage liegt. Gesetzt wird nur, was seg_clear ueber die ganze Strecke gegen
+    Fremdkupfer freigibt. Laenger als max_len wird nicht gebrueckt - das waere
+    kein Reparieren mehr, sondern Routen.
+    """
+    # Ziel ist NICHT nur der Hauptcluster. Zu irgendeinem anderen Cluster zu
+    # bruecken genuegt: Die Runden wiederholen sich, und was einmal verbunden
+    # ist, waechst beim naechsten Durchlauf mit zusammen. Nur auf den
+    # Hauptcluster zu zielen liess fast alle Reste stehen - ihre naechste
+    # Flaeche gehoerte meist einem anderen Rest.
+    ziel = alle_frags if alle_frags is not None else main_frags
+    import math as _m
+    for i in gruppe:
+        a = items[i]
+        if a.kind == "frag":
+            continue
+        lagen = copper_layers(board) if a.layer is None else [a.layer]
+        for pa in _punkte(a):
+            # Startpunkte ausserhalb der Platine sind tabu. Das Massepad der
+            # Klinkenbuchse ragt absichtlich ueber die Kante; eine Bahn von
+            # dort aus faengt im Nichts an und erzeugt prompt einen zweiten
+            # Randabstandsfehler.
+            if not inside_outline(pa[0], pa[1], square, 0.6):
+                continue
+            for lay in lagen:
+                frags = ziel.get(lay) or []
+                if not frags:
+                    continue
+                for k in range(24):
+                    ang = _m.radians(360.0 * k / 24.0)
+                    dx, dy = _m.cos(ang), _m.sin(ang)
+                    d = 0.5
+                    while d <= max_len:
+                        x, y = pa[0] + dx * d, pa[1] + dy * d
+                        if not inside_outline(x, y, square, 0.6):
+                            break
+                        if any(contains_margin(fr, x, y) for fr in frags):
+                            if all((x - hx) ** 2 + (y - hy) ** 2 >= 1.0
+                                   for hx, hy in holes) and \
+                               seg_clear(board, lay, pa[0], pa[1], x, y, breite):
+                                tr = pcbnew.PCB_TRACK(board)
+                                tr.SetStart(pcbnew.VECTOR2I(mm(pa[0]), mm(pa[1])))
+                                tr.SetEnd(pcbnew.VECTOR2I(mm(x), mm(y)))
+                                tr.SetWidth(mm(breite))
+                                tr.SetLayer(lay)
+                                tr.SetNet(net)
+                                board.Add(tr)
+                                print("  Bruecke %.2f mm auf %s (%.2f,%.2f)"
+                                      % (d, board.GetLayerName(lay), pa[0], pa[1]))
+                                return "track"
+                            break
+                        d += 0.25
+    return False
+
+
 def connect(name, max_rounds=4):
     pcb = os.path.join(ROOT, "hardware", name, name + ".kicad_pcb")
     for rnd in range(max_rounds):
@@ -214,9 +302,15 @@ def connect(name, max_rounds=4):
                         done = True
                         break
             if not done:
+                done = _bruecke(board, net, items, g, main_frags, holes,
+                                square=(name == "top_ui"),
+                                alle_frags=fremd_frags(items, g))
+            if not done:
                 sample = items[g[0]]
                 print("  Cluster ohne Kandidat (%d Elemente, z.B. %s %s)"
                       % (len(g), sample.kind, sample.geom))
+            elif done == "track":
+                placed += 1
         pcbnew.SaveBoard(pcb, board)
         board2 = pcbnew.LoadBoard(pcb)
         filler = pcbnew.ZONE_FILLER(board2)

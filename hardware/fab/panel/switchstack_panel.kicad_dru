@@ -19,3 +19,21 @@
 (rule "Bohrungsabstand an Bauteil-Befestigungsloechern"
   (constraint hole_clearance (min 0.2mm))
   (condition "A.Pad_Type == 'NPTH, mechanical' || B.Pad_Type == 'NPTH, mechanical'"))
+
+# Der Klinkenstecker ragt absichtlich ueber die Boardkante.
+#
+# J6 sitzt bei (-9 / +19); sein Massepad reicht bis y = 24,78, die Boardkante
+# liegt bei 23,5. Das ist kein Versehen, sondern Voraussetzung dafuer, dass
+# die Buchse durch den Abdeckrahmen greift - gen_layouts meldet den Ueberhang
+# ausdruecklich als beabsichtigt.
+#
+# Ohne diese Ausnahme meldet die DRC hier dauerhaft einen Randabstandsfehler
+# und verdeckt damit echte Funde. Die Ausnahme gilt NUR fuer dieses eine
+# Bauteil, nicht fuer Randabstaende allgemein.
+(rule "Klinkenbuchse ragt absichtlich ueber die Kante"
+  (constraint edge_clearance (min 0mm))
+# Im Fertigungsnutzen tragen die Bauteile ein Praefix (T_ fuer das
+# Top-Board), deshalb beide Schreibweisen. Auf dem Mid-Board heisst J6 der
+# Haubenkontakt - der darf NICHT ueberstehen, und die .kicad_dru dieses
+# Projekts gilt dort auch nicht.
+  (condition "A.Reference == 'J6' || B.Reference == 'J6' || A.Reference == 'T_J6' || B.Reference == 'T_J6'"))

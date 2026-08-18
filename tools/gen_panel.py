@@ -54,7 +54,21 @@ TOP_CR = 4.0
 # +x von ihr weg.
 TOP_TABS = [("top", 10.0), ("right", -10.0), ("bottom", -10.0), ("left", 10.0)]
 SLOT = 2.2              # Breite der Fraesfuge (Fraeser 2,0 mm + Toleranz)
-RAIL = 4.0              # Rahmenbreite
+RAIL = 4.0              # Rahmenbreite links und rechts
+# Oben und unten breiter: Die Bestueckungsautomaten klemmen den Nutzen an
+# zwei gegenueberliegenden LANGseiten, und dafuer verlangen die Fertiger
+# ueblicherweise mindestens 5 mm freien Rand. Hier 8 mm, damit Passermarken
+# und Werkzeugbohrungen mit Abstand hineinpassen.
+RAIL_Y = 8.0
+
+# --- Passermarken und Werkzeugbohrungen, 18.08.2026 ---------------------
+# Ohne beides nimmt kein Bestuecker den Nutzen an: Die Passermarken geben der
+# Maschine ihren Nullpunkt, die Werkzeugbohrungen halten ihn beim Transport.
+# Drei Marken, nicht drehsymmetrisch angeordnet - so kann der Nutzen nicht
+# um 180 Grad verdreht eingelegt werden, ohne dass es auffaellt.
+FID_D = 1.0             # Kupferpunkt
+FID_MASK = 3.0          # Lotstoppfreistellung, ueblich 3x Punktdurchmesser
+TOOL_D = 3.0            # Werkzeugbohrung, NPTH
 TAB_W = 4.0             # Stegbreite
 # Diagonalen: 0/180 Grad sind die Befestigungsbohrungen, 90 Grad ist beim
 # Top-Board der ueberstehende USB-C-Stecker und 270 Grad beim Mid-Board der
@@ -206,6 +220,60 @@ def _mb_hole(panel, x, y):
         fp.Reference().SetVisible(False)
         fp.Value().SetVisible(False)
         panel.Add(fp)
+
+
+def _fiducial(panel, x, y):
+    """Passermarke: runder Kupferpunkt mit grosser Lotstoppfreistellung."""
+    fp = pcbnew.FOOTPRINT(panel)
+    fp.SetPosition(vec(x, y))
+    pad = pcbnew.PAD(fp)
+    pad.SetAttribute(pcbnew.PAD_ATTRIB_SMD)
+    pad.SetShape(pcbnew.PAD_SHAPE_CIRCLE)
+    pad.SetSize(pcbnew.VECTOR2I(mm(FID_D), mm(FID_D)))
+    pad.SetPosition(vec(x, y))
+    lset = pcbnew.LSET()
+    lset.addLayer(pcbnew.F_Cu)
+    pad.SetLayerSet(lset)
+    pad.SetLocalSolderMaskMargin(mm((FID_MASK - FID_D) / 2.0))
+    fp.Add(pad)
+    fp.SetReference("FID")
+    fp.Reference().SetVisible(False)
+    fp.Value().SetVisible(False)
+    panel.Add(fp)
+
+
+def _tool_hole(panel, x, y):
+    """Werkzeugbohrung im Rand, unbelegt."""
+    fp = pcbnew.FOOTPRINT(panel)
+    fp.SetPosition(vec(x, y))
+    pad = pcbnew.PAD(fp)
+    pad.SetAttribute(pcbnew.PAD_ATTRIB_NPTH)
+    pad.SetShape(pcbnew.PAD_SHAPE_CIRCLE)
+    pad.SetSize(pcbnew.VECTOR2I(mm(TOOL_D), mm(TOOL_D)))
+    pad.SetDrillSize(pcbnew.VECTOR2I(mm(TOOL_D), mm(TOOL_D)))
+    pad.SetPosition(vec(x, y))
+    pad.SetLayerSet(pad.UnplatedHoleMask())
+    fp.Add(pad)
+    fp.SetReference("TOOL")
+    fp.Reference().SetVisible(False)
+    fp.Value().SetVisible(False)
+    panel.Add(fp)
+
+
+def fiducials_and_tooling(panel, w, h):
+    """Drei Passermarken und zwei Werkzeugbohrungen in die breiten Raender.
+
+    Die Marken sitzen bewusst NICHT drehsymmetrisch: zwei am unteren Rand,
+    eine am oberen. Wird der Nutzen um 180 Grad verdreht eingelegt, passt das
+    Muster nicht mehr und die Maschine merkt es.
+    """
+    x0, x1 = -w / 2 + RAIL_Y / 2, w / 2 - RAIL_Y / 2
+    y0, y1 = -h / 2 + RAIL_Y / 2, h / 2 - RAIL_Y / 2
+    for x, y in ((x0, y0), (x1, y0), (x0, y1)):
+        _fiducial(panel, x, y)
+    for x, y in ((x1 - 6.0, y1), (x0 + 6.0, y1)):
+        _tool_hole(panel, x, y)
+    return 3, 2
 
 
 def _rrect_path(half, cr, n_arc=12):
@@ -420,7 +488,7 @@ def main():
     shift = (xs[0] + xs[-1]) / 2.0
     centers = [(x - shift, 0.0) for x in xs]
     w = (xs[-1] - xs[0]) + halfs[0] + halfs[-1] + 2 * RAIL
-    h = 2 * (max(halfs) + RAIL)
+    h = 2 * (max(halfs) + RAIL_Y)
 
     panel = pcbnew.BOARD()
     # Vier Lagen wie die Quellboards. Ohne das landen alle Bahnen auf In1/In2
@@ -441,6 +509,7 @@ def main():
     # Quadrat ueber seine eigene Parallelkurve.
     outline(panel, centers[:2], w, h)
     outline_square(panel, *centers[2])
+    n_fid, n_tool = fiducials_and_tooling(panel, w, h)
 
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     panel.Save(OUT)
@@ -457,6 +526,9 @@ def main():
     print("Groesse      : %.1f x %.1f mm = %.0f cm2" % (w, h, w * h / 100))
     print("Bauteile     : %d  Netze: %d  Zonen: %d"
           % (total["fp"], len(cache), total["zone"]))
+    print("Passermarken : %d Stueck \u00d8%.1f mit %.1f Freistellung, "
+          "%d Werkzeugbohrungen \u00d8%.1f, Rand oben/unten %.1f mm"
+          % (n_fid, FID_D, FID_MASK, n_tool, TOOL_D, RAIL_Y))
     print("Stege        : 2 x %d am Kreis, %d am Quadrat, je %.1f mm breit "
           "mit %d Mausbissen Ø%.1f"
           % (len(TAB_ANGLES), len(TOP_TABS), TAB_W, MB_N, MB_D))
