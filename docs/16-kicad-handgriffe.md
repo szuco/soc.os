@@ -40,9 +40,41 @@ Häkchen bei „Report all errors for each track" aus, dann **Run DRC**. Unter
 
 | Board | offen | wo |
 |---|---|---|
-| **Top** | 3 Signale | alle drei am Raumsensor **U2** (SHT40) bei (3,5 / −19): Pin 1 `I2C_SDA`, Pin 2 `I2C_SCL`, Pin 3 `3V3_SYS`. Das Bauteil ist gerade dorthin gewandert, der Router kam zwischen ToF und Ecktaster nicht mehr heraus |
-| **Mid** | 3 Signale | `3V3_SYS`, `QSPI_D3`, `USB_DP_C`, dazu 12 Masse-Inseln |
-| **Bottom** | 7 Signale | `3V3_SYS` (3×), `24V_PROT` (2×), `5V_SYS`, `24V_EN`, dazu 10 Masse-Inseln |
+| **Top** | 7 Signale | `3V3_SYS` (3×), `I2C_SDA`, `I2C_SCL`, `DISP_LEDA`, `DISP_CS`, dazu 3 Masse-Inseln |
+| **Mid** | 4 Signale | `3V3_SYS`, `USB_VBUS`, `USB_DP_C` (2×), dazu 11 Masse-Inseln |
+| **Bottom** | 6 Signale | `3V3_SYS`, `24V_PROT` (2×), **`M1_ISNS` (3×, komplett ungeroutet — siehe unten)**, dazu 10 Masse-Inseln |
+
+### `M1_ISNS` ist mit Absicht leer
+
+Auf Bottom ist der Motorstrom-Messpfad von Motor 1 **vollständig ohne
+Leiterbahn**. Das ist kein Versehen und auch kein Rest, den der Router
+liegengelassen hat — er hatte ihn geroutet, und zwar falsch.
+
+Freerouting hat `M1_ISNS` auf F.Cu direkt an `V_TRIP_LO` gepresst, auf
+engstem Raum um (1,2–1,7 / 5,3–6,2). Ergebnis waren vier Kurzschlüsse, eine
+Kreuzung und ein Abstandsfehler. Einzeln herausgelöste Segmente haben das
+Problem nur verschoben: Nach jedem Eingriff meldete die DRC dieselben zwei
+Netze an der nächsten Stelle.
+
+Sachlich ist die Paarung ohnehin die schlechtestmögliche. `M1_ISNS` ist das
+analoge Messsignal des Motorstroms, `V_TRIP_LO` die Vergleichsschwelle, gegen
+die es ausgewertet wird. Koppeln die beiden, verschiebt sich die
+Auslöseschwelle mit dem gemessenen Strom — die Hinderniserkennung würde sich
+selbst verstimmen, und zwar ohne dass eine DRC das je bemerkt.
+
+**Deshalb von Hand ziehen, und dabei:**
+
+- `M1_ISNS` mit **spürbarem Abstand** zu `V_TRIP_LO` führen, gern über eine
+  andere Lage. Nicht parallel über längere Strecken.
+- Zwischen beiden möglichst Massefläche stehen lassen.
+- Kurz halten: vom Shunt `R_M1_SH` zum Messverstärker, nicht quer über das
+  Board.
+
+Bei Motor 2 hat der Router dieselbe Ecke ohne Fehler gelöst — `M2_ISNS` zeigt
+also, dass dort ein Weg existiert. Als Vorbild taugt es aber nur für die
+Wegführung, nicht für die Länge: Die Bahn ist 70,9 mm lang und läuft damit
+weiter über das Board, als einem Messsignal guttut. Wer ohnehin gerade von
+Hand routet, darf auch `M2_ISNS` gern kürzen.
 
 ## 3. Masse-Inseln schließen
 

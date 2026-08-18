@@ -40,6 +40,9 @@ KIFP = "/Applications/KiCad/KiCad.app/Contents/SharedSupport/footprints"
 OUT = os.path.join(ROOT, "hardware", "lib", "3dmodels")
 
 # (Footprint-Bibliothek, Footprint, Hoehe ueber der Platine, Quelle der Hoehe)
+# Die 3,5-mm-Klinke ist am 18.08.2026 entfallen: Neben dem Displaypanel war
+# auf dem Top-Board kein Platz mehr, und der Sternanschluss laeuft seitdem
+# ueber eine stehende JST-GH-Buchse - fuer die KiCad ein Modell mitbringt.
 TEILE = [
     ("Connector_Molex", "Molex_Micro-Fit_3.0_43045-2012_2x10_P3.00mm_Vertical",
      8.9, "Molex 43045, Serienmass Steckerhoehe ueber Platine; docs/04 "
@@ -53,8 +56,6 @@ TEILE = [
      9.25, "stehende USB-C-Buchsen dieser Bauform liegen zwischen 7 und "
            "9,25 mm; genommen ist der obere Wert aus dem Datenblatt der "
            "GCT USB4115, damit die Huelle nicht zu klein ist"),
-    ("Connector_Audio", "Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles",
-     12.0, "WQP-PJ398SM, Korpuslaenge der stehenden Bauform"),
 ]
 
 

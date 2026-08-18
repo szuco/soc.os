@@ -32,9 +32,9 @@ Soft-Limit und der einzige noch offene Leistungshalbleiter provisorisch.
 
 | Board | Schaltplan | Layout / Routing | Fertigungsdaten |
 |---|---|---|---|
-| **BOTTOM** `bottom_power_motor` | ✅ **79 Bauteile** statt 102 — integrierte Brücken DRV8871 statt acht MOSFETs, ein Feldstecker statt vier | 🟡 **vierlagig, 768 Segmente, 81 Vias, null Kupferfehler**; 7 Signale offen, 10 Masse-Inseln | ⛔ Handarbeit, siehe [`16`](16-kicad-handgriffe.md) |
-| **MID** `mid_logic` | ✅ 47 Bauteile — Feldstecker abgegeben, USB-C übernommen | 🟡 **vierlagig, 795 Segmente**; 3 Signale offen, 12 Masse-Inseln, 1 Abstandsfehler | ⛔ Handarbeit |
-| **TOP** `top_ui` | ✅ 20 Bauteile — kein USB, kein Reserve-UART; ToF und Raumsensor unter einem Schlitz | 🟡 **vierlagig, 149 Segmente, null Kupferfehler**; nur noch 3 Signale offen (alle am Raumsensor), 1 Masse-Insel | ⛔ Handarbeit |
+| **BOTTOM** `bottom_power_motor` | ✅ **79 Bauteile** statt 102 — integrierte Brücken DRV8871 statt acht MOSFETs, ein Feldstecker statt vier | 🟡 **vierlagig, 811 Segmente, 91 Vias, null Kupferfehler**; 6 Signale offen (davon M1_ISNS ganz), 10 Masse-Inseln | ⛔ Handarbeit, siehe [`16`](16-kicad-handgriffe.md) |
+| **MID** `mid_logic` | ✅ 47 Bauteile — Feldstecker abgegeben, USB-C übernommen | 🟡 **vierlagig, 720 Segmente, 74 Vias, null Kupferfehler**; 4 Signale offen, 11 Masse-Inseln | ⛔ Handarbeit |
+| **TOP** `top_ui` | ✅ 23 Bauteile — kein USB, kein Reserve-UART; ToF und Raumsensor unter einem Schlitz | 🟡 **vierlagig, 179 Segmente, 22 Vias, null Kupferfehler**; 7 Signale offen, 3 Masse-Inseln | ⛔ Handarbeit |
 | **Nutzen** `fab/panel` | — (Build-Ergebnis) | ✅ **vierlagig, 173,4 × 72,4 mm**, mit Passermarken und Werkzeugbohrungen, deckungsgleich mit der Summe der Einzelboards | 🟡 bestellbar, sobald die Handarbeit erledigt ist |
 
 Die 43 offenen Verbindungen auf Bottom sind **kein Rückstand des Autorouters**,

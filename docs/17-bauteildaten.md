@@ -4,12 +4,36 @@ Vier Teile blockieren die Bestellung, weil ihre Maße, ihr Footprint oder ihr
 3D-Modell fehlen. Diese Seite sagt für jedes, **was genau fehlt**, **wo es
 herkommt** und **was davon abhängt**.
 
-| Teil | Stand | fehlt |
+| Teil | Stand | 3D-Modell |
 |---|---|---|
-| **Display** | 🟡 **ER-TFT1.69-3** gewählt | Raster der Fahne, Pinbelegung |
-| **Klinkenbuchse** | 🟡 Footprint steht | Datenblatt, 3D-Modell |
-| **USB-C** | 🟡 Footprint steht | Datenblatt, 3D-Modell |
-| **Feldstecker** | ✅ Typ steht | 3D-Modell vom Hersteller |
+| **Display** | ✅ **ER-TFT1.69-3**, Datenblatt ausgewertet | Hüllkörper nötig |
+| **Sternanschluss** | ✅ **JST GH BM02B-GHS-TBT** — die Klinke ist entfallen | ✅ **von KiCad** |
+| **USB-C** | 🟡 GT-USB-7051x, LCSC C2843970 | 🟡 Hüllkörper, Höhe angenommen |
+| **Feldstecker** | ✅ Molex Micro-Fit 43045-1612 | 🟡 Hüllkörper aus dem Footprint |
+
+**Zwei Punkte haben sich seit dem 18.08.2026 erledigt.** Das Display hat sein
+Datenblatt (Auszug in [`datasheets/ER-TFT1.69-3.md`](datasheets/ER-TFT1.69-3.md)),
+und die Klinkenbuchse gibt es nicht mehr — sie passte neben dem Displaypanel
+nicht mehr auf das Board und ist durch einen JST GH ersetzt, für den KiCad ein
+Modell mitliefert.
+
+**Was bleibt, sind zwei Hüllkörper.** Für USB-C und den Feldstecker erzeugt
+[`../mechanical/connector_models.py`](../mechanical/connector_models.py) Körper
+aus dem F.Fab-Grundriss des Footprints — der Grundriss ist damit so genau wie
+das Footprint, nur die Höhe ist gesetzt:
+
+| | Höhe | Herkunft |
+|---|---|---|
+| Micro-Fit 43045-1612 | 8,90 mm | Serienmaß der Baureihe |
+| USB-C GT-USB-7051x | 9,25 mm | oberer Wert der Bauform (GCT USB4115) |
+
+Für die Frage „stößt etwas an" reicht das. Die offiziellen Modelle liegen bei
+Molex zu jeder Bestellnummer und bei GCT für den USB4115; beide Seiten geben
+sie automatisierten Abrufen nicht heraus, sie müssen im Browser geholt und
+unter `hardware/lib/3dmodels/` abgelegt werden. Sobald sie dort liegen,
+benutzt `gen_layouts.py` sie ohne weitere Änderung — die Verknüpfung greift
+über den Dateinamen.
+
 
 ---
 

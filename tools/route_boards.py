@@ -161,6 +161,13 @@ RING_RO = 26.4
 SQ_RI = 23.0        # mm; halbe Kantenlaenge 23,5 minus Randabstand
 SQ_RO = 25.0        # mm; deutlich ausserhalb der Platine
 
+# Die USB-C-Kerbe in der linken Kante des Top-Boards. In KiCad-Koordinaten
+# liegt sie bei x -23,5..-17,25 und y 3,25..12,75; im DSN kippt Y, deshalb
+# hier negativ. Ohne eigenen Keepout routet Freerouting quer durch den
+# Ausschnitt - gemessen am 18.08.2026 zwei copper_edge_clearance-Fehler
+# einer BTN2-Bahn auf In1.Cu. 0,5 mm Randabstand sind eingerechnet.
+NOTCH_KEEPOUT = (-25.0, -16.75, -13.25, -2.75)   # DSN: x0, x1, y0, y1
+
 
 def _ring_polygon(a0, a1, step=3.0):
     """Annulus-Sektor von a0 bis a1 Grad (DSN-Koordinaten, Y nach oben)."""
@@ -205,6 +212,8 @@ def _square_bars(gap=None):
         g0, g1 = gap
         bars.append(poly(-o, g0, -o, -i))
         bars.append(poly(g1, o, -o, -i))
+    nx0, nx1, ny0, ny1 = NOTCH_KEEPOUT
+    bars.append(poly(nx0, nx1, ny0, ny1))
     return bars
 
 
