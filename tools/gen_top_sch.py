@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Erzeugt den Schaltplan des Top-Boards (USB-C, Taster, Sensorik, Display, Stern).
+Erzeugt den Schaltplan des Top-Boards (Taster, Sensorik, Display, Stern).
 
     python3 tools/gen_top_sch.py
 
@@ -8,8 +8,9 @@ Wie bei Bottom und Mid: Konnektivitaet als Quelltext, Netzlisten-Rueckvergleich
 mit kicad-cli, keine Schaltungsreview.
 
 Besonderheiten:
-  * USB-C haengt am NATIVEN USB des ESP32-S3 auf dem Mid-Board. D+/D- laufen
-    ueber J_STK_A 34/36 durch den Stack (siehe stack_pinout.py, v0.3).
+  * KEIN USB auf diesem Board. Die Buchse sitzt seit dem 18.08.2026 stehend
+    auf dem Mid-Board und greift durch eine Randkerbe dieses Boards nach vorn
+    (Begruendung unten im Rumpf).
   * Der Stern-Ausgang sitzt hier (Frontanschluss laut Frontplatte) und wird
     per High-Side-P-FET geschaltet; STAR_EN kommt vom I2C-Expander des
     Mid-Boards ueber den Stack.
@@ -36,7 +37,6 @@ R0603 = "Resistor_SMD:R_0603_1608Metric"
 C0603 = "Capacitor_SMD:C_0603_1608Metric"
 
 NC_ALLOWED = {
-    ("J1", "A8"), ("J1", "B8"),      # SBU1/SBU2 - bei USB 2.0 unbenutzt
     ("J6", "TN"),                    # Schaltkontakt der Klinke, absichtlich offen
     ("U3", "8"),                     # VL53L1X DNC - laut Datenblatt offen lassen
 }
@@ -46,46 +46,22 @@ def build():
     s = Schematic("top_ui", "SwitchStack TOP - Front / UI", paper="A2")
 
     # =====================================================================
-    # 1. USB-C (Device/UFP, nur USB 2.0)
+    # 1. Kein USB auf diesem Board mehr
     # =====================================================================
-    # STEHENDE Buchse: Der Stecker geht nach VORN, nicht radial nach aussen.
-    # Damit liegt der Anschluss unter der Zentralscheibe und ist erst nach
-    # deren Abnahme erreichbar - Punkt 45. Gewaehlt: G-Switch GT-USB-7051x,
-    # SMT, vertikal, 22 Pads (A- und B-Reihe vollstaendig, also drehbar),
-    # Footprint 9,94 x 6,40 mm. Die liegende GCT USB4085 hatte 8,95 x 9,17 und
-    # zeigte radial nach aussen gegen die Dosenwand.
-    s.add("J1", "Connector:USB_C_Receptacle_USB2.0_16P", "USB-C",
-          "Connector_USB:USB_C_Receptacle_G-Switch_GT-USB-7051x",
-          MPN="G-Switch GT-USB-7051A/B, vertikal SMT (LCSC C2843970) - "
-              "Bauhoehe gegen die 4,5 mm bis zur Scheibe pruefen")
-    s.connect("USB_VBUS", ("J1", "A4"), ("J1", "B4"), ("J1", "A9"), ("J1", "B9"))
-    # Schirm: KiCad 9 nannte den Pin S1, KiCad 10 nennt ihn SH - Symbol und
-    # Footprint sind innerhalb einer Version konsistent, deshalb hier abfragen.
-    shield = "SH" if "SH" in symbol_pins("Connector:USB_C_Receptacle_USB2.0_16P") else "S1"
-    s.connect("PGND",     ("J1", "A1"), ("J1", "B1"), ("J1", "A12"), ("J1", "B12"),
-              ("J1", shield))
-    s.connect("USB_CC1",  ("J1", "A5"))
-    s.connect("USB_CC2",  ("J1", "B5"))
-    s.connect("USB_DP_C", ("J1", "A6"), ("J1", "B6"))
-    s.connect("USB_DN_C", ("J1", "A7"), ("J1", "B7"))
-
-    # CC: je 5,1 k einzeln nach GND -> UFP/Device
-    s.add("R1", "Device:R", "5k1", R0603)
-    s.connect("USB_CC1", ("R1", "1"))
-    s.connect("PGND",    ("R1", "2"))
-    s.add("R2", "Device:R", "5k1", R0603)
-    s.connect("USB_CC2", ("R2", "1"))
-    s.connect("PGND",    ("R2", "2"))
-
-    # ESD direkt an der Buchse; danach in den Stack
-    s.add("U1", "Power_Protection:USBLC6-2SC6", "USBLC6-2SC6",
-          "Package_TO_SOT_SMD:SOT-23-6")
-    s.connect("USB_DN_C", ("U1", "1"))
-    s.connect("PGND",     ("U1", "2"))
-    s.connect("USB_DP_C", ("U1", "3"))
-    s.connect("USB_DP",   ("U1", "4"))
-    s.connect("USB_VBUS", ("U1", "5"))
-    s.connect("USB_DN",   ("U1", "6"))
+    # Die USB-C-Buchse sass bis zum 18.08.2026 hier. Sie musste weg, weil sie
+    # nicht passte: Ueber der Top-Platine sind bis zur Zentralscheibe 3,5 mm
+    # frei, eine stehende USB-C-Buchse baut 7 bis 9,25 mm. Sie haette die
+    # Scheibe durchstossen - und liegend haette sie radial nach aussen gegen
+    # die Adapterwand gezeigt.
+    #
+    # Sie sitzt jetzt STEHEND AUF DEM MID-BOARD und greift durch eine
+    # Randkerbe dieses Boards nach vorn. Zwischen Mids Oberseite und Tops
+    # Oberseite liegen 10,0 mm - dort passt sie bequem, und der Stecker
+    # kommt weiterhin von vorn, sobald die Zentralscheibe ab ist.
+    #
+    # Mitgewandert sind die ESD-Diode und die beiden CC-Widerstaende. Damit
+    # verschwinden acht offene Netze und alle Randabstandsfehler von diesem
+    # Board, und USB_DP/USB_DN muessen nicht mehr durch den Stackverbinder.
 
     # =====================================================================
     # 2. Vier Ecktaster unter den Druckkreuzen der Zentralscheibe

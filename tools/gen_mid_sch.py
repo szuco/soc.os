@@ -46,6 +46,7 @@ C0805 = "Capacitor_SMD:C_0805_2012Metric"
 
 # Absichtlich unbeschaltete Pins (Referenz, Pinnummer im Symbol)
 NC_ALLOWED = {
+    ("J7", "A8"), ("J7", "B8"),   # SBU1/SBU2 - bei USB 2.0 unbenutzt
     ("U1", "15"),   # IO3   Strapping, ungenutzt
     ("U1", "16"),   # IO46  Strapping
     ("U1", "26"),   # IO45  Strapping
@@ -100,6 +101,51 @@ def build():
     # Nativer USB
     s.connect("USB_DN", ("U1", "13"))         # IO19
     s.connect("USB_DP", ("U1", "14"))         # IO20
+    # =====================================================================
+    #    USB-C - seit dem 18.08.2026 auf DIESEM Board
+    # =====================================================================
+    # Sie sass bis dahin auf dem Top-Board und passte dort nicht: Zwischen
+    # Top-Platine und Zentralscheibe sind 3,5 mm frei, eine stehende
+    # USB-C-Buchse baut 7 bis 9,25 mm. Zwischen Mids Oberseite und Tops
+    # Oberseite liegen dagegen 10,0 mm (docs/04, Tiefenbudget) - die Buchse
+    # steht hier und greift durch eine Randkerbe des Top-Boards nach vorn.
+    # Gesteckt wird weiterhin von vorn, sobald die Zentralscheibe ab ist.
+    #
+    # Zwei Dinge werden dadurch besser: Der native USB des ESP32-S3 sitzt auf
+    # DIESEM Board, die Datenleitungen muessen also nicht mehr ueber zwei
+    # Steckkontakte des Stapels - J_STK_A 34/36 sind frei geworden. Und das
+    # Top-Board verliert acht offene Netze samt aller Randabstandsfehler.
+    s.add("J7", "Connector:USB_C_Receptacle_USB2.0_16P", "USB-C",
+          "Connector_USB:USB_C_Receptacle_G-Switch_GT-USB-7051x",
+          MPN="G-Switch GT-USB-7051A/B, vertikal SMT (LCSC C2843970)")
+    s.connect("USB_VBUS", ("J7", "A4"), ("J7", "B4"), ("J7", "A9"), ("J7", "B9"))
+    # Schirm: KiCad 9 nannte den Pin S1, KiCad 10 nennt ihn SH.
+    shield = "SH" if "SH" in symbol_pins("Connector:USB_C_Receptacle_USB2.0_16P") else "S1"
+    s.connect("PGND",     ("J7", "A1"), ("J7", "B1"), ("J7", "A12"), ("J7", "B12"),
+              ("J7", shield))
+    s.connect("USB_CC1",  ("J7", "A5"))
+    s.connect("USB_CC2",  ("J7", "B5"))
+    s.connect("USB_DP_C", ("J7", "A6"), ("J7", "B6"))
+    s.connect("USB_DN_C", ("J7", "A7"), ("J7", "B7"))
+
+    # CC: je 5,1 k einzeln nach GND -> UFP/Device
+    s.add("R18", "Device:R", "5k1", R0603)
+    s.connect("USB_CC1", ("R18", "1"))
+    s.connect("PGND",    ("R18", "2"))
+    s.add("R19", "Device:R", "5k1", R0603)
+    s.connect("USB_CC2", ("R19", "1"))
+    s.connect("PGND",    ("R19", "2"))
+
+    # ESD direkt an der Buchse, danach an den Prozessor
+    s.add("U5", "Power_Protection:USBLC6-2SC6", "USBLC6-2SC6",
+          "Package_TO_SOT_SMD:SOT-23-6")
+    s.connect("USB_DN_C", ("U5", "1"))
+    s.connect("PGND",     ("U5", "2"))
+    s.connect("USB_DP_C", ("U5", "3"))
+    s.connect("USB_DP",   ("U5", "4"))
+    s.connect("USB_VBUS", ("U5", "5"))
+    s.connect("USB_DN",   ("U5", "6"))
+
     # Motor
     s.connect("M1_INA", ("U1", "31"))         # IO38
     s.connect("M1_INB", ("U1", "32"))         # IO39

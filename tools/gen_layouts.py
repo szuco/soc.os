@@ -64,6 +64,27 @@ HOLE_R = 21.5
 # mechanical/adapter.py und docs/04-mechanical.md Abschnitt 1e.
 TOP_SQ = 47.0          # Kantenlaenge - siehe Tiefenkette unten
 TOP_CR = 4.0           # Eckradius
+
+# RANDKERBE FUER DIE USB-C-BUCHSE, 18.08.2026.
+#
+# Die Buchse steht auf dem MID-Board und greift hier durch. Ueber dem
+# Top-Board sind bis zur Zentralscheibe nur 3,5 mm frei, eine stehende
+# USB-C-Buchse baut 7 bis 9,25 mm; zwischen Mids und Tops Oberseite sind es
+# 10,0 mm. Gesteckt wird weiterhin von vorn, sobald die Scheibe ab ist.
+#
+# Offene Kerbe statt Fenster: Der Buchsenkoerper misst 9,94 x 6,40, der
+# Boardrand liegt bei y = 23,5. Ein geschlossenes Fenster liesse einen Steg
+# von einem halben Millimeter stehen - der bricht beim Nutzentrennen.
+#
+# Die Lage folgt der Buchse auf Mid (4,5 / 19,5) und haelt Abstand zu
+# Klinkenbuchse (-9 / 19), Ecktaster (18 / 20) und Displayfenster (bis 13,5).
+# Die Kerbe muss den GANZEN Buchsenkoerper freistellen, nicht nur seine Nase:
+# Der Koerper ist ueber seine volle Hoehe gleich breit und durchstoesst die
+# Ebene des Top-Boards. Der Koerper misst 9,94 x 6,40 und sitzt auf Mid bei
+# (3,5 / 20,3) - weiter nach aussen geht nicht, sonst laufen seine Ecken ueber
+# Mids Radius von 26.
+NOTCH_X0, NOTCH_X1 = -2.0, 9.0     # Kerbenbreite 11,0 mm
+NOTCH_Y            = 16.8          # Kerbengrund; von dort bis zum Rand
 # Bohrbild v2: ZWEI Bohrungen bei 0/180 Grad. Die alten Winkel 120/240
 # kollidierten mit den Sicheltasten-Stoesseln (117/243 Grad, nur ~2 mm
 # daneben), und bei r21,5 blockieren Stackverbinder (um 45/135/225/315),
@@ -148,6 +169,11 @@ def inside_outline(x, y, square, margin=0.0):
         dx, dy = ax - (h - TOP_CR), ay - (h - TOP_CR)
         if dx > 0 and dy > 0:
             return math.hypot(dx, dy) <= TOP_CR
+        # Die USB-Kerbe ist kein Board. Der Platzierer darf dort nichts
+        # ablegen, und der Randabstand gilt auch an ihren Flanken.
+        if (NOTCH_X0 - margin <= x <= NOTCH_X1 + margin
+                and y >= NOTCH_Y - margin):
+            return False
         return True
     return math.hypot(x, y) <= BOARD_R - margin
 
@@ -247,8 +273,14 @@ class BoardBuilder:
         # Abgerundetes Quadrat: vier Geraden, vier Eckboegen
         h, cr = TOP_SQ / 2.0, TOP_CR
         k = 0.7071067811865476
+        # Die Bodenkante (y = +h) ist durch die USB-Kerbe unterbrochen:
+        # statt einer Geraden drei Segmente rechts, hinein, links.
         for a, b in (((-(h - cr), -h), ((h - cr), -h)),
-                     (((h - cr), h), (-(h - cr), h)),
+                     (((h - cr), h), (NOTCH_X1, h)),
+                     ((NOTCH_X1, h), (NOTCH_X1, NOTCH_Y)),
+                     ((NOTCH_X1, NOTCH_Y), (NOTCH_X0, NOTCH_Y)),
+                     ((NOTCH_X0, NOTCH_Y), (NOTCH_X0, h)),
+                     ((NOTCH_X0, h), (-(h - cr), h)),
                      ((-h, (h - cr)), (-h, -(h - cr))),
                      ((h, -(h - cr)), (h, (h - cr)))):
             seg = pcbnew.PCB_SHAPE(self.board)
@@ -445,8 +477,20 @@ class BoardBuilder:
                 # dort sitzen die Taster.
                 h = TOP_SQ / 2.0 - 0.6
                 r = max(TOP_CR - 0.6, 0.1)
-                for cx, cy, a0 in ((h - r, h - r, 0.0), (-(h - r), h - r, 90.0),
-                                   (-(h - r), -(h - r), 180.0), (h - r, -(h - r), 270.0)):
+                # Rechte untere Ecke -> rechts an der Kerbe vorbei -> hinein ->
+                # heraus -> linke untere Ecke -> Rest im Uhrzeigersinn.
+                o.Append(mm(h - r + r), mm(h - r))
+                for cx, cy, a0 in ((h - r, h - r, 0.0),):
+                    for k in range(7):
+                        a = math.radians(a0 + 90.0 * k / 6.0)
+                        o.Append(mm(cx + r * math.cos(a)), mm(cy + r * math.sin(a)))
+                o.Append(mm(NOTCH_X1 + 0.6), mm(h))
+                o.Append(mm(NOTCH_X1 + 0.6), mm(NOTCH_Y - 0.6))
+                o.Append(mm(NOTCH_X0 - 0.6), mm(NOTCH_Y - 0.6))
+                o.Append(mm(NOTCH_X0 - 0.6), mm(h))
+                for cx, cy, a0 in ((-(h - r), h - r, 90.0),
+                                   (-(h - r), -(h - r), 180.0),
+                                   (h - r, -(h - r), 270.0)):
                     for k in range(7):
                         a = math.radians(a0 + 90.0 * k / 6.0)
                         o.Append(mm(cx + r * math.cos(a)), mm(cy + r * math.sin(a)))
@@ -628,7 +672,13 @@ FIXED_BOTTOM = dict(_FET_GRID,
 
 FIXED_MID = {
     "U1":  (0.0, -12.5, 0, "F"),       # ESP32, Antenne zur Frontkante
-    "J4":  (0.0, 20.5, 0, "F"),        # RS485-Anschluss unten
+    # RS485 vom Bodenmittelpunkt nach links gerueckt: Dort steht seit dem
+    # 18.08.2026 die USB-C-Buchse, die durch die Randkerbe des Top-Boards
+    # greift. Der Bodenrand ist der einzige Streifen, der beiden passt -
+    # oben blockiert das ESP32-Modul mit seiner Antenne, links und rechts
+    # laesst das Displayfenster des Top-Boards nur 7,2 mm.
+    "J4":  (-11.5, 19.0, 0, "F"),      # RS485-Anschluss unten links
+    "J7":  (3.5, 20.3, 0, "F"),        # USB-C, stehend, greift durch Top
     # Feldstecker, seit dem 16.08.2026 GETEILT: Mit vier Reed-Kontakten
     # (Verschluss und Sabotage je Fenster, Punkt 34) waere ein 8-poliger
     # JST-SH 11,9 mm lang - dafuer ist auf dem Mid-Board nachweislich kein
@@ -637,7 +687,16 @@ FIXED_MID = {
     # nebenbei Eingaenge und Schaltausgang sauber.
     "J5":  (-9.0, 3.8, 90, "B"),       # 6-pol: 4 Reed + 2 GND
     "J6":  (-20.8, 6.6, 90, "B"),      # 2-pol: Haubenkontakt
-    "U4":  (12.0, 17.5, 0, "F"),       # PhotoMOS, freie Flaeche rechts unten
+        # PhotoMOS auf die RUECKSEITE: Vorn braucht der Bodenrand jetzt Platz
+    # fuer die USB-C-Buchse, und der einzige andere freie Fleck kollidiert
+    # mit dem Stackverbinder J3. Hinten ist der Bereich frei - der
+    # PCF8575 sitzt weiter links.
+    # U4 (PhotoMOS) ist NICHT mehr fest platziert. Der Bodenrand, auf dem er
+    # sass, gehoert seit dem 18.08.2026 der USB-C-Buchse; eine gesuchte
+    # Ersatzstelle gab es weder vorn noch hinten - ein Rastersuchlauf ueber
+    # das ganze Board fand keine freie Flaeche von 11,6 x 3,6 mm. Der
+    # automatische Platzierer darf ihn deshalb selbst unterbringen, notfalls
+    # indem er andere Kleinteile verschiebt.
     "BZ1": (5.5, 8.0, 0, "F"),         # Piezo
     # PCF8575 auf die RUECKSEITE: Der 16-Bit-Typ im SSOP-24 findet vorn
     # keinen Platz mehr - dort sitzen ESP32, MAX3485, PhotoMOS und Piezo.
@@ -669,7 +728,6 @@ FIXED_TOP = dict(
     # USB-C mittig oben, vollstaendig von der Zentralscheibe verdeckt und erst
     # nach deren Abnahme erreichbar (Punkt 45). Die Buchse steht jetzt - der
     # Stecker geht nach vorn, nicht radial gegen die Dosenwand.
-    J1=(0.0, -19.0, 0, "F"),
     # F1 (PTC) hat keine mechanische Bindung mehr - auf dem quadratischen Board
     # ist jede feste Position entweder unter dem Stackverbinder oder unter dem
     # Klinken-Platzhalter. Die Automatik findet ihn.

@@ -1,9 +1,20 @@
 #!/usr/bin/env python3
 """
-Stack-Pinout v0.3 - die EINZIGE Quelle fuer J_STK_A und J_STK_B.
+Stack-Pinout v0.4 - die EINZIGE Quelle fuer J_STK_A und J_STK_B.
 
 Alle drei Schaltplan-Generatoren importieren diese Tabellen; docs/03 wird
 daraus erzeugt. Damit koennen die Boards nicht auseinanderlaufen.
+
+Aenderung v0.3 -> v0.4 (18.08.2026):
+  * USB_DP/USB_DN sind von A34/A36 VERSCHWUNDEN und heissen jetzt RSV_A3/RSV_A5.
+    Die USB-C-Buchse ist auf das Mid-Board gewandert, wo auch der ESP32-S3
+    sitzt - die Datenleitungen bleiben damit auf einer Platine und muessen
+    ueberhaupt nicht mehr durch den Stapel. Grund fuer den Umzug war die
+    Bauhoehe: Ueber dem Top-Board sind bis zur Zentralscheibe 3,5 mm frei,
+    eine stehende USB-C-Buchse baut 7 bis 9,25 mm. Zwischen Mid und Top sind
+    es 10,0 mm. Die Buchse greift durch eine Randkerbe des Top-Boards.
+  * USB_VBUS bleibt auf A18 - es wird weiterhin nach unten zum Power-Mux auf
+    dem Bottom-Board gefuehrt, kommt jetzt nur von Mid statt von Top.
 
 Aenderungen v0.2 -> v0.3:
   * USB_DP/USB_DN neu auf J_STK_A 34/36 (benachbart in Reihe B, PGND daneben).
@@ -30,8 +41,8 @@ STK_A = {
     18: "USB_VBUS", 19: "PGND", 20: "M2_INA", 21: "PGND", 22: "M2_INB",
     23: "STAR_EN", 24: "RSV_A2", 25: "PGND", 26: "I_SENSE1", 27: "AGND",
     28: "I_SENSE2", 29: "AGND", 30: "HW_TRIP1", 31: "HW_TRIP2",
-    32: "TRIP_RST", 33: "RELAY_CTL", 34: "USB_DP", 35: "RSV_A4",
-    36: "USB_DN", 37: "RSV_A6", 38: "PGND", 39: "PGND", 40: "PGND",
+    32: "TRIP_RST", 33: "RELAY_CTL", 34: "RSV_A3", 35: "RSV_A4",
+    36: "RSV_A5", 37: "RSV_A6", 38: "PGND", 39: "PGND", 40: "PGND",
 }
 
 # J_STK_B - UI und Kommunikation
