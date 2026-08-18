@@ -125,6 +125,27 @@ PAD_MAP_REF = {
 # sonst mit den frueheren Sicheltastern des Top-Boards ueberlappten.
 STACK_POS = {"J2": (-14.2, -2.0, 0), "J3": (14.2, -2.0, 0)}
 
+# AUF WELCHER SEITE, das war bis zum 18.08.2026 falsch.
+#
+# Alle drei Boards trugen die Verbinder auf der VORDERSEITE. Drei gleiche
+# Buchsen auf drei Vorderseiten koennen nicht ineinandergreifen, und auf dem
+# Top-Board stand die Buchse ausserdem genau dort, wo das Displaypanel
+# aufliegen soll - 8 mm hoch, mitten unter der Klebeflaeche.
+#
+# Der Koerper gehoert jeweils auf die Seite, die zum naechsten Board zeigt:
+#
+#   Bottom  F traegt den Feldstecker und zeigt in den Kabelraum
+#           -> Stackverbinder auf B, zu Mid hin
+#   Mid     F zeigt zu Top (dort steht auch die USB-Buchse, die durch Tops
+#           Randkerbe greift)  -> Koerper auf F, Stifte ragen nach B zu Bottom
+#   Top     B zeigt zu Mid  -> Stackverbinder auf B, Vorderseite frei fuers
+#           Panel
+#
+# Mid braucht damit einen STAPELverbinder: Buchse auf der einen Seite, lange
+# Stifte auf der anderen. Genau das ist Punkt 23 in docs/06, und genau daran
+# haengt auch der Plattenabstand.
+STACK_SIDE = {"bottom_power_motor": "B", "mid_logic": "F", "top_ui": "B"}
+
 
 def mm(v):
     return pcbnew.FromMM(float(v))
@@ -635,8 +656,9 @@ def build_board(name, module, fixed, auto_sides=("F", "B"),
         bb.add_component(c)
     bb.placed = set()
     # 1. Stackverbinder - identisch auf allen Boards
+    seite = STACK_SIDE.get(name, "F")
     for ref, (x, y, rot) in STACK_POS.items():
-        bb.place_fixed(ref, x, y, rot, "F")
+        bb.place_fixed(ref, x, y, rot, seite)
         bb.placed.add(ref)
     # 2. mechanisch gebundene Teile, mit Kollisionspruefung
     for ref, (x, y, rot, side) in fixed.items():
@@ -829,7 +851,11 @@ FIXED_TOP = dict(
     # 32,7 x 27,0 mm (Eckradius 0,7) und liegt bei (-0,95 / +0,3) mathematisch,
     # also praktisch mittig - dafuer ist ein 1,69"-Panel 240x280 quer der
     # Kandidat (Punkt 43).
-    J5=(0.0, 3.0, 0, "F"),
+    # J5 auf die RUECKSEITE: Auf der Vorderseite liegt das Displaypanel auf,
+    # und eine FPC-Buchse von 1,2 mm Hoehe darunter macht das unmoeglich. Die
+    # Fahne ist 18,15 mm lang und laut Zeichnung ohnehin gefaltet - sie greift
+    # um die Boardkante.
+    J5=(0.0, 3.0, 0, "B"),
     # Die vier Durchbrueche der Zentralscheibe liegen in den Diagonalfeldern
     # zwischen Pfeil und Ecktaster, bei (+/-9 / +/-19) mathematisch. Das haelt
     # rund 8 mm Abstand zu Kreuz und Symbol und liegt sicher auf der Platine.
