@@ -168,6 +168,7 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
     <div class="spec"><dt>Motoren</dt><dd>2 ×<small> 24 V, 1,7 A blockiert</small></dd></div>
     <div class="spec"><dt>Display</dt><dd>240×280<small> ST7789V</small></dd></div>
     <div class="spec"><dt>Lagen</dt><dd>4<small> je Board</small></dd></div>
+    <div class="spec"><dt>Offen</dt><dd>16<small> von 75 Netzen</small></dd></div>
   </dl>
 </header>
 
@@ -202,7 +203,7 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
       <div class="lv" style="color:var(--ui)">Top · UI</div>
       <h3>Bedienung und Sensorik</h3>
       <ul>
-        <li>USB-C nach vorn, hinter der Zentralscheibe verborgen</li>
+        <li>Randkerbe f&uuml;r die USB-C-Buchse des Mid-Boards</li>
         <li>Rechteck-LCD 240&times;280, ST7789V</li>
         <li>4 Taster in den Ecken, unter den Druckkreuzen</li>
         <li>Temperatur und Feuchte f&uuml;r den Raum, SHT4x</li>
@@ -215,6 +216,7 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
       <ul>
         <li>ESP32-S3-WROOM-1-N16R8</li>
         <li>RS-485 als primärer Bus</li>
+        <li>USB-C stehend, greift durch das Top-Board</li>
         <li>PCF8575-Portexpander, 16 Bit</li>
         <li>4 Reed-Kontakte: 2 Fenster, 2 Sabotage</li>
         <li>PhotoMOS-Meldekontakt, Piezo</li>
@@ -385,10 +387,10 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
       <text class="dim" x="-6.6" y="-18.4">ToF</text>
       <circle cx="-9" cy="19" r="2.6" fill="var(--paper)" stroke="var(--copper)" stroke-width=".45"/>
       <text class="dim" x="-5.6" y="20">Klinke</text>
-      <!-- USB-C nach vorn, hinter der Scheibe -->
-      <rect x="-4.4" y="-20.5" width="8.8" height="3" rx=".6" fill="none"
-            stroke="var(--ink-3)" stroke-width=".4" stroke-dasharray="1.2 .9"/>
-      <text class="dim" x="5.4" y="-18.6">USB-C, verdeckt</text>
+      <!-- Randkerbe fuer die USB-C-Buchse des Mid-Boards -->
+      <path d="M -2,23.5 L -2,16.8 L 9,16.8 L 9,23.5" fill="var(--paper)"
+            stroke="var(--copper)" stroke-width=".55"/>
+      <text class="dim" x="10.4" y="21">USB-C aus Mid</text>
 
       <!-- Schraublanglöcher auf 60 -->
       <rect x="-31.95" y="-1.95" width="3.9" height="3.9" rx="1.95"
@@ -445,10 +447,10 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
 
     <div class="st"><span class="part">teilweise</span><div>
       <b>Layout, vierlagig geroutet</b>
-      <p>Mid ist fertig: 637 Segmente, <strong>null Kupferfehler</strong>, zwei
-      offene Signale. Bottom 1376 Segmente, acht offene Signale, zwei
-      Haarrisse im Abstand. Top 193 Segmente, elf offene Signale — davon acht
-      am USB-Stecker, der ohnehin getauscht wird.</p></div></div>
+      <p>Von 75 offenen Signalnetzen sind 16 übrig: Bottom 4, Mid 9, Top 3.
+      Der Durchbruch bei Top war kein Router, sondern ein Werkzeugfehler — der
+      Randkeepout war ein Kreisring und lag auf dem quadratischen Board quer
+      über die Platine, vor allen vier Ecktastern.</p></div></div>
 
     <div class="st"><span class="part">teilweise</span><div>
       <b>Mechanik im Stapel</b>
@@ -456,12 +458,12 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
       17&nbsp;mm Reserve. Die Bauteilhöhen sind aber weiter Annahmen —
       belastbar wird es erst mit den Datenblättern der gewählten Teile.</p></div></div>
 
-    <div class="st"><span class="no">offen</span><div>
-      <b>USB-C-Steckverbinder</b>
-      <p>Die verbaute Buchse hat ihre Befestigungslöcher zu nah am eigenen
-      Padfeld; acht offene Netze auf Top hängen daran. Gesucht ist eine
-      vertikale Buchse mit außenliegenden Laschen — Kabel von vorn, sobald die
-      Zentralscheibe ab ist.</p></div></div>
+    <div class="st"><span class="pill ok">geprüft</span><div>
+      <b>USB-C sitzt jetzt auf dem Mid-Board</b>
+      <p>Über dem Top-Board sind bis zur Zentralscheibe 3,5&nbsp;mm frei, eine
+      stehende USB-C-Buchse baut 7 bis 9,25&nbsp;mm — sie passte dort nie.
+      Zwischen Mid und Top sind es 10,0&nbsp;mm. Sie greift durch eine
+      Randkerbe des Top-Boards, gesteckt wird weiter frontal.</p></div></div>
 
     <div class="st"><span class="no">offen</span><div>
       <b>Fertigungsdaten zum Bestellen</b>
