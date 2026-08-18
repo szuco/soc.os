@@ -1892,14 +1892,18 @@
 		)
 		(embedded_fonts no)
 	)
-    (symbol "Connector_Audio:AudioJack2_SwitchT"
+    (symbol "Connector_Generic:Conn_01x02"
+		(pin_names
+			(offset 1.016)
+			(hide yes)
+		)
 		(exclude_from_sim no)
 		(in_bom yes)
 		(on_board yes)
 		(in_pos_files yes)
 		(duplicate_pin_numbers_are_jumpers no)
 		(property "Reference" "J"
-			(at 0 8.89 0)
+			(at 0 2.54 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -1908,8 +1912,8 @@
 				)
 			)
 		)
-		(property "Value" "AudioJack2_SwitchT"
-			(at 0 6.35 0)
+		(property "Value" "Conn_01x02"
+			(at 0 -5.08 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(effects
@@ -1940,7 +1944,7 @@
 				)
 			)
 		)
-		(property "Description" "Audio Jack, 2 Poles (Mono / TS), Switched T Pole (Normalling)"
+		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
 			(at 0 0 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -1951,7 +1955,7 @@
 				)
 			)
 		)
-		(property "ki_keywords" "audio jack receptacle mono headphones phone TS connector"
+		(property "ki_keywords" "connector"
 			(at 0 0 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -1962,7 +1966,7 @@
 				)
 			)
 		)
-		(property "ki_fp_filters" "Jack*"
+		(property "ki_fp_filters" "Connector*:*_1x??_*"
 			(at 0 0 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -1973,45 +1977,10 @@
 				)
 			)
 		)
-		(symbol "AudioJack2_SwitchT_0_1"
+		(symbol "Conn_01x02_1_1"
 			(rectangle
-				(start -2.54 0)
-				(end -3.81 -2.54)
-				(stroke
-					(width 0.254)
-					(type default)
-				)
-				(fill
-					(type outline)
-				)
-			)
-			(polyline
-				(pts
-					(xy 0 0) (xy 0.635 -0.635) (xy 1.27 0) (xy 2.54 0)
-				)
-				(stroke
-					(width 0.254)
-					(type default)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(polyline
-				(pts
-					(xy 1.778 -0.254) (xy 2.032 -0.762)
-				)
-				(stroke
-					(width 0)
-					(type default)
-				)
-				(fill
-					(type none)
-				)
-			)
-			(rectangle
-				(start 2.54 3.81)
-				(end -2.54 -5.08)
+				(start -1.27 1.27)
+				(end 1.27 -3.81)
 				(stroke
 					(width 0.254)
 					(type default)
@@ -2020,43 +1989,39 @@
 					(type background)
 				)
 			)
-			(polyline
-				(pts
-					(xy 2.54 2.54) (xy -0.635 2.54) (xy -0.635 0) (xy -1.27 -0.635) (xy -1.905 0)
-				)
+			(rectangle
+				(start -1.27 0.127)
+				(end 0 -0.127)
 				(stroke
-					(width 0.254)
+					(width 0.1524)
 					(type default)
 				)
 				(fill
 					(type none)
 				)
 			)
-			(polyline
-				(pts
-					(xy 2.54 -2.54) (xy 1.778 -2.54) (xy 1.778 -0.254) (xy 1.524 -0.762)
-				)
+			(rectangle
+				(start -1.27 -2.413)
+				(end 0 -2.667)
 				(stroke
-					(width 0)
+					(width 0.1524)
 					(type default)
 				)
 				(fill
 					(type none)
 				)
 			)
-		)
-		(symbol "AudioJack2_SwitchT_1_1"
 			(pin passive line
-				(at 5.08 2.54 180)
-				(length 2.54)
-				(name ""
+				(at -5.08 0 0)
+				(length 3.81)
+				(name "Pin_1"
 					(effects
 						(font
 							(size 1.27 1.27)
 						)
 					)
 				)
-				(number "S"
+				(number "1"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -2065,34 +2030,16 @@
 				)
 			)
 			(pin passive line
-				(at 5.08 0 180)
-				(length 2.54)
-				(name ""
+				(at -5.08 -2.54 0)
+				(length 3.81)
+				(name "Pin_2"
 					(effects
 						(font
 							(size 1.27 1.27)
 						)
 					)
 				)
-				(number "T"
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-			)
-			(pin passive line
-				(at 5.08 -2.54 180)
-				(length 2.54)
-				(name ""
-					(effects
-						(font
-							(size 1.27 1.27)
-						)
-					)
-				)
-				(number "TN"
+				(number "2"
 					(effects
 						(font
 							(size 1.27 1.27)
@@ -3945,20 +3892,19 @@
     (instances (project "top_ui" (path "/b42c7d3a-b5ea-559e-28b6-972545138727"
       (reference "F1") (unit 1))))
   )
-  (symbol (lib_id "Connector_Audio:AudioJack2_SwitchT") (at 381.0000 69.8500 0) (unit 1)
+  (symbol (lib_id "Connector_Generic:Conn_01x02") (at 381.0000 69.8500 0) (unit 1)
     (in_bom yes) (on_board yes) (dnp no)
     (uuid 78948101-eab3-b89e-e788-a1c77022a901)
     (property "Reference" "J6" (at 387.3500 62.2300 0)
       (effects (font (size 1.27 1.27)) (justify left)))
-    (property "Value" "Stern Klinke" (at 387.3500 64.7700 0)
+    (property "Value" "Stern" (at 387.3500 64.7700 0)
       (effects (font (size 1.27 1.27)) (justify left)))
-    (property "Footprint" "Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles" (at 381.0000 69.8500 0)
+    (property "Footprint" "Connector_JST:JST_GH_BM02B-GHS-TBT_1x02-1MP_P1.25mm_Vertical" (at 381.0000 69.8500 0)
       (effects (font (size 1.27 1.27)) hide))
-    (property "MPN" "PLATZHALTER 3,5 mm vertikal - Zielteil 2,5 mm, Bauhoehe max 10,5 mm ueber der Platine, Footprint aus dem Datenblatt uebernehmen" (at 381.0000 72.3900 0)
+    (property "MPN" "JST GH BM02B-GHS-TBT, 2-polig stehend mit Verriegelung" (at 381.0000 72.3900 0)
       (effects (font (size 1.27 1.27)) hide))
-    (pin "S" (uuid 0cc6827c-d7c8-4a1d-d99f-1ea6667c8a9f))
-    (pin "T" (uuid 5f7a050a-de28-24ac-7900-77c962a343ef))
-    (pin "TN" (uuid ad417d92-4c4c-7cb2-f000-5dd918e38134))
+    (pin "1" (uuid 7a024604-bec0-6ad9-9d11-dcdb0c2a8ec9))
+    (pin "2" (uuid 1490aa6c-c60d-6d72-275a-f21de69fd3a1))
     (instances (project "top_ui" (path "/b42c7d3a-b5ea-559e-28b6-972545138727"
       (reference "J6") (unit 1))))
   )
@@ -4501,11 +4447,11 @@
   (global_label "PGND" (shape bidirectional) (at 279.4000 78.7400 0)
     (effects (font (size 1.27 1.27)) (justify left)) (uuid b61616f5-5481-80c7-589d-ebb2481764b5)
     (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 279.4000 78.7400 0) (effects (font (size 1.27 1.27)) hide)))
-  (wire (pts (xy 386.0800 67.3100) (xy 391.1600 67.3100))
-    (stroke (width 0) (type default)) (uuid 5d2b4a98-2645-6761-91ac-0843f075b500))
-  (global_label "PGND" (shape bidirectional) (at 391.1600 67.3100 0)
-    (effects (font (size 1.27 1.27)) (justify left)) (uuid b15530c4-f758-65fe-60ac-53c959d01c79)
-    (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 391.1600 67.3100 0) (effects (font (size 1.27 1.27)) hide)))
+  (wire (pts (xy 375.9200 72.3900) (xy 370.8400 72.3900))
+    (stroke (width 0) (type default)) (uuid 43b69d10-85bc-74a9-ac8e-6a729e70bab7))
+  (global_label "PGND" (shape bidirectional) (at 370.8400 72.3900 0)
+    (effects (font (size 1.27 1.27)) (justify left)) (uuid aab61fbe-e264-50a2-23af-2b887cb1681a)
+    (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 370.8400 72.3900 0) (effects (font (size 1.27 1.27)) hide)))
   (wire (pts (xy 434.3400 85.0900) (xy 434.3400 90.1700))
     (stroke (width 0) (type default)) (uuid 367fabb2-d207-6adc-5608-24d5b8c9f55c))
   (global_label "PGND" (shape bidirectional) (at 434.3400 90.1700 0)
@@ -4796,11 +4742,11 @@
   (global_label "STAR_OUT" (shape bidirectional) (at 330.2000 78.7400 0)
     (effects (font (size 1.27 1.27)) (justify left)) (uuid 80f8421a-037b-6820-8b7a-1f28988bc978)
     (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 330.2000 78.7400 0) (effects (font (size 1.27 1.27)) hide)))
-  (wire (pts (xy 386.0800 69.8500) (xy 391.1600 69.8500))
-    (stroke (width 0) (type default)) (uuid 084492db-8eca-6d47-4296-4bcc1c735a3e))
-  (global_label "STAR_OUT" (shape bidirectional) (at 391.1600 69.8500 0)
-    (effects (font (size 1.27 1.27)) (justify left)) (uuid 2010fc98-9e44-bcc5-a04f-90446c3a04fc)
-    (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 391.1600 69.8500 0) (effects (font (size 1.27 1.27)) hide)))
+  (wire (pts (xy 375.9200 69.8500) (xy 370.8400 69.8500))
+    (stroke (width 0) (type default)) (uuid 573c2d5f-7db2-361b-5ed2-21c258e8cdb6))
+  (global_label "STAR_OUT" (shape bidirectional) (at 370.8400 69.8500 0)
+    (effects (font (size 1.27 1.27)) (justify left)) (uuid 56d36e4b-cd0e-5b50-8fbe-ada7ec237106)
+    (property "Intersheetrefs" "${INTERSHEET_REFS}" (at 370.8400 69.8500 0) (effects (font (size 1.27 1.27)) hide)))
   (wire (pts (xy 279.4000 66.0400) (xy 279.4000 60.9600))
     (stroke (width 0) (type default)) (uuid 71ae2738-763f-6df3-a166-8174177dd73f))
   (global_label "STAR_SW" (shape bidirectional) (at 279.4000 60.9600 0)

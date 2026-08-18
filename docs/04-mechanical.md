@@ -92,7 +92,7 @@ Taste — symmetrisch, und alle vier im 55er-Fenster und damit über der Dose:
 > | Durchbruch | Lage | Zweck |
 > |---|---|---|
 > | **oben** | (0 / −19), Schlitz 14 × 5 mm | **ToF und Raumsensor gemeinsam** |
-> | **unten** | (4 / +19), Ø 6 | **Klinkenbuchse** Weihnachtsstern |
+> | **unten links** | (−10 / +19,4), rund 6 × 5 mm | **Sternanschluss**, JST GH |
 >
 > **Ein Loch für zwei Sensoren.** Der VL53L1X sitzt bei (−3,5 / −19), der
 > SHT4x bei (+3,5 / −19) — 3 mm zwischen den Bauteilkanten. Näher wäre
@@ -333,6 +333,31 @@ Von der Sichtfläche der Zentralscheibe nach hinten gezählt:
 | 2,5 … 4,5 | SMD-Taster über der Leiterplatte |
 | 4,5 … 5,5 | **Top-Leiterplatte** |
 | 7,5 | Rastebene und hinterer Rand der Scheibe (F2) |
+
+### Die Displayfläche im Besonderen
+
+Dort gilt eine eigene Kette, denn das Panel liegt zwischen Platine und
+Scheibe:
+
+| von … bis | was |
+|---|---|
+| 0,0 … 1,0 | Zentralscheibe |
+| 1,0 … 2,9 | **Luft, 1,90 mm** — hier sitzt die Schaumdichtung |
+| 2,9 … 4,5 | **Panel ER-TFT1.69-3**, 1,60 mm |
+| 4,5 | Klebefuge, 0,1 bis 0,2 mm |
+| 4,5 … 5,5 | Top-Leiterplatte |
+
+**Befestigt wird geklebt, nicht geklemmt.** Doppelseitiges Band umlaufend auf
+den Rand außerhalb der aktiven Fläche — **2,40 mm** an den langen Seiten,
+**1,05 mm** an den kurzen. Die Schaumdichtung in den 1,90 mm davor drückt das
+Panel zusätzlich an und hält Staub ab, **darf aber nicht die Befestigung
+sein**: Die Zentralscheibe ist bewusst abnehmbar, damit man an USB kommt —
+ein nur geklemmtes Panel fiele beim Abnehmen heraus.
+
+**Die Vorderseite unter dem Panel ist im Layout gesperrt** (`block_f` in
+`gen_layouts.py`). Das war nötig, weil dort zunächst die beiden
+Stackverbinder standen — 8 mm hoch, mitten unter der Klebefläche. Sie liegen
+jetzt auf der Rückseite, wo sie ohnehin hingehören, ebenso die FPC-Buchse.
 
 > **Und eine dritte, am 18.08.2026 dazugekommen: die USB-C-Buchse passt hier
 > nicht.** Zwischen Platinenvorderseite (4,5) und Sichtfläche liegen 4,5 mm,

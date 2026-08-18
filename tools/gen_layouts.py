@@ -861,7 +861,10 @@ FIXED_TOP = dict(
     # rund 8 mm Abstand zu Kreuz und Symbol und liegt sicher auf der Platine.
     # Links oben ToF, links unten Klinke; rechts zweimal Lueftung - dort sitzt
     # deshalb der SHT4x (Punkt 46, Raummessung).
-    J6=(-9.0, 19.0, 180, "F"),         # Klinkenbuchse Stern, unten LINKS
+    # Sternanschluss unten links, im Streifen unter dem Displaypanel.
+    # Der ist 8,16 mm hoch (Panelunterkante 15,34 bis Boardrand 23,50); der
+    # JST GH misst 4,95 mm in y und laesst damit 1,6 mm nach oben und unten.
+    J6=(-10.0, 19.4, 0, "F"),          # Sternanschluss JST GH, unten links
     # ToF UND Raumsensor unter EINEM Durchbruch, 18.08.2026.
     #
     # Bisher sassen sie auf den Diagonalen bei (-9 / -19) und (+9 / -19) und
@@ -920,7 +923,14 @@ def main():
         # ist groesser; 36 x 31 als Sperrflaeche ist der vorlaeufige Ansatz.
         "top":    dict(name="top_ui", module=gen_top_sch, square=True,
                        fixed=FIXED_TOP, auto_sides=("B", "F"),
-                       block_f=(-18, -15.5, 17, 15.5), edge_ok=("J1", "J6")),
+                       # Die Vorderseite unter dem Displaypanel ist gesperrt.
+                       # Das Panel wird dort AUFGEKLEBT und ist 1,6 mm dick -
+                       # jedes Bauteil darunter macht das unmoeglich. Der
+                       # Bereich ist der Panelumriss 30,07 x 37,43 quer, mittig
+                       # ueber dem Scheibenfenster bei (-0,95 / +0,3), plus
+                       # 0,5 mm Rand fuer die Klebefuge.
+                       block_f=(-20.2, -15.3, 18.3, 15.9),
+                       edge_ok=("J1", "J6")),
     }
     fail = 0
     for key, plan in plans.items():

@@ -226,15 +226,33 @@ def build():
     s.connect("STAR_SW",  ("F1", "1"))
     s.connect("STAR_OUT", ("F1", "2"))
 
-    # Klinkenbuchse in der Frontplatte, 6 Uhr. Der Schaltkontakt TN bleibt
-    # offen - "Stern gesteckt" waere ein zusaetzlicher Stackpin und ein GPIO,
-    # dafuer ist die Funktion zu klein.
-    s.add("J6", "Connector_Audio:AudioJack2_SwitchT", "Stern Klinke",
-          "Connector_Audio:Jack_3.5mm_QingPu_WQP-PJ398SM_Vertical_CircularHoles",
-          MPN="PLATZHALTER 3,5 mm vertikal - Zielteil 2,5 mm, Bauhoehe max 10,5 mm "
-              "ueber der Platine, Footprint aus dem Datenblatt uebernehmen")
-    s.connect("STAR_OUT", ("J6", "T"))
-    s.connect("PGND",     ("J6", "S"))
+    # STERNANSCHLUSS: JST GH statt Klinkenbuchse, 18.08.2026.
+    #
+    # Es war eine 3,5-mm-Klinke, 9,0 x 12,48 mm gross und 12 mm hoch. Mit dem
+    # Displaypanel (30,07 x 37,43, mittig ueber dem Scheibenfenster) bleibt
+    # unter ihm nur ein Streifen von 8,16 mm - die Klinke braucht selbst
+    # quergelegt 9,0 mm. Sie passte schlicht nicht mehr.
+    #
+    # Fuer zwei Litzen bei 80 mA war sie ohnehin ueberdimensioniert. Gewaehlt
+    # ist die kleinste zweipolige Bauform mit VERRIEGELUNG, die es mit
+    # 3D-Modell gibt:
+    #
+    #   JST GH BM02B-GHS-TBT   5,75 x 4,95 mm, 4,20 mm hoch, 1,25 mm Raster
+    #
+    # Sie steht 0,7 mm hoeher als die 3,50 mm, die bis zur Scheibeninnenseite
+    # frei sind - deshalb bekommt die Zentralscheibe unten links eine kleine
+    # Oeffnung von rund 6 x 5 mm. Dafuer kommt man ohne Abnehmen der Scheibe
+    # an den Stecker, und die Verriegelung haelt ihn fest.
+    #
+    # Die einzige Bauform, die ganz unter die Scheibe passt, waere die
+    # LIEGENDE JST SH mit 2,96 mm - verworfen, weil das Kabel dann seitlich
+    # abgeht und der 1,0-mm-Raster fuer einen Steckverbinder, den man in die
+    # Hand nimmt, zu zierlich ist.
+    s.add("J6", "Connector_Generic:Conn_01x02", "Stern",
+          "Connector_JST:JST_GH_BM02B-GHS-TBT_1x02-1MP_P1.25mm_Vertical",
+          MPN="JST GH BM02B-GHS-TBT, 2-polig stehend mit Verriegelung")
+    s.connect("STAR_OUT", ("J6", "1"))
+    s.connect("PGND",     ("J6", "2"))
 
     # =====================================================================
     # 6. Praesenz: VL53L1X (ToF) und Reserveanschluss fuer ein Satellitenmodul
