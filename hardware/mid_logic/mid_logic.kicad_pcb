@@ -13206,6 +13206,22 @@
 		(net "REED2_IN")
 		(uuid "c1ad96af-6f39-43a3-a137-47029a05d4b1")
 	)
+	(via
+		(at -4.951413 7.781576)
+		(size 0.6)
+		(drill 0.3)
+		(layers "F.Cu" "B.Cu")
+		(net "PGND")
+		(uuid "0e4c1af7-03b1-495f-8859-b6b35efbe4ad")
+	)
+	(via
+		(at 10.7 -17.345)
+		(size 0.6)
+		(drill 0.3)
+		(layers "F.Cu" "B.Cu")
+		(net "PGND")
+		(uuid "6748fb27-4834-4a71-bfb2-fe6ab3d9d183")
+	)
 	(segment
 		(start -2.8033 8.6733)
 		(end -1.5011 9.9755)

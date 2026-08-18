@@ -32,6 +32,16 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 mm = lambda v: pcbnew.FromMM(v)   # noqa: E731
 
 F, B = pcbnew.F_Cu, pcbnew.B_Cu
+# Alle Kupferlagen des Boards. Seit der Umstellung auf vier Lagen (17.08.2026)
+# reicht F/B nicht mehr: Das Skript setzte durchgehende Vias, pruefte den
+# Freiraum aber nur auf den Aussenlagen - und traf damit Leiterbahnen auf
+# In1/In2. Ergebnis waren zwei Kurzschluesse auf Mid und einer auf Top.
+CU_ALL = (F, pcbnew.In1_Cu, pcbnew.In2_Cu, B)
+
+
+def copper_layers(board):
+    en = board.GetEnabledLayers()
+    return [l for l in CU_ALL if en.Contains(l)]
 
 
 class Item:
@@ -69,7 +79,7 @@ def collect(board):
                        pcbnew.ToMM(p.GetSize().y)) / 2
             items.append(Item("pad", layer,
                               (pcbnew.ToMM(pos.x), pcbnew.ToMM(pos.y)), half))
-    for layer in (F, B):
+    for layer in copper_layers(board):
         for poly in fragments(board, layer):
             items.append(Item("frag", layer, poly, 0))
     return items
@@ -148,7 +158,7 @@ def connect(name, max_rounds=4):
               % (rnd + 1, len(glist), len(main)))
         if len(glist) == 1:
             break
-        main_frags = {F: [], B: []}
+        main_frags = {l: [] for l in copper_layers(board)}
         for i in main:
             if items[i].kind == "frag":
                 main_frags[items[i].layer].append(items[i].geom)
@@ -167,12 +177,14 @@ def connect(name, max_rounds=4):
                     pts = [(x0 + (x1 - x0) * k / steps,
                             y0 + (y1 - y0) * k / steps)
                            for k in range(steps + 1)]
-                    layers_other = [B, F] if it.layer == F else [F, B]
+                    layers_other = [l for l in copper_layers(board)
+                                    if l != it.layer]
                 else:
                     x, y = it.geom
                     pts = [(x + dx, y + dy)
                            for dx in (-0.3, 0, 0.3) for dy in (-0.3, 0, 0.3)]
-                    layers_other = [B, F] if it.layer in (F, None) else [F]
+                    layers_other = [l for l in copper_layers(board)
+                                    if l != it.layer]
                 for (x, y) in pts:
                     if done:
                         break
@@ -184,8 +196,10 @@ def connect(name, max_rounds=4):
                         if not all((x - hx) ** 2 + (y - hy) ** 2 >= 1.0
                                    for hx, hy in holes):
                             continue
-                        if not (seg_clear(board, F, x, y, x, y, 0.6)
-                                and seg_clear(board, B, x, y, x, y, 0.6)):
+                        # Freiraum auf ALLEN Lagen pruefen - das Via geht
+                        # durch das ganze Board, nicht nur durch F und B.
+                        if not all(seg_clear(board, l, x, y, x, y, 0.6)
+                                   for l in copper_layers(board)):
                             continue
                         v = pcbnew.PCB_VIA(board)
                         v.SetPosition(pcbnew.VECTOR2I(mm(x), mm(y)))
