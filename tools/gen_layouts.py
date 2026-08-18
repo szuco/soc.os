@@ -116,11 +116,34 @@ def mm(v):
     return pcbnew.FromMM(float(v))
 
 
+# Eigene 3D-Modelle des Projekts. KiCad liefert fuer drei Steckverbinder
+# dieses Projekts KEINES mit - ausgerechnet fuer die drei, die das
+# Tiefenbudget bestimmen: Leistungsstecker, USB-C-Buchse und Klinkenbuchse.
+# Ihr Footprint verweist auf eine STEP-Datei, die es in der Bibliothek nicht
+# gibt; sie blieben im 3D-View unsichtbar.
+# mechanical/connector_models.py erzeugt Huellkoerper aus dem F.Fab-Grundriss,
+# hier werden sie eingehaengt.
+PROJ_3D = os.path.join(ROOT, "hardware", "lib", "3dmodels")
+
+
+def _eigenes_modell(fp, name):
+    pfad = os.path.join(PROJ_3D, name + ".step")
+    if not os.path.exists(pfad):
+        return False
+    fp.Models().clear()
+    m = pcbnew.FP_3DMODEL()
+    m.m_Filename = "${KIPRJMOD}/../lib/3dmodels/" + name + ".step"
+    m.m_Show = True
+    fp.Models().push_back(m)
+    return True
+
+
 def load_fp(fpid):
     lib, name = fpid.split(":")
     fp = pcbnew.FootprintLoad(os.path.join(FPDIR, lib + ".pretty"), name)
     if fp is None:
         raise RuntimeError("Footprint %s nicht ladbar" % fpid)
+    _eigenes_modell(fp, name)
     return fp
 
 

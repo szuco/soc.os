@@ -23,13 +23,17 @@ Steckerpads ragen ueber die Boardkante.
 
 import os
 import re
+import shutil
 import subprocess
 import sys
 import zipfile
 
 # ZONE_FILLER stuerzt ohne X-Display ab (KiCad 7, headless) - unter
 # xvfb-run funktioniert er. Ohne DISPLAY starten wir uns selbst neu.
-if not os.environ.get("DISPLAY"):
+# Unter KiCad 7 stuerzte ZONE_FILLER ohne X-Display ab, deshalb startete sich
+# das Skript unter xvfb-run neu. Mit KiCad 10 laeuft er headless durch, und
+# auf macOS gibt es xvfb-run gar nicht. Nur noch versuchen, wenn es da ist.
+if not os.environ.get("DISPLAY") and shutil.which("xvfb-run"):
     os.execvp("xvfb-run", ["xvfb-run", "-a", sys.executable] + sys.argv)
 
 import pcbnew  # noqa: E402
@@ -41,7 +45,10 @@ from route_boards import classify_unrouted                      # noqa: E402
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FAB = os.path.join(ROOT, "hardware", "fab")
 
-LAYERS = ("F.Cu,B.Cu,F.Paste,B.Paste,F.SilkS,B.SilkS,"
+# Seit dem 17.08.2026 sind alle Boards VIERLAGIG - In1 und In2 muessen mit,
+# sonst fehlen dem Fertiger zwei Kupferlagen und er baut stillschweigend
+# etwas anderes, als der Schaltplan sagt.
+LAYERS = ("F.Cu,In1.Cu,In2.Cu,B.Cu,F.Paste,B.Paste,F.SilkS,B.SilkS,"
           "F.Mask,B.Mask,Edge.Cuts")
 
 BOARDS = ("bottom_power_motor", "mid_logic", "top_ui")
