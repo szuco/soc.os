@@ -42,6 +42,15 @@ BOARDS = [
      "r = 26,9 mm liegen — ein Kreis reicht dort nicht hin."),
 ]
 
+# Beschriftung der beiden Ansichten je Board: (F.Cu, B.Cu) - nach Funktion
+# im eingebauten Zustand, nicht nach KiCads Lagennamen. Siehe Kommentar
+# weiter unten bei den Ansichten.
+SEITEN = {
+    "bottom_power_motor": ("Nach hinten, in die Dose", "Zum Mid-Board"),
+    "mid_logic": ("Zum Top-Board", "Zum Bottom-Board"),
+    "top_ui": ("Nach vorn, zur Zentralscheibe", "Zum Mid-Board"),
+}
+
 # Der eine Feldstecker: Molex Micro-Fit 43045-1612, 2x8, stehend.
 FELD = [
     ("1", "24V_IN", "Versorgung", "24 V DC ±10 %"),
@@ -161,6 +170,17 @@ def main():
     else:
         a('<p class="warnung">Stapelbild fehlt — erst '
           '<code>tools/render_all.py</code> laufen lassen.</p>')
+    a('<aside class="offen">')
+    a('<p class="offen-titel">Offen: der Stapelverbinder</p>')
+    a('<p>Alle drei Platinen tragen denselben Footprint einer '
+      '2×20-Buchsenleiste im 1,27-mm-Raster — und drei Buchsen stecken '
+      'nicht ineinander. Der Footprint ist ein Platzhalter für die '
+      'Mechanik. Gesucht ist ein durchsteckbarer Stapelverbinder: ein '
+      'Buchsenkörper mit verlängerten Schwänzen, die in die Buchse '
+      'darunter greifen, Stapelhöhe 10 mm. Dasselbe Teil auf allen drei '
+      'Boards, damit es keine Buchse/Stecker-Zuordnung und keine zweite '
+      'Bestellnummer gibt. Die Teilenummer steht noch aus.</p>')
+    a('</aside>')
     a('</section>')
 
     # Die drei Ebenen
@@ -186,7 +206,14 @@ def main():
         a('</ul>')
         if oben or unten:
             a('<div class="ansichten">')
-            for img, lab in ((oben, "Oberseite"), (unten, "Unterseite")):
+            # NICHT "Oberseite/Unterseite" beschriften. KiCads F.Cu ist nicht
+            # verlaesslich die im Geraet obenliegende Seite: Auf Bottom traegt
+            # F.Cu den Feldstecker und zeigt damit nach HINTEN in die Dose,
+            # waehrend die Stapelbuchsen auf B.Cu nach oben weisen. Wer die
+            # Bilder "Oberseite/Unterseite" nennt, dreht das Board fuer den
+            # Leser um - genau darueber bin ich am 18.08.2026 selbst
+            # gestolpert. Beschriftet wird deshalb nach Funktion.
+            for img, lab in ((oben, SEITEN[n][0]), (unten, SEITEN[n][1])):
                 if img:
                     a('<figure><img src="%s" alt="%s, %s"><figcaption>%s'
                       '</figcaption></figure>' % (img, kurz, lab, lab))
@@ -347,6 +374,13 @@ td{padding:.55rem .8rem .55rem 0; border-bottom:1px solid var(--raster);
   color:var(--matt); white-space:nowrap;}
 .summe td{border-bottom:none; border-top:1px solid var(--linie);
   padding-top:.7rem;}
+
+.offen{border-left:3px solid var(--akzent); padding:.2rem 0 .2rem 1.1rem;
+  display:flex; flex-direction:column; gap:.5rem; max-width:66ch;}
+.offen-titel{font-family:"IBM Plex Sans Condensed",sans-serif; font-weight:600;
+  font-size:.78rem; text-transform:uppercase; letter-spacing:.1em;
+  color:var(--akzent);}
+.offen p:last-child{color:var(--matt); font-size:.95rem;}
 
 .fuss{border-top:1px solid var(--linie); padding-top:1.5rem;
   font-size:.85rem; color:var(--matt);}
