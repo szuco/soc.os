@@ -148,6 +148,19 @@ CLASSES = {
 RING_RI = 25.6      # mm; Kupfer bleibt unter ~25,45 -> Randabstand > 0,5
 RING_RO = 26.4
 
+# Das TOP-Board ist quadratisch, nicht rund. Sein Randkeepout muss deshalb
+# ebenfalls quadratisch sein.
+#
+# Bis zum 18.08.2026 bekam auch Top den Kreisring von r = 25,6 bis 26,4 -
+# ein Mass, das aus den runden Boards mit Ourchmesser 52 stammt. Auf einem
+# 47x47-Quadrat liegt dieser Ring MITTEN AUF DER PLATINE, und die vier
+# Ecktaster sitzen bei r = 26,91, also ausserhalb davon. Der Ring war damit
+# eine geschlossene Sperre zwischen Boardmitte und allen vier Tastern: Die
+# Tastennetze waren nie routbar, egal mit welchem Router, welcher Lagenzahl
+# und welcher Pinbelegung.
+SQ_RI = 23.0        # mm; halbe Kantenlaenge 23,5 minus Randabstand
+SQ_RO = 25.0        # mm; deutlich ausserhalb der Platine
+
 
 def _ring_polygon(a0, a1, step=3.0):
     """Annulus-Sektor von a0 bis a1 Grad (DSN-Koordinaten, Y nach oben)."""
@@ -170,37 +183,63 @@ def _ring_polygon(a0, a1, step=3.0):
     return " ".join("%.1f %.1f" % (x * 1000, y * 1000) for x, y in pts)
 
 
-def _edge_ring(src, slit=None):
-    """Ring-Keepout am Boardrand in den DSN-Structure-Block einfuegen.
+def _square_bars(gap=None):
+    """Vier Balken entlang der Kanten des quadratischen Top-Boards.
+
+    Statt eines Kreisrings, der auf einem Quadrat quer ueber die Platine
+    laeuft. `gap` ist ein x-Intervall, das im unteren Balken (DSN: y negativ)
+    ausgespart bleibt - dort ragt das Pad der Klinkenbuchse absichtlich ueber
+    die Boardkante.
+    """
+    i, o = SQ_RI, SQ_RO
+    bars = []
+    def poly(x0, x1, y0, y1):
+        pts = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+        return " ".join("%.1f %.1f" % (x * 1000, y * 1000) for x, y in pts)
+    bars.append(poly(-o, o, i, o))      # oben
+    bars.append(poly(-o, -i, -o, o))    # links
+    bars.append(poly(i, o, -o, o))      # rechts
+    if gap is None:
+        bars.append(poly(-o, o, -o, -i))
+    else:
+        g0, g1 = gap
+        bars.append(poly(-o, g0, -o, -i))
+        bars.append(poly(g1, o, -o, -i))
+    return bars
+
+
+def _edge_ring(src, slit=None, square=False):
+    """Randkeepout in den DSN-Structure-Block einfuegen.
 
     KiCad exportiert die Kante ohne den Kupfer-Randabstand, und Freerouting
     routet sonst bis fast an die Kante (gemessen: 0,28 mm statt 0,5 mm).
     Ein Boundary-Shrink hat sich als falscher Weg erwiesen: Er sperrt
-    ueberhaengende Steckerpads komplett aus und wuergt die Randkorridore
-    zwischen den Tastern ab. Der Annulus-Keepout laesst Pads und Korridore
-    intakt; `slit` (Winkelpaar) laesst einen Sektor frei - beim Top-Board
-    der USB-C-Stecker bei 270 Grad, dessen Pads ueber die Kante ragen.
-    Zwei ueberlappende Halbringe, weil ein geschlossener Ring kein
-    einfaches Polygon ist.
+    ueberhaengende Steckerpads komplett aus. Der Keepout laesst Pads und
+    Korridore intakt.
+
+    Runde Boards bekommen einen Annulus, das quadratische Top-Board vier
+    Balken entlang seiner Kanten - siehe die Begruendung bei SQ_RI.
     """
-    if slit is None:
-        arcs = [(0.0, 185.0), (180.0, 365.0)]
+    if square:
+        # Aussparung fuer die Klinkenbuchse bei KiCad (-9 / +19); in
+        # DSN-Koordinaten (Y nach oben) liegt sie am unteren Rand.
+        polys = _square_bars(gap=(-14.0, -4.0))
+    elif slit is None:
+        polys = [_ring_polygon(a0, a1) for a0, a1 in ((0.0, 185.0), (180.0, 365.0))]
     else:
         s0, s1 = slit
-        arcs = [(s1, (s0 + 360.0 + s1) / 2.0 + 2.5),
-                ((s0 + 360.0 + s1) / 2.0 - 2.5, s0 + 360.0)]
-    # Alle Kupferlagen aus dem DSN, nicht nur F/B. Bis zum 17.08.2026 stand
-    # hier ("F.Cu", "B.Cu") fest - mit der Umstellung auf vier Lagen routete
-    # Freerouting auf In1/In2 bis an die Kante und erzeugte vier
-    # copper_edge_clearance-Verletzungen, die es auf den Aussenlagen nicht gab.
+        polys = [_ring_polygon(a0, a1) for a0, a1 in
+                 ((s1, (s0 + 360.0 + s1) / 2.0 + 2.5),
+                  ((s0 + 360.0 + s1) / 2.0 - 2.5, s0 + 360.0))]
+
     layers = re.findall(r'\(layer (\S+)\s*\n\s*\(type signal\)', src)
     if not layers:
         layers = ["F.Cu", "B.Cu"]
     blocks = []
-    for i, (a0, a1) in enumerate(arcs):
+    for i, poly in enumerate(polys):
         for layer in layers:
             blocks.append('    (keepout "ring_%d_%s" (polygon %s 0 %s))'
-                          % (i, layer, layer, _ring_polygon(a0, a1)))
+                          % (i, layer, layer, poly))
     m = re.search(r'\(boundary', src)
     depth = 0
     for i in range(m.start(), len(src)):
@@ -213,9 +252,9 @@ def _edge_ring(src, slit=None):
     return src[:i + 1] + "\n" + "\n".join(blocks) + src[i + 1:]
 
 
-def patch_dsn(path, classes, slit=None):
+def patch_dsn(path, classes, slit=None, square=False):
     src = open(path, encoding="utf-8").read()
-    src = _edge_ring(src, slit=slit)
+    src = _edge_ring(src, slit=slit, square=square)
 
     via_std, via_pwr = _via_names(src)
 
@@ -369,8 +408,7 @@ def route(name, passes=None, timeout=None):
     pcbnew.ExportSpecctraDSN(board, dsn)
     # Top: Schlitz im Ring-Keepout am USB-C-Sektor (270 Grad), dessen
     # Pads beabsichtigt ueber die Boardkante ragen
-    patch_dsn(dsn, CLASSES.get(name, {}),
-              slit=(257.0, 283.0) if name == "top_ui" else None)
+    patch_dsn(dsn, CLASSES.get(name, {}), square=(name == "top_ui"))
     print("%-20s DSN exportiert und gepatcht" % name)
 
     if os.path.exists(ses):
