@@ -4,20 +4,40 @@
 
 | Board | Lagen | Kupfer | Begründung |
 |---|---|---|---|
-| BOTTOM | 2 oder 4 | **1 oz genügt** | Summenstrom ≈ 4,1 A im ungünstigsten Fall — seit der Blockierstrommessung vom 17.08.2026, siehe [`11-motor-data.md`](11-motor-data.md). Die vorhandenen breiten Bahnen bleiben, schaden nicht und kosten nichts |
-| MID | 4 empfohlen | 1 oz | ESP32-Routingdichte, durchgehende GND-Referenz |
-| TOP | 2 ausreichend | 1 oz | wenig Strom, geringe Dichte |
+| BOTTOM | **4** | **1 oz genügt** | Summenstrom ≈ 4,1 A im ungünstigsten Fall — seit der Blockierstrommessung vom 17.08.2026, siehe [`11-motor-data.md`](11-motor-data.md). Die vorhandenen breiten Bahnen bleiben, schaden nicht und kosten nichts |
+| MID | **4** | 1 oz | ESP32-Routingdichte |
+| TOP | **4** | 1 oz | wenig Strom, aber zwei dichte Steckverbinder |
 
-Alle drei Boards: **1,0 mm Dicke**, Ø 52,0 mm.
+Alle drei Boards: **1,0 mm Dicke**. Bottom und Mid Ø 52,0 mm, Top 47 × 47 mm.
+
+> **Vier Lagen für alle drei, entschieden am 17.08.2026.** Zweilagig kam der
+> Autorouter nicht durch — nach 200 Passes blieben 75 Signalnetze offen, und
+> Freerouting meldete selbst, es könne „not improve the result much further".
+> Der Umstieg auf vier Lagen hat das entschieden:
+>
+> | | zweilagig | vierlagig |
+> |---|---:|---:|
+> | Mid | 18 offen | **2** |
+> | Bottom | 43 offen | **8** |
+> | Top | 14 offen | 11 |
+>
+> Bei Top half es kaum, weil dort nicht der Platz fehlt, sondern der Zugang zu
+> zwei Steckverbindern — den Befestigungslöchern der USB-C-Buchse und der
+> Innenreihe des 2×20-Stackverbinders im 1,27-mm-Raster.
+>
+> Die Masseflächen liegen auf **allen vier** Lagen und werden nach dem Routing
+> gefüllt; es gibt bewusst keine durchgehende Massefläche auf einer eigenen
+> Lage. Das wäre für die EMV besser, kostet aber eine der vier Routinglagen.
+> Innen volle Padanbindung, außen Wärmefallen für die Durchsteckteile.
 
 Bei 1,0 mm Gesamtdicke und vier Lagen wird der dielektrische Abstand dünn — das ist
 herstellbar, aber der konkrete Stackup ist beim Fertiger zu bestätigen, bevor
 Impedanz- oder Isolationsannahmen darauf aufgebaut werden.
 
-Für das Bottom-Board gilt: 2 oz Kupfer erlaubt bei gleicher Erwärmung deutlich
-schmalere Leiterbahnen als 1 oz, kostet aber Aufpreis und vergrößert die minimalen
-Strukturbreiten. Ob es nötig ist, entscheidet die Leiterbahnstromrechnung nach dem
-Placement — nicht vorab.
+Die 2-oz-Frage für Bottom ist erledigt: Bei 4,1 A Summenstrom im ungünstigsten
+Fall reicht Standardkupfer. 2 oz erlaubte schmalere Bahnen bei gleicher Erwärmung,
+kostet aber Aufpreis und vergrößert die minimalen Strukturbreiten — beides
+unnötig.
 
 ## 2. Leiterbahnauslegung
 
