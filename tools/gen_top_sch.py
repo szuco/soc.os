@@ -115,10 +115,40 @@ def build():
     # Layout traegt 985 Leiterbahnen. Belegung deshalb per Kommentar:
     #     QSPI_CLK -> SCK      QSPI_D0 -> MOSI/SDA     QSPI_D1 -> DC
     #     QSPI_D2, QSPI_D3 -> frei (Reserve am Stack)
-    s.add("J5", "Connector_Generic:Conn_01x10", "ST7789 240x280",
-          "Connector_PinHeader_1.27mm:PinHeader_1x10_P1.27mm_Vertical",
-          MPN="PLATZHALTER - reales Modul mit FPC vermessen, dann Footprint "
-              "und Pinzahl tauschen (Module haben meist 8 Pins)")
+    # DISPLAY: ER-TFT1.69-3 (EastRising/buydisplay), 18.08.2026 gewaehlt.
+    #
+    #   aktive Flaeche   27,97 x 32,63 mm
+    #   sichtbar         28,97 x 33,63 mm
+    #   Aussenmass       30,07 x 37,43 x 1,6 mm (FPC gefaltet)
+    #   Treiber          ST7789V, 4-Draht-SPI
+    #   Anschluss        12-polige FPC, STECKBAR (Variante -3; die -1 hat
+    #                    eine Fahne zum Anloeten)
+    #
+    # QUER EINGEBAUT. Die aktive Flaeche misst dann 32,63 x 27,97 gegen ein
+    # Fenster von 32,70 x 27,00: In der Breite bleiben 0,07 mm Luft, in der
+    # Hoehe verdeckt die Zentralscheibe oben und unten je 0,49 mm - rund
+    # 8 Pixel je Seite. Bewusst in Kauf genommen (Entscheidung 18.08.2026);
+    # die Firmware darf in den obersten und untersten acht Zeilen nichts
+    # Wichtiges zeichnen.
+    #
+    # ZWEI ZAHLEN FEHLEN NOCH, beide nur aus dem Datenblatt zu holen:
+    # buydisplay.com/download/manual/ER-TFT1.69-3_Datasheet.pdf - im Browser
+    # oeffnen, automatische Downloads blockt der Anbieter mit HTTP 403.
+    #
+    #   1. DAS RASTER DER FAHNE. Die Loetvariante ist mit 0,7 mm angegeben.
+    #      KiCad bringt fuer 0,7 mm KEIN einziges FPC-Footprint mit - nur 0,5
+    #      und 1,0. Ist es wirklich 0,7, muss eines in die Projektbibliothek
+    #      gezeichnet werden. Bis dahin steht hier ein 0,5-mm-Footprint mit
+    #      der richtigen Polzahl.
+    #   2. DIE PINBELEGUNG. Zwoelf Pole sind gesichert, welches Signal auf
+    #      welchem liegt nicht. Die Zuordnung unten ist die des bisherigen
+    #      Platzhalters und mit hoher Wahrscheinlichkeit FALSCH.
+    #
+    # Solange beides offen ist, darf dieses Board NICHT bestellt werden.
+    s.add("J5", "Connector_Generic:Conn_01x12", "ER-TFT1.69-3",
+          "Connector_FFC-FPC:TE_1-1734839-2_1x12-1MP_P0.5mm_Horizontal",
+          MPN="Panel ER-TFT1.69-3, 12-pol FPC steckbar. RASTER UND "
+              "PINBELEGUNG VOR DER BESTELLUNG AUS DEM DATENBLATT PRUEFEN")
     s.connect("3V3_SYS",  ("J5", "1"))
     s.connect("PGND",     ("J5", "2"))
     s.connect("QSPI_CLK", ("J5", "3"))    # SCK
@@ -129,6 +159,10 @@ def build():
     s.connect("DISP_CS",  ("J5", "8"))
     s.connect("DISP_RST", ("J5", "9"))
     s.connect("DISP_BL",  ("J5", "10"))
+    # 11 und 12 sind bei zwoelfpoligen Panels ueblicherweise Hintergrund-
+    # licht-Kathode und ein zweiter Massepin - bis zum Datenblatt eine
+    # Annahme, deshalb im Kommentar und nicht als stille Verdrahtung.
+    s.connect("PGND",     ("J5", "11"), ("J5", "12"))
 
     # =====================================================================
     # 5. Stern-Ausgang: High-Side-P-FET, geschaltet ueber STAR_EN

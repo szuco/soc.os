@@ -6,7 +6,7 @@ herkommt** und **was davon abhängt**.
 
 | Teil | Stand | fehlt |
 |---|---|---|
-| **Display** | ⛔ kein Bauteil gewählt | alles — Typ, Maße, Footprint |
+| **Display** | 🟡 **ER-TFT1.69-3** gewählt | Raster der Fahne, Pinbelegung |
 | **Klinkenbuchse** | 🟡 Footprint steht | Datenblatt, 3D-Modell |
 | **USB-C** | 🟡 Footprint steht | Datenblatt, 3D-Modell |
 | **Feldstecker** | ✅ Typ steht | 3D-Modell vom Hersteller |
@@ -29,7 +29,44 @@ das Modul wäre einen Millimeter breiter als die Platine. **Scheidet aus.**
 FPC-Buchse gesteckt oder direkt angelötet. **Das ist die Bauform, die wir
 brauchen**, und sie passt auch zum vorgesehenen Anschluss.
 
-### Konkrete Kandidaten
+### Gewählt am 18.08.2026: ER-TFT1.69-3
+
+| | |
+|---|---|
+| aktive Fläche | **27,97 × 32,63 mm** |
+| sichtbare Fläche | 28,97 × 33,63 mm |
+| Außenmaß (FPC gefaltet) | **30,07 × 37,43 × 1,6 mm** |
+| Treiber | ST7789V, 4-Draht-SPI |
+| Anschluss | **12-polige FPC, steckbar** |
+
+Quer eingebaut misst die aktive Fläche 32,63 × 27,97 gegen ein Fenster von
+32,70 × 27,00: **0,07 mm Luft in der Breite**, und in der Höhe verdeckt die
+Scheibe oben und unten je 0,49 mm, also **rund acht Pixel je Seite**. Bewusst
+in Kauf genommen — die Firmware darf in diesen Zeilen nichts Wichtiges
+zeichnen.
+
+Auf dem Top-Board: Dicke 1,6 mm gegen 2,0 mm Budget passt; in y reicht das
+Panel bis ±15,04 und bleibt damit frei von den Ecktastern bei 18,27…21,73. In
+x reicht es bis ±18,71 und liegt damit **neben** den Tastern — rund 1,5 mm
+diagonaler Abstand. Am realen Teil ansehen.
+
+### Was noch fehlt
+
+Beides steht nur im Datenblatt
+(`buydisplay.com/download/manual/ER-TFT1.69-3_Datasheet.pdf`, im Browser
+öffnen — automatische Downloads liefern HTTP 403):
+
+1. **Das Raster der Fahne.** Die Lötvariante ist mit 0,7 mm angegeben. KiCad
+   bringt für 0,7 mm **kein einziges** FPC-Footprint mit, nur 0,5 und 1,0.
+   Ist es wirklich 0,7, muss eines in die Projektbibliothek gezeichnet
+   werden. Im Schaltplan steht solange ein 0,5-mm-Footprint mit der richtigen
+   Polzahl.
+2. **Die Pinbelegung.** Zwölf Pole sind gesichert, welches Signal auf welchem
+   liegt nicht.
+
+Solange beides offen ist, darf das Top-Board **nicht** bestellt werden.
+
+### Frühere Kandidaten
 
 | Quelle | Typ | Anschluss |
 |---|---|---|
