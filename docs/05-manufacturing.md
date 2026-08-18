@@ -15,15 +15,24 @@ Alle drei Boards: **1,0 mm Dicke**. Bottom und Mid Ø 52,0 mm, Top 47 × 47 mm.
 > Freerouting meldete selbst, es könne „not improve the result much further".
 > Der Umstieg auf vier Lagen hat das entschieden:
 >
-> | | zweilagig | vierlagig |
-> |---|---:|---:|
-> | Mid | 18 offen | **2** |
-> | Bottom | 43 offen | **8** |
-> | Top | 14 offen | 11 |
+> | | zweilagig | vierlagig | Endstand |
+> |---|---:|---:|---:|
+> | Mid | 18 offen | **2** | 9 |
+> | Bottom | 43 offen | **8** | **4** |
+> | Top | 14 offen | 11 | **3** |
 >
-> Bei Top half es kaum, weil dort nicht der Platz fehlt, sondern der Zugang zu
-> zwei Steckverbindern — den Befestigungslöchern der USB-C-Buchse und der
-> Innenreihe des 2×20-Stackverbinders im 1,27-mm-Raster.
+> **Bei Top half die Lagenzahl nichts — und der Grund war ein Fehler im
+> Werkzeug.** `route_boards.py` legt dem Router einen Keepout an den Boardrand,
+> weil KiCads Specctra-Export den Kupfer-Randabstand nicht mitgibt. Dieser
+> Keepout war ein **Kreisring von r = 25,6 bis 26,4** — richtig für die runden
+> Boards mit Ø 52, aber auf dem quadratischen Top-Board lag er quer über die
+> Platine, und dessen vier Ecktaster sitzen bei r = 26,91, also außerhalb.
+> Alle vier Tastennetze waren damit unroutbar, unabhängig von Lagenzahl,
+> Routerversion und Pinbelegung. Seit der Keepout der Boardform folgt, fällt
+> Top von 11 auf 3 offene Netze.
+>
+> Für Mid und Bottom haben die vier Lagen dagegen eigenständig gewirkt — sie
+> sind rund, der Ring lag bei ihnen richtig.
 >
 > Die Masseflächen liegen auf **allen vier** Lagen und werden nach dem Routing
 > gefüllt; es gibt bewusst keine durchgehende Massefläche auf einer eigenen

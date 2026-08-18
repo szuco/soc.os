@@ -9,7 +9,19 @@
 - Motor-Hochströme werden **nicht** über die Stackverbinder geführt. Sie bleiben
   vollständig auf dem Bottom-Board.
 - Stackverbinder führen ausschließlich Kleinleistung und Signale.
-- **Regeländerung v0.3:** USB `D+`/`D−` laufen **doch** durch den Stack
+- **Regeländerung v0.5 (18.08.2026):** Die vier Tastennetze liegen jetzt auf der
+  **Außenreihe** des Verbinders, der ihrer Ecke am nächsten ist — `BTN1` auf
+  `B1`, `BTN2` auf `A2`, `BTN3` auf `A40`, `BTN4` auf `B39`. Vorher lagen alle
+  vier auf `B26…B29`, also auf vier benachbarten Kontakten der **Innen**reihe
+  des **rechten** Verbinders, während ihre Taster in allen vier Ecken des
+  Top-Boards sitzen — zwei davon links. `I2C_SCL`/`SDA` wanderten aus
+  demselben Grund von `B6`/`B8` nach `B5`/`B7`.
+- **Regeländerung v0.4/v0.5:** USB `D+`/`D−` laufen **nicht mehr** durch den
+  Stack. Die USB-C-Buchse sitzt seit dem 18.08.2026 auf dem Mid-Board, wo auch
+  der ESP32-S3 steht; `A34`/`A36` sind frei (`RSV_A3`/`RSV_A5`). Grund war die
+  Bauhöhe: Über dem Top-Board sind bis zur Zentralscheibe 3,5 mm frei, eine
+  stehende USB-C-Buchse baut 7 bis 9,25 mm. `USB_VBUS` bleibt auf `A18`.
+- **Frühere Regeländerung v0.3:** USB `D+`/`D−` liefen **doch** durch den Stack
   (`J_STK_A` 34/36, benachbart, PGND daneben). Die alte Regel stammte aus der Zeit
   mit USB-UART-Baustein auf dem Top-Board; mit dem nativen USB des ESP32-S3 auf dem
   Mid-Board gibt es keine Alternative — und Full-Speed-USB (12 MHz) über zwei
@@ -56,7 +68,7 @@ nebeneinander. Pin 1 auf allen drei Boards gleich orientiert.
 
 | Pin | Signal | Pin | Signal |
 |---:|---|---:|---|
-| 1 | `PGND` | 2 | `PGND` |
+| 1 | `PGND` | 2 | `BTN2` |
 | 3 | `5V_SYS` | 4 | `5V_SYS` |
 | 5 | `5V_SYS` | 6 | `5V_SYS` |
 | 7 | `PGND` | 8 | `PGND` |
@@ -72,10 +84,10 @@ nebeneinander. Pin 1 auf allen drei Boards gleich orientiert.
 | 27 | `AGND` | 28 | `I_SENSE2` |
 | 29 | `AGND` | 30 | `HW_TRIP1` |
 | 31 | `HW_TRIP2` | 32 | `TRIP_RST` |
-| 33 | `RELAY_CTL` | 34 | `USB_DP` |
-| 35 | `RSV_A4` | 36 | `USB_DN` |
+| 33 | `RELAY_CTL` | 34 | `RSV_A3` |
+| 35 | `RSV_A4` | 36 | `RSV_A5` |
 | 37 | `RSV_A6` | 38 | `PGND` |
-| 39 | `PGND` | 40 | `PGND` |
+| 39 | `PGND` | 40 | `BTN3` |
 
 Änderungen gegenüber v0.1:
 
@@ -92,10 +104,10 @@ auf dem Mid-Board zusammengelegt (Standard-Halbduplex, ein GPIO).
 
 | Pin | Signal | Pin | Signal |
 |---:|---|---:|---|
-| 1 | `PGND` | 2 | `PGND` |
+| 1 | `BTN1` | 2 | `PGND` |
 | 3 | `3V3_SYS` | 4 | `3V3_SYS` |
-| 5 | `PGND` | 6 | `I2C_SCL` |
-| 7 | `PGND` | 8 | `I2C_SDA` |
+| 5 | `I2C_SCL` | 6 | `PGND` |
+| 7 | `I2C_SDA` | 8 | `PGND` |
 | 9 | `PGND` | 10 | `I2C_INT` |
 | 11 | `PGND` | 12 | `UART485_TX` |
 | 13 | `PGND` | 14 | `UART485_RX` |
@@ -104,14 +116,14 @@ auf dem Mid-Board zusammengelegt (Standard-Halbduplex, ein GPIO).
 | 19 | `PGND` | 20 | `UART_AUX_RX` |
 | 21 | `PRESENCE_INT` | 22 | `PGND` |
 | 23 | `AUDIO_PWM` | 24 | `QSPI_CLK` |
-| 25 | `PGND` | 26 | `BTN1` |
-| 27 | `BTN2` | 28 | `BTN3` |
-| 29 | `BTN4` | 30 | `PGND` |
+| 25 | `PGND` | 26 | `PGND` |
+| 27 | `PGND` | 28 | `PGND` |
+| 29 | `PGND` | 30 | `PGND` |
 | 31 | `QSPI_D0` | 32 | `QSPI_D1` |
 | 33 | `PGND` | 34 | `QSPI_D2` |
 | 35 | `QSPI_D3` | 36 | `DISP_CS` |
 | 37 | `DISP_RST` | 38 | `DISP_BL` |
-| 39 | `PGND` | 40 | `PGND` |
+| 39 | `BTN4` | 40 | `PGND` |
 
 - `QSPI_CLK` und `QSPI_D0–D3` laufen mit 40 MHz. Sie liegen bewusst gebündelt und
   bekommen im Layout gleiche Länge und durchgehende Massereferenz.
@@ -162,4 +174,6 @@ Treiber, ein Bauteil statt zwei.
 |---|---|
 | 0.1 | Erster ausgearbeiteter Vorschlag aus der Projektzusammenfassung |
 | **0.2** | **Aus dem Bottom-Schaltplan erzeugt.** `INA`/`INB` statt `PWM`/`DIR`, QSPI-Bus für das Display, `USB_VBUS` ergänzt |
+| **0.5** | **Tasten und I2C auf die Außenreihe**, Tasten auf beide Verbinder verteilt. Anlass: Auf Top blieben mit drei verschiedenen Anläufen dieselben elf Netze offen |
+| **0.4** | USB-C wandert auf das Mid-Board (Bauhöhe), `USB_DP`/`USB_DN` verlassen den Stack |
 | **0.3** | **Gemeinsame Quelle `tools/stack_pinout.py`** für alle drei Boards. `USB_DP`/`USB_DN` durch den Stack (nativer USB), `STAR_EN` neu (Sternstecker sitzt auf TOP, der frühere J4 auf Bottom war ein Fehler), `RS485_DE`+`RE` → `RS485_DIR` |

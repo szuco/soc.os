@@ -290,6 +290,31 @@ Von der Sichtfläche der Zentralscheibe nach hinten gezählt:
 | 4,5 … 5,5 | **Top-Leiterplatte** |
 | 7,5 | Rastebene und hinterer Rand der Scheibe (F2) |
 
+> **Und eine dritte, am 18.08.2026 dazugekommen: die USB-C-Buchse passt hier
+> nicht.** Zwischen Platinenvorderseite (4,5) und Sichtfläche liegen 4,5 mm,
+> davon gehören 1,0 mm der Scheibe selbst und 1,5 mm ihren Druckkreuzen —
+> nutzbar sind rund **3,5 mm**. Eine stehende USB-C-Buchse baut 7 bis 9,25 mm
+> (GCT USB4115: H = 9,25 mm laut Datenblatt); keine Bauform liegt unter 7 mm.
+> Sie hätte die Zentralscheibe durchstoßen, und liegend hätte sie radial nach
+> außen gegen die Adapterwand gezeigt.
+>
+> Die Buchse steht deshalb jetzt auf dem **Mid-Board** bei (3,5 / 20,3) und
+> greift durch eine **offene Randkerbe** des Top-Boards nach vorn. Zwischen
+> Mids und Tops Oberseite liegen 10,0 mm — dort passt sie bequem. Gesteckt
+> wird weiterhin frontal, sobald die Zentralscheibe ab ist.
+>
+> Die Kerbe misst 11,0 mm in der Breite und reicht von y = 16,8 bis zur
+> Boardkante bei 23,5. Offen statt geschlossen, weil ein Fenster einen Steg
+> von einem halben Millimeter stehen ließe — der bricht beim Nutzentrennen.
+> Der Buchsenkörper liegt mit −0,65…7,65 / 18,15…22,45 vollständig darin, mit
+> 3,3 mm Abstand zum Displayfenster, 4 mm zur Klinkenbuchse und 9 mm zum
+> Ecktaster.
+>
+> Der Adapter musste mitziehen: Seine zentrale Durchführung endete bei 21,5
+> und ist an dieser Stelle bis 24,0 verlängert. Damit ist er **nicht mehr
+> punktsymmetrisch** — die Freistellung liegt auf der 6-Uhr-Seite, dieselbe
+> Richtung wie Kerbe und Klinkenbuchse.
+
 Zwei Folgerungen, die nicht verhandelbar sind:
 
 **Die Rastebene liegt hinter der Leiterplatte.** Der Schnapprand des Adapters

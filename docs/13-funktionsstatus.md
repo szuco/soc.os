@@ -16,7 +16,7 @@ Legende: ✅ fertig und geprüft · 🟡 begonnen, Rest benannt · ⛔ nicht vor
 | **Spezifikation** | ✅ vollständig — 13 Dokumente, alle Entscheidungen entweder getroffen oder als Punkt 1–52 offen benannt |
 | **Mechanik** | ✅ Boards generiert; Front = BJ-Zentralscheibe 6435-914, **Adapter erzeugt und selbstgeprüft**; 🔒 offen ist die Bauhöhe des realen Displaymoduls |
 | **Schaltpläne** | ✅ alle drei Boards erzeugt und netzlistengeprüft; ⛔ **keine Schaltungsreview gegen Datenblätter** |
-| **Layouts** | 🟡 alle drei **vierlagig** geroutet — 1376 / 637 / 193 Segmente. **Mid ist fertig: null Kupferfehler.** Bottom zwei Haarrisse im Abstand (0,148 und 0,102 statt 0,15 mm), Top zwei Randfälle. Offene Signalnetze: 8 / 2 / 11, dazu Masse-Inseln 30 / 13 / 4 |
+| **Layouts** | 🟡 alle drei **vierlagig** geroutet — 1430 / 641 / 175 Segmente. Offene Signalnetze **4 / 9 / 3**, von ursprünglich 43 / 18 / 14. Mid ohne Kupferfehler; Bottom ein Haarriss im Abstand, Top der dokumentierte Überhang der Klinkenbuchse |
 | **Fertigungsdaten** | ⛔ **keine** — der frühere Top-Export war überholt und ist gelöscht; der Nutzen ist als Boarddatei erzeugt |
 | **Firmware** | 🟡 **fertig übersetzt** (RAM 35 %, Flash 56 %), mit Menü und einstellbaren Fahrzeiten — aber **ohne Lasterkennung und ohne RS-485-Protokoll** |
 | **Bestellt / gebaut** | ⛔ nichts — kein Board gefertigt, kein Motor vermessen |
@@ -32,10 +32,10 @@ Soft-Limit und der einzige noch offene Leistungshalbleiter provisorisch.
 
 | Board | Schaltplan | Layout / Routing | Fertigungsdaten |
 |---|---|---|---|
-| **BOTTOM** `bottom_power_motor` | ✅ 102 Bauteile, 104 Netze, Netzlistenvergleich bestanden | 🟡 **vierlagig, 1376 Segmente, 161 Vias**; 8 Signale offen (Gate- und Schaltknoten von M2, `24V_PROT`), 30 Masse-Inseln, 2 Abstands-Haarrisse | ⛔ wartet auf das Rest-Routing |
-| **MID** `mid_logic` | ✅ 46 Bauteile, 61 Netze | ✅ **vierlagig, 637 Segmente, 75 Vias, null Kupferfehler**; offen nur `3V3_SYS` und `RS485_DIR` plus 13 Masse-Inseln | 🟡 nahezu bestellbar |
-| **TOP** `top_ui` | ✅ 27 Bauteile, 53 Netze | 🟡 **vierlagig, 193 Segmente, 19 Vias**; 11 Signale offen — 8 davon am USB-Stecker, 3 an der Innenreihe von J3 | ⛔ wartet auf den Steckverbindertausch |
-| **Nutzen** `fab/panel` | — (Build-Ergebnis) | 🟡 **173,4 × 64,4 mm**, zwei Kreise + ein Quadrat — **neu zu erzeugen**, seit die Boards vierlagig sind | 🟡 bestellbar, sobald geroutet |
+| **BOTTOM** `bottom_power_motor` | ✅ 102 Bauteile, 104 Netze, Netzlistenvergleich bestanden | 🟡 **vierlagig, 1430 Segmente, 137 Vias**; 4 Signale offen (`24V_F`, `24V_PROT` ×2, `M1A_HO_G`), 26 Masse-Inseln, 1 Abstands-Haarriss | ⛔ wartet auf das Rest-Routing |
+| **MID** `mid_logic` | ✅ 50 Bauteile, 67 Netze — jetzt mit USB-C, ESD-Diode und CC-Widerständen | 🟡 **vierlagig, 641 Segmente, 68 Vias, null Kupferfehler**; 9 Signale offen, 12 Masse-Inseln | 🟡 nahezu bestellbar |
+| **TOP** `top_ui` | ✅ 21 Bauteile, 49 Netze — kein USB mehr, dafür eine Randkerbe | 🟡 **vierlagig, 175 Segmente, 15 Vias**; nur noch 3 Signale offen (`3V3_SYS`, `I2C_SCL`, `I2C_SDA`), 1 Masse-Insel | 🟡 nahezu bestellbar |
+| **Nutzen** `fab/panel` | — (Build-Ergebnis) | ✅ **vierlagig, 173,4 × 64,4 mm**, deckungsgleich mit der Summe der Einzelboards (55 offene Verbindungen = 4 + 21 + 30) | 🟡 bestellbar, sobald geroutet |
 
 Die 43 offenen Verbindungen auf Bottom sind **kein Rückstand des Autorouters**,
 sondern Absicht: [`05-manufacturing.md`](05-manufacturing.md) Abschnitt 3 verlangt
