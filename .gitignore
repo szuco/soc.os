@@ -41,3 +41,9 @@ __pycache__/
 
 # Freerouting-Laufzeitlog (wird beim Routing im CWD angelegt)
 logs/
+
+# Bauergebnisse der 3D-Baugruppe: aus den Boards und adapter.py jederzeit neu
+# erzeugbar (mechanical/stack.py), zusammen aber ueber 70 MB - das gehoert
+# nicht in die Versionsgeschichte.
+mechanical/export/stack/*.step
+mechanical/export/switchstack_stack.step
