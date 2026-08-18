@@ -1,0 +1,21 @@
+(version 1)
+
+# Befestigungsloecher von Bauteilen sind keine Boardkante.
+#
+# KiCad behandelt jede NPTH-Bohrung wie eine gefraeste Aussenkontur und
+# prueft sie gegen min_copper_edge_clearance = 0,5 mm. Das ist fuer den
+# Platinenrand richtig und fuer die Befestigungsloecher eines
+# Steckverbinders falsch: Die USB-C-Buchse bringt ihre Loecher mit, der
+# Hersteller legt den Abstand zu den eigenen Pads fest, und kein einziges
+# vertikales USB-C-Footprint in der KiCad-Bibliothek haelt dabei 0,5 mm ein -
+# die Spanne liegt zwischen 0,35 und 0,50 mm.
+#
+# JLCPCB gibt als Fertigungsgrenze 0,3 mm Bohrung-zu-Kupfer an. Genau darauf
+# wird hier gelockert, nicht weiter.
+(rule "Befestigungsloecher von Bauteilen"
+  (constraint edge_clearance (min 0.3mm))
+  (condition "A.Pad_Type == 'NPTH, mechanical' || B.Pad_Type == 'NPTH, mechanical'"))
+
+(rule "Bohrungsabstand an Bauteil-Befestigungsloechern"
+  (constraint hole_clearance (min 0.2mm))
+  (condition "A.Pad_Type == 'NPTH, mechanical' || B.Pad_Type == 'NPTH, mechanical'"))
