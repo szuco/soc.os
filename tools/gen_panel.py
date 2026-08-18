@@ -32,6 +32,7 @@ import copy
 import json
 import math
 import os
+import shutil
 import subprocess
 import sys
 
@@ -422,6 +423,11 @@ def main():
     h = 2 * (max(halfs) + RAIL)
 
     panel = pcbnew.BOARD()
+    # Vier Lagen wie die Quellboards. Ohne das landen alle Bahnen auf In1/In2
+    # auf einer abgeschalteten Lage - der Nutzen meldete 199 mal
+    # item_on_disabled_layer und 152 haengende Vias, obwohl die Einzelboards
+    # sauber waren.
+    panel.SetCopperLayerCount(4)
     cache = {}
     total = {"fp": 0, "track": 0, "zone": 0, "draw": 0}
     for (path, rp, np_), (dx, dy) in zip(SOURCES, centers):
@@ -439,6 +445,13 @@ def main():
     os.makedirs(os.path.dirname(OUT), exist_ok=True)
     panel.Save(OUT)
     names = write_project(OUT.replace(".kicad_pcb", ".kicad_pro"))
+    # Die eigenen DRC-Regeln der Einzelprojekte gelten auch fuer den Nutzen -
+    # sonst prueft er die Befestigungsloecher der Steckverbinder wieder gegen
+    # die 0,5-mm-Kantenregel und meldet Dutzende Scheinverletzungen.
+    dru_src = os.path.join(ROOT, "hardware", "top_ui", "top_ui.kicad_dru")
+    if os.path.exists(dru_src):
+        shutil.copyfile(dru_src, OUT.replace(".kicad_pcb", ".kicad_dru"))
+        print("DRC-Regeln  : aus top_ui uebernommen")
     print("Nutzen       : %s" % os.path.relpath(OUT, ROOT))
     print("Netzklassen  : %s" % ", ".join(names))
     print("Groesse      : %.1f x %.1f mm = %.0f cm2" % (w, h, w * h / 100))

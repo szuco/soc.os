@@ -105,6 +105,22 @@ PARAMS = dict(
     # Muss die beiden Stackverbinder durchlassen: sie stehen bei x = +/-14,2,
     # sind 4,1 breit und 26,4 lang -> bis (16,25 / 13,2).
     bore_sq           = 43.0,
+
+    # --- Freistellung fuer die USB-C-Buchse, 18.08.2026 -------------------
+    # Die Buchse steht seit heute auf dem MID-Board und greift durch eine
+    # Randkerbe des Top-Boards nach vorn. Ihr Koerper reicht in KiCad-
+    # Koordinaten bis (7,65 / 22,45) - die zentrale Durchfuehrung endet aber
+    # schon bei 21,5. Ohne diese Freistellung stiesse die Buchse gegen den
+    # Auflagesteg des Adapters.
+    #
+    # ORIENTIERUNG: y waechst hier wie in KiCad nach UNTEN, also zur
+    # 6-Uhr-Seite - dort sitzen Klinkenbuchse, USB-Kerbe und diese
+    # Freistellung. Der Adapter ist dadurch nicht mehr punktsymmetrisch und
+    # kann nur in einer Lage montiert werden; die Kerbe des Top-Boards zeigt
+    # dieselbe Richtung und macht es beim Zusammenbau sichtbar.
+    usb_relief_x0     = -1.2,   # Koerper -0,65 minus Spiel
+    usb_relief_x1     = 8.2,    # Koerper  7,65 plus Spiel
+    usb_relief_y      = 24.0,   # bis hinter die Boardkante (23,5)
 )
 
 
@@ -160,6 +176,16 @@ def build_adapter(p=PARAMS):
             fillet(s.vertices(), 2.0)
         extrude(amount=z["total"], mode=Mode.SUBTRACT)
 
+        # -- Freistellung fuer die USB-C-Buchse ----------------------------
+        # Verlaengert die zentrale Durchfuehrung an einer Stelle bis hinter
+        # die Boardkante, damit der Buchsenkoerper vom Mid-Board hindurchgreift.
+        with BuildSketch(Plane.XY) as u:
+            with Locations(((p["usb_relief_x0"] + p["usb_relief_x1"]) / 2.0,
+                            (p["bore_sq"] / 2.0 + p["usb_relief_y"]) / 2.0)):
+                Rectangle(p["usb_relief_x1"] - p["usb_relief_x0"],
+                          p["usb_relief_y"] - p["bore_sq"] / 2.0)
+        extrude(amount=z["total"], mode=Mode.SUBTRACT)
+
         # -- Schraubschlitze auf 60 mm --------------------------------------
         for sx in (p["screw_pitch"] / 2, -p["screw_pitch"] / 2):
             with BuildSketch(Plane.XY):
@@ -198,6 +224,20 @@ def check_adapter(part, p=PARAMS):
                     "gefordert sind %.1f"
                     % (p["bore_sq"], (p["pcb_sq"] - p["bore_sq"]) / 2,
                        p["seat_w"]))
+    # Die USB-Freistellung muss den Buchsenkoerper aufnehmen (Koerper laut
+    # KiCad-Footprint -0,65..7,65 in x, bis 22,45 in y) und darf der Platine
+    # nicht zu viel Auflage nehmen.
+    if not (p["usb_relief_x0"] <= -0.65 and p["usb_relief_x1"] >= 7.65):
+        errs.append("USB-Freistellung %.1f..%.1f deckt den Buchsenkoerper "
+                    "-0,65..7,65 nicht ab"
+                    % (p["usb_relief_x0"], p["usb_relief_x1"]))
+    if p["usb_relief_y"] < 22.45:
+        errs.append("USB-Freistellung reicht nur bis %.1f, der Buchsenkoerper "
+                    "bis 22,45" % p["usb_relief_y"])
+    breite = p["usb_relief_x1"] - p["usb_relief_x0"]
+    if breite > p["pcb_sq"] * 0.3:
+        errs.append("USB-Freistellung %.1f mm nimmt mehr als 30 %% der "
+                    "Auflagekante (%.1f mm)" % (breite, p["pcb_sq"]))
     if p["frame_grip"] <= rim_out:
         errs.append("Flansch %.1f ist nicht breiter als der Schnapprand"
                     % p["frame_grip"])
