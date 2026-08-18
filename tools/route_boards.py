@@ -52,7 +52,7 @@ JAR = os.environ.get("FREEROUTING_JAR", "")
 # Freerouting braucht ein X-Display. Unter Linux loest das xvfb-run, auf macOS
 # gibt es kein Xvfb - dort uebernimmt ein Container. Beide Wege rufen dasselbe
 # Jar mit denselben Argumenten auf; der Unterschied ist nur die Huelle.
-DOCKER_IMAGE = os.environ.get("FREEROUTING_IMAGE", "switchstack-freerouting")
+DOCKER_IMAGE = os.environ.get("SWITCHSTACK_FR_IMAGE", "switchstack-freerouting")
 
 
 def freerouting_cmd(dsn, ses, passes):
