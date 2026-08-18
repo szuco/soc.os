@@ -456,7 +456,17 @@ class BoardBuilder:
                     a = 2 * math.pi * k / n
                     o.Append(mm((BOARD_R - 0.6) * math.cos(a)),
                              mm((BOARD_R - 0.6) * math.sin(a)))
-            zone.SetPadConnection(pcbnew.ZONE_CONNECTION_THERMAL)
+            # Waermefallen nur aussen, innen volle Anbindung.
+            #
+            # Auf den Innenlagen ist die Flaeche durch die Leiterbahnen
+            # zerschnitten; ein Pad bekommt dort haeufig nur noch einen Steg
+            # statt der geforderten zwei, und KiCad meldet starved_thermal -
+            # am 17.08.2026 dreissigmal allein auf Bottom. Waermefallen
+            # existieren fuers Handloeten, und innen wird nicht geloetet.
+            # Aussen bleiben sie, weil die Durchsteckteile von Hand kommen.
+            zone.SetPadConnection(pcbnew.ZONE_CONNECTION_FULL
+                                  if layer in (pcbnew.In1_Cu, pcbnew.In2_Cu)
+                                  else pcbnew.ZONE_CONNECTION_THERMAL)
             zone.SetLocalClearance(mm(0.3))
             zone.SetMinThickness(mm(0.25))
             self.board.Add(zone)
