@@ -531,6 +531,38 @@ class BoardBuilder:
 
     def save(self, path):
         pcbnew.SaveBoard(path, self.board)
+        self._write_project(path)
+
+    @staticmethod
+    def _write_project(pcb_path):
+        """Regelwerk in die .kicad_pro schreiben.
+
+        pcbnew.SaveBoard legt die Projektdatei mit KiCads Vorgaben an bzw.
+        setzt sie zurueck - am 18.08.2026 hat das die Regeln stillschweigend
+        auf 0,2 mm Abstand und zwei Waermefallenstege zurueckgedreht, obwohl
+        beide bewusst anders entschieden waren. Deshalb werden sie hier nach
+        jedem Speichern wieder gesetzt.
+
+        clearance 0,15 mm  - der in docs/05 festgelegte Wert; KiCads Vorgabe
+                             von 0,2 erzeugte 41 Scheinverletzungen.
+        min_resolved_spokes 1 - auf einer durch Leiterbahnen zerschnittenen
+                             Flaeche passt oft kein zweiter Steg mehr. Zwei
+                             sind eine Empfehlung fuer gleichmaessiges
+                             Erwaermen, kein elektrisches Erfordernis.
+        """
+        pro = pcb_path.replace(".kicad_pcb", ".kicad_pro")
+        if not os.path.exists(pro):
+            return
+        with open(pro, encoding="utf-8") as f:
+            d = json.load(f)
+        for c in d.get("net_settings", {}).get("classes", []):
+            if c.get("name") == "Default":
+                c["clearance"] = 0.15
+        rules = d.setdefault("board", {}).setdefault(
+            "design_settings", {}).setdefault("rules", {})
+        rules["min_resolved_spokes"] = 1
+        with open(pro, "w", encoding="utf-8") as f:
+            json.dump(d, f, indent=2)
 
 
 def build_board(name, module, fixed, auto_sides=("F", "B"),
