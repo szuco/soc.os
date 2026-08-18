@@ -37,6 +37,7 @@ R0603 = "Resistor_SMD:R_0603_1608Metric"
 C0603 = "Capacitor_SMD:C_0603_1608Metric"
 
 NC_ALLOWED = {
+    ("J5", "1"),    # TE des Displays - wir werten ihn nicht aus
     ("J6", "TN"),                    # Schaltkontakt der Klinke, absichtlich offen
     ("U3", "8"),                     # VL53L1X DNC - laut Datenblatt offen lassen
 }
@@ -147,22 +148,53 @@ def build():
     # Solange beides offen ist, darf dieses Board NICHT bestellt werden.
     s.add("J5", "Connector_Generic:Conn_01x12", "ER-TFT1.69-3",
           "Connector_FFC-FPC:TE_1-1734839-2_1x12-1MP_P0.5mm_Horizontal",
-          MPN="Panel ER-TFT1.69-3, 12-pol FPC steckbar. RASTER UND "
-              "PINBELEGUNG VOR DER BESTELLUNG AUS DEM DATENBLATT PRUEFEN")
-    s.connect("3V3_SYS",  ("J5", "1"))
-    s.connect("PGND",     ("J5", "2"))
-    s.connect("QSPI_CLK", ("J5", "3"))    # SCK
-    s.connect("QSPI_D0",  ("J5", "4"))    # MOSI / SDA
-    s.connect("QSPI_D1",  ("J5", "5"))    # DC
-    s.connect("QSPI_D2",  ("J5", "6"))    # frei
-    s.connect("QSPI_D3",  ("J5", "7"))    # frei
-    s.connect("DISP_CS",  ("J5", "8"))
-    s.connect("DISP_RST", ("J5", "9"))
-    s.connect("DISP_BL",  ("J5", "10"))
-    # 11 und 12 sind bei zwoelfpoligen Panels ueblicherweise Hintergrund-
-    # licht-Kathode und ein zweiter Massepin - bis zum Datenblatt eine
-    # Annahme, deshalb im Kommentar und nicht als stille Verdrahtung.
-    s.connect("PGND",     ("J5", "11"), ("J5", "12"))
+          MPN="Panel ER-TFT1.69-3, 12-pol FPC 0,50 mm steckbar - "
+              "Raster und Belegung aus dem Datenblatt bestaetigt")
+    # Belegung nach Datenblatt Abschnitt 4.1, gesichert in
+    # docs/datasheets/ER-TFT1.69-3.md
+    s.connect("DISP_TE",   ("J5", "1"))    # Tearing Effect, wird nicht genutzt
+    s.connect("PGND",      ("J5", "2"), ("J5", "12"))
+    s.connect("QSPI_D1",   ("J5", "3"))    # RS = Daten/Befehl
+    s.connect("DISP_RST",  ("J5", "4"))
+    s.connect("QSPI_D0",   ("J5", "5"))    # SDA
+    s.connect("QSPI_CLK",  ("J5", "6"))    # SCL
+    s.connect("DISP_CS",   ("J5", "7"))
+    s.connect("3V3_SYS",   ("J5", "8"), ("J5", "9"))   # VCC und IOVCC
+    s.connect("DISP_LEDA", ("J5", "10"))
+    s.connect("DISP_LEDK", ("J5", "11"))
+
+    # --- Hintergrundbeleuchtung: sie braucht einen Treiber ----------------
+    # Das Datenblatt nennt 45 mA typisch und 60 mA maximal bei Vf = 3,0 bis
+    # 3,2 V, drei LEDs parallel. Bis zum 18.08.2026 hing LEDA hier direkt an
+    # DISP_BL - also an einem GPIO des ESP32, ueber zwei Steckkontakte des
+    # Stapels hinweg. Das haette den Pin ueberlastet.
+    #
+    # Aus 3,3 V geht es auch mit Vorwiderstand nicht: Bei Vf = 3,0 bis 3,2 V
+    # blieben 0,1 bis 0,3 V uebrig, der Strom schwankte um den Faktor drei
+    # ueber die Bauteiltoleranz allein. Deshalb die 5-V-Schiene, die ohnehin
+    # ueber J_STK_A heraufkommt:
+    #
+    #     (5,0 - 3,1) V / 45 mA = 42 Ohm  ->  39 Ohm, 86 mW
+    #
+    # Gedimmt wird an der KATHODE mit einem Low-Side-FET. Der Gate-Pulldown
+    # haelt die Beleuchtung aus, solange der ESP32 nicht bootet - sonst
+    # leuchtet das Display beim Einschalten unkontrolliert auf.
+    s.add("R_BL", "Device:R", "39R", R0603,
+          MPN="Vorwiderstand Hintergrundbeleuchtung, 86 mW bei 45 mA")
+    s.connect("5V_SYS",    ("R_BL", "1"))
+    s.connect("DISP_LEDA", ("R_BL", "2"))
+
+    s.add("Q_BL", "SwitchStack:Q_NMOS_GDS", "N-FET 30V 1A",
+          "Package_TO_SOT_SMD:SOT-23",
+          MPN="Logic-Level, Vgs(th) < 2 V - 2N7002 reicht bei 60 mA")
+    s.connect("DISP_BL",   ("Q_BL", "1"))
+    s.connect("DISP_LEDK", ("Q_BL", "2"))
+    s.connect("PGND",      ("Q_BL", "3"))
+
+    s.add("R_BLG", "Device:R", "100k", R0603,
+          MPN="Gate-Pulldown: Beleuchtung aus, solange der ESP32 nicht bootet")
+    s.connect("DISP_BL", ("R_BLG", "1"))
+    s.connect("PGND",    ("R_BLG", "2"))
 
     # =====================================================================
     # 5. Stern-Ausgang: High-Side-P-FET, geschaltet ueber STAR_EN
