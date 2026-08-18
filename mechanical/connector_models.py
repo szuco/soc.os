@@ -44,6 +44,9 @@ TEILE = [
     ("Connector_Molex", "Molex_Micro-Fit_3.0_43045-2012_2x10_P3.00mm_Vertical",
      8.9, "Molex 43045, Serienmass Steckerhoehe ueber Platine; docs/04 "
           "rechnet mit 10,0 mm inklusive gestecktem Gegenstueck"),
+    ("Connector_Molex", "Molex_Micro-Fit_3.0_43045-1612_2x08_P3.00mm_Vertical",
+     8.9, "wie oben - das ist der Feldstecker, ueber den seit dem 18.08.2026 "
+          "die gesamte Verdrahtung laeuft"),
     ("Connector_Molex", "Molex_Micro-Fit_3.0_43045-0612_2x03_P3.00mm_Vertical",
      8.9, "wie oben, nur kuerzer"),
     ("Connector_USB", "USB_C_Receptacle_G-Switch_GT-USB-7051x",
@@ -81,6 +84,11 @@ def bauen(lib, name, hoehe):
     if box is None:
         return None, None
     x0, x1, y0, y1 = box
+    # Y SPIEGELN. Das Footprint zaehlt Y nach unten, KiCads 3D-Ansicht nach
+    # oben - ein unveraendert uebernommener Grundriss sitzt sonst spiegelbildlich
+    # neben seinen Pads. Beim ersten Versuch am 18.08.2026 lag der Feldstecker
+    # deshalb quer ueber der halben Platine statt auf seinem Padfeld.
+    y0, y1 = -y1, -y0
     with BuildPart() as p:
         with BuildSketch(Plane.XY):
             Polygon((x0, y0), (x1, y0), (x1, y1), (x0, y1), align=None)
