@@ -168,12 +168,10 @@ SQ_RO = 25.0        # mm; deutlich ausserhalb der Platine
 # einer BTN2-Bahn auf In1.Cu. 0,5 mm Randabstand sind eingerechnet.
 NOTCH_KEEPOUT = (-25.0, -16.75, -13.25, -2.75)   # DSN: x0, x1, y0, y1
 
-# Der Magnetdurchbruch in der Unterkante des Top-Boards (KiCad -10,0 / 19,6,
-# Durchmesser 6,7). Im DSN kippt Y, deshalb negativ. Dieselbe Falle wie bei
-# der USB-Kerbe: Ohne eigenen Keepout routet Freerouting quer durch das Loch.
-# Als Quadrat gesperrt - grosszuegiger als noetig, aber der Streifen dort
-# traegt ohnehin keine Bahnen.
-MAG_KEEPOUT = (-13.85, -6.15, -23.45, -15.75)   # DSN: x0, x1, y0, y1
+# Die Kabelkerbe in der Unterkante des Top-Boards (KiCad x +-2,5,
+# y 21,5..23,5; im DSN kippt Y). Dieselbe Falle wie bei der USB-Kerbe:
+# Ohne eigenen Keepout routet Freerouting quer durch den Ausschnitt.
+KERB_KEEPOUT = (-3.0, 3.0, -23.6, -21.0)   # DSN: x0, x1, y0, y1
 
 
 def _ring_polygon(a0, a1, step=3.0):
@@ -221,8 +219,8 @@ def _square_bars(gap=None):
         bars.append(poly(g1, o, -o, -i))
     nx0, nx1, ny0, ny1 = NOTCH_KEEPOUT
     bars.append(poly(nx0, nx1, ny0, ny1))
-    mx0, mx1, my0, my1 = MAG_KEEPOUT
-    bars.append(poly(mx0, mx1, my0, my1))
+    kx0, kx1, ky0, ky1 = KERB_KEEPOUT
+    bars.append(poly(kx0, kx1, ky0, ky1))
     return bars
 
 

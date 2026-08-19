@@ -1,9 +1,27 @@
 #!/usr/bin/env python3
 """
-Stack-Pinout v0.6 - die EINZIGE Quelle fuer J_STK_A und J_STK_B.
+Stack-Pinout v0.7 - die EINZIGE Quelle fuer J_STK_A und J_STK_B.
 
 Alle drei Schaltplan-Generatoren importieren diese Tabellen; docs/03 wird
 daraus erzeugt. Damit koennen die Boards nicht auseinanderlaufen.
+
+Aenderung v0.6 -> v0.7 (19.08.2026):
+  * B2 wird EN_LOOP - der Hauptschalter des Geraets. Bisher stand nach dem
+    Zusammenschrauben von Bottom und Mid sofort Spannung auf allem: Das Gate
+    des Verpolschutz-FETs Q1 lag ueber R1 fest an PGND, der FET leitete
+    immer. Jetzt laeuft der Gate-Pulldown als SCHLEIFE durch den Stapel:
+
+      Q1-Gate -> R1 -> EN_LOOP (B2) -> hoch zum Top-Board -> SW5 -> PGND
+
+    Ohne aufgestecktes Top-Board ist die Schleife offen, ein neuer 1-M-
+    Pullup (R1B) haelt das Gate an der Source - Q1 sperrt, NICHTS hinter ihm
+    bekommt 24 V. Mit Top-Board entscheidet der Schiebeschalter SW5. Der
+    Strom in der Schleife ist der Gate-Teilerstrom, rund 20 uA - jede
+    Signalkontaktierung reicht.
+
+    B2 ist gewaehlt, weil es am oberen Ende des rechten Verbinders liegt,
+    direkt neben SW5 - und weil PGND mit 25 verbleibenden Kontakten
+    weiterhin ueppig vertreten ist.
 
 Aenderung v0.5 -> v0.6 (18.08.2026):
   * ALLE FELDANSCHLUESSE LIEGEN JETZT AUF EINEM STECKER auf der Rueckseite
@@ -101,7 +119,7 @@ STK_A = {
 
 # J_STK_B - UI und Kommunikation
 STK_B = {
-    1: "BTN1", 2: "PGND", 3: "3V3_SYS", 4: "3V3_SYS", 5: "I2C_SCL",
+    1: "BTN1", 2: "EN_LOOP", 3: "3V3_SYS", 4: "3V3_SYS", 5: "I2C_SCL",
     6: "PGND", 7: "I2C_SDA", 8: "PGND", 9: "PGND", 10: "I2C_INT",
     11: "PGND", 12: "UART485_TX", 13: "PGND", 14: "UART485_RX",
     15: "RS485_DIR", 16: "RS485_DIR", 17: "PGND", 18: "UART_AUX_TX",

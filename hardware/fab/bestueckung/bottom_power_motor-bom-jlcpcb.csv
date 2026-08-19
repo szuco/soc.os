@@ -12,6 +12,7 @@ Comment,Designator,Footprint,LCSC Part #
 12V,D2,D_SOD-123,
 15A traege,F1,Fuse_Littelfuse-NANO2-451_453,
 180k,R5,R_0603_1608Metric,
+1M,R1B,R_0603_1608Metric,
 1k,"R11,R_M1_F,R_M2_F",R_0603_1608Metric,
 1n,"C_M1_F,C_M2_F",C_0603_1608Metric,
 220u/35V Polymer,"C3,C4",CP_Elec_8x6.5,

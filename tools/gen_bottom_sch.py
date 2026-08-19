@@ -111,9 +111,25 @@ def build():
     s.connect("24V_GATE_P", ("Q1", "1"))
     s.connect("24V_F",      ("Q1", "2"))
     s.connect("24V_PROT",   ("Q1", "3"))
+    # SEIT DEM 19.08.2026 IST DER GATE-PULLDOWN EINE SCHLEIFE DURCH DEN
+    # STAPEL, nicht mehr ein fester Draht nach PGND. R1 endet auf EN_LOOP;
+    # das Netz laeuft ueber Stapelkontakt B2 zum Top-Board, dort durch den
+    # Hauptschalter SW5 und zurueck nach PGND. Folge:
+    #
+    #   Top-Board fehlt      -> Schleife offen -> Q1 sperrt -> alles aus
+    #   SW5 aus              -> dito
+    #   SW5 ein              -> Gate ueber R1/R1B geteilt, Q1 leitet
+    #
+    # R1B haelt das Gate bei offener Schleife DEFINIERT an der Source -
+    # vorher hing es nur am Zener-Leckstrom. Teiler bei geschlossener
+    # Schleife: 24 V * 100k/1,1M = 2,2 V am Gate, Ugs = -21,8 V, von D2 auf
+    # -12 V begrenzt. Schleifenstrom rund 20 uA.
     s.add("R1", "Device:R", "100k", R0603)
     s.connect("24V_GATE_P", ("R1", "1"))
-    s.connect("PGND",       ("R1", "2"))
+    s.connect("EN_LOOP",    ("R1", "2"))
+    s.add("R1B", "Device:R", "1M", R0603)
+    s.connect("24V_F",      ("R1B", "1"))
+    s.connect("24V_GATE_P", ("R1B", "2"))
     s.add("D2", "Device:D_Zener", "12V", "Diode_SMD:D_SOD-123")
     s.connect("24V_F",      ("D2", "1"))
     s.connect("24V_GATE_P", ("D2", "2"))

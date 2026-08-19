@@ -266,6 +266,26 @@ def build():
     s.connect("PGND",     ("J6", "2"))
 
     # =====================================================================
+    # 5b. HAUPTSCHALTER (19.08.2026). Er schliesst die Gate-Schleife des
+    # Verpolschutz-FETs auf dem Bottom-Board (EN_LOOP, Stapelkontakt B2,
+    # siehe stack_pinout v0.7 und gen_bottom_sch). Damit gilt:
+    #
+    #   Top-Board nicht aufgesteckt -> Geraet stromlos
+    #   SW5 aus                     -> Geraet stromlos
+    #
+    # Vorher stand nach dem Verschrauben von Bottom und Mid sofort 24 V auf
+    # allem, ohne dass das Top-Board ueberhaupt steckte.
+    #
+    # Copal CVS-01: 1,5 mm hoch, verschwindet unter der Zentralscheibe und
+    # wird durch eine kleine Oeffnung bedient. Er schaltet nur die
+    # Gate-Schleife (rund 20 uA), nicht den Laststrom.
+    s.add("SW5", "Switch:SW_DIP_x01", "HAUPT",
+          "Button_Switch_SMD:SW_DIP_SPSTx01_Slide_Copal_CVS-01xB_W5.9mm_P1mm",
+          MPN="Nidec Copal CVS-01TB")
+    s.connect("EN_LOOP", ("SW5", "1"))
+    s.connect("PGND",    ("SW5", "2"))
+
+    # =====================================================================
     # 6. Praesenz: VL53L1X (ToF) und Reserveanschluss fuer ein Satellitenmodul
     #
     # Der Sensor sitzt auf 12 Uhr am Boardrand und schaut durch ein konisches

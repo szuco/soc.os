@@ -95,11 +95,24 @@ PARAMS = dict(
     neck_relief       = 1.5,    # wie weit der Rastraum zurueckspringt
     seat_w            = 2.0,    # Auflagebreite fuer die Platine
 
-    # --- Tragring-Flansch --------------------------------------------------
+    # --- Basisring ---------------------------------------------------------
+    # Bis zum 19.08.2026 trug hier ein 70er Flansch den Abdeckrahmen und
+    # zwei Schraubschlitze die Dosenbefestigung. Beides ist an den
+    # TRAGRING-ADAPTER (mechanical/tragring.py) gewandert: Der Rahmen klemmt
+    # dort, die Dose haelt dort. Dieses Teil ist seither nur noch der
+    # SCHEIBENTRAEGER - es muss durch die Fensteroeffnung des Rahmens
+    # (Steg ~50) passen und darf deshalb nirgends breiter sein als der
+    # Schnapprand. Die Tiefenkette bleibt unveraendert; aus dem Flansch
+    # wurde ein gleich dicker Basisring in Randbreite.
     flange_t          = 2.5,
-    screw_pitch       = 60.0,   # DIN 49073
-    screw_slot_w      = 3.9,
-    screw_slot_len    = 4.0,
+
+    # --- Verschraubung Top <-> Mid ------------------------------------------
+    # M2,5-Schrauben von vorn durch H1/H2 des Top-Boards in 10-mm-Huelsen
+    # zum Mid-Board. Die Schraube laeuft NICHT durch dieses Teil - aber die
+    # Huelse muss von hinten an die Platinenrueckseite heran, und dort steht
+    # die Auflage im Weg. Je eine Tasche schafft Platz.
+    huelse_x          = 21.5,   # wie H1/H2
+    huelse_tasche_d   = 5.8,    # Sechskant SW 4,5 -> Eckenmass 5,2 + Spiel
 
     # --- Zentrale Durchfuehrung -------------------------------------------
     # Muss die beiden Stackverbinder durchlassen: sie stehen bei x = +/-14,2,
@@ -189,9 +202,9 @@ def build_adapter(p=PARAMS):
     neck_out = rim_out - p["neck_relief"]                # 48,3 ... 46,8
 
     with BuildPart() as fp:
-        # -- Tragring-Flansch: darauf klemmt der Rahmen ---------------------
+        # -- Basisring: frueher der Tragring-Flansch, siehe Parameterblock --
         with BuildSketch(Plane.XY) as s:
-            Rectangle(p["frame_grip"], p["frame_grip"])
+            Rectangle(rim_out, rim_out)
             fillet(s.vertices(), 2.0)
         extrude(amount=z["flange"])
 
@@ -264,13 +277,12 @@ def build_adapter(p=PARAMS):
                     Rectangle(p["magnet_slot_w"], y_out - p["bore_sq"] / 2.0)
             extrude(amount=z["pocket"] - z["neck"], mode=Mode.SUBTRACT)
 
-        # -- Schraubschlitze auf 60 mm --------------------------------------
-        for sx in (p["screw_pitch"] / 2, -p["screw_pitch"] / 2):
+        # -- Huelsentaschen: die Huelse muss an die Platinenrueckseite ------
+        for sx in (p["huelse_x"], -p["huelse_x"]):
             with BuildSketch(Plane.XY):
                 with Locations((sx, 0)):
-                    SlotOverall(p["screw_slot_len"] + p["screw_slot_w"],
-                                p["screw_slot_w"])
-            extrude(amount=z["flange"], mode=Mode.SUBTRACT)
+                    Circle(p["huelse_tasche_d"] / 2.0)
+            extrude(amount=z["pocket"], mode=Mode.SUBTRACT)
 
     return fp.part
 
@@ -316,9 +328,14 @@ def check_adapter(part, p=PARAMS):
     if breite > p["pcb_sq"] * 0.3:
         errs.append("USB-Freistellung %.1f mm nimmt mehr als 30 %% der "
                     "Auflagekante (%.1f mm)" % (breite, p["pcb_sq"]))
-    if p["frame_grip"] <= rim_out:
-        errs.append("Flansch %.1f ist nicht breiter als der Schnapprand"
-                    % p["frame_grip"])
+    # Seit dem 19.08.2026 gilt das UMGEKEHRTE des alten Flansch-Kriteriums:
+    # Das Teil muss durch die Fensteroeffnung des Rahmens (Steg ~50), darf
+    # also nirgends breiter sein als der Schnapprand.
+    if p["huelse_x"] + p["huelse_tasche_d"] / 2.0 > p["pcb_sq"] / 2.0 + 1.0:
+        errs.append("Huelsentasche ragt ueber die Platinenkante hinaus")
+    if p["huelse_x"] - p["huelse_tasche_d"] / 2.0 > p["bore_sq"] / 2.0:
+        errs.append("Huelsentasche erreicht die Durchfuehrung nicht - die "
+                    "Huelse stuende auf massivem Material")
     # Der Adapter baut vor der Wand - aber der Rahmen muss ihn verdecken.
     if z["total"] > p["frame_depth"]:
         errs.append("Bauhoehe %.1f ueberragt den Rahmen (%.1f tief)"
@@ -383,7 +400,9 @@ def check_adapter(part, p=PARAMS):
         solid(Pos(p["magnet_x"], p["magnet_y"] + (p["magnet_d"] + d_out) / 4.0,
                   z["total"] - p["plate_face_t"] - p["magnet_h"] / 2.0)
               * Box(0.4, 0.4, 0.4), "Magnethuelse")
-    solid(Pos(p["bore_sq"] / 2 + 0.6, 0, (z["neck"] + z["seat"]) / 2)
+    # Probe an der 12-Uhr-Kante: an 3 und 9 Uhr sitzt die Huelsentasche,
+    # an 6 Uhr die USB-Freistellung.
+    solid(Pos(0, -(p["bore_sq"] / 2 + 0.6), (z["neck"] + z["seat"]) / 2)
           * Box(0.6, 0.6, 0.4), "Auflage der Leiterplatte")
 
     # Die Platine muss in die Tasche passen, die Taschenwand muss stehen.
@@ -392,12 +411,13 @@ def check_adapter(part, p=PARAMS):
     solid(Pos(rim_out / 2 - 0.3, 0, (z["seat"] + z["pocket"]) / 2)
           * Box(0.4, 0.6, 0.4), "Taschenwand")
 
-    # Schraubschlitze frei, Flansch aussen massiv.
-    for sx in (p["screw_pitch"] / 2, -p["screw_pitch"] / 2):
-        clear(Pos(sx, 0, z["flange"] / 2) * Box(1.0, 1.0, z["flange"] - 0.2),
-              "Schraubschlitz x=%+.0f" % sx)
-    solid(Pos(p["frame_grip"] / 2 - 1.0, p["frame_grip"] / 2 - 1.0,
-              z["flange"] / 2) * Box(0.8, 0.8, 0.4), "Flanschecke")
+    # Huelsentaschen frei bis zur Platinenrueckseite.
+    for sx in (p["huelse_x"], -p["huelse_x"]):
+        clear(Pos(sx, 0, z["pocket"] / 2) * Box(2.0, 2.0, z["pocket"] - 0.2),
+              "Huelsentasche x=%+.0f" % sx)
+    # Basisring aussen massiv - jetzt in Randbreite, nicht mehr 70.
+    solid(Pos(rim_out / 2 - 1.0, rim_out / 2 - 1.0, z["flange"] / 2)
+          * Box(0.8, 0.8, 0.4), "Basisringecke")
 
     return errs
 
@@ -418,8 +438,8 @@ def main():
     export_step(part, str(out / "adapter.step"))
     export_stl(part, str(out / "adapter.stl"))
 
-    print("Flansch      : %.1f x %.1f x %.1f mm (Rahmen klemmt darauf)"
-          % (p["frame_grip"], p["frame_grip"], p["flange_t"]))
+    print("Basisring    : %.1f x %.1f x %.1f mm (Rahmen klemmt am Tragring)"
+          % (rim_out, rim_out, p["flange_t"]))
     print("Schnapprand  : %.1f aussen, Rastmass der Scheibe %.1f"
           % (rim_out, p["snap_inner"]))
     print("Platine      : %.1f x %.1f, Tasche %.1f, Auflage %.1f mm breit"

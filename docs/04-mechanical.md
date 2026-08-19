@@ -423,6 +423,52 @@ mathematisch **+Y = Frontreferenz „oben“** (12-Uhr-Position). Der Hochstrom-
 sitzt entsprechend im Bereich **−Y (unten)** des Bottom-Boards. Diese Orientierung ist auf
 jedem Board durch eine Silkscreen-Markierung an der 12-Uhr-Position kenntlich zu machen.
 
+## 2b. Befestigungskonzept v2 — verschraubt statt nur gesteckt (19.08.2026)
+
+Bisher hielt der Stapel allein durch die Steckverbinder, und der Adapter
+übernahm Tragring UND Scheibenträger in einem Teil. Beides ist aufgeteilt:
+
+```
+Dose
+ └─ schrauben (60 mm) ─ TRAGRING-ADAPTER  (mechanical/tragring.py, gedruckt)
+                          ├─ Abdeckrahmen klemmt mit den Doppelstegen darauf
+                          ├─ führt die Hülsen seitlich (Ø-6-Bohrungen)
+                          └─ Kabeldurchlass für den Magnetkontakt
+Bottom ═ Hülse M2,5×10 ═ Mid ═ Hülse M2,5×10 ═ Top
+                                                └─ liegt in der Tasche des
+                                                   SCHEIBENADAPTERS (adapter.py)
+                                                    └─ Zentralscheibe rastet darauf
+```
+
+**Der Kraftfluss beim Anziehen der beiden Schrauben von vorn:**
+Schraubenkopf → Top-Board → Adaptertasche → Schnapprand → Zentralscheibe →
+Rahmensteg → Tragring-Adapter → Dose. Genau das presst den Abdeckrahmen fest —
+er ist zwischen Scheibe und Tragring eingeklemmt, wie im Original von
+Busch-Jaeger, nur dass dort der Tragring aus Metall ist.
+
+**Montagereihenfolge:**
+
+1. Tragring-Adapter mit den Geräteschrauben in die Dose
+2. Bottom unter Mid schrauben (zwei Hülsen M2,5 × 10), Stapel einsetzen —
+   die Hülsen der oberen Etage fädeln durch die Ø-6-Führungen des Tragrings
+3. Feldstecker-Leiste von hinten einklicken
+4. Abdeckrahmen auf den Tragring klemmen
+5. Magnetkontakt-Kabel durch die Unterkerbe des Top-Boards nach hinten in J6
+6. Top-Board in den Scheibenadapter, beide von vorn mit M2,5 in die Hülsen
+7. Zentralscheibe aufrasten — damit ist alles gepresst
+
+**Die Steckverbinder tragen seitdem nichts mehr.** Sie sind rein elektrisch;
+Punkt 23 (durchsteckbarer Stapelverbinder) verliert dadurch seine mechanische
+Bedingung und reduziert sich auf die Frage nach einem elektrisch passenden
+Paar mit 10 mm Stapelhöhe.
+
+**Maßvorbehalte, in den Testdruck aufzunehmen:** die Klemmhöhe der
+Doppelstege am 70er-Kantenmaß (F13) und neu **F14**: Ist der Abdeckrahmen
+unten mittig **hohl** — mindestens Ø 12 frei und ≈ 9 mm tief? Dort sitzt der
+Einschraubkörper des Magnetkontakts (DCX-909: Gewinde Ø 8, Länge 8,5); hinter
+dem Rahmenrand ist Putz, der Körper muss also vollständig in den Hohlraum des
+Rahmens passen.
+
 ## 3. Befestigungsbohrungen
 
 > **Bohrbild v2 — ZWEI Bohrungen statt drei.** Die Layout-Kollisionsprüfung hat

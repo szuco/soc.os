@@ -105,12 +105,20 @@ def lies(pfad, *namen):
 
 
 P = lies(os.path.join(ROOT, "mechanical", "adapter.py"), "PARAMS")["PARAMS"]
+T = lies(os.path.join(ROOT, "mechanical", "tragring.py"), "PARAMS")["PARAMS"]
 S = lies(os.path.join(ROOT, "mechanical", "stack.py"), "TEILE", "ADAPTER")
 B = lies(os.path.join(ROOT, "tools", "gen_boards.py"),
          "BOARD_DIAMETER", "BOARD_THICKNESS", "TOP_SQ", "HOLE_PITCH_R")
 L = lies(os.path.join(ROOT, "tools", "gen_layouts.py"),
          "NOTCH_X0", "NOTCH_X1", "NOTCH_Y0", "NOTCH_Y1",
-         "MAG_X", "MAG_Y", "MAG_D", "STACK_POS", "BTN_POS")
+         "KERB_W", "KERB_T", "STACK_POS", "BTN_POS")
+
+# Der Magnetkontakt sitzt seit dem 19.08.2026 im ABDECKRAHMEN unten mittig
+# (docs/04, 2b), nicht mehr in einem Loch des Boards. Im Board gibt es nur
+# noch die Kabelkerbe KERB_W x KERB_T an der Unterkante; hier abgeleitet:
+MAG_FRAME_Y = 31.5       # Mitte der unteren Rahmenleiste (Fenster 27,5 + 4)
+MAG_FLANSCH = 12.0       # Flansch des DCX-909
+
 
 # --- AUS DER DOKU, je mit Fundstelle --------------------------------------
 # Panel ER-TFT1.69-3, docs/17-bauteildaten.md Abschnitt 1
@@ -134,7 +142,7 @@ USB_A, USB_B = 9.94, 6.40
 TASTER_A, TASTER_B = 3.9, 2.9   # SMD-Taster, docs/04
 KREUZ = 3.2                     # F10
 # JST GH BM02B stehend, gesteckt rund 5,7 mm (gen_layouts, Kommentar zu J6)
-J6_X, J6_Y, J6_H, J6_B = -17.0, 19.6, 5.7, 6.0
+J6_X, J6_Y, J6_H, J6_B = 0.0, 18.0, 5.7, 6.0
 # Fenster der Zentralscheibe, docs/04 Abschnitt 1d
 FENSTER_X, FENSTER_Y = 32.7, 27.0
 FENSTER_M = (-0.95, -0.3)       # Mitte, in KiCad-y (nach unten)
@@ -438,23 +446,23 @@ def panel_a(x0, y0):
     # Adapter
     s.gruppe("adapter", Z["adapter"][0], Z["adapter"][1])
     for vz in (1, -1):
+        # Seit dem 19.08.2026 endet der Adapter am Schnapprand: Der 70er
+        # Flansch samt Schraubschlitzen gehoert jetzt dem Tragring-Adapter
+        # (mechanical/tragring.py), der zwischen Mid und Top an der Wand
+        # sitzt und hier nicht geschnitten wird - Befestigungskonzept v2,
+        # docs/04 Abschnitt 2b.
         s.teil("adapter", ad["flansch"][0], ad["flansch"][1],
-               vz * bohr, vz * P["frame_grip"] / 2.0, KUNST_H, KUNST)
+               vz * bohr, vz * rand, KUNST_H, KUNST)
         s.teil("adapter", ad["hals"][0], ad["hals"][1], vz * bohr, vz * hals,
                KUNST_H, KUNST)
         s.teil("adapter", ad["schulter"][0], ad["schulter"][1], vz * bohr,
                vz * rand, KUNST_H, KUNST)
         s.teil("adapter", ad["tasche"][0], ad["tasche"][1], vz * tasche,
                vz * rand, KUNST_H, KUNST)
-        s.teil("adapter", ad["flansch"][0], ad["flansch"][1],
-               vz * P["screw_pitch"] / 2.0 - P["screw_slot_w"] / 2,
-               vz * P["screw_pitch"] / 2.0 + P["screw_slot_w"] / 2,
-               PAPIER, ROT)
-    s.fahne("adapter", ad["flansch"][0], P["frame_grip"] / 2.0,
-            ["Adapter, gedruckt", "70,0 × 70,0 × 10,0",
-             "Flansch 2,5 · Auflage 2,0"])
-    s.marke("adapter", ad["flansch"][1] + 1.2, -P["screw_pitch"] / 2.0,
-            "Schraubschlitz 3,9 auf 60,0", ROT)
+    s.fahne("adapter", ad["flansch"][0], rand,
+            ["Scheibenadapter, gedruckt", "49,8 × 49,8 × 5,5",
+             "Basisring 2,5 · Auflage 2,0",
+             "Rahmen + Schrauben: Tragring (v2)"])
     s.marke("adapter", ad["hals"][0] + 0.4, hals - 4.5, "Rastraum 1,5 × 1,3")
     s.marke("adapter", ad["tasche"][0] + 0.4, tasche - 9.0,
             "Tasche 47,4 · Auflage 2,0")
@@ -497,10 +505,10 @@ def panel_a(x0, y0):
 def panel_b(x0, y0):
     s = Schnitt(x0, y0, 620,
                 "Schnitt B – B   ·   Ebene y = 19,6  (6-Uhr-Seite)",
-                "Ecktaster gegen Druckkreuz · Magnetkontakt im Durchbruch · "
+                "Ecktaster gegen Druckkreuz · Kabelkerbe unten mittig · "
                 "J6 auf der Rückseite")
     r = B["BOARD_DIAMETER"] / 2.0
-    sehne = (r * r - L["MAG_Y"] ** 2) ** 0.5
+    sehne = (r * r - 19.6 ** 2) ** 0.5
     h = B["TOP_SQ"] / 2.0
     ad = Z["adapter_teile"]
     rand = (P["snap_inner"] - P["rim_play"]) / 2.0
@@ -524,11 +532,12 @@ def panel_b(x0, y0):
     # Top mit Durchbruch, Tastern und J6
     s.gruppe("top", Z["top_ui"][0] - J6_H, Z["top_ui"][1])
     zt = Z["top_ui"]
-    mx0, mx1 = L["MAG_X"] - L["MAG_D"] / 2, L["MAG_X"] + L["MAG_D"] / 2
-    s.teil("top", zt[0], zt[1], -h, mx0, PCB)
-    s.teil("top", zt[0], zt[1], mx1, h, PCB)
-    s.teil("top", zt[1], zt[1] + 1.0, mx0 - 1.2, mx1 + 1.2, BAUTEIL)
-    strichkasten(s.X("top", zt[0] - 4.5), s.Y(mx1), s.X("top", zt[0]),
+    # Die Schnittebene y = 19,6 liegt VOR der Kerbentiefe (Kante 23,5,
+    # Kerbe bis 21,5) - das Board ist hier durchgehend; die Kerbe wird als
+    # Strichkasten angedeutet.
+    mx0, mx1 = -L["KERB_W"] / 2.0, L["KERB_W"] / 2.0
+    s.teil("top", zt[0], zt[1], -h, h, PCB)
+    strichkasten(s.X("top", zt[0]), s.Y(mx1), s.X("top", zt[1]),
                  s.Y(mx0), ROT)
     s.teil("top", zt[0] - J6_H, zt[0], J6_X - J6_B / 2, J6_X + J6_B / 2,
            BAUTEIL)
@@ -594,19 +603,24 @@ def panel_c(cx, cy):
     rand = (P["snap_inner"] - P["rim_play"]) / 2.0
     tasche = (P["pcb_sq"] + P["pcb_play"]) / 2.0
     bohr = P["bore_sq"] / 2.0
-    fg = P["frame_grip"] / 2.0
+    fg = T["grip"] / 2.0
 
-    # Adapter
+    # Tragring (70er Platte mit den Geraeteschrauben) und darin der
+    # Scheibenadapter - seit Befestigungskonzept v2 zwei Teile.
     rechteck(-fg, -fg, fg, fg, KUNST_H, KUNST, 1.2)
     srechteck(-rand, -rand, rand, rand, KUNST)
     srechteck(-tasche, -tasche, tasche, tasche, KUNST)
     rechteck(-bohr, -bohr, bohr, bohr, PAPIER, KUNST, 1.2)
     for vz in (1, -1):
-        halb = (P["screw_slot_len"] + P["screw_slot_w"]) / 2.0
-        rechteck(vz * P["screw_pitch"] / 2 - halb, -P["screw_slot_w"] / 2,
-                 vz * P["screw_pitch"] / 2 + halb, P["screw_slot_w"] / 2,
+        halb = (T["screw_slot_len"] + T["screw_slot_w"]) / 2.0
+        rechteck(vz * T["screw_pitch"] / 2 - halb, -T["screw_slot_w"] / 2,
+                 vz * T["screw_pitch"] / 2 + halb, T["screw_slot_w"] / 2,
                  PAPIER, ROT)
-    text(X(-fg), Y(-fg) - 12, "Adapterflansch 70,0 · Durchführung 43 × 43",
+    for vz in (1, -1):
+        kreis(X(vz * T["huelse_x"]), Y(0), T["huelse_d"] / 2 * PX_MM,
+              PAPIER, ROT, 1.2)
+    text(X(-fg), Y(-fg) - 12,
+         "Tragring 70,0 · Scheibenadapter 49,8 · Durchführung 43 × 43",
          KLEIN, KUNST, "lb")
 
     # USB-Freistellung des Adapters, an ihrer heutigen Stelle
@@ -647,11 +661,14 @@ def panel_c(cx, cy):
     text(X(L["BTN_POS"]["SW1"][0]) - 6, Y(L["BTN_POS"]["SW1"][1]) - 12,
          "Ecktaster (±18 / ±20)", KLEIN, GRAU, "rb")
 
-    # Magnetdurchbruch und J6
-    kreis(X(L["MAG_X"]), Y(L["MAG_Y"]), L["MAG_D"] / 2 * PX_MM, PAPIER, ROT,
-          1.2)
-    text(X(L["MAG_X"]) - 4, Y(L["MAG_Y"]) + 12, "Magnet Ø 6,7", KLEIN, ROT,
-         "mt")
+    # Kabelkerbe unten mittig; der Magnetkontakt selbst sitzt im
+    # Abdeckrahmen und liegt ausserhalb dieser Draufsicht des Boards.
+    h_top = B["TOP_SQ"] / 2.0
+    rechteck(-L["KERB_W"] / 2.0, h_top - L["KERB_T"], L["KERB_W"] / 2.0,
+             h_top, PAPIER, ROT, 1.2)
+    text(X(0) - 6, Y(h_top - L["KERB_T"]) - 6,
+         "Kabelkerbe %.0f × %.0f → Magnet im Rahmen (y ≈ %.0f)"
+         % (L["KERB_W"], L["KERB_T"], MAG_FRAME_Y), KLEIN, ROT, "rb")
     rechteck(J6_X - J6_B / 2, J6_Y - 2.5, J6_X + J6_B / 2, J6_Y + 2.5, None,
              GRAU)
     text(X(J6_X) - 8, Y(J6_Y), "J6", KLEIN, GRAU, "rm")

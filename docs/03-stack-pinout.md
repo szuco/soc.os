@@ -104,7 +104,7 @@ auf dem Mid-Board zusammengelegt (Standard-Halbduplex, ein GPIO).
 
 | Pin | Signal | Pin | Signal |
 |---:|---|---:|---|
-| 1 | `BTN1` | 2 | `PGND` |
+| 1 | `BTN1` | 2 | `EN_LOOP` |
 | 3 | `3V3_SYS` | 4 | `3V3_SYS` |
 | 5 | `I2C_SCL` | 6 | `PGND` |
 | 7 | `I2C_SDA` | 8 | `PGND` |
@@ -172,6 +172,7 @@ Treiber, ein Bauteil statt zwei.
 
 | Version | Änderung |
 |---|---|
+| **0.7** | **B2 wird `EN_LOOP` — der Hauptschalter.** Der Gate-Pulldown des Verpolschutz-FETs läuft als Schleife durch den Stapel: Q1-Gate → R1 → B2 → SW5 auf Top → PGND. Ohne Top-Board oder mit SW5 aus sperrt Q1, nichts hinter ihm bekommt 24 V. Vorher stand nach dem Verschrauben von Bottom und Mid sofort Spannung auf allem |
 | 0.1 | Erster ausgearbeiteter Vorschlag aus der Projektzusammenfassung |
 | **0.2** | **Aus dem Bottom-Schaltplan erzeugt.** `INA`/`INB` statt `PWM`/`DIR`, QSPI-Bus für das Display, `USB_VBUS` ergänzt |
 | **0.5** | **Tasten und I2C auf die Außenreihe**, Tasten auf beide Verbinder verteilt. Anlass: Auf Top blieben mit drei verschiedenen Anläufen dieselben elf Netze offen |

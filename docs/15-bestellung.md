@@ -27,6 +27,20 @@ ohnehin nötig.
 | Mindeststrukturen | 0,15 mm Abstand, 0,2 mm Bahn | im Regelwerk hinterlegt |
 | kleinste Bohrung | 0,3 mm | Vias 0,6/0,3 |
 
+### Dazu: die Lötscheibe (19.08.2026)
+
+`hardware/stern_puck/` ist eine **zweite, winzige Bestellposition**: die
+Ø-16-Lötscheibe, die die Steckseite des Magnetkontakts DCX-909 mit den
+Litzen des Weihnachtssterns verbindet (docs/17, 4b). Zweilagig, ohne
+Bestückung — als eigener Auftrag kostet sie bei JLCPCB den Mindestpreis von
+etwa 2 €. Sie in den Vierlagen-Nutzen zu integrieren wäre teurer, nicht
+billiger: Sie würde dort als Vierlagerin mitbezahlt.
+
+Gerber dafür erzeugt derselbe Ablauf wie unten, nur mit
+`hardware/stern_puck/stern_puck.kicad_pcb` als Eingabe. Bei der Bestellung
+**2 Lagen, 1,0 mm, beliebige Farbe** wählen; Stückzahl 5 ist das Minimum und
+mehr als genug.
+
 ## 2. Die Dateien
 
 ```

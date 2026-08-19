@@ -116,17 +116,18 @@ NOTCH_Y0, NOTCH_Y1 = 3.25, 12.75    # Kerbenhoehe 9,5 mm
 # GEPRUEFTES GEGENBEISPIEL: Das Teil DCX-909-(9x8)-H5.2 hat 8,00 mm
 # Koerperdurchmesser und passt damit NICHT. _pruefe_magnetloch() bricht ab,
 # statt ein Loch ins Panel zu schneiden.
-# Der Durchbruch ist ein LANGLOCH, kein Kreis - und das ist der Kern der
-# Sache: Eng ist es nur in y (7,60 mm zwischen Panel und Kante). In x stehen
-# zwischen den beiden unteren Ecktastern rund 38 mm zur Verfuegung. Ein
-# laenglicher Magnetkontakt passt deshalb dort, wo ein runder mit 8 mm
-# scheitert - und laenglich ist bei dieser Bauteilklasse die haeufigere Form
-# (HytePro M416/M423/M430, CFE, EDAC POGO+).
+# KABELKERBE unten zentriert (19.08.2026). Der Magnetkontakt des Sterns
+# sitzt nicht mehr in der Zentralscheibe, sondern im ABDECKRAHMEN unten
+# mittig - dort ist er 12 mm tief und haelt auch das 8-mm-Teil DCX-909, das
+# in den 7,6-mm-Streifen des Boards nie gepasst haette. Von ihm laeuft ein
+# kurzes Kabel hinter dem Rahmen nach innen, durch diese Kerbe an der
+# Unterkante des Top-Boards auf dessen RUECKSEITE und dort in J6.
 #
-# MAG_W == MAG_H ergibt wieder einen Kreis; dann ist es das runde Teil.
-MAG_X, MAG_Y = -10.0, 19.6          # unten links, wie der bisherige Durchbruch
-MAG_W = 6.7                         # Loch in x = Koerper + 0,2 Spiel
-MAG_H = 6.7                         # Loch in y - hier sitzt die enge Grenze
+# Das Langloch IM Board (18.08.2026, eine Zwischenloesung von einem Tag) ist
+# damit entfallen - und mit ihm die Durchmessergrenze von 6,8 mm, an der
+# jedes gemessene Kaufteil gescheitert war.
+KERB_W = 5.0                        # Kerbenbreite - zwei Litzen mit Huelle
+KERB_T = 2.0                        # Kerbentiefe von der Kante nach innen
 # Bohrbild v2: ZWEI Bohrungen bei 0/180 Grad. Die alten Winkel 120/240
 # kollidierten mit den Sicheltasten-Stoesseln (117/243 Grad, nur ~2 mm
 # daneben), und bei r21,5 blockieren Stackverbinder (um 45/135/225/315),
@@ -201,46 +202,19 @@ def _eigenes_modell(fp, name):
     return True
 
 
-def _pruefe_magnetloch(panel_y1=15.9, rand_panel=0.3, rand_kante=0.5):
-    """Passt der Magnetdurchbruch zwischen Displaypanel und Platinenkante?
-
-    Lieber hier abbrechen als ein Loch unter das aufgeklebte Panel schneiden
-    oder die Kante anschneiden - beides faellt sonst erst am fertigen Board
-    auf.
-    """
-    # Zum Panel genuegt ein kleinerer Abstand: In panel_y1 steckt bereits
-    # die 0,5 mm Klebefuge. Zur Platinenkante bleibt es beim vollen Wert.
+def _pruefe_kabelkerbe():
+    """Die Kabelkerbe darf weder J5 noch J6 auf der Rueckseite treffen."""
     h = TOP_SQ / 2.0
-    oben = MAG_Y - MAG_H / 2.0
-    unten = MAG_Y + MAG_H / 2.0
-    groesst = h - rand_kante - panel_y1 - rand_panel
-    if oben < panel_y1 + rand_panel:
-        raise RuntimeError(
-            "Magnetdurchbruch reicht bis y=%.2f und damit unter das "
-            "Displaypanel (Sperrflaeche %.2f, Randabstand %.2f). In den "
-            "freien Streifen passen hoechstens %.2f mm Durchmesser."
-            % (oben, panel_y1, rand_panel, groesst))
-    if unten > h - rand_kante:
-        raise RuntimeError(
-            "Magnetdurchbruch reicht bis y=%.2f, die Platinenkante liegt "
-            "bei %.2f (Randabstand %.2f). Groesster Durchmesser %.2f mm."
-            % (unten, h, rand_kante, groesst))
-
-    # In x ist viel Platz - aber nicht beliebig viel: J6 steht in demselben
-    # Streifen. Ein laengliches Teil waechst genau in seine Richtung, und ein
-    # Durchbruch unter einem Steckverbinder faellt sonst erst beim Bestuecken
-    # auf. Der Steckerkoerper der GH misst 5,75 x 4,95 mm.
-    j6 = FIXED_TOP.get("J6")
-    if j6:
-        j6x = j6[0]
-        abstand = abs(MAG_X - j6x)
-        noetig = MAG_W / 2.0 + 5.75 / 2.0 + 0.5
-        if abstand < noetig:
+    tief = h - KERB_T
+    for ref in ("J5", "J6"):
+        eintrag = FIXED_TOP.get(ref)
+        if not eintrag:
+            continue
+        x, y = eintrag[0], eintrag[1]
+        if abs(x) < KERB_W / 2.0 + 3.5 and y > tief - 3.5:
             raise RuntimeError(
-                "Magnetdurchbruch (Breite %.2f bei x=%.2f) kommt J6 bei "
-                "x=%.2f zu nahe: %.2f mm Achsabstand, noetig sind %.2f. "
-                "Entweder das Teil kuerzer waehlen oder J6 verschieben."
-                % (MAG_W, MAG_X, j6x, abstand, noetig))
+                "Kabelkerbe (Breite %.1f an der Unterkante) kollidiert mit "
+                "%s bei (%.1f/%.1f)" % (KERB_W, ref, x, y))
 
 
 def load_fp(fpid):
@@ -403,8 +377,14 @@ class BoardBuilder:
         k = 0.7071067811865476
         # Die linke Kante (x = -h) ist durch die USB-Kerbe unterbrochen:
         # statt einer Geraden fuenf Segmente hinein und wieder heraus.
+        kw, kt = KERB_W / 2.0, TOP_SQ / 2.0 - KERB_T
         for a, b in (((-(h - cr), -h), ((h - cr), -h)),
-                     (((h - cr), h), (-(h - cr), h)),
+                     # Unterkante in fuenf Segmenten um die Kabelkerbe herum
+                     (((h - cr), h), (kw, h)),
+                     ((kw, h), (kw, kt)),
+                     ((kw, kt), (-kw, kt)),
+                     ((-kw, kt), (-kw, h)),
+                     ((-kw, h), (-(h - cr), h)),
                      ((-h, (h - cr)), (-h, NOTCH_Y1)),
                      ((-h, NOTCH_Y1), (NOTCH_X1, NOTCH_Y1)),
                      ((NOTCH_X1, NOTCH_Y1), (NOTCH_X1, NOTCH_Y0)),
@@ -432,9 +412,7 @@ class BoardBuilder:
             arc.SetWidth(mm(0.1))
             self.board.Add(arc)
 
-        # Durchbruch fuer den Magnetkontakt auf Edge.Cuts.
-        _pruefe_magnetloch()
-        self._langloch(MAG_X, MAG_Y, MAG_W, MAG_H)
+        _pruefe_kabelkerbe()
 
     def _langloch(self, cx, cy, w, h):
         """Abgerundeter Durchbruch auf Edge.Cuts.
@@ -991,21 +969,10 @@ FIXED_TOP = dict(
     # Sternanschluss unten links, im Streifen unter dem Displaypanel.
     # Der ist 8,16 mm hoch (Panelunterkante 15,34 bis Boardrand 23,50); der
     # JST GH misst 4,95 mm in y und laesst damit 1,6 mm nach oben und unten.
-    # J6 sass bis zum 18.08.2026 auf der VORDERSEITE - damals war er der
-    # Sternanschluss und musste durch die Scheibe erreichbar sein. Seit der
-    # Stern ueber einen Magnetkontakt IN der Frontplatte angeschlossen wird,
-    # ist J6 nur noch die interne Verbindung dorthin. Vorne waere er damit
-    # ein Fremdkoerper: Ueber der Platine sind nur 3,50 mm frei (Sichtflaeche
-    # 1,0 + Druckkreuze 1,5 + Taster 2,0), und die GH baut gesteckt 4,25 mm
-    # liegend beziehungsweise rund 5,7 mm stehend - beides zu viel, beides
-    # haette ein Loch in der Sichtflaeche gebraucht.
-    # Hinten sind 10,0 mm frei bis zum Mid-Board, und gegenueber liegt dort
-    # nichts: naechstes Bauteil auf Mid ist 6,2 mm entfernt und flach.
-    # Das Kabel geht durch einen Schlitz im Adapter nach vorn zur Magnettasche.
-    # Nicht mehr bei x = -10: Dort sitzt seit heute der Magnetdurchbruch
-    # (MAG_X/MAG_Y), und J6 lag genau darauf. Er rueckt nach links daneben,
-    # bleibt aber in Reichweite der beiden Litzen aus dem Durchbruch.
-    J6=(-17.0, 19.6, 0, "B"),          # Sternanschluss JST GH, unten links
+    # J6 auf der Rueckseite, direkt hinter der Kabelkerbe: Das Kabel vom
+    # Magnetkontakt im Abdeckrahmen kommt durch die Kerbe (0 / 23,5..21,5)
+    # und soll dahinter ohne Umweg stecken.
+    J6=(0.0, 18.0, 0, "B"),            # Sternanschluss JST GH, intern
     # ToF UND Raumsensor unter EINEM Durchbruch, 18.08.2026.
     #
     # Bisher sassen sie auf den Diagonalen bei (-9 / -19) und (+9 / -19) und
@@ -1029,8 +996,23 @@ FIXED_TOP = dict(
     # (Wunsch 18.08.2026). Der Abstand von 3 mm zwischen den Bauteilkanten
     # bleibt - er ist die Bedingung, unter der ein gemeinsamer Durchbruch
     # ueberhaupt geht.
-    U3=(5.5, -19.0, 0, "F"),           # VL53L1X
-    U2=(12.5, -19.0, 0, "F"),          # SHT4x
+    U3=(5.5, -19.0, 0, "F"),
+    # Der Hauptschalter, auf dem alten Platz des Raumsensors: oben rechts
+    # zwischen ToF-Loch und Ecktaster, durch eine kleine Oeffnung bedienbar.
+    # 1,5 mm hoch - passt unter die Scheibe (3,5 mm frei).
+    # GEDREHT, weil er waagerecht nirgends passt: Das Fenster zwischen ToF
+    # (Courtyard bis 8,245) und Ecktaster SW1 (ab 15,205) ist 6,96 mm breit,
+    # der Courtyard des CVS-01 aber 7,69 x 3,41. Drei Anlaeufe bei 12,5,
+    # 11,0 und 11,9 endeten alle in Ueberlappungen - erst das Ausmessen der
+    # Courtyards statt Schaetzens hat es gezeigt. Hochkant belegt er
+    # 10,2..13,6 in x und -23,25..-15,56 in y; die Panel-Sperrflaeche
+    # beginnt erst bei -15,3, die Kante liegt bei -23,5.
+    SW5=(11.9, -19.4, 90, "F"),           # VL53L1X
+    # U2 gespiegelt zu U3 (19.08.2026): Die Zentralscheibe bekommt aus
+    # Symmetriegruenden ZWEI gleiche Loecher bei x = +-5,5 - hinter dem einen
+    # der ToF, hinter dem anderen der Raumsensor. Nebeneffekt: Der SHT4x
+    # rueckt vom Displaypanel weg, dessen Backlight-Waerme er sonst mismisst.
+    U2=(-5.5, -19.0, 0, "F"),          # SHT4x
     # USB-C mittig oben, vollstaendig von der Zentralscheibe verdeckt und erst
     # nach deren Abnahme erreichbar (Punkt 45). Die Buchse steht jetzt - der
     # Stecker geht nach vorn, nicht radial gegen die Dosenwand.

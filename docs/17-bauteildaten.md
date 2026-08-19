@@ -212,7 +212,37 @@ einen Durchbruch des Top-Boards nach hinten in die 10 mm zwischen Top und Mid.
 ein Loch unter das aufgeklebte Panel oder unter einen Steckverbinder zu
 schneiden. Gegen alle vier Fälle getestet.
 
-### Das vorhandene Teil passt nicht
+### Aufgelöst am 19.08.2026: Der Kontakt sitzt im Abdeckrahmen
+
+Die ganze Durchmesserfrage hat sich erledigt: Der Magnetkontakt sitzt jetzt
+**im Abdeckrahmen unten mittig**, nicht mehr in der Zentralscheibe. Dort ist
+Platz für das vorhandene **DCX-909-Set** — die Einschraubseite (Gewinde Ø 8,
+Flansch Ø 12, Länge 8,5) kommt in ein Ø-8-Loch der unteren Rahmenleiste,
+vorausgesetzt der Rahmen ist dort hohl (**Messpunkt F14**, docs/04 2b).
+
+Vom Kontakt läuft ein kurzes Kabel hinter dem Rahmen nach innen, durch den
+Kabeldurchlass des Tragring-Adapters und die Unterkerbe des Top-Boards auf
+dessen Rückseite in J6. Im Board selbst gibt es **kein Magnetloch mehr**.
+
+### Die Gegenseite: Litzen an die Steckseite (Lötscheibe)
+
+Die abnehmbare Seite des DCX-909 ist ein Platinenbauteil — drei Lötstifte
+Ø 0,8 im Abstand 3,70. Litzen direkt an solche Stifte zu löten hält nicht:
+Jede Bewegung arbeitet in der Lötstelle.
+
+Deshalb gibt es `hardware/stern_puck/` — eine **Ø-14-Lötscheibe**, die im
+selben Fertigungsauftrag mitbestellt wird:
+
+1. DCX-909-Stifte in die drei Durchstecklöcher löten
+2. Litzen des Sterns von hinten durch die **Fesselbohrungen** fädeln,
+   umschlagen, in die Lötaugen löten — die Zugentlastung ist die Bohrung,
+   nicht das Zinn
+3. Schrumpfschlauch mit Innenkleber über alles
+
+Polung ist auf dem Siebdruck markiert; die N-Pol-Kodierung des DCX-909
+verhindert verkehrtes Anlegen am Rahmen.
+
+### Überholt: Das vorhandene Teil passt nicht (galt nur für den Scheiben-Einbau)
 
 **DCX-909-(9×8)-H5.2**, gemessen aus der Maßzeichnung: Körper Ø 8,00 mm,
 Flansch Ø 9,00 mm, Bauhöhe 5,20 mm, magnetisch kodiert (N-Pol markiert). Die

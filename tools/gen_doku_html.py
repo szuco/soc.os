@@ -38,8 +38,11 @@ BOARDS = [
      "Dose hat mit Schrauben nur 54 mm lichte Weite."),
     ("top_ui", "Top", "Bedienung und Sensorik", "quadratisch, 47 × 47 mm",
      "Vier Ecktaster, ein 1,69-Zoll-Display, Abstands- und Raumtemperatur"
-     "sensor. Quadratisch, weil die Druckkreuze der Zentralscheibe auf "
-     "r = 26,9 mm liegen — ein Kreis reicht dort nicht hin."),
+     "sensor hinter zwei symmetrischen Löchern der Zentralscheibe — und der "
+     "Hauptschalter: Ohne aufgestecktes Top-Board oder mit Schalter aus "
+     "bleibt das ganze Gerät stromlos. Quadratisch, weil die Druckkreuze "
+     "der Zentralscheibe auf r = 26,9 mm liegen — ein Kreis reicht dort "
+     "nicht hin."),
 ]
 
 # Beschriftung der beiden Ansichten je Board: (F.Cu, B.Cu) - nach Funktion
