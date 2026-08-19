@@ -116,8 +116,17 @@ NOTCH_Y0, NOTCH_Y1 = 3.25, 12.75    # Kerbenhoehe 9,5 mm
 # GEPRUEFTES GEGENBEISPIEL: Das Teil DCX-909-(9x8)-H5.2 hat 8,00 mm
 # Koerperdurchmesser und passt damit NICHT. _pruefe_magnetloch() bricht ab,
 # statt ein Loch ins Panel zu schneiden.
+# Der Durchbruch ist ein LANGLOCH, kein Kreis - und das ist der Kern der
+# Sache: Eng ist es nur in y (7,60 mm zwischen Panel und Kante). In x stehen
+# zwischen den beiden unteren Ecktastern rund 38 mm zur Verfuegung. Ein
+# laenglicher Magnetkontakt passt deshalb dort, wo ein runder mit 8 mm
+# scheitert - und laenglich ist bei dieser Bauteilklasse die haeufigere Form
+# (HytePro M416/M423/M430, CFE, EDAC POGO+).
+#
+# MAG_W == MAG_H ergibt wieder einen Kreis; dann ist es das runde Teil.
 MAG_X, MAG_Y = -10.0, 19.6          # unten links, wie der bisherige Durchbruch
-MAG_D = 6.7                         # Lochdurchmesser = Koerper 6,5 + 0,2 Spiel
+MAG_W = 6.7                         # Loch in x = Koerper + 0,2 Spiel
+MAG_H = 6.7                         # Loch in y - hier sitzt die enge Grenze
 # Bohrbild v2: ZWEI Bohrungen bei 0/180 Grad. Die alten Winkel 120/240
 # kollidierten mit den Sicheltasten-Stoesseln (117/243 Grad, nur ~2 mm
 # daneben), und bei r21,5 blockieren Stackverbinder (um 45/135/225/315),
@@ -202,8 +211,8 @@ def _pruefe_magnetloch(panel_y1=15.9, rand_panel=0.3, rand_kante=0.5):
     # Zum Panel genuegt ein kleinerer Abstand: In panel_y1 steckt bereits
     # die 0,5 mm Klebefuge. Zur Platinenkante bleibt es beim vollen Wert.
     h = TOP_SQ / 2.0
-    oben = MAG_Y - MAG_D / 2.0
-    unten = MAG_Y + MAG_D / 2.0
+    oben = MAG_Y - MAG_H / 2.0
+    unten = MAG_Y + MAG_H / 2.0
     groesst = h - rand_kante - panel_y1 - rand_panel
     if oben < panel_y1 + rand_panel:
         raise RuntimeError(
@@ -216,6 +225,22 @@ def _pruefe_magnetloch(panel_y1=15.9, rand_panel=0.3, rand_kante=0.5):
             "Magnetdurchbruch reicht bis y=%.2f, die Platinenkante liegt "
             "bei %.2f (Randabstand %.2f). Groesster Durchmesser %.2f mm."
             % (unten, h, rand_kante, groesst))
+
+    # In x ist viel Platz - aber nicht beliebig viel: J6 steht in demselben
+    # Streifen. Ein laengliches Teil waechst genau in seine Richtung, und ein
+    # Durchbruch unter einem Steckverbinder faellt sonst erst beim Bestuecken
+    # auf. Der Steckerkoerper der GH misst 5,75 x 4,95 mm.
+    j6 = FIXED_TOP.get("J6")
+    if j6:
+        j6x = j6[0]
+        abstand = abs(MAG_X - j6x)
+        noetig = MAG_W / 2.0 + 5.75 / 2.0 + 0.5
+        if abstand < noetig:
+            raise RuntimeError(
+                "Magnetdurchbruch (Breite %.2f bei x=%.2f) kommt J6 bei "
+                "x=%.2f zu nahe: %.2f mm Achsabstand, noetig sind %.2f. "
+                "Entweder das Teil kuerzer waehlen oder J6 verschieben."
+                % (MAG_W, MAG_X, j6x, abstand, noetig))
 
 
 def load_fp(fpid):
@@ -407,15 +432,62 @@ class BoardBuilder:
             arc.SetWidth(mm(0.1))
             self.board.Add(arc)
 
-        # Durchbruch fuer den Magnetkontakt - ein Kreis auf Edge.Cuts.
+        # Durchbruch fuer den Magnetkontakt auf Edge.Cuts.
         _pruefe_magnetloch()
-        loch = pcbnew.PCB_SHAPE(self.board)
-        loch.SetShape(pcbnew.SHAPE_T_CIRCLE)
-        loch.SetLayer(pcbnew.Edge_Cuts)
-        loch.SetCenter(pcbnew.VECTOR2I(mm(MAG_X), mm(MAG_Y)))
-        loch.SetEnd(pcbnew.VECTOR2I(mm(MAG_X + MAG_D / 2.0), mm(MAG_Y)))
-        loch.SetWidth(mm(0.1))
-        self.board.Add(loch)
+        self._langloch(MAG_X, MAG_Y, MAG_W, MAG_H)
+
+    def _langloch(self, cx, cy, w, h):
+        """Abgerundeter Durchbruch auf Edge.Cuts.
+
+        Bei w == h wird daraus ein Kreis - eine Sonderfallbehandlung, weil
+        KiCad dafuer eine eigene Form kennt und ein aus vier Boegen
+        zusammengesetzter Kreis in der DRC leicht als offene Kontur gilt.
+        """
+        r = min(w, h) / 2.0
+        if abs(w - h) < 1e-6:
+            c = pcbnew.PCB_SHAPE(self.board)
+            c.SetShape(pcbnew.SHAPE_T_CIRCLE)
+            c.SetLayer(pcbnew.Edge_Cuts)
+            c.SetCenter(pcbnew.VECTOR2I(mm(cx), mm(cy)))
+            c.SetEnd(pcbnew.VECTOR2I(mm(cx + r), mm(cy)))
+            c.SetWidth(mm(0.1))
+            self.board.Add(c)
+            return
+
+        # Langloch: zwei Geraden und zwei Halbkreise.
+        dx = (w - h) / 2.0 if w > h else 0.0
+        dy = (h - w) / 2.0 if h > w else 0.0
+        for a, b in (((cx - dx, cy - dy - r), (cx + dx, cy - dy - r)),
+                     ((cx + dx, cy + dy + r), (cx - dx, cy + dy + r))) \
+                if w > h else \
+                (((cx - dx - r, cy - dy), (cx - dx - r, cy + dy)),
+                 ((cx + dx + r, cy + dy), (cx + dx + r, cy - dy))):
+            seg = pcbnew.PCB_SHAPE(self.board)
+            seg.SetShape(pcbnew.SHAPE_T_SEGMENT)
+            seg.SetLayer(pcbnew.Edge_Cuts)
+            seg.SetStart(pcbnew.VECTOR2I(mm(a[0]), mm(a[1])))
+            seg.SetEnd(pcbnew.VECTOR2I(mm(b[0]), mm(b[1])))
+            seg.SetWidth(mm(0.1))
+            self.board.Add(seg)
+
+        for vz in (1, -1):
+            mx, my = cx + vz * dx, cy + vz * dy
+            if w > h:
+                p1 = (mx, my - r)
+                p2 = (mx, my + r)
+                pm = (mx + vz * r, my)
+            else:
+                p1 = (mx - r, my)
+                p2 = (mx + r, my)
+                pm = (mx, my + vz * r)
+            arc = pcbnew.PCB_SHAPE(self.board)
+            arc.SetShape(pcbnew.SHAPE_T_ARC)
+            arc.SetLayer(pcbnew.Edge_Cuts)
+            arc.SetArcGeometry(pcbnew.VECTOR2I(mm(p1[0]), mm(p1[1])),
+                               pcbnew.VECTOR2I(mm(pm[0]), mm(pm[1])),
+                               pcbnew.VECTOR2I(mm(p2[0]), mm(p2[1])))
+            arc.SetWidth(mm(0.1))
+            self.board.Add(arc)
 
     def _holes(self):
         for i, (x, y) in enumerate(HOLES):

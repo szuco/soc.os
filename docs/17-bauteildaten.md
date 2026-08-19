@@ -193,6 +193,54 @@ geschraubt, einzeln, über Kopf.
 
 ---
 
+## 4b. Magnetkontakt für den Stern — was er messen darf
+
+Seit dem 18.08.2026 wird der Stern nicht mehr gesteckt, sondern magnetisch
+angelegt. Der Kontakt sitzt in einem Loch der Zentralscheibe und taucht durch
+einen Durchbruch des Top-Boards nach hinten in die 10 mm zwischen Top und Mid.
+**Die Bauhöhe ist damit gleichgültig** — der Durchmesser nicht.
+
+| Grenze | Wert | woher |
+|---|---|---|
+| Displaypanel (Sperrfläche) endet bei | y = 15,90 | `gen_layouts` `block_f` |
+| Platinenkante | y = 23,50 | TOP_SQ/2 |
+| freier Streifen | **7,60 mm** | |
+| abzüglich 0,3 mm zum Panel, 0,5 mm zur Kante | **≤ 6,80 mm in y** | |
+| in x, solange J6 bei x = −17 steht | **≤ 7,25 mm** | Achsabstand minus GH-Körper |
+
+`_pruefe_magnetloch()` rechnet beides beim Erzeugen nach und bricht ab, statt
+ein Loch unter das aufgeklebte Panel oder unter einen Steckverbinder zu
+schneiden. Gegen alle vier Fälle getestet.
+
+### Das vorhandene Teil passt nicht
+
+**DCX-909-(9×8)-H5.2**, gemessen aus der Maßzeichnung: Körper Ø 8,00 mm,
+Flansch Ø 9,00 mm, Bauhöhe 5,20 mm, magnetisch kodiert (N-Pol markiert). Die
+Kodierung ist vorbildlich, die Höhe seit dem Durchbruch belanglos — aber
+8,00 mm sind 1,2 mm zu viel für den Streifen. Wird abgewiesen.
+
+### Was die Suche ergeben hat
+
+Gesucht wurde nach einem Katalogteil mit öffentlichem Datenblatt. **Es gibt
+keines.** Diese Bauteilklasse wird fast ausschließlich als Auftragsfertigung
+ohne Datenblatt verkauft:
+
+- [Promax](https://promaxpogopin.com/magnetic-connector-2pin/), [SUNMON](https://smeconn.com/magnetic-pogo-pin-connector/),
+  [QH Industrial](https://www.connectors-cables.com/magnetic-pogo-pin-connector/) — nur Auftragsfertigung
+- [HytePro](https://www.hyte.pro/product/m423.html) M416/M423/M430 — echte Modellnummern, Seite
+  aber gegen Abruf gesperrt (403)
+- [EDAC POGO+ bei DigiKey](https://www.digikey.com/en/product-highlight/e/edac/pogo-magnetic-spring-loaded-connectors) — Katalogware mit Datenblatt, aber
+  Kontaktleisten mit 1,8/2,0 mm Raster, kein fertiger Magnetstecker
+- LCSC führt Pogo-Pins, jedoch keinen 2-poligen Magnetkontakt mit Maßzeichnung
+
+**Also gilt dasselbe Verfahren wie beim DCX-909: kaufen und messen.** Neu ist
+nur, dass wir jetzt genau wissen, worauf zu achten ist — ein Maß, nicht drei.
+
+**Einkaufszettel:** 2-polig, magnetisch kodiert (N/S, „anti-reverse"),
+**eine Abmessung ≤ 6,5 mm**, Strom ≥ 0,2 A (der Stern zieht 80 mA). Bauhöhe
+und die zweite Abmessung sind frei — bei einem länglichen Teil muss dann
+allerdings J6 weichen, was der Wächter meldet.
+
 ## 5. Reihenfolge
 
 1. **Display entscheiden.** Es blockiert am meisten — Footprint, Pinzahl und
