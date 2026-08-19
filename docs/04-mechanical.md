@@ -432,7 +432,7 @@ Bisher hielt der Stapel allein durch die Steckverbinder, und der Adapter
 Dose
  └─ schrauben (60 mm) ─ TRAGRING-ADAPTER  (mechanical/tragring.py, gedruckt)
                           ├─ Abdeckrahmen klemmt mit den Doppelstegen darauf
-                          ├─ führt die Hülsen seitlich (Ø-6-Bohrungen)
+                          ├─ zentriert den Adapter-Basisring in der 50,6er Öffnung
                           └─ Kabeldurchlass für den Magnetkontakt
 Bottom ═ Hülse M2,5×10 ═ Mid ═ Hülse M2,5×10 ═ Top
                                                 └─ liegt in der Tasche des
@@ -449,12 +449,12 @@ Busch-Jaeger, nur dass dort der Tragring aus Metall ist.
 **Montagereihenfolge:**
 
 1. Tragring-Adapter mit den Geräteschrauben in die Dose
-2. Bottom unter Mid schrauben (zwei Hülsen M2,5 × 10), Stapel einsetzen —
-   die Hülsen der oberen Etage fädeln durch die Ø-6-Führungen des Tragrings
+2. Bottom unter Mid schrauben (zwei Hülsen M2,5 × 9 — der Ebenenabstand ist
+   10, die Platine 1), Stapel einsetzen
 3. Feldstecker-Leiste von hinten einklicken
 4. Abdeckrahmen auf den Tragring klemmen
 5. Magnetkontakt-Kabel durch die Unterkerbe des Top-Boards nach hinten in J6
-6. Top-Board in den Scheibenadapter, beide von vorn mit M2,5 in die Hülsen
+6. Top-Board in den Scheibenadapter, beide von vorn mit M2,5 in die 9-mm-Hülsen
 7. Zentralscheibe aufrasten — damit ist alles gepresst
 
 **Die Steckverbinder tragen seitdem nichts mehr.** Sie sind rein elektrisch;

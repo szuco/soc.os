@@ -67,6 +67,9 @@ TEILE = [
 # genau auf die Flanschvorderkante (15,5 + 2,5) - so muss es sein.
 # Aufgefallen beim Zeichnen von tools/gen_explosion.py.
 ADAPTER = ("adapter.step", 15.5)
+# Der Tragring liegt auf der Wandebene: Rahmenvorderkante 27,5 minus
+# Rahmentiefe 12. Der Adapter-Basisring taucht durch seine Oeffnung.
+TRAGRING = ("tragring.step", 15.5)
 
 
 def bauen():
@@ -80,13 +83,15 @@ def bauen():
         koerper.label = name.replace(".step", "")
         teile.append(Location((0, 0, z)) * koerper)
 
-    ad = os.path.join(ROOT, "mechanical", "export", ADAPTER[0])
-    if os.path.exists(ad):
-        a = import_step(ad)
-        a.label = "adapter"
-        teile.append(Location((0, 0, ADAPTER[1])) * a)
-    else:
-        print("Hinweis: adapter.step fehlt, Stapel ohne Adapter")
+    for datei, z, label in ((ADAPTER[0], ADAPTER[1], "adapter"),
+                            (TRAGRING[0], TRAGRING[1], "tragring")):
+        pfad = os.path.join(ROOT, "mechanical", "export", datei)
+        if os.path.exists(pfad):
+            a = import_step(pfad)
+            a.label = label
+            teile.append(Location((0, 0, z)) * a)
+        else:
+            print("Hinweis: %s fehlt, Stapel ohne %s" % (datei, label))
 
     return Compound(children=teile, label="SwitchStack")
 

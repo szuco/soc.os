@@ -105,6 +105,12 @@ PARAMS = dict(
     # Schnapprand. Die Tiefenkette bleibt unveraendert; aus dem Flansch
     # wurde ein gleich dicker Basisring in Randbreite.
     flange_t          = 2.5,
+    # KEIN schmaler Fuss - der Gedanke war falsch: Um die 43er Durchfuehrung
+    # herum kann kein 34er Fuss existieren. Stattdessen ist die OEFFNUNG des
+    # Tragrings 50,6 breit (tragring.py): Der ganze 49,8er Adapter taucht
+    # hindurch, und die Oeffnung zentriert ihn mit 0,4 mm Spiel je Seite.
+    # Aufgefallen beim Einbau des Tragrings in die Gesamtbaugruppe am
+    # 19.08.2026 - Basisring und Platte wollten dasselbe Tiefenband.
 
     # --- Verschraubung Top <-> Mid ------------------------------------------
     # M2,5-Schrauben von vorn durch H1/H2 des Top-Boards in 10-mm-Huelsen
@@ -202,7 +208,7 @@ def build_adapter(p=PARAMS):
     neck_out = rim_out - p["neck_relief"]                # 48,3 ... 46,8
 
     with BuildPart() as fp:
-        # -- Basisring: frueher der Tragring-Flansch, siehe Parameterblock --
+        # -- Basisring: taucht KOMPLETT durch die Tragring-Oeffnung ---------
         with BuildSketch(Plane.XY) as s:
             Rectangle(rim_out, rim_out)
             fillet(s.vertices(), 2.0)
@@ -415,7 +421,7 @@ def check_adapter(part, p=PARAMS):
     for sx in (p["huelse_x"], -p["huelse_x"]):
         clear(Pos(sx, 0, z["pocket"] / 2) * Box(2.0, 2.0, z["pocket"] - 0.2),
               "Huelsentasche x=%+.0f" % sx)
-    # Basisring aussen massiv - jetzt in Randbreite, nicht mehr 70.
+    # Basisringecke massiv (der Ring liegt zwischen Durchfuehrung und Rand).
     solid(Pos(rim_out / 2 - 1.0, rim_out / 2 - 1.0, z["flange"] / 2)
           * Box(0.8, 0.8, 0.4), "Basisringecke")
 
@@ -438,7 +444,7 @@ def main():
     export_step(part, str(out / "adapter.step"))
     export_stl(part, str(out / "adapter.stl"))
 
-    print("Basisring    : %.1f x %.1f x %.1f mm (Rahmen klemmt am Tragring)"
+    print("Basisring    : %.1f x %.1f x %.1f mm, taucht durch den Tragring"
           % (rim_out, rim_out, p["flange_t"]))
     print("Schnapprand  : %.1f aussen, Rastmass der Scheibe %.1f"
           % (rim_out, p["snap_inner"]))

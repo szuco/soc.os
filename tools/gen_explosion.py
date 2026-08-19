@@ -616,11 +616,8 @@ def panel_c(cx, cy):
         rechteck(vz * T["screw_pitch"] / 2 - halb, -T["screw_slot_w"] / 2,
                  vz * T["screw_pitch"] / 2 + halb, T["screw_slot_w"] / 2,
                  PAPIER, ROT)
-    for vz in (1, -1):
-        kreis(X(vz * T["huelse_x"]), Y(0), T["huelse_d"] / 2 * PX_MM,
-              PAPIER, ROT, 1.2)
     text(X(-fg), Y(-fg) - 12,
-         "Tragring 70,0 · Scheibenadapter 49,8 · Durchführung 43 × 43",
+         "Tragring 70,0, Öffnung 50,6 · Adapter 49,8 taucht durch",
          KLEIN, KUNST, "lb")
 
     # USB-Freistellung des Adapters, an ihrer heutigen Stelle
