@@ -441,9 +441,9 @@ def panel_a(x0, y0):
         s.teil("tragring", Z["rahmen"][0], Z["rahmen"][0] + T["t"],
                vz * T["open_sq"] / 2.0, vz * T["grip"] / 2.0, KUNST_H, KUNST)
     s.fahne("tragring", Z["rahmen"][0], T["grip"] / 2.0,
-            ["Tragring, gedruckt — kommt ZUERST:",
+            ["Tragring, gedruckt — NACH dem Stapel:",
              "70,0 × 70,0 × 2,0 · Öffnung 50,6 zentriert",
-             "Geräteschrauben auf 60,0 in die Dose"])
+             "Ø-52-Boards passen nicht durch 50,6"])
 
     # Top-Board mit den beiden Schrauben von vorn
     s.gruppe("top", Z["top_ui"][0], Z["top_ui"][1])

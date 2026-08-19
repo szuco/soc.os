@@ -190,22 +190,26 @@ def main():
         a('<p>Der Abdeckrahmen hält nicht von allein — er wird geklemmt. '
           'Die Kette, von hinten nach vorn:</p>')
         a('<ol>')
-        a('<li>Der <b>Tragring</b> wird mit den Geräteschrauben (60 mm) '
-          'in die Leerdose geschraubt — er ist das einzige Teil, das die '
-          'Dose direkt hält.</li>')
-        a('<li><b>Bottom, Mid und Top</b> sind über M2,5-Hülsen zu einem '
-          'Stapel verschraubt; die Stapelverbinder übertragen nur noch '
-          'Strom und Signale.</li>')
-        a('<li>Der <b>Abdeckrahmen</b> wird auf den Tragring geklemmt — '
-          'noch lose.</li>')
-        a('<li>Das <b>Top-Board</b> liegt in der Tasche des '
-          '<b>Scheibenadapters</b>; zwei Schrauben von vorn durch das '
-          'Board in die Hülsen ziehen beide gegen das Mid-Board. Der '
-          'Adapter taucht dabei durch die Tragring-Öffnung und wird von '
-          'ihr zentriert.</li>')
-        a('<li>Die <b>Zentralscheibe</b> rastet auf den Adapter und '
-          'presst mit ihrem Rand den Rahmensteg gegen den Tragring — '
-          'erst jetzt sitzt der Rahmen fest.</li>')
+        a('<li><b>Bottom und Mid verschrauben:</b> untere Hülsen '
+          'Buchse/Buchse von hinten an Bottom, Mid auflegen, obere Hülsen '
+          'Stift/Buchse von vorn durch Mid — der Stift klemmt Mid zwischen '
+          'den Hülsen. Alle M2,5 × 9.</li>')
+        a('<li>Die in der Dose vorverdrahtete <b>Feldstecker-Leiste</b> '
+          'hinten an Bottom klicken, die Einheit in die Leerdose '
+          'schieben.</li>')
+        a('<li>Erst jetzt den <b>Tragring</b> aufsetzen — er fädelt über '
+          'Hülsen und USB-Buchse — und mit den Geräteschrauben (60 mm) '
+          'festschrauben. Andersherum ginge es nicht: Die Ø-52-Boards '
+          'passen nicht durch seine 50,6er Öffnung.</li>')
+        a('<li>Den <b>Abdeckrahmen</b> auf den Tragring klemmen — noch '
+          'lose — und das Kabel des Magnetkontakts durch den '
+          'Kabeldurchlass in J6 auf der Top-Rückseite stecken.</li>')
+        a('<li>Das <b>Top-Board</b> im Scheibenadapter aufsetzen, zwei '
+          'Schrauben von vorn in die Hülsen; der Adapter taucht durch die '
+          'Tragring-Öffnung und wird von ihr zentriert.</li>')
+        a('<li>Die <b>Zentralscheibe</b> aufrasten — ihr Rand presst den '
+          'Rahmensteg gegen den Tragring. Erst jetzt sitzt der Rahmen '
+          'fest.</li>')
         a('</ol>')
         a('<p>Kraftfluss: Schraubenkopf → Top-Board → Adaptertasche → '
           'Schnapprand → Zentralscheibe → Rahmensteg → Tragring → '

@@ -446,16 +446,29 @@ Rahmensteg → Tragring-Adapter → Dose. Genau das presst den Abdeckrahmen fest
 er ist zwischen Scheibe und Tragring eingeklemmt, wie im Original von
 Busch-Jaeger, nur dass dort der Tragring aus Metall ist.
 
-**Montagereihenfolge:**
+**Montagereihenfolge — korrigiert am 20.08.2026.** Die erste Fassung begann
+mit dem Tragring in der Dose; das ist unbaubar, denn die Ø-52-Boards passen
+nicht durch seine 50,6er Öffnung. Der Stapel muss ZUERST hinein:
 
-1. Tragring-Adapter mit den Geräteschrauben in die Dose
-2. Bottom unter Mid schrauben (zwei Hülsen M2,5 × 9 — der Ebenenabstand ist
-   10, die Platine 1), Stapel einsetzen
-3. Feldstecker-Leiste von hinten einklicken
-4. Abdeckrahmen auf den Tragring klemmen
-5. Magnetkontakt-Kabel durch die Unterkerbe des Top-Boards nach hinten in J6
-6. Top-Board in den Scheibenadapter, beide von vorn mit M2,5 in die 9-mm-Hülsen
-7. Zentralscheibe aufrasten — damit ist alles gepresst
+1. **Bottom mit Mid verschrauben.** Untere Hülsen (M2,5 × 9,
+   Buchse/Buchse) mit zwei Schrauben von hinten an Bottom; Mid auflegen;
+   obere Hülsen (M2,5 × 9, **Stift/Buchse**) von vorn durch Mid in die
+   unteren schrauben — ihr Gewindestift klemmt Mid zwischen den Hülsen.
+2. **Feldstecker-Leiste anstecken.** Die in der Dose vorverdrahtete
+   Micro-Fit-Leiste klickt hinten an Bottom.
+3. **Einheit in die Leerdose** — Bottom voran, USB-C zeigt zur 9-Uhr-Seite.
+4. **Tragring aufsetzen und festschrauben.** Er fädelt über die oberen
+   Hülsen (Luft 3,8) und die USB-C-Buchse (Luft 2,1) und greift mit den
+   Geräteschrauben auf 60 mm in die Dose.
+5. **Abdeckrahmen auf den Tragring klemmen** — er sitzt noch lose.
+6. **Magnetkontakt-Kabel** aus der unteren Rahmenleiste durch den
+   Kabeldurchlass des Tragrings nach innen führen und in J6 auf der
+   Top-Rückseite stecken (liegende Buchse, Öffnung zur Kerbe).
+7. **Top-Board in den Scheibenadapter**, aufsetzen, zwei Schrauben M2,5
+   von vorn durch H1/H2 in die oberen Hülsen. Der Adapter taucht durch
+   die Tragring-Öffnung und wird von ihr zentriert.
+8. **Zentralscheibe aufrasten** — ihr Rand presst den Rahmensteg gegen
+   den Tragring. Erst jetzt sitzt der Rahmen fest.
 
 **Die Steckverbinder tragen seitdem nichts mehr.** Sie sind rein elektrisch;
 Punkt 23 (durchsteckbarer Stapelverbinder) verliert dadurch seine mechanische
