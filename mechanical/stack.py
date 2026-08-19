@@ -51,7 +51,22 @@ TEILE = [
 
 # Der Adapter sitzt vor dem Top-Board. Seine Platinentasche nimmt das
 # Top-Board auf; Tasche und Boardrueckseite liegen aufeinander.
-ADAPTER = ("adapter.step", 21.0)
+#
+# KORREKTUR 19.08.2026: Hier stand 21,0 - die Zahl der Board-VORDERseite.
+# Der Nullpunkt des Adapters ist aber seine Flanschrueckseite, und seine
+# Auflage (Modellhoehe seat) liegt 4,5 mm davor. Gefordert ist, dass die
+# Auflage auf der Board-RUECKseite sitzt:
+#
+#     seat  = plate_depth + flange_t - (face + cross + switch + pcb)
+#           = 10,0 - 5,5 = 4,5
+#     Versatz = Rueckseite Top (20,0) - seat (4,5) = 15,5
+#
+# Mit 21,0 schwebte der Adapter 5,5 mm zu weit vorn, das Top-Board lag
+# nicht in seiner Tasche. Gegenprobe: Mit 15,5 faellt die hintere Kante
+# der Zentralscheibe (Tiefe 7,5 vor der Sichtflaeche bei 25,5, also 18,0)
+# genau auf die Flanschvorderkante (15,5 + 2,5) - so muss es sein.
+# Aufgefallen beim Zeichnen von tools/gen_explosion.py.
+ADAPTER = ("adapter.step", 15.5)
 
 
 def bauen():

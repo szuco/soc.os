@@ -115,6 +115,7 @@ def main():
         return 1
 
     stapel = bild("stack.png", 1400)
+    front = bild("front-explosion.png", 1900)
     ansichten = {}
     for n, _, _, _, _ in BOARDS:
         ansichten[n] = (bild("%s_top.png" % n, 760),
@@ -170,6 +171,17 @@ def main():
     else:
         a('<p class="warnung">Stapelbild fehlt — erst '
           '<code>tools/render_all.py</code> laufen lassen.</p>')
+    if front:
+        a('<figure class="explosion">')
+        a('<img src="%s" alt="Maßstäbliche Schnitte durch Abdeckrahmen, '
+          'Zentralscheibe, Adapter, Top-Board und Displaypanel">' % front)
+        a('<figcaption>Die Front im Schnitt — zwei maßstäbliche '
+          'Schnittebenen, die Draufsicht und die eingebaute Tiefenlage. '
+          'Gezeichnet aus den Parametern von <code>adapter.py</code> und '
+          'den Layoutkonstanten, nicht gerendert; rot markiert sind die '
+          'offenen Punkte. Erzeugt von '
+          '<code>tools/gen_explosion.py</code>.</figcaption>')
+        a('</figure>')
     a('<aside class="offen">')
     a('<p class="offen-titel">Offen: der Stapelverbinder</p>')
     a('<p>Alle drei Platinen tragen denselben Footprint einer '

@@ -44,6 +44,29 @@ Die Tiefenkette, von der Sichtfläche nach hinten (`04-mechanical.md` 1e):
       7,5   Rastebene, hintere Kante der Scheibe  (F2)
 ```
 
+### Die Zeichnung dazu
+
+![Maßstäbliche Schnitte durch Abdeckrahmen, Zentralscheibe, Adapter, Top-Board und Displaypanel](renders/front-explosion.png)
+
+Erzeugt von [`../tools/gen_explosion.py`](../tools/gen_explosion.py) →
+`renders/front-explosion.png`. Sie enthält zwei Schnittebenen, die Draufsicht
+und die eingebaute Tiefenlage.
+
+**Was sie zeigt:** die fünf Teile maßstäblich in Höhe *und* Tiefe, ihre
+eingebaute z-Lage, und rot markiert die offenen Punkte an genau der Stelle, an
+der sie auftreten.
+
+**Was sie nicht zeigt:** kein 3D. Ein Schnitt zeigt nur, was in seiner Ebene
+liegt; alles, was als *projiziert* beschriftet ist, liegt daneben und ist
+hineingeklappt. Die Explosionsabstände von 13 mm sind Darstellung, kein Maß.
+Nicht dargestellt sind Dose, Schrauben, Kabel und alle Bauteile ohne eigene
+Beschriftung. Der Magnetkontakt ist ein Platzhalter (Punkt 64).
+
+Die Zahlen liest das Werkzeug mit `ast` direkt aus `adapter.py`, `stack.py`,
+`gen_boards.py` und `gen_layouts.py` — es kann also nicht auseinanderlaufen,
+und ein CAD-Lauf ist dafür nicht nötig. Die 57 MB große
+`switchstack_stack.step` wird bewusst **nicht** geladen.
+
 **Die Rastebene liegt hinter der Leiterplatte.** Daraus folgt der ganze Aufbau:
 Der Schnapprand des Adapters steht hinter dem Board und ist Rastglied und
 Auflage in einem. In der Displayfläche gilt eine eigene Kette — 1,90 mm Luft
@@ -121,7 +144,7 @@ auffängt — und wo nichts steht, fängt nichts auf.
 |---|---|---|---|
 | **Adapter ↔ Gerätedose** | **verschraubt**, zwei Geräteschrauben nach DIN 49073 | Langlöcher 3,9 mm breit, 7,9 mm über alles, Achsabstand 60,0 | Das Langloch — es fängt die Lochbild- und Verdrehtoleranz der Dose radial auf. **Das gesamte Gerätegewicht hängt hier**, in gedrucktem Kunststoff mit 2,5 mm Flansch (Punkt 51) |
 | **Rahmen ↔ Adapter** | **geklemmt**, Doppelstege des Rahmens | Innenmaß 70,0 gegen Flansch 70,0 × 70,0, Ecken R 2,0 | **keines** — Null-Spiel-Paarung. Der Rahmen hält nur sich selbst; F13 nennt die Stege „eher Justierung als Halt". Wie fest er wirklich sitzt: ungeprüft (Punkt 25) |
-| **Zentralscheibe ↔ Adapter** | **gerastet**, vier Nasen mittig je Kante | Rand außen 49,8 gegen lichtes Rastmaß 50,0 → 0,1 mm Luft je Seite; Rastraum springt 1,5 mm zurück → **0,75 mm radialer Eingriff je Seite**, 1,3 mm tief | `rim_play` = 0,2 mm gesamt. Für ein FDM-Druckteil ist das sehr eng; Übermaß beim Druck macht die Scheibe unaufsteckbar, Untermaß lose (Punkt 25) |
+| **Zentralscheibe ↔ Adapter** | **aufgesteckt** — vier Nasen mittig je Kante, aber **ohne Hintergriff** | Rand außen 49,8 gegen lichtes Rastmaß 50,0 → **0,1 mm Luft je Seite**. Der Rastraum springt zwar 1,5 mm zurück, doch die Nasenspitzen liegen mit 25,0 *außerhalb* der Schulter (24,9) — sie gleiten über den Rand, statt dahinterzugreifen | `rim_play` = 0,2 mm gesamt, ausdrücklich als *Untermaß* geführt. Damit hält die Scheibe rechnerisch nur durch Reibung — **Punkt 67** |
 | **Top-Board ↔ Adapter** | **eingelegt und hintergriffen** — Tasche seitlich, Auflage hinten | Tasche 47,4 für Board 47,0 → 0,2 mm je Seite; Auflage 2,0 mm ringsum, unterbrochen von der 9,4 mm breiten USB-Freistellung | `pcb_play` = 0,4 mm gesamt fängt die Fräßtoleranz des Boards auf. **Nach vorn hält nichts** — das übernimmt die Scheibe |
 | **Zentralscheibe ↔ Top-Board** | **Anpressung über die vier Druckkreuze** | Kreuze 3,2 × 3,2 mm bei (±18,0 / ±20,0), 1,5 mm hoch, treffen die Taster | **keines** — siehe Abschnitt 4. Die Scheibe ist zugleich das einzige Teil, das das Board am Herausfallen hindert; ist sie ab, liegt das Board lose in der Tasche |
 | **Displaypanel ↔ Top-Board** | **geklebt**, doppelseitiges Band umlaufend | 2,40 mm lange Seiten, 1,05 mm kurze Seiten; Klebefuge 0,1–0,2 mm | Die Klebefuge. **Bewusst geklebt und nicht geklemmt:** Die Schaumdichtung in den 1,90 mm davor drückt an, darf aber nicht die Befestigung sein — sonst fällt das Panel heraus, sobald die Scheibe abgenommen wird |
@@ -135,8 +158,15 @@ auffängt — und wo nichts steht, fängt nichts auf.
 
 Gewicht und Bedienkraft des ganzen Geräts laufen über **zwei gedruckte
 Schraubaugen** in die Dose; alles andere hängt in Reihe daran — Rahmen geklemmt,
-Scheibe gerastet, Top-Board in der Tasche liegend, Mid und Bottom an zwei
+Scheibe aufgesteckt, Top-Board in der Tasche liegend, Mid und Bottom an zwei
 Steckverbindern.
+
+> **Korrektur 19.08.2026.** Hier stand zuvor „Scheibe gerastet, 0,75 mm
+> radialer Eingriff je Seite". Die 0,75 mm sind die Stufentiefe des
+> Adapterrandes (49,8 gegen Rastraum 48,3), **nicht** der Eingriff der Nasen:
+> Deren lichtes Maß ist 50,0 und liegt damit 0,1 mm je Seite *außerhalb* des
+> Randes. Aufgefallen beim maßstäblichen Zeichnen — siehe Abschnitt 7 und
+> Punkt 67.
 
 ---
 
@@ -217,6 +247,9 @@ dieser Tabelle.
 
 | Thema | Punkt |
 |---|---|
+| Zentralscheibe rastet rechnerisch nicht ein — 0,1 mm Luft statt Hintergriff | **67** |
+| USB-Freistellung des Adapters liegt auf der falschen Seite | **68** |
+| Ebenenabstand: 9,0 mm im Modell gegen 10,0 mm im Tiefenbudget | **66** |
 | Vias in Strompfaden — Bemessung statt „mehrfach setzen" | **60** |
 | Halt von Mid und Bottom; Befestigungsbohrungen ohne Gegenstück im Adapter | **61** |
 | Nullspalt zwischen Druckkreuz und Taster | **62** |
@@ -228,6 +261,36 @@ dieser Tabelle.
 | Bauhöhe und Außenmaß des realen Displaymoduls | 15c |
 | Stackverbinder-Paar samt Codierung und Steckhöhe | 23 |
 | Sicherung der Platine gegen Herausfallen bei abgenommener Scheibe | `../mechanical/README.md`, „Was noch fehlt" |
+
+## 7. Was das maßstäbliche Zeichnen zutage gefördert hat
+
+Vier Dinge, die in den Tabellen nicht auffielen, weil dort jede Zahl für sich
+richtig ist. Erst nebeneinander gezeichnet stimmen sie nicht zusammen. Alle
+vier prüft `gen_explosion.py` jetzt bei jedem Lauf und schreibt sie ins Bild.
+
+1. **Der Adapter saß in `stack.py` 5,5 mm zu weit vorn** — dort stand 21,0, die
+   Koordinate der Board*vorder*seite, gefordert ist die Lage der Auflage auf
+   der Board*rück*seite: 20,0 − 4,5 = **15,5**. Korrigiert am 19.08.2026, mit
+   Gegenprobe: Mit 15,5 fällt die hintere Kante der Zentralscheibe (18,0)
+   genau auf die Flanschvorderkante (15,5 + 2,5). Die Baugruppen-STEP ist
+   damit neu zu erzeugen — bis dahin zeigte sie den Adapter schwebend.
+2. **Die Zentralscheibe rastet rechnerisch nicht ein** (Punkt 67). Ihr lichtes
+   Nasenmaß ist 50,0, der Schnapprand 49,8 — die Nasen gleiten mit 0,1 mm Luft
+   je Seite über den Rand, statt hinter der Schulter zu greifen. Der
+   Selbsttest in `adapter.py` prüft nur, *dass* der Rand hineinpasst, nie,
+   *dass* etwas hält.
+3. **Die USB-Freistellung des Adapters liegt auf der falschen Seite**
+   (Punkt 68). Sie steht bei x = −1,2…8,2 auf der 6-Uhr-Seite; die Buchse ist
+   am 18.08.2026 an den linken Rand gewandert (x = −23,2…−16,8, Kerbe
+   −23,5…−17,25). Der Adapter stellt heute eine Stelle frei, an der nichts
+   steht, und lässt Material dort stehen, wo der Buchsenkörper durchgreift.
+4. **Ein Millimeter Unterschied im Ebenenabstand** (Punkt 66): `stack.py`
+   setzt die Boards auf 0/10/20 — zwischen Boardvorderseite und nächster
+   Boardrückseite bleiben damit 9,0 mm. Das Tiefenbudget in
+   [`04-mechanical.md`](04-mechanical.md) Abschnitt 4 rechnet mit 10,0 mm ab
+   Boardvorderseite. Eine der beiden Lesarten ist falsch, und welche, hängt
+   daran, wie die Stapelhöhe des noch nicht gewählten Verbinders definiert ist
+   (Punkt 23).
 
 **Die Quellenlage ist an einer Stelle widersprüchlich** und wurde hier nicht
 stillschweigend geglättet: [`04-mechanical.md`](04-mechanical.md) Abschnitte 6b

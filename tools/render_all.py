@@ -163,6 +163,20 @@ def main():
 
     print("%-20s %-7s %s" % ("stapelbild", "", "ok" if stapelbild() else "FEHLER"))
 
+    # Die Schnittzeichnung der Front. Sie braucht weder KiCad noch einen
+    # Geometriekern - sie liest die Masse aus den Quellen und zeichnet sie.
+    # Deshalb laeuft sie hier immer mit, auch wenn kein Board neu erzeugt
+    # wurde: Aendert sich ein Parameter in adapter.py, ist das Bild sonst
+    # still veraltet.
+    r = subprocess.run([sys.executable,
+                        os.path.join(ROOT, "tools", "gen_explosion.py")],
+                       capture_output=True, text=True)
+    print("%-20s %-7s %s" % ("frontschnitt", "",
+                             "ok" if r.returncode == 0 else "FEHLER"))
+    for zeile in (r.stdout or r.stderr[-400:]).splitlines():
+        if zeile.strip().startswith("!"):
+            print("   %s" % zeile.strip())
+
     # Gesamtbaugruppe erst danach - sie liest die eben geschriebenen STEPs.
     r = subprocess.run([sys.executable,
                         os.path.join(ROOT, "mechanical", "stack.py")],

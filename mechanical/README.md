@@ -104,3 +104,11 @@ Abschnitte 1b bis 1e.
 **Einbaureihenfolge, Kraftfluss und Toleranzen** — wer wen hält, was wann
 gefügt wird und wo die Reihenfolge zwingend ist:
 [`../docs/18-montage-und-kraefte.md`](../docs/18-montage-und-kraefte.md).
+
+**Maßstäbliche Schnitte durch die Front** (zwei Schnittebenen, Draufsicht,
+eingebaute Tiefenlage): [`../docs/renders/front-explosion.png`](../docs/renders/front-explosion.png),
+erzeugt von [`../tools/gen_explosion.py`](../tools/gen_explosion.py). Das
+Werkzeug liest die Maße mit `ast` aus `adapter.py`, `stack.py` und den
+Layoutkonstanten — es braucht weder KiCad noch build123d und lädt die 57 MB
+große Baugruppen-STEP **nicht**. Nach jeder Parameteränderung neu laufen
+lassen; `tools/render_all.py` stößt es ohnehin mit an.
