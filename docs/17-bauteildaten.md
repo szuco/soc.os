@@ -7,7 +7,7 @@ herkommt** und **was davon abhängt**.
 | Teil | Stand | 3D-Modell |
 |---|---|---|
 | **Display** | ✅ **ER-TFT1.69-3**, Datenblatt ausgewertet | Hüllkörper nötig |
-| **Sternanschluss** | ✅ **JST GH BM02B-GHS-TBT** — die Klinke ist entfallen | ✅ **von KiCad** |
+| **Sternanschluss** | ✅ **JST GH SM02B-GHS-TB, liegend** — seit 19.08. abends: Die stehende BM02B ließ gesteckt nur 3,15 mm, und ihre Litzen zeigten axial aufs Mid-Board. Liegend baut sie 4,25 mm und entlässt die Litzen waagerecht in die Kabelkerbe | ✅ **von KiCad** |
 | **USB-C** | 🟡 GT-USB-7051x, LCSC C2843970 | 🟡 Hüllkörper, Höhe angenommen |
 | **Feldstecker** | ✅ Molex Micro-Fit 43045-1612 | 🟡 Hüllkörper aus dem Footprint |
 

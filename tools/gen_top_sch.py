@@ -259,9 +259,16 @@ def build():
     # Hinten sind 10,0 mm frei bis zum Mid-Board. Die stehende Bauform bleibt
     # damit, wie sie ist - sie passt dort dreifach - und der enge Streifen
     # neben dem Display wird frei.
+    # LIEGEND, nicht stehend (19.08.2026, zweite Korrektur): Hinter dem
+    # Top-Board sind 9,0 mm frei (Ebenenabstand 10 minus Platine). Die
+    # stehende BM02B baut gesteckt 5,85 - es blieben 3,15 mm, und die
+    # Litzen verlassen ihr Gehaeuse AXIAL Richtung Mid-Board: Sie muessten
+    # auf diesem Rest um 90 Grad biegen und druecken dauerhaft gegen die
+    # Platine. Die liegende SM02B baut gesteckt 4,25 und entlaesst die
+    # Litzen WAAGERECHT - genau in die Kabelkerbe.
     s.add("J6", "Connector_Generic:Conn_01x02", "Stern (intern)",
-          "Connector_JST:JST_GH_BM02B-GHS-TBT_1x02-1MP_P1.25mm_Vertical",
-          MPN="JST GH BM02B-GHS-TBT, 2-polig stehend mit Verriegelung")
+          "Connector_JST:JST_GH_SM02B-GHS-TB_1x02-1MP_P1.25mm_Horizontal",
+          MPN="JST GH SM02B-GHS-TB, 2-polig liegend mit Verriegelung")
     s.connect("STAR_OUT", ("J6", "1"))
     s.connect("PGND",     ("J6", "2"))
 

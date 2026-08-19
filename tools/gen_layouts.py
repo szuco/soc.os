@@ -969,10 +969,13 @@ FIXED_TOP = dict(
     # Sternanschluss unten links, im Streifen unter dem Displaypanel.
     # Der ist 8,16 mm hoch (Panelunterkante 15,34 bis Boardrand 23,50); der
     # JST GH misst 4,95 mm in y und laesst damit 1,6 mm nach oben und unten.
-    # J6 auf der Rueckseite, direkt hinter der Kabelkerbe: Das Kabel vom
-    # Magnetkontakt im Abdeckrahmen kommt durch die Kerbe (0 / 23,5..21,5)
-    # und soll dahinter ohne Umweg stecken.
-    J6=(0.0, 18.0, 0, "B"),            # Sternanschluss JST GH, intern
+    # J6 auf der Rueckseite, LIEGEND, die Oeffnung zur Kabelkerbe: Der
+    # Koerper der SM02B reicht in Footprint-y von -1,6 bis 2,45; bei
+    # y = 19,0 endet er auf 21,45 - buendig vor der Kerbe (ab 21,5). Der
+    # Stecker faehrt von der Kerbe her ein, die Litzen laufen geradeaus
+    # hinaus. Auf der Rueckseite spiegelt KiCad nur x; die Oeffnung nach
+    # +y bleibt bei Rotation 0 erhalten.
+    J6=(0.0, 19.0, 0, "B"),            # Sternanschluss JST GH, intern
     # ToF UND Raumsensor unter EINEM Durchbruch, 18.08.2026.
     #
     # Bisher sassen sie auf den Diagonalen bei (-9 / -19) und (+9 / -19) und

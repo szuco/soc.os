@@ -185,6 +185,32 @@ def main():
           'offenen Punkte. Erzeugt von '
           '<code>tools/gen_explosion.py</code>.</figcaption>')
         a('</figure>')
+        a('<div class="halten">')
+        a('<h3>Wer hält wen</h3>')
+        a('<p>Der Abdeckrahmen hält nicht von allein — er wird geklemmt. '
+          'Die Kette, von hinten nach vorn:</p>')
+        a('<ol>')
+        a('<li>Der <b>Tragring</b> wird mit den Geräteschrauben (60 mm) '
+          'in die Leerdose geschraubt — er ist das einzige Teil, das die '
+          'Dose direkt hält.</li>')
+        a('<li><b>Bottom, Mid und Top</b> sind über M2,5-Hülsen zu einem '
+          'Stapel verschraubt; die Stapelverbinder übertragen nur noch '
+          'Strom und Signale.</li>')
+        a('<li>Der <b>Abdeckrahmen</b> wird auf den Tragring geklemmt — '
+          'noch lose.</li>')
+        a('<li>Das <b>Top-Board</b> liegt in der Tasche des '
+          '<b>Scheibenadapters</b>; zwei Schrauben von vorn durch das '
+          'Board in die Hülsen ziehen beide gegen das Mid-Board. Der '
+          'Adapter taucht dabei durch die Tragring-Öffnung und wird von '
+          'ihr zentriert.</li>')
+        a('<li>Die <b>Zentralscheibe</b> rastet auf den Adapter und '
+          'presst mit ihrem Rand den Rahmensteg gegen den Tragring — '
+          'erst jetzt sitzt der Rahmen fest.</li>')
+        a('</ol>')
+        a('<p>Kraftfluss: Schraubenkopf → Top-Board → Adaptertasche → '
+          'Schnapprand → Zentralscheibe → Rahmensteg → Tragring → '
+          'Dose.</p>')
+        a('</div>')
     a('<aside class="offen">')
     a('<p class="offen-titel">Offen: der Stapelverbinder</p>')
     a('<p>Alle drei Platinen tragen denselben Footprint einer '
@@ -389,6 +415,12 @@ td{padding:.55rem .8rem .55rem 0; border-bottom:1px solid var(--raster);
   color:var(--matt); white-space:nowrap;}
 .summe td{border-bottom:none; border-top:1px solid var(--linie);
   padding-top:.7rem;}
+
+.halten{display:flex; flex-direction:column; gap:.6rem; max-width:66ch;}
+.halten h3{font-size:1.1rem;}
+.halten ol{margin:0; padding-left:1.4rem; display:flex;
+  flex-direction:column; gap:.45rem;}
+.halten p:last-child{color:var(--matt); font-size:.95rem;}
 
 .offen{border-left:3px solid var(--akzent); padding:.2rem 0 .2rem 1.1rem;
   display:flex; flex-direction:column; gap:.5rem; max-width:66ch;}

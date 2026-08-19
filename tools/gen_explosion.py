@@ -38,7 +38,7 @@ WAS SIE NICHT ZEIGT
   * keine Dose, keine Schrauben, keine Kabel
   * die Explosionsabstaende sind Darstellung, kein Mass; die Teile selbst
     und ihre eingebaute Tiefenlage sind massstaeblich
-  * der Magnetkontakt ist ein Platzhalter - magnet_d/magnet_h in adapter.py
+  * der Magnetkontakt sitzt im Abdeckrahmen (docs/04, 2b/F14)
     sind nicht gemessen (Punkt 64)
 
 QUELLEN DER MASSE
@@ -142,7 +142,9 @@ USB_A, USB_B = 9.94, 6.40
 TASTER_A, TASTER_B = 3.9, 2.9   # SMD-Taster, docs/04
 KREUZ = 3.2                     # F10
 # JST GH BM02B stehend, gesteckt rund 5,7 mm (gen_layouts, Kommentar zu J6)
-J6_X, J6_Y, J6_H, J6_B = 0.0, 18.0, 5.7, 6.0
+J6_X, J6_Y, J6_H, J6_B = 0.0, 19.0, 4.25, 6.0   # liegend seit 19.08.2026
+HUELSE_X = 21.5          # Huelsen und Schrauben: die H1/H2-Achse
+HUELSE_B = 2.25          # halbe Schluesselweite 4,5
 # Fenster der Zentralscheibe, docs/04 Abschnitt 1d
 FENSTER_X, FENSTER_Y = 32.7, 27.0
 FENSTER_M = (-0.95, -0.3)       # Mitte, in KiCad-y (nach unten)
@@ -385,7 +387,8 @@ class Schnitt(object):
 
 def panel_a(x0, y0):
     s = Schnitt(x0, y0, 1000, "Schnitt A – A   ·   Ebene y = 0",
-                "Tiefenkette, Display, Rastung, Flansch, Rahmen · "
+                "Tiefenkette und Kraftfluss: Schraube → Top-Board → Adapter "
+                "→ Scheibe → Rahmen → Tragring → Dose · "
                 "Explosionsabstand %.0f mm, sonst maßstäblich" % LUECKE)
     r = B["BOARD_DIAMETER"] / 2.0
     h = B["TOP_SQ"] / 2.0
@@ -410,6 +413,11 @@ def panel_a(x0, y0):
     s.fahne("bottom", zb[0], r, ["Bottom-Board", "Ø 52,0 × 1,0"])
     s.marke("bottom", zb[1] + 1.4, -sx - 7.0, "Stapelverbinder 2×20,")
     s.marke("bottom", zb[1] + 1.4, -sx - 11.0, "1,27 mm · Stapelhöhe 10,0")
+    for vz in (1, -1):
+        s.teil("bottom", zb[1], Z["mid_logic"][0], vz * HUELSE_X - HUELSE_B,
+               vz * HUELSE_X + HUELSE_B, FEIN, TUSCHE)
+    s.marke("bottom", zb[1] + 1.4, HUELSE_X + 3.5,
+            "Hülse M2,5 × 9", TUSCHE)
 
     # Mid-Board
     s.gruppe("mid", Z["mid_logic"][0], Z["top_ui"][0])
@@ -419,12 +427,37 @@ def panel_a(x0, y0):
         s.teil("mid", zm[1], Z["top_ui"][0], vz * sx - STK_B / 2,
                vz * sx + STK_B / 2, BAUTEIL)
     s.fahne("mid", zm[0], r, ["Mid-Board", "Ø 52,0 × 1,0"])
+    for vz in (1, -1):
+        s.teil("mid", zm[1], Z["top_ui"][0], vz * HUELSE_X - HUELSE_B,
+               vz * HUELSE_X + HUELSE_B, FEIN, TUSCHE)
+    s.marke("mid", zm[1] + 1.4, HUELSE_X + 3.5,
+            "Hülse M2,5 × 9", TUSCHE)
 
-    # Top-Board
+    # Tragring - er liegt auf der Wandebene, zwischen Mid und Top. Die
+    # Huelsen laufen frei durch seine 50,6er Oeffnung; der Basisring des
+    # Adapters taucht hindurch und wird von ihr zentriert.
+    s.gruppe("tragring", Z["rahmen"][0], Z["rahmen"][0] + T["t"], luecke=0)
+    for vz in (1, -1):
+        s.teil("tragring", Z["rahmen"][0], Z["rahmen"][0] + T["t"],
+               vz * T["open_sq"] / 2.0, vz * T["grip"] / 2.0, KUNST_H, KUNST)
+    s.fahne("tragring", Z["rahmen"][0], T["grip"] / 2.0,
+            ["Tragring, gedruckt — kommt ZUERST:",
+             "70,0 × 70,0 × 2,0 · Öffnung 50,6 zentriert",
+             "Geräteschrauben auf 60,0 in die Dose"])
+
+    # Top-Board mit den beiden Schrauben von vorn
     s.gruppe("top", Z["top_ui"][0], Z["top_ui"][1])
     zt = Z["top_ui"]
     s.teil("top", zt[0], zt[1], -h, h, PCB)
     s.fahne("top", zt[0], h, ["Top-Board", "47,0 × 47,0 × 1,0"])
+    for vz in (1, -1):
+        # Kopf auf der Platinenvorderseite, Schaft durch H1/H2 in die Huelse
+        s.teil("top", zt[1], zt[1] + 1.7, vz * HUELSE_X - 2.25,
+               vz * HUELSE_X + 2.25, TUSCHE, TUSCHE)
+        s.teil("top", zt[0] - 1.0, zt[1], vz * HUELSE_X - 1.25,
+               vz * HUELSE_X + 1.25, TUSCHE, TUSCHE)
+    s.marke("top", zt[0] - 1.0, -(HUELSE_X + 4.5),
+            "M2,5 Flachkopf von vorn — zieht alles zusammen", TUSCHE, "rm")
 
     # Displaypanel, aufgeklebt
     s.gruppe("panel", Z["panel"][0], Z["panel"][1])
@@ -497,7 +530,8 @@ def panel_a(x0, y0):
                vz * (P["frame_grip"] / 2.0 + 1.6), BAUTEIL, None)
     s.fahne("rahmen", zr[0], RAHMEN_AM / 2.0,
             ["Abdeckrahmen 1721-914", "81 × 81 × 12 · Fenster 56,0",
-             "klemmt auf 70,0"])
+             "klemmt auf dem Tragring (70,0) und wird",
+             "von der Scheibe dagegen gepresst"])
 
 
 # --- Panel B: Schnitt bei y = 19,6 ----------------------------------------
@@ -544,9 +578,8 @@ def panel_b(x0, y0):
     for vz in (1, -1):
         s.teil("top", Z["taster"][0], Z["taster"][1], vz * btn - TASTER_A / 2,
                vz * btn + TASTER_A / 2, BAUTEIL)
-    s.fahne("top", zt[0], h, ["Top-Board 47 × 47", "Durchbruch Ø 6,7",
-                              ("Magnetkontakt:", ROT),
-                              ("Halt offen (P. 64)", ROT)])
+    s.fahne("top", zt[0], h, ["Top-Board 47 × 47", "Kabelkerbe 5 × 2",
+                              ("Magnetkontakt im Rahmen (F14)", ROT)])
     s.marke("top", zt[0] - J6_H - 1.2, -30.0, "J6 (JST GH, hinten)",
             GRAU, "rm")
     s.marke("top", Z["taster"][0] + 0.5, btn + 4.0, "Ecktaster 2,0 hoch")
@@ -742,7 +775,8 @@ def kopf_und_notizen(meldungen):
         "Ein Schnitt zeigt nur, was in seiner Ebene liegt; »projiziert«",
         "heißt: liegt daneben und ist hineingeklappt.",
         "Nicht dargestellt: Dose, Schrauben, Kabel und alle Bauteile ohne",
-        "eigene Beschriftung. Der Magnetkontakt ist ein Platzhalter.",
+        "eigene Beschriftung. Der Magnetkontakt sitzt im Abdeckrahmen",
+        "unten mittig und liegt damit ausserhalb der Schnittebenen.",
     ]
     for i, s in enumerate(zeilen):
         text(x0 + 18, y0 + 48 + i * 17, s, NORMAL, GRAU)
