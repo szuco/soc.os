@@ -34,7 +34,7 @@ Soft-Limit und der einzige noch offene Leistungshalbleiter provisorisch.
 |---|---|---|---|
 | **BOTTOM** `bottom_power_motor` | ✅ **82 Bauteile** statt 102 — dazu R1B und die EN_LOOP-Schleife (Hauptschalter, v0.7) — integrierte Brücken DRV8871 statt acht MOSFETs, ein Feldstecker statt vier | 🟡 **vierlagig, 863 Segmente, 108 Vias (Leistungsnetze 0,8/0,4 + Zwillinge), null Kupferfehler**; 6 Signale offen, Via-Engpassliste in docs/16 | ⛔ Handarbeit, siehe [`16`](16-kicad-handgriffe.md) |
 | **MID** `mid_logic` | ✅ 49 Bauteile — Feldstecker abgegeben, USB-C übernommen | 🟡 **vierlagig, 776 Segmente, 87 Vias, null Kupferfehler**; 3 Signale offen (RELAY_CTL neu dabei), RESET/BOOT vorn unter den Durchgriffen | ⛔ Handarbeit |
-| **TOP** `top_ui` | ✅ 26 Bauteile — kein USB; ToF und Raumsensor symmetrisch bei ±5,5, Hauptschalter SW5 hochkant daneben | 🟡 **vierlagig, 179 Segmente, 21 Vias, null Kupferfehler**; 8 Signale offen; Durchgriffe H3/H4 für RESET/BOOT | ⛔ Handarbeit |
+| **TOP** `top_ui` | ✅ 26 Bauteile — kein USB; ToF und Raumsensor symmetrisch bei ±5,5, Hauptschalter SW5 hochkant daneben | 🟡 **vierlagig, 181 Segmente, 22 Vias, null Kupferfehler**; 7 Signale offen; Durchgriffe H3/H4 für RESET/BOOT, J6 liegend vor der Kerbe | ⛔ Handarbeit |
 | **Nutzen** `fab/panel` | — (Build-Ergebnis) | ✅ **vierlagig, 173,4 × 72,4 mm**, mit Passermarken und Werkzeugbohrungen, deckungsgleich mit der Summe der Einzelboards | 🟡 bestellbar, sobald die Handarbeit erledigt ist |
 
 Die 43 offenen Verbindungen auf Bottom sind **kein Rückstand des Autorouters**,

@@ -205,18 +205,30 @@ def _eigenes_modell(fp, name):
 
 
 def _pruefe_kabelkerbe():
-    """Die Kabelkerbe darf weder J5 noch J6 auf der Rueckseite treffen."""
+    """Die Kabelkerbe darf weder J5 noch J6 koerperlich anschneiden.
+
+    ACHTUNG, hier steckte ein stiller Totalausfall (aufgeflogen am
+    20.08.2026, als die Reset-Durchgriffe fehlten): Die erste Fassung
+    prueft mit Pauschalabstand 3,5 - und meldete damit auch das LIEGENDE
+    J6, das absichtlich buendig VOR der Kerbe sitzt (Koerperende 21,45,
+    Kerbe ab 21,5). gen_layouts top brach seitdem bei jedem Lauf ab,
+    waehrend route/gnd das ALTE Board weiterverarbeiteten - J6 blieb
+    stehend, H3/H4 fehlten, und niemand sah es, weil die Kette danach
+    fehlerfrei durchlief. Jetzt rechnet die Pruefung mit den ECHTEN
+    Koerpertiefen der beiden Footprints.
+    """
     h = TOP_SQ / 2.0
     tief = h - KERB_T
-    for ref in ("J5", "J6"):
+    halbtiefe = {"J5": 3.2, "J6": 2.45}
+    for ref, ht in halbtiefe.items():
         eintrag = FIXED_TOP.get(ref)
         if not eintrag:
             continue
         x, y = eintrag[0], eintrag[1]
-        if abs(x) < KERB_W / 2.0 + 3.5 and y > tief - 3.5:
+        if abs(x) < KERB_W / 2.0 + 3.0 and y + ht > tief + 0.04:
             raise RuntimeError(
-                "Kabelkerbe (Breite %.1f an der Unterkante) kollidiert mit "
-                "%s bei (%.1f/%.1f)" % (KERB_W, ref, x, y))
+                "Kabelkerbe (ab y=%.2f) schneidet %s an - Koerper reicht "
+                "bis y=%.2f" % (tief, ref, y + ht))
 
 
 def load_fp(fpid):
@@ -988,13 +1000,18 @@ FIXED_TOP = dict(
     # Sternanschluss unten links, im Streifen unter dem Displaypanel.
     # Der ist 8,16 mm hoch (Panelunterkante 15,34 bis Boardrand 23,50); der
     # JST GH misst 4,95 mm in y und laesst damit 1,6 mm nach oben und unten.
-    # J6 auf der Rueckseite, LIEGEND, die Oeffnung zur Kabelkerbe: Der
-    # Koerper der SM02B reicht in Footprint-y von -1,6 bis 2,45; bei
-    # y = 19,0 endet er auf 21,45 - buendig vor der Kerbe (ab 21,5). Der
-    # Stecker faehrt von der Kerbe her ein, die Litzen laufen geradeaus
-    # hinaus. Auf der Rueckseite spiegelt KiCad nur x; die Oeffnung nach
-    # +y bleibt bei Rotation 0 erhalten.
-    J6=(0.0, 19.0, 0, "B"),            # Sternanschluss JST GH, intern
+    # J6 auf der Rueckseite, LIEGEND, die Oeffnung zur Kabelkerbe.
+    # ROTATION 180, nicht 0: KiCads Flip auf die Rueckseite spiegelt hier
+    # auch die y-Achse - bei Rotation 0 lagen die Loetpads ploetzlich bei
+    # y = 20,85 (0,65 vor der Kerbenkante, zwei Randfehler) und die
+    # Oeffnung zeigte zum Panel. Um 180 gedreht liegen die Pads sicher bei
+    # 17,15, der Koerper endet buendig bei 21,45, und der Stecker faehrt
+    # von der Kerbe her ein.
+    # y = 18,45 statt 19,0: Bei 19,0 standen die MP-Befestigungspads
+    # 0,03 mm vor den Kerbenflanken - zwei Randfehler. Der halbe
+    # Millimeter Board zwischen Koerper (endet 20,9) und Kerbe (ab 21,5)
+    # stoert die Litzen nicht.
+    J6=(0.0, 18.45, 180, "B"),         # Sternanschluss JST GH, intern
     # ToF UND Raumsensor unter EINEM Durchbruch, 18.08.2026.
     #
     # Bisher sassen sie auf den Diagonalen bei (-9 / -19) und (+9 / -19) und
