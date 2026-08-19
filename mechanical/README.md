@@ -91,6 +91,16 @@ unten die Taster — sie stehen auf (±18 · ±20) und reichen mit Footprint bis
   braucht, zeigt der reale Aufbau.
 - **Sicherung der Platine gegen Herausfallen.** Heute hält sie die Scheibe, die
   über die Taster auf sie drückt. Ob das reicht, zeigt der erste Druck.
+- **Nullspalt zwischen Druckkreuz und Taster** (Punkt 62). Kreuzunterkante und
+  Tasteroberkante liegen beide auf 2,5 — die Tiefenkette hat kein nachgiebiges
+  Glied, jede Toleranz landet direkt auf dem Schaltweg.
+- **Wer hält Mid und Bottom** (Punkt 61). Die Befestigungsbohrungen auf
+  r = 21,5 haben im Adapter kein Gegenstück; der Stapel hängt an den beiden
+  Stackverbindern.
 
 Herleitung und Messprotokoll: [`../docs/04-mechanical.md`](../docs/04-mechanical.md),
 Abschnitte 1b bis 1e.
+
+**Einbaureihenfolge, Kraftfluss und Toleranzen** — wer wen hält, was wann
+gefügt wird und wo die Reihenfolge zwingend ist:
+[`../docs/18-montage-und-kraefte.md`](../docs/18-montage-und-kraefte.md).
