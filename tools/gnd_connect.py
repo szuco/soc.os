@@ -286,13 +286,24 @@ def connect(name, max_rounds=4):
                             continue
                         # Freiraum auf ALLEN Lagen pruefen - das Via geht
                         # durch das ganze Board, nicht nur durch F und B.
-                        if not all(seg_clear(board, l, x, y, x, y, 0.6)
+                        # Die Suchbreite folgt der VIAGROESSE: Auf Bottom
+                        # sind die Bruecken 0,8 breit - mit der alten
+                        # 0,6er-Suche wurden sie in 0,6er-Luecken gesetzt
+                        # und rissen vier Abstandsfehler (20.08.2026).
+                        via_b = 0.8 if "bottom" in name else 0.6
+                        if not all(seg_clear(board, l, x, y, x, y, via_b + 0.1)
                                    for l in copper_layers(board)):
                             continue
                         v = pcbnew.PCB_VIA(board)
                         v.SetPosition(pcbnew.VECTOR2I(mm(x), mm(y)))
-                        v.SetWidth(mm(0.6))
-                        v.SetDrill(mm(0.3))
+                        # Auf dem Leistungsboard 0,8/0,4: Auch eine
+                        # Massebruecke kann im Rueckstrompfad liegen.
+                        if "bottom" in name:
+                            v.SetWidth(mm(0.8))
+                            v.SetDrill(mm(0.4))
+                        else:
+                            v.SetWidth(mm(0.6))
+                            v.SetDrill(mm(0.3))
                         v.SetLayerPair(F, B)
                         v.SetNet(net)
                         board.Add(v)

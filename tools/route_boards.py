@@ -110,27 +110,26 @@ CLASSES = {
         # 0,8 mm / 0,2 mm statt 1,0 / 0,25: Mit den breiteren Regeln
         # liess Freerouting nach 200 Passes (62 min) noch 58 Verbindungen
         # offen - die 1,0-mm-Bahnen passen nicht ueberall zwischen die
-        # FET-Pads. 0,8 mm traegt bei 35-um-Kupfer ~3 A dauerhaft und
-        # deckt Laufstrom (<= 1 A) wie Trip-Transienten ab; die
-        # Leistungspfade werden vor der Fertigung ohnehin von Hand
-        # nachgezogen (docs/05).
-        # Vias 0,6/0,3 und Standard-Clearance: Die 0,8er-Vias mit 0,2er-
-        # Clearance passen nicht in die Schluchten zwischen den FET-Pads;
-        # die letzten ~50 Verbindungen blieben damit dauerhaft offen.
-        # 0,6er-Vias tragen 2-3 A - fuer Laufstrom und kurze Transienten
-        # ausreichend; Leistungspfade werden vor der Fertigung ohnehin
-        # von Hand nachgezogen (docs/05).
+        # FET-Pads. 0,8 mm traegt bei 35-um-Kupfer ~3 A dauerhaft.
+        #
+        # VIAS: SEIT DEM 20.08.2026 DAS LEISTUNGSVIA 0,8/0,4. Vorher stand
+        # hier VIA_STD (0,6/0,3, ~1,2 A) - ein Erbe der diskreten
+        # H-Bruecke, zwischen deren acht FETs das grosse Via nicht passte.
+        # Die FETs sind seit dem DRV8871-Umbau weg, der Grund damit auch.
+        # Ein 0,3er Via im 24-V-Pfad war der Engpass des ganzen Boards:
+        # 24V_IN lief ueber genau EIN solches Via, bei 4,1 A Summenstrom.
+        # tools/via_check.py prueft das seitdem nach jedem Routing.
         #
         # CLEARANCE MIT RESERVE. Freerouting unterschreitet die Vorgabe: Bei
         # 150 um Anweisung kamen auf In1.Cu real 114 bis 144 um heraus - fuenf
         # Verletzungen gegen die 150-um-Regel. Deshalb steht hier 200 um, damit
         # auch das Ergebnis ueber 150 bleibt. Die Bahnbreiten sind davon
         # unberuehrt.
-        "PWR": (800, 200, VIA_STD, [
+        "PWR": (800, 200, VIA_PWR, [
             "24V_IN", "24V_F", "24V_PROT", "M1_A", "M1_B", "M2_A", "M2_B",
             "M1_SWA", "M1_SWB", "M2_SWA", "M2_SWB",
         ]),
-        "RAIL": (500, 200, VIA_STD, [
+        "RAIL": (500, 200, VIA_PWR, [
             "5V_BUCK", "5V_SYS", "3V3_SYS", "6V2_STAR", "6V2_STAR_F",
             "12V_RAW", "12V_GATE", "U2_SW", "U3_SW", "U4_SW", "USB_VBUS",
         ]),

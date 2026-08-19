@@ -85,6 +85,16 @@ def build_tragring(p=PARAMS):
             with Locations((0, (p["kabel_y0"] + half) / 2.0)):
                 Rectangle(p["kabel_w"], half - p["kabel_y0"] + 1.0,
                           mode=Mode.SUBTRACT)
+            # Bajonettschlitze fuer den Gehaeuse-Becher (gehaeuse.py):
+            # an 12, 3 und 9 Uhr, tangential lang genug fuer Kopf und
+            # Verriegelungsdrehung (~7 Grad = 3,2 mm Bogen bei r 26,1).
+            import math as _m
+            for wink in (90, 0, 180):
+                wr = _m.radians(wink)
+                x, y = 26.1 * _m.cos(wr), -26.1 * _m.sin(wr)
+                with Locations((x, y)):
+                    Rectangle(1.4 + 0.6, 3.0 + 2.6 + 3.2 + 0.6,
+                              rotation=-wink, mode=Mode.SUBTRACT)
             # Geraeteschrauben
             for sx in (p["screw_pitch"] / 2.0, -p["screw_pitch"] / 2.0):
                 with Locations((sx, 0)):
@@ -116,9 +126,11 @@ def check_tragring(part, p=PARAMS):
         errs.append("Schraubschlitz schneidet die zentrale Oeffnung")
     # Der Rahmensteg (Fensteroeffnung ~50, Steg bis ~55) braucht Auflage:
     # bei y = +-26 muss die Platte tragen - ausser im Kabeldurchlass.
-    for name, (x, y) in (("Stegauflage oben", (0.0, -26.0)),
-                         ("Stegauflage links", (-26.0, 0.0)),
-                         ("Stegauflage rechts", (26.0, 0.0))):
+    # Die Proben liegen NEBEN den Bajonettschlitzen (die sitzen exakt auf
+    # den Achsen bei r 26,1) - der Steg traegt ringsum, nur nicht dort.
+    for name, (x, y) in (("Stegauflage oben", (10.0, -26.0)),
+                         ("Stegauflage links", (-26.0, 10.0)),
+                         ("Stegauflage rechts", (26.0, -10.0))):
         if (part & Pos(x, y, p["t"] / 2.0) * Box(0.6, 0.6, p["t"] - 0.4)).volume < 1e-6:
             errs.append("kein Material: %s" % name)
     # Kabeldurchlass frei

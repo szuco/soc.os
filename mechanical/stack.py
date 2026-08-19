@@ -70,6 +70,9 @@ ADAPTER = ("adapter.step", 15.5)
 # Der Tragring liegt auf der Wandebene: Rahmenvorderkante 27,5 minus
 # Rahmentiefe 12. Der Adapter-Basisring taucht durch seine Oeffnung.
 TRAGRING = ("tragring.step", 15.5)
+# Der Becher ist in seinen eigenen Koordinaten schon richtig gelagert
+# (z 0 = Rueckseite Bottom-Board), deshalb Versatz 0.
+GEHAEUSE = ("gehaeuse.step", 0.0)
 
 
 def bauen():
@@ -84,7 +87,8 @@ def bauen():
         teile.append(Location((0, 0, z)) * koerper)
 
     for datei, z, label in ((ADAPTER[0], ADAPTER[1], "adapter"),
-                            (TRAGRING[0], TRAGRING[1], "tragring")):
+                            (TRAGRING[0], TRAGRING[1], "tragring"),
+                            (GEHAEUSE[0], GEHAEUSE[1], "gehaeuse")):
         pfad = os.path.join(ROOT, "mechanical", "export", datei)
         if os.path.exists(pfad):
             a = import_step(pfad)

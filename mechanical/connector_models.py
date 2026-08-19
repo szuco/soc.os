@@ -52,6 +52,22 @@ TEILE = [
           "die gesamte Verdrahtung laeuft"),
     ("Connector_Molex", "Molex_Micro-Fit_3.0_43045-0612_2x03_P3.00mm_Vertical",
      8.9, "wie oben, nur kuerzer"),
+    # Sechs weitere Faelle desselben Musters, gefunden bei der Inventur am
+    # 20.08.2026 ("warum fehlen manche Bauteile in der 3D-Ansicht?"):
+    # KiCad liefert das Footprint, aber keine STEP-Datei. Hoehen aus den
+    # jeweiligen Datenblaettern (Serienmasse, keine Vermessung).
+    ("Fuse", "Fuse_Littelfuse-NANO2-451_453",
+     3.05, "Littelfuse NANO2, Gehauesehoehe laut Datenblatt"),
+    ("Fuse", "Fuse_1812_4532Metric",
+     0.85, "Chipsicherung 1812"),
+    ("Package_SO", "PowerPAK_SO-8_Single",
+     1.1, "Vishay PowerPAK SO-8, max. 1,07"),
+    ("Inductor_SMD", "L_Bourns_SRP7028A_7.3x6.6mm",
+     3.0, "Bourns SRP7028A, 2,9 laut Datenblatt"),
+    ("Sensor_Humidity", "Sensirion_DFN-4_1.5x1.5mm_P0.8mm_SHT4x_NoCentralPad",
+     0.5, "SHT4x DFN"),
+    ("Connector_FFC-FPC", "TE_1-1734839-2_1x12-1MP_P0.5mm_Horizontal",
+     1.25, "TE FPC-Buchse liegend, 0,5-mm-Raster"),
     ("Connector_USB", "USB_C_Receptacle_G-Switch_GT-USB-7051x",
      9.25, "stehende USB-C-Buchsen dieser Bauform liegen zwischen 7 und "
            "9,25 mm; genommen ist der obere Wert aus dem Datenblatt der "

@@ -440,11 +440,20 @@ Bottom ═ Hülse M2,5×10 ═ Mid ═ Hülse M2,5×10 ═ Top
                                                     └─ Zentralscheibe rastet darauf
 ```
 
-**Der Kraftfluss beim Anziehen der beiden Schrauben von vorn:**
-Schraubenkopf → Top-Board → Adaptertasche → Schnapprand → Zentralscheibe →
-Rahmensteg → Tragring-Adapter → Dose. Genau das presst den Abdeckrahmen fest —
-er ist zwischen Scheibe und Tragring eingeklemmt, wie im Original von
-Busch-Jaeger, nur dass dort der Tragring aus Metall ist.
+**Der Kraftfluss beim Anziehen der beiden Schrauben von vorn — korrigiert
+am 20.08.2026:** Schraubenkopf → Top-Board → Adaptertasche →
+**Adapter-Drucklippe** → Rahmensteg → Tragring-Adapter → Dose.
+
+Die erste Fassung führte die Kraft über die Zentralscheibe. Das war falsch,
+und der Einwand kam aus der Anschauung des echten Teils: **Die 6435-914 ist
+das Bedienelement** — die ganze Scheibe bewegt sich, um die Ecktaster zu
+drücken. Ein bewegliches Teil kann keine Klemmkraft tragen. Deshalb hat der
+Scheibenadapter jetzt eine **Drucklippe** an der Vorderkante (51,6, an den
+Kantenmitten für die Rastnasen unterbrochen), die den Rahmensteg direkt
+gegen den Tragring presst. Die Scheibe wird zum Schluss nur aufgeclippt und
+bleibt kraftfrei beweglich. **Messpunkt F15:** Steg-Innenmaß des Rahmens
+(Lippe muss darüber greifen) und Innenmaß des Scheibenkorpus (Lippe muss
+darunter bleiben) — 51,6 ist ein Platzhalter zwischen beiden Annahmen.
 
 **Montagereihenfolge — korrigiert am 20.08.2026.** Die erste Fassung begann
 mit dem Tragring in der Dose; das ist unbaubar, denn die Ø-52-Boards passen
@@ -467,8 +476,9 @@ nicht durch seine 50,6er Öffnung. Der Stapel muss ZUERST hinein:
 7. **Top-Board in den Scheibenadapter**, aufsetzen, zwei Schrauben M2,5
    von vorn durch H1/H2 in die oberen Hülsen. Der Adapter taucht durch
    die Tragring-Öffnung und wird von ihr zentriert.
-8. **Zentralscheibe aufrasten** — ihr Rand presst den Rahmensteg gegen
-   den Tragring. Erst jetzt sitzt der Rahmen fest.
+8. **Zentralscheibe aufrasten** — nur noch das: Sie hält nichts und
+   presst nichts, sie ist das bewegliche Bedienelement. Der Rahmen sitzt
+   bereits seit Schritt 7 fest, gepresst von der Drucklippe des Adapters.
 
 **Die Steckverbinder tragen seitdem nichts mehr.** Sie sind rein elektrisch;
 Punkt 23 (durchsteckbarer Stapelverbinder) verliert dadurch seine mechanische
@@ -481,6 +491,32 @@ unten mittig **hohl** — mindestens Ø 12 frei und ≈ 9 mm tief? Dort sitzt de
 Einschraubkörper des Magnetkontakts (DCX-909: Gewinde Ø 8, Länge 8,5); hinter
 dem Rahmenrand ist Putz, der Körper muss also vollständig in den Hohlraum des
 Rahmens passen.
+
+## 2c. Das Gehäuse — ein Becher, der in den Tragring rastet (20.08.2026)
+
+`mechanical/gehaeuse.py` kapselt Bottom und Mid: Ein Becher (Ø 54,6 außen,
+Wand 1,1) geht von hinten über die beiden Boards, die Rückwand hat ein
+Tunnel-Fenster für die Feldstecker-Leiste — sie bleibt als einziges von
+hinten zugänglich. Vier Auflagebosse tragen das Bottom-Board; gedruckt wird
+der Becher zusammen mit dem Tragring.
+
+**Verbindung: Bajonett, kein Rasthaken.** Radiale Haken scheiterten
+dreifach — auf den Diagonalen sitzt der Adapter (die 50,6er Öffnung ist
+quadratisch, ihre Ecken reichen bis r 35,8), außen die Dosenwand (r 27,5),
+innen der Adapter-Basisring (24,9). Frei ist nur ein 2,2-mm-Band auf den
+Achsen. Drei Zapfen an 12, 3 und 9 Uhr fahren durch Bogenschlitze der
+Platte; eine Drehung um ~7° legt die **tangential** auskragenden Köpfe auf
+die Plattenvorderseite — null radialer Überstand. 6 Uhr entfällt, dort
+läuft das Magnetkabel.
+
+**Die enge Stelle:** Dose lichte Weite ~55 (an den Schraubdomen ~54),
+Becher außen 54,6 — deshalb ist die Wand an 3 und 9 Uhr gefenstert, dort
+schaut die Platinenkante heraus. **Messpunkt F16:** lichte Weite der
+echten Dose und Lage/Breite ihrer Schraubdome, vor dem Druck.
+
+Montage ändert sich vorn nicht; neu ist Schritt 2b: Boards in den Becher,
+Leiste durch das Rückwandfenster anstecken, Becher an den Tragring
+bajonettieren — dann als Einheit in die Dose.
 
 ## 3. Befestigungsbohrungen
 

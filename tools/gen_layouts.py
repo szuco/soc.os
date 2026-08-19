@@ -134,6 +134,8 @@ KERB_T = 2.0                        # Kerbentiefe von der Kante nach innen
 # ESP32-Antenne (um 90) und Leistungsstecker (um 270) alle uebrigen
 # Kandidaten. Verdrehsicherung uebernehmen die beiden Stackverbinder.
 HOLES = [(HOLE_R, 0.0), (-HOLE_R, 0.0)]
+# Durchgriffe nur im Top-Board - Lage == RESET/BOOT auf Mid (FIXED_MID).
+DURCHGRIFFE = [(-8.0, 18.6), (8.0, 18.6)]
 
 # Footprint-Pads, deren Nummern nicht den Symbolpins entsprechen.
 # PowerPAK SO-8: Pads 1-3 = Source, 4 = Gate, 5 = Drain;
@@ -473,6 +475,15 @@ class BoardBuilder:
             fp.SetReference("H%d" % (i + 1))
             fp.SetPosition(pcbnew.VECTOR2I(mm(x), mm(y)))
             self.board.Add(fp)
+        # Durchgriffe nur im Top-Board: Unter ihnen sitzen RESET und BOOT
+        # des Mid-Boards. Bei abgenommener Scheibe drueckt ein Stift durch
+        # das Loch - das Top-Board selbst braucht dort nichts.
+        if self.square:
+            for i, (x, y) in enumerate(DURCHGRIFFE):
+                fp = load_fp("MountingHole:MountingHole_3.2mm_M3")
+                fp.SetReference("H%d" % (i + 3))
+                fp.SetPosition(pcbnew.VECTOR2I(mm(x), mm(y)))
+                self.board.Add(fp)
 
     def _marker(self):
         r = (TOP_SQ / 2.0 if self.square else BOARD_R) - 2.0
@@ -901,6 +912,14 @@ FIXED_BOTTOM = dict(_BRIDGES,
 )
 
 FIXED_MID = {
+    # RESET und BOOT nach vorn unten (20.08.2026). Vorher sass SW1 mitten
+    # unter dem Top-Board und SW2 zeigte zur RUECKSEITE - beide nach dem
+    # Zusammenbau unerreichbar. Jetzt liegen sie unter zwei OE-3,2-Loechern
+    # im Top-Board (H3/H4) und werden bei abgenommener Zentralscheibe mit
+    # einem Stift durch das Board gedrueckt. x = +-8: rechts beginnt der
+    # Stapelverbinder bei 11,5, in der Mitte steht das gesteckte J6 bis +-3.
+    "SW1": (-8.0, 18.6, 0, "F"),       # RESET, unten links
+    "SW2": (8.0, 18.6, 0, "F"),        # BOOT, unten rechts
     # ACHTUNG, die Zahl ist NICHT die Koerpermitte. place() zentriert auf die
     # Bounding-Box, und beim ESP32-Footprint ist das der COURTYARD - der deckt
     # die ganze Antennen-Sperrzone ab und ist 48 x 41 mm gross. Zwischen

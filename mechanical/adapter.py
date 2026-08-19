@@ -120,6 +120,26 @@ PARAMS = dict(
     huelse_x          = 21.5,   # wie H1/H2
     huelse_tasche_d   = 5.8,    # Sechskant SW 4,5 -> Eckenmass 5,2 + Spiel
 
+    # --- Drucklippe (20.08.2026) ------------------------------------------
+    # DIE ZENTRALSCHEIBE KANN NICHT KLEMMEN. Sie ist bei der 6435-914 das
+    # Bedienelement - die ganze Scheibe bewegt sich, um die Ecktaster zu
+    # druecken. Ein bewegliches Teil traegt keine Klemmkraft. Deshalb
+    # presst der ADAPTER SELBST den Rahmensteg gegen den Tragring: mit
+    # dieser Lippe an seiner Vorderkante, die ueber das Steg-Innenmass des
+    # Rahmens greift.
+    #
+    # Die Lippe ist an den vier KANTENMITTEN unterbrochen - dort muessen
+    # die Rastnasen der Scheibe (lichte 50,0) vorbei, und 51,6 liesse sie
+    # nicht durch. Gedrueckt wird an den vier Ecken; der Steg ist
+    # umlaufend, ihm ist das gleich.
+    #
+    # ZWEI MASSE SIND PLATZHALTER (Messpunkt F15): das Steg-Innenmass des
+    # Rahmens (Lippe muss DARUEBER greifen, angenommen ~50,5) und das
+    # Innenmass des Scheibenkorpus (Lippe muss DARUNTER bleiben,
+    # angenommen ~52,5). lip_sq liegt dazwischen.
+    lip_sq            = 51.6,   # PLATZHALTER - F15 messen
+    lip_gap           = 14.0,   # Unterbrechung je Kantenmitte (Nasenpass)
+
     # --- Zentrale Durchfuehrung -------------------------------------------
     # Muss die beiden Stackverbinder durchlassen: sie stehen bei x = +/-14,2,
     # sind 4,1 breit und 26,4 lang -> bis (16,25 / 13,2).
@@ -224,9 +244,15 @@ def build_adapter(p=PARAMS):
             Rectangle(rim_out, rim_out)
         extrude(amount=z["seat"] - z["neck"])
 
-        # -- Tasche fuer die Leiterplatte -----------------------------------
+        # -- Tasche fuer die Leiterplatte, aussen mit der Drucklippe --------
         with BuildSketch(Plane.XY.offset(z["seat"])) as s:
-            Rectangle(rim_out, rim_out)
+            # Volle Lippe, dann die Kantenmitten herausschneiden
+            # (Nasenpass), dann das Grundband in Randbreite wieder
+            # auffuellen, zuletzt die Tasche.
+            Rectangle(p["lip_sq"], p["lip_sq"])
+            Rectangle(p["lip_gap"], p["lip_sq"], mode=Mode.SUBTRACT)
+            Rectangle(p["lip_sq"], p["lip_gap"], mode=Mode.SUBTRACT)
+            Rectangle(rim_out, rim_out, mode=Mode.ADD)
             Rectangle(pocket_in, pocket_in, mode=Mode.SUBTRACT)
         extrude(amount=z["pocket"] - z["seat"])
 
@@ -421,6 +447,23 @@ def check_adapter(part, p=PARAMS):
     for sx in (p["huelse_x"], -p["huelse_x"]):
         clear(Pos(sx, 0, z["pocket"] / 2) * Box(2.0, 2.0, z["pocket"] - 0.2),
               "Huelsentasche x=%+.0f" % sx)
+    # Drucklippe: an den Ecken vorhanden, an den Kantenmitten unterbrochen.
+    if p["lip_sq"] <= rim_out:
+        errs.append("Drucklippe %.1f greift nicht ueber den Rand %.1f - "
+                    "sie wuerde den Rahmensteg nie beruehren"
+                    % (p["lip_sq"], rim_out))
+    if p["lip_sq"] >= p["snap_inner"] + 2.4:
+        errs.append("Drucklippe %.1f vermutlich groesser als der "
+                    "Scheibenkorpus innen (F15 messen!)" % p["lip_sq"])
+    ecke = p["lip_sq"] / 2.0 - 0.4
+    solid(Pos(ecke, ecke, (z["seat"] + z["pocket"]) / 2) * Box(0.5, 0.5, 0.4),
+          "Drucklippe Ecke")
+    clear(Pos(0, (rim_out + p["lip_sq"]) / 4.0 + rim_out / 4.0,
+              (z["seat"] + z["pocket"]) / 2) * Box(1.0, 0.4, 0.4)
+          if False else
+          Pos(0, p["lip_sq"] / 2.0 - 0.3, (z["seat"] + z["pocket"]) / 2)
+          * Box(1.0, 0.4, 0.4), "Nasenpass Kantenmitte")
+
     # Basisringecke massiv (der Ring liegt zwischen Durchfuehrung und Rand).
     solid(Pos(rim_out / 2 - 1.0, rim_out / 2 - 1.0, z["flange"] / 2)
           * Box(0.8, 0.8, 0.4), "Basisringecke")

@@ -48,6 +48,18 @@ Fall reicht Standardkupfer. 2 oz erlaubte schmalere Bahnen bei gleicher Erwärmu
 kostet aber Aufpreis und vergrößert die minimalen Strukturbreiten — beides
 unnötig.
 
+## Vias und Strom (20.08.2026)
+
+Ein 0,6/0,3-Via trägt rund 1,2 A — `24V_IN` lief über genau eines davon,
+bei 4,1 A Summenstrom. Seitdem gilt:
+
+- **Leistungs- und Schienennetze auf Bottom routen mit 0,8/0,4** (~1,6 A);
+  Mid und Top hatten das Leistungsvia bereits.
+- **`tools/via_check.py` läuft nach jedem Routing**: 4 A je mm Bohrung,
+  Vias desselben Netzes im 3-mm-Umkreis zählen parallel. `--fix` setzt
+  Zwillingsvias neben unterdimensionierte Übergänge — danach immer DRC.
+- Masse-Brücken (`gnd_connect`) setzen auf Bottom ebenfalls 0,8/0,4.
+
 ## 2. Leiterbahnauslegung
 
 Für jeden Hochstrompfad ist die Breite gegen den realen Strom zu rechnen, nicht zu

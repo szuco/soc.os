@@ -205,15 +205,19 @@ def main():
           'lose — und das Kabel des Magnetkontakts durch den '
           'Kabeldurchlass in J6 auf der Top-Rückseite stecken.</li>')
         a('<li>Das <b>Top-Board</b> im Scheibenadapter aufsetzen, zwei '
-          'Schrauben von vorn in die Hülsen; der Adapter taucht durch die '
-          'Tragring-Öffnung und wird von ihr zentriert.</li>')
-        a('<li>Die <b>Zentralscheibe</b> aufrasten — ihr Rand presst den '
-          'Rahmensteg gegen den Tragring. Erst jetzt sitzt der Rahmen '
-          'fest.</li>')
+          'Schrauben von vorn in die Hülsen. Die <b>Drucklippe</b> an der '
+          'Adapter-Vorderkante presst dabei den Rahmensteg gegen den '
+          'Tragring — jetzt sitzt der Rahmen fest.</li>')
+        a('<li>Die <b>Zentralscheibe</b> nur noch aufrasten. Sie hält '
+          'nichts und presst nichts — sie ist das bewegliche '
+          'Bedienelement, das die vier Ecktaster drückt, und muss dafür '
+          'kraftfrei bleiben.</li>')
         a('</ol>')
         a('<p>Kraftfluss: Schraubenkopf → Top-Board → Adaptertasche → '
-          'Schnapprand → Zentralscheibe → Rahmensteg → Tragring → '
-          'Dose.</p>')
+          'Drucklippe → Rahmensteg → Tragring → Dose. '
+          'Reset und Boot des Mid-Boards liegen unter zwei Ø-3,2-Löchern '
+          'im Top-Board — bei abgenommener Scheibe mit einem Stift '
+          'drückbar, im Betrieb unsichtbar.</p>')
         a('</div>')
     a('<aside class="offen">')
     a('<p class="offen-titel">Offen: der Stapelverbinder</p>')

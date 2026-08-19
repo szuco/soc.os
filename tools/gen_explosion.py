@@ -387,8 +387,8 @@ class Schnitt(object):
 
 def panel_a(x0, y0):
     s = Schnitt(x0, y0, 1000, "Schnitt A – A   ·   Ebene y = 0",
-                "Tiefenkette und Kraftfluss: Schraube → Top-Board → Adapter "
-                "→ Scheibe → Rahmen → Tragring → Dose · "
+                "Kraftfluss: Schraube → Top-Board → Adapter-Drucklippe → "
+                "Rahmensteg → Tragring → Dose · Scheibe kraftfrei · "
                 "Explosionsabstand %.0f mm, sonst maßstäblich" % LUECKE)
     r = B["BOARD_DIAMETER"] / 2.0
     h = B["TOP_SQ"] / 2.0
@@ -494,8 +494,8 @@ def panel_a(x0, y0):
                vz * rand, KUNST_H, KUNST)
     s.fahne("adapter", ad["flansch"][0], rand,
             ["Scheibenadapter, gedruckt", "49,8 × 49,8 × 5,5",
-             "Basisring 2,5 · Auflage 2,0",
-             "Rahmen + Schrauben: Tragring (v2)"])
+             ("Drucklippe 51,6 vorn — SIE presst den", ROT),
+             ("Rahmensteg. Steg-Innenmaß: F15 messen", ROT)])
     s.marke("adapter", ad["hals"][0] + 0.4, hals - 4.5, "Rastraum 1,5 × 1,3")
     s.marke("adapter", ad["tasche"][0] + 0.4, tasche - 9.0,
             "Tasche 47,4 · Auflage 2,0")
@@ -513,7 +513,9 @@ def panel_a(x0, y0):
         s.teil("scheibe", Z["kreuz"][0], Z["kreuz"][1], vz * btn - KREUZ / 2,
                vz * btn + KREUZ / 2, FEIN, GRAU)
     s.fahne("scheibe", zc[0], am,
-            ["Zentralscheibe 6435-914", "55,2 × 55,2 × 7,5"])
+            ["Zentralscheibe 6435-914", "55,2 × 55,2 × 7,5",
+             "kraftfrei aufgeclippt — sie ist das",
+             "Bedienelement und bleibt beweglich"])
     s.marke("scheibe", zc[0] - 1.0, -am - 3.0,
             "Rastnase 1,0 – nur 0,10 mm Luft je Seite,", ROT, "ra")
     s.marke("scheibe", zc[0] - 1.0, -am - 7.0,
@@ -531,7 +533,7 @@ def panel_a(x0, y0):
     s.fahne("rahmen", zr[0], RAHMEN_AM / 2.0,
             ["Abdeckrahmen 1721-914", "81 × 81 × 12 · Fenster 56,0",
              "klemmt auf dem Tragring (70,0) und wird",
-             "von der Scheibe dagegen gepresst"])
+             "von der Adapter-Drucklippe dagegen gepresst"])
 
 
 # --- Panel B: Schnitt bei y = 19,6 ----------------------------------------

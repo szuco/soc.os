@@ -76,6 +76,29 @@ Wegführung, nicht für die Länge: Die Bahn ist 70,9 mm lang und läuft damit
 weiter über das Board, als einem Messsignal guttut. Wer ohnehin gerade von
 Hand routet, darf auch `M2_ISNS` gern kürzen.
 
+## 2b. Via-Engpässe von Hand entschärfen (20.08.2026)
+
+`tools/via_check.py` prüft nach jedem Routing, ob jedes Via den Dauerstrom
+seines Netzes trägt (4 A je mm Bohrung; Vias im 3-mm-Umkreis zählen
+parallel). `--fix` setzt Zwillinge — wo kein Platz war, bleibt Handarbeit.
+Der Weg ist immer derselbe: eine Signalbahn im Umkreis um 1–2 mm verlegen,
+dann ein zweites Via 0,8/0,4 neben das gemeldete setzen.
+
+Stand nach dem letzten Lauf (Koordinaten aus `via_check.py`):
+
+| Board | Netz | Stelle | trägt / braucht |
+|---|---|---|---|
+| Bottom | `24V_PROT` | (−3,6/−1,0), (−15,1/15,2) | 1,6 / 4,1 A |
+| Bottom | `24V_PROT` | (−20,0/−7,9), (5,8/4,2) | 3,2 / 4,1 A |
+| Bottom | `PGND` | (−3,5/5,9) | 3,2 / 4,1 A |
+| Bottom | `5V_SYS` | (−16,1/−12,8), (−3,1/−6,7), (−12,2/−9,4), (−16,9/−8,4) | 1,6 / 2,0 A |
+| Bottom | `5V_BUCK` | (−7,7/−16,2) | 1,6 / 2,0 A |
+| Mid | `PGND` | (5,8/2,6) | 1,2 / 1,5 A |
+
+Einordnung: 4,1 A ist der rechnerische Grenzfall (beide Motoren blockiert
+plus Volllast); der reale Dauerstrom liegt bei ~2,3 A. Die Liste ist also
+Pflicht vor der Bestellung, aber kein Grund zur Panik.
+
 ## 3. Masse-Inseln schließen
 
 Unter `unconnected_items` stehen auch Einträge mit `PGND`. Das sind Pads, die
