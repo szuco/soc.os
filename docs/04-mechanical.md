@@ -524,6 +524,24 @@ Becher außen 54,6 — deshalb ist die Wand an 3 und 9 Uhr gefenstert, dort
 schaut die Platinenkante heraus. **Messpunkt F16:** lichte Weite der
 echten Dose und Lage/Breite ihrer Schraubdome, vor dem Druck.
 
+**F16 im Detail — das Messprotokoll (mit Messschieber, an der echten
+Dose):**
+
+| # | Was | Annahme heute |
+|---|---|---|
+| F16a | Lichte Weite vorn am Rand, auf zwei Achsen (0°/90°) | 55,0 |
+| F16b | Lichte Weite in ~20 mm Tiefe (Verjüngung, Rippen?) | 55,0 |
+| F16c | Weite über die Schraubdome (Innenkante zu Innenkante) | ~54 |
+| F16d | Breite eines Doms, tangential (→ Fensterbreite) | 16 |
+| F16e | Tiefe: Dosenrand bis Rückwand innen | 61 |
+| F16f | Kabeleinführungen der Rückwand; ~22 mm hinter der Mitte frei? | mittig frei |
+| F16g | optional: Dosentyp/Aufdruck; Rand putzbündig? | — |
+
+Nach der Messung werden `gehaeuse.py` (Weite, Spiel, Fensterlage/-breite,
+Tunnel), die Gegenproben in `tragring.py`, STL/STEP, Renderings und die
+Doku in einem Durchgang nachgezogen. Fällt F16 großzügig aus, bekommt
+der Becher mehr Luft statt 0,2 mm Passung; fällt er eng aus:
+
 **Falls F16 eng ausfällt — Hebel in dieser Reihenfolge (20.08., nachts,
 Einwand des Nutzers):** Der Becher steht mit 54,6 gegen die 55er-Annahme
 rechnerisch auf Kante; ob das real reicht, entscheidet allein F16 (eine
