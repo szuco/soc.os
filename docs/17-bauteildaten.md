@@ -74,21 +74,51 @@ Panel bis ±15,04 und bleibt damit frei von den Ecktastern bei 18,27…21,73. In
 x reicht es bis ±18,71 und liegt damit **neben** den Tastern — rund 1,5 mm
 diagonaler Abstand. Am realen Teil ansehen.
 
-### Was noch fehlt
+### Der Weg der Fahne (20.08.2026)
 
-Beides steht nur im Datenblatt
-(`buydisplay.com/download/manual/ER-TFT1.69-3_Datasheet.pdf`, im Browser
-öffnen — automatische Downloads liefern HTTP 403):
+Die 18,15-mm-FPC erreicht ihre Buchse **durch einen Schlitz im Board**,
+nicht um die Kante — der früher dokumentierte Weg um die Boardkante braucht
+30,3 mm und war nie möglich:
 
-1. **Das Raster der Fahne.** Die Lötvariante ist mit 0,7 mm angegeben. KiCad
-   bringt für 0,7 mm **kein einziges** FPC-Footprint mit, nur 0,5 und 1,0.
-   Ist es wirklich 0,7, muss eines in die Projektbibliothek gezeichnet
-   werden. Im Schaltplan steht solange ein 0,5-mm-Footprint mit der richtigen
-   Polzahl.
-2. **Die Pinbelegung.** Zwölf Pole sind gesichert, welches Signal auf welchem
-   liegt nicht.
+```
+Panel (vorn, geklebt)
+  └─ Fahne faltet an der Panelunterkante (y 15,3) um 180°
+     └─ läuft unter dem Glas zurück (~8,9 mm)
+        └─ taucht durch den FPC-Schlitz 10,0 × 1,6 bei (0 / 6,4)
+           └─ steckt hinten in J5 (0 / 3,8), Einschub zeigt zum Schlitz
+```
 
-Solange beides offen ist, darf das Top-Board **nicht** bestellt werden.
+Rechnerisch ~17,6 mm von 18,15 — etwa 0,6 mm Reserve. Beim ersten
+Musteraufbau prüfen; falls es klemmt, wandert der Schlitz näher an die
+Panelkante (FPC_Y in `gen_layouts.py`).
+
+### Was noch fehlt — bereinigt am 20.08.2026
+
+Die beiden früheren „Blocker" hier waren **veraltet**: Das Raster der Fahne
+ist längst aus dem Datenblatt bestätigt (**0,50 mm**, siehe FPC-Tabelle
+oben), und die Pinbelegung liegt vollständig vor und ist in `gen_top_sch`
+verdrahtet. Beides stand hier trotzdem noch als offen — die Doku hinkte.
+
+**Wirklich offen sind zwei Fragen, die bisher nie gestellt wurden:**
+
+1. **Die Kontaktseite der Fahne.** Die TE-Buchse 1-1734839-2 kontaktiert
+   auf EINER Seite. Die Fahne wird an der Panelunterkante um 180° gefaltet
+   und taucht durch den FPC-Schlitz — jede dieser Stationen wendet die
+   Fahne. Ob am Ende die Kontaktflächen zur Kontaktseite der Buchse
+   zeigen, ist **ungeprüft**. Falsch herum wäre das Board wertlos; die
+   Alternative wäre die spiegelbildliche Buchse (2-1734839-2 o. ä.) oder
+   eine andere Faltung. **Vor der Bestellung am Papiermodell prüfen:**
+   Fahne aus Papier im Maßstab falten und durchstecken.
+2. **Die Pinreihenfolge nach der Faltung.** Dieselben zwei Wendungen können
+   Pin 1↔12 spiegeln. `gen_top_sch` verdrahtet J5 nach der
+   Datenblatt-Reihenfolge der *ungefalteten* Fahne — ob sie nach Faltung
+   und Durchstecken noch stimmt oder rückwärts läuft, entscheidet dasselbe
+   Papiermodell.
+3. **Backlight-Vorwiderstand.** R_BL = 39 Ω an 5 V ist gerechnet, nicht
+   gegen die LED-Kette des Datenblatts geprüft (Anzahl LEDs in Serie,
+   Flussspannung, Nennstrom).
+
+Bis 1. und 2. geprüft sind, gilt weiter: **Top-Board nicht bestellen.**
 
 ### Frühere Kandidaten
 

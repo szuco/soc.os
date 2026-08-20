@@ -128,6 +128,16 @@ NOTCH_Y0, NOTCH_Y1 = 3.25, 12.75    # Kerbenhoehe 9,5 mm
 # jedes gemessene Kaufteil gescheitert war.
 KERB_W = 5.0                        # Kerbenbreite - zwei Litzen mit Huelle
 KERB_T = 2.0                        # Kerbentiefe von der Kante nach innen
+
+# FPC-SCHLITZ (20.08.2026). Die Displayfahne ist 18,15 mm lang - der lange
+# dokumentierte Weg "um die Boardkante" braucht 30,3 mm und war schlicht
+# unmoeglich (nachgerechnet: 8,2 zur Kante + 1,6 Umgriff + 20,5 zurueck).
+# Der echte Weg: Fahne an der Panelunterkante (y 15,3) um 180 Grad falten,
+# unter dem Glas zurueck, durch diesen Schlitz auf die Rueckseite, dort in
+# J5 - zusammen ~17,2 mm, rund 1 mm Reserve. Breite: Fahne max. 8,47 plus
+# Luft; Hoehe 1,6 fuer 0,3er FPC samt Faltradius.
+FPC_X, FPC_Y = 0.0, 6.4
+FPC_W, FPC_H = 10.0, 1.6
 # Bohrbild v2: ZWEI Bohrungen bei 0/180 Grad. Die alten Winkel 120/240
 # kollidierten mit den Sicheltasten-Stoesseln (117/243 Grad, nur ~2 mm
 # daneben), und bei r21,5 blockieren Stackverbinder (um 45/135/225/315),
@@ -427,6 +437,8 @@ class BoardBuilder:
             self.board.Add(arc)
 
         _pruefe_kabelkerbe()
+        # Der FPC-Schlitz unter dem Displaypanel (Begruendung bei FPC_X)
+        self._langloch(FPC_X, FPC_Y, FPC_W, FPC_H)
 
     def _langloch(self, cx, cy, w, h):
         """Abgerundeter Durchbruch auf Edge.Cuts.
@@ -988,10 +1000,17 @@ FIXED_TOP = dict(
     # also praktisch mittig - dafuer ist ein 1,69"-Panel 240x280 quer der
     # Kandidat (Punkt 43).
     # J5 auf die RUECKSEITE: Auf der Vorderseite liegt das Displaypanel auf,
-    # und eine FPC-Buchse von 1,2 mm Hoehe darunter macht das unmoeglich. Die
-    # Fahne ist 18,15 mm lang und laut Zeichnung ohnehin gefaltet - sie greift
-    # um die Boardkante.
-    J5=(0.0, 3.0, 0, "B"),
+    # und eine FPC-Buchse von 1,2 mm Hoehe darunter macht das unmoeglich.
+    # Der Weg der Fahne fuehrt durch den FPC-SCHLITZ (FPC_X/FPC_Y) - die
+    # fruehere Behauptung "sie greift um die Boardkante" scheiterte an der
+    # Arithmetik: 30,3 mm Weg bei 18,15 mm Fahne.
+    # y = 4,2 und ROTATION 180 (20.08.2026): Die Buchse rueckt an den
+    # FPC-Schlitz (y 6,2), damit die 18,15er Fahne reicht, und die Drehung
+    # ist dieselbe Lektion wie bei J6 - der Flip auf die Rueckseite
+    # spiegelt auch y, bei 0 Grad zeigte der Einschub vom Schlitz weg.
+    # 3,8 statt 4,2: Bei 4,2 standen die MP-Pads 0,3 mm vor der
+    # Schlitzkante. Die Fahnenreserve schrumpft auf ~0,6 mm - reicht.
+    J5=(0.0, 3.8, 180, "B"),
     # Die vier Durchbrueche der Zentralscheibe liegen in den Diagonalfeldern
     # zwischen Pfeil und Ecktaster, bei (+/-9 / +/-19) mathematisch. Das haelt
     # rund 8 mm Abstand zu Kreuz und Symbol und liegt sicher auf der Platine.

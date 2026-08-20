@@ -157,9 +157,18 @@ PARAMS = dict(
     # Freistellung. Der Adapter ist dadurch nicht mehr punktsymmetrisch und
     # kann nur in einer Lage montiert werden; die Kerbe des Top-Boards zeigt
     # dieselbe Richtung und macht es beim Zusammenbau sichtbar.
-    usb_relief_x0     = -1.2,   # Koerper -0,65 minus Spiel
-    usb_relief_x1     = 8.2,    # Koerper  7,65 plus Spiel
-    usb_relief_y      = 24.0,   # bis hinter die Boardkante (23,5)
+    # BEHOBEN am 20.08.2026 (Punkt 68): Die Freistellung sass an der
+    # 6-Uhr-Kante (x -1,2..8,2) - der Planungsstand VOR dem Umzug der
+    # Buchse. Real steht sie links auf dem Mid-Board und greift durch die
+    # Randkerbe des Top-Boards bei x -23,2..-16,8, y 3,4..13,4 nach vorn.
+    # Zwei Tage lang stand der Widerspruch als roter Selbsttest-Punkt in
+    # der Explosionszeichnung. Jetzt ist die Freistellung eine RANDKERBE
+    # der linken Adapterkante, offen nach aussen - so findet auch der
+    # breitere USB-Stecker von vorn hinein.
+    usb_relief_x0     = -25.5,  # ueber die Aussenkante (24,9) hinaus
+    usb_relief_x1     = -16.0,  # Koerper endet bei -16,8, plus Spiel
+    usb_relief_y0     = 2.4,
+    usb_relief_y1     = 14.4,
 
     # --- Halter fuer den Magnetkontakt des Sterns, 18.08.2026 -------------
     # Der Stern wird nicht mehr gesteckt, sondern magnetisch angelegt. Der
@@ -262,14 +271,12 @@ def build_adapter(p=PARAMS):
             fillet(s.vertices(), 2.0)
         extrude(amount=z["total"], mode=Mode.SUBTRACT)
 
-        # -- Freistellung fuer die USB-C-Buchse ----------------------------
-        # Verlaengert die zentrale Durchfuehrung an einer Stelle bis hinter
-        # die Boardkante, damit der Buchsenkoerper vom Mid-Board hindurchgreift.
+        # -- Freistellung fuer die USB-C-Buchse: Kerbe der linken Kante ----
         with BuildSketch(Plane.XY) as u:
             with Locations(((p["usb_relief_x0"] + p["usb_relief_x1"]) / 2.0,
-                            (p["bore_sq"] / 2.0 + p["usb_relief_y"]) / 2.0)):
+                            (p["usb_relief_y0"] + p["usb_relief_y1"]) / 2.0)):
                 Rectangle(p["usb_relief_x1"] - p["usb_relief_x0"],
-                          p["usb_relief_y"] - p["bore_sq"] / 2.0)
+                          p["usb_relief_y1"] - p["usb_relief_y0"])
         extrude(amount=z["total"], mode=Mode.SUBTRACT)
 
         # -- Halter fuer den Magnetkontakt des Sterns -----------------------
@@ -346,20 +353,19 @@ def check_adapter(part, p=PARAMS):
                     "gefordert sind %.1f"
                     % (p["bore_sq"], (p["pcb_sq"] - p["bore_sq"]) / 2,
                        p["seat_w"]))
-    # Die USB-Freistellung muss den Buchsenkoerper aufnehmen (Koerper laut
-    # KiCad-Footprint -0,65..7,65 in x, bis 22,45 in y) und darf der Platine
-    # nicht zu viel Auflage nehmen.
-    if not (p["usb_relief_x0"] <= -0.65 and p["usb_relief_x1"] >= 7.65):
+    # Die USB-Freistellung muss den Buchsenkoerper aufnehmen: links auf dem
+    # Mid-Board, KiCad-Koordinaten x -23,2..-16,8, y 3,4..13,4.
+    if not (p["usb_relief_x0"] <= -23.2 and p["usb_relief_x1"] >= -16.8):
         errs.append("USB-Freistellung %.1f..%.1f deckt den Buchsenkoerper "
-                    "-0,65..7,65 nicht ab"
+                    "-23,2..-16,8 nicht ab"
                     % (p["usb_relief_x0"], p["usb_relief_x1"]))
-    if p["usb_relief_y"] < 22.45:
-        errs.append("USB-Freistellung reicht nur bis %.1f, der Buchsenkoerper "
-                    "bis 22,45" % p["usb_relief_y"])
-    breite = p["usb_relief_x1"] - p["usb_relief_x0"]
-    if breite > p["pcb_sq"] * 0.3:
+    if not (p["usb_relief_y0"] <= 3.4 and p["usb_relief_y1"] >= 13.4):
+        errs.append("USB-Freistellung y %.1f..%.1f deckt 3,4..13,4 nicht ab"
+                    % (p["usb_relief_y0"], p["usb_relief_y1"]))
+    hoehe = p["usb_relief_y1"] - p["usb_relief_y0"]
+    if hoehe > p["pcb_sq"] * 0.3:
         errs.append("USB-Freistellung %.1f mm nimmt mehr als 30 %% der "
-                    "Auflagekante (%.1f mm)" % (breite, p["pcb_sq"]))
+                    "Auflagekante (%.1f mm)" % (hoehe, p["pcb_sq"]))
     # Seit dem 19.08.2026 gilt das UMGEKEHRTE des alten Flansch-Kriteriums:
     # Das Teil muss durch die Fensteroeffnung des Rahmens (Steg ~50), darf
     # also nirgends breiter sein als der Schnapprand.

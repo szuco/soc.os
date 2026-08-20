@@ -220,7 +220,7 @@ def selbsttest():
     ux0, ux1 = USB_X - USB_B / 2.0, USB_X + USB_B / 2.0
     if not (P["usb_relief_x0"] <= ux0 and P["usb_relief_x1"] >= ux1):
         m.append("USB-Freistellung des Adapters bei x = %.1f…%.1f, die "
-                 "Buchse steht bei x = %.1f…%.1f - Punkt 68"
+                 "Buchse steht bei x = %.1f…%.1f - Punkt 68 ist WIEDER auf"
                  % (P["usb_relief_x0"], P["usb_relief_x1"], ux0, ux1))
     return m
 
@@ -655,13 +655,12 @@ def panel_c(cx, cy):
          "Tragring 70,0, Öffnung 50,6 · Adapter 49,8 taucht durch",
          KLEIN, KUNST, "lb")
 
-    # USB-Freistellung des Adapters, an ihrer heutigen Stelle
-    rechteck(P["usb_relief_x0"], bohr, P["usb_relief_x1"], P["usb_relief_y"],
-             PAPIER, ROT, 1.2)
-    text(X(P["usb_relief_x1"]) + 8, Y(P["usb_relief_y"]) - 8,
-         "USB-Freistellung des Adapters —", KLEIN, ROT, "lm")
-    text(X(P["usb_relief_x1"]) + 8, Y(P["usb_relief_y"]) + 8,
-         "die Buchse steht aber links (Punkt 68)", KLEIN, ROT, "lm")
+    # USB-Freistellung des Adapters - seit dem 20.08.2026 als Randkerbe
+    # der LINKEN Kante, deckungsgleich ueber der Buchse (Punkt 68 behoben).
+    rechteck(P["usb_relief_x0"], P["usb_relief_y0"], P["usb_relief_x1"],
+             P["usb_relief_y1"], PAPIER, KUNST, 1.2)
+    text(X(P["usb_relief_x0"]) - 8, Y(P["usb_relief_y0"]) - 6,
+         "USB-Freistellung des Adapters, deckt die Buchse", KLEIN, KUNST, "rb")
 
     # Top-Board mit Randkerbe
     srechteck(-h, -h, h, h, PCB_H, 1.2)
@@ -673,8 +672,8 @@ def panel_c(cx, cy):
     # USB-C des Mid-Boards, projiziert
     rechteck(USB_X - USB_B / 2, USB_Y - USB_A / 2, USB_X + USB_B / 2,
              USB_Y + USB_A / 2, None, ROT, 1.2)
-    text(X(USB_X) - 8, Y(USB_Y + USB_A / 2) + 14, "USB-C auf Mid (Punkt 68)",
-         KLEIN, ROT, "rt")
+    text(X(USB_X) - 8, Y(USB_Y + USB_A / 2) + 14, "USB-C auf Mid",
+         KLEIN, GRAU, "rt")
 
     # Displaypanel und Fenster
     srechteck(-PANEL_X / 2, -PANEL_Y / 2, PANEL_X / 2, PANEL_Y / 2, DISPLAY)
