@@ -90,6 +90,27 @@ Nummer** — aus drei Quellen, mit drei Verlässlichkeitsstufen:
 | Extended-Teile — im Portal per Parametersuche wählen | ~35 | 1210-Kondensatoren (22u/47u/10u/100u-50V), E96-Widerstände (10k2, 39R, 53k6, 68k1, 88k7, 392k), Zener 5V6/12V/33V, SMBJ30A, 60V-3A-Schottky SMB, Shunts 5m0-2512, PTC + Sicherungen, SRP5030T-2R2M, Taster TL3342/SKRK/CVS-01, Buzzer PKMCS0909E |
 | **Bewusst offene Entscheidungen** — erst entscheiden, dann Nummer | ~19 | Stapelverbinder 6× (Punkt 23), Q1-FET (Punkt 8), P-/N-FET SOT-23 2×, PhotoMOS-Typ, TLV3702 (bei LCSC nicht geführt), VL53L1X (nicht geführt), Micro-Fit 43045-1612 (nicht geführt — THT, zur Not von Hand) |
 
+## 2c. Beschaffung neben LCSC — entschieden am 20.08.2026
+
+**Mouser-Sammelbestellung (Handbestückung, alles gut lötbar):**
+
+| Teil | Menge | Zweck |
+|---|---|---|
+| Vishay SIR4409DP-T1-GE3 | 1 (+1 Reserve) | Q1 Verpolschutz (PowerPAK SO-8) |
+| TI TLV3702IDR | 2 (+2) | Fensterkomparatoren (SOIC-8) |
+| E-Switch TL3342 | 2 | RESET/BOOT auf Mid (SMD, große Pads) |
+| Molex 43045-1612 | 1 | Feldstecker (THT) |
+| Molex 43025-1600 + 43030-Kontakte | 1 Satz | **Gegenstück** für den Kabelbaum in der Dose |
+| JST GHR-02V-S + SSHL-002T-P0.2 | 2 Sätze | **Gegenstücke** für J6 (Stern) |
+
+**JLC Global Sourcing (maschinell bestücken lassen):**
+VL53L1CXV0FY/1 — LGA-Reflow, nicht handlötbar.
+
+**Herstellerkatalog (Wayconn/Scondar/Samtec):**
+Das Stapelverbinder-Paar nach Punkt 23: erhöhte 2×20-Buchse 1,27 mm
+(H ≈ 8,5, Einstecktiefe ≥ 2,5) für Bottom/Top plus THT-Stiftleiste mit
+beidseitigem Überstand ≥ 3 mm für Mid.
+
 ## 3. Ablauf im Portal
 
 ### Schritt 1 — Gerber hochladen

@@ -296,7 +296,7 @@ def build():
 
     s.add("U4", "Relay_SolidState:AQY282GS", "PhotoMOS 60V",
           "Package_SO:SOP-4_4.4x2.6mm_P1.27mm",
-          MPN="1 Form A, SELV - NICHT fuer Netzspannung")
+          MPN="Panasonic AQY212S, LCSC C1525231")
     s.add("R13", "Device:R", "330R", R0603, MPN="LED-Strom PhotoMOS, ca. 6 mA")
     s.connect("3V3_SYS",   ("R13", "1"))
     s.connect("RELAY_LED", ("R13", "2"))

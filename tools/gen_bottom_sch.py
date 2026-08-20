@@ -111,7 +111,7 @@ def build():
     # Verpolschutz: P-MOSFET high-side, Gate ueber R gegen GND, Zener begrenzt Ugs
     s.add("Q1", "SwitchStack:Q_PMOS_GSD", "P-FET 40V 30A",
           "Package_SO:PowerPAK_SO-8_Single",
-          MPN="z.B. SiR429DP; Pad-Zuordnung siehe PAD_MAP in gen_layouts")
+          MPN="Vishay SIR4409DP-T1-GE3 (P-Kanal -40V/60A; Mouser, Handbestueckung) - Pad-Zuordnung siehe PAD_MAP in gen_layouts")
     s.connect("24V_GATE_P", ("Q1", "1"))
     s.connect("24V_F",      ("Q1", "2"))
     s.connect("24V_PROT",   ("Q1", "3"))

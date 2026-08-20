@@ -83,6 +83,7 @@ NUMMERN = {
     ("BTN2", "SKQG"): "C115351",
     ("BTN3", "SKQG"): "C115351",
     ("BTN4", "SKQG"): "C115351",
+    ("PhotoMOS 60V", "SOP-4"): "C1525231",  # Panasonic AQY212S (Entscheid 20.08.)
 }
 
 
