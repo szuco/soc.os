@@ -126,6 +126,26 @@ verdrahtet. Beides stand hier trotzdem noch als offen — die Doku hinkte.
 > Flussmittel gut machbar, Pin-1-Marke auf F.Fab), dann das Panel mit dem
 > Werksklebeband aufkleben. Prüfpunkt Musteraufbau: FPC 0,13 + Lot in der
 > 0,15-Klebebandfuge — die Fahnenzone flach halten.
+>
+> **Das Bügel-Rezept im Detail (Frage vom 21.08.: „von oben auf die
+> Fahne drücken?" — ja, genau so, mit drei Bedingungen):**
+> 1. Pads fluxen, hauchdünn verzinnen, mit Entlötlitze wieder
+>    **abziehen** — es bleibt ein ebener Film (Dickenbudget der Fuge!).
+>    Später kommt von oben KEIN Lot dazu. Schonvariante: Sn42/Bi58,
+>    dann reicht ~200 °C.
+> 2. **Buch aufklappen:** Werksfaltung als Scharnier, Panel nach rechts
+>    umgeklappt, Displayseite nach unten auf eine Unterlage in
+>    Boardhöhe (Schutzfolie bleibt drauf). Die Finger liegen dann von
+>    allein face-down auf den Pads. Pin 1 aufs oberste Pad, Kapton über
+>    den Fahnenkörper, Flux auf die Zone.
+> 3. **Bügeln:** Meißelspitze 300–320 °C, Pin 1 heften, Lage prüfen,
+>    Pin 12, dann die Reihe — je Pin 1–2 s ruhig aufsetzen, nicht
+>    schieben. Kontrolle: Lot glänzt am 0,36er Padstummel vor der
+>    Fahnenspitze (dort zieht es auch kapillar nach, wenn die Spitze
+>    direkt ansetzt). Brücken in den 0,3er Lücken mit Flux + Litze
+>    räumen. Zug- und Durchgangsprobe VOR dem Zuklappen — danach ist
+>    Nacharbeit Zerstörung. Liner abziehen (liegt aufgeklappt oben),
+>    zuklappen, ausrichten, andrücken.
 
 > **NACHTRAG 20.08., nachts — die Faltkante war falsch (Einwand des
 > Nutzers, am Foto verifiziert):** Die Fahne verlässt das Modul an der
