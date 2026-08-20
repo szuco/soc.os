@@ -68,6 +68,21 @@ NUMMERN = {
     ("10u", "SRP7028A"): "C2687402",  # Bourns SRP7028A-100M
     ("33u", "SRP7028A"): "C2046760",  # Bourns SRP7028A-330M
     ("BC847", "SOT-23"): "C181141",   # BC847C
+    ("P-FET 20V 1A", "SOT-23"): "C15127",   # AO3401A, -30V 4A
+    ("N-FET 30V 1A", "SOT-23"): "C20917",   # AO3400A, 30V 5,7A
+    ("5V6", "D_SOD-123"): "C78726",         # BZT52C5V6-TP, MCC
+    ("12V", "D_SOD-123"): "C177013",        # BZT52C12-13-F, Diodes
+    ("33V", "D_SOD-123"): "C545300",        # BZT52C33
+    ("SMBJ30A", "D_SMB"): "C353368",
+    ("60V 3A", "D_SMB"): "C145306",         # B360B-E3/52T, Vishay
+    ("5m0 1W", "R_2512"): "C5375417",       # 2512 5m 2W - mehr traegt mehr
+    ("0,2 A PTC", "Fuse_1206"): "C207035",  # Littelfuse 1206L020YR
+    ("22u", "C_1210"): "C52306",            # Samsung CL32A226KAJNNNE 25V
+    ("Piezo passiv SMD", "PKMCS"): "C910763",  # Murata PKMCS0909E4000-R1
+    ("BTN1", "SKQG"): "C115351",  # Alps SKQGABE010, Ersatz fuer SKRK (P69)
+    ("BTN2", "SKQG"): "C115351",
+    ("BTN3", "SKQG"): "C115351",
+    ("BTN4", "SKQG"): "C115351",
 }
 
 

@@ -66,7 +66,11 @@ TEILE = [
 # der Zentralscheibe (Tiefe 7,5 vor der Sichtflaeche bei 25,5, also 18,0)
 # genau auf die Flanschvorderkante (15,5 + 2,5) - so muss es sein.
 # Aufgefallen beim Zeichnen von tools/gen_explosion.py.
-ADAPTER = ("adapter.step", 15.5)
+# 15,0 seit dem Tasterwechsel (SKQG, 1,5 statt 2,0 hoch): Die Tasche des
+# Adapters haelt die Platinenrueckseite, und die sitzt jetzt 5,0 statt
+# 5,5 hinter der Sichtflaeche - der Adapter rueckt 0,5 nach hinten.
+# gen_explosion.py prueft diesen Wert gegen die Adapterparameter.
+ADAPTER = ("adapter.step", 15.0)
 # Der Tragring liegt auf der Wandebene: Rahmenvorderkante 27,5 minus
 # Rahmentiefe 12. Der Adapter-Basisring taucht durch seine Oeffnung.
 TRAGRING = ("tragring.step", 15.5)

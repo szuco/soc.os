@@ -83,10 +83,14 @@ PARAMS = dict(
     pcb_corner_r      = 4.0,    # Eckradius (= TOP_CR)
     pcb_t             = 1.0,
     pcb_play          = 0.4,    # Spiel in der Tasche, gesamt
-    switch_h          = 2.0,    # SMD-Taster ueber der Platine
+    # 1,5 statt 2,0 seit dem Tasterwechsel SKRK -> SKQG (20.08.2026,
+    # Punkt 69 - das SKRK ist abgekuendigt). Die Tiefenkette rechnet sich
+    # daraus neu: Die Platine rueckt 0,5 mm nach vorn, die Auflage wird
+    # entsprechend tiefer.
+    switch_h          = 1.5,    # SMD-Taster ueber der Platine (SKQG)
     btn_x             = 18.0,   # Tasterposition = Kreuzposition
     btn_y             = 20.0,
-    btn_reach         = 22.2,   # groesste Ausdehnung eines Tasters vom Zentrum
+    btn_reach         = 22.3,   # SKQG: 19,7 + 5,2/2 in y (Taster 0,3 innen)
 
     # --- Schnapprand -------------------------------------------------------
     rim_wall          = 1.4,    # Wandstaerke -> bestimmt pcb_sq

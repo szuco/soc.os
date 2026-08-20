@@ -897,10 +897,20 @@ def run_drc(path):
 # 3,2 x 3,2 mm gross und trifft genau EINEN Taster; die frueheren acht
 # parallelen Taster der Sichelkappen sind entfallen.
 # KiCad zaehlt Y nach unten, deshalb hier das Vorzeichen gedreht.
-BTN_POS = {"SW1": (18.0, -20.0),      # oben rechts
-           "SW2": (-18.0, -20.0),     # oben links
-           "SW3": (-18.0, 20.0),      # unten links
-           "SW4": (18.0, 20.0)}       # unten rechts
+# 17,7/19,7 statt 18/20 (20.08.2026): Die SKQG-Pads reichen bis 1,8 mm
+# neben den Koerper; auf 18/20 kam die aeussere Padecke dem Eckbogen (r 4
+# um 19,5/19,5) auf 0,17 mm nahe - vier Randfehler. 0,3 mm je Achse nach
+# innen schaffen 0,59 mm Luft, und das Druckkreuz (3,2 auf 5,2 Flaeche)
+# behaelt 1,0 mm Deckungsreserve zur gemessenen Kreuzposition 18/20.
+# (18,1 / 19,35) nach zwei Fehlversuchen mit dem SKQG: Bei 18/20 kam die
+# aeussere Padecke dem Eckbogen auf 0,17 nahe, bei 17,7/19,7 ueberlappte
+# der 8,6 mm breite Courtyard den Hauptschalter SW5. Jetzt: 0,56 zum
+# Bogen, 0,2 zu SW5, und das Druckkreuz (gemessen 18/20) behaelt 0,35
+# Deckungsreserve auf der 5,2er-Tasterflaeche.
+BTN_POS = {"SW1": (18.1, -19.35),     # oben rechts
+           "SW2": (-18.1, -19.35),    # oben links
+           "SW3": (-18.1, 19.35),     # unten links
+           "SW4": (18.1, 19.35)}      # unten rechts
 
 # DAS FET-RASTER IST AM 18.08.2026 ENTFALLEN. Hier standen acht MOSFETs im
 # PowerPAK SO-8 in vier Spalten, zwei Reihen - die diskrete H-Bruecke. Sie

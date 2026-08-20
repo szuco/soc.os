@@ -82,8 +82,14 @@ def build():
                     (3, "unten links"), (4, "unten rechts")):
         ref = "SW%d" % n
         s.add(ref, "Switch:SW_Push", "BTN%d" % n,
-              "Button_Switch_SMD:SW_Push_SPST_NO_Alps_SKRK",
-              MPN="Alps SKRK o.ae., 3,9x2,9 - Ecke %s, unter dem Druckkreuz "
+              "Button_Switch_SMD:SW_SPST_SKQG_WithStem",
+              # SKQG statt SKRK (20.08.2026): Das SKRKAEE010 ist
+              # abgekuendigt (Punkt 69). Der SKQG ist Alps' Standard-
+              # Flachtaster, 5,2 x 5,2 x 1,5, Betaetigungskraft 1,6 N wie
+              # das Original, bei LCSC ab Lager - und die groessere
+              # Betaetigungsflaeche faengt das Druckkreuz besser.
+              # Bauhoehe 1,5 statt 2,0 -> switch_h in adapter.py.
+              MPN="Alps SKQGABE010, LCSC C115351 - Ecke %s, Druckkreuz "
                   "der Zentralscheibe" % ecke)
         s.connect("BTN%d" % n, (ref, "1"))
         s.connect("PGND",      (ref, "2"))

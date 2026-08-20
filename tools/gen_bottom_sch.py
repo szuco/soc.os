@@ -93,7 +93,11 @@ def build():
     s.connect("HOOD_B",   ("J1", "15"))
 
     # Sicherung - Wert messabhaengig
-    s.add("F1", "Device:Fuse", "15A traege",
+    # FLINK, nicht traege: Die NANO2-453 (Slo-Blo) endet laut Littelfuse
+    # bei 5 A; 15 A gibt es nur flink (451, z. B. 0451015.MRL). Sachlich
+    # gleichwertig - die Sicherung schuetzt die Leitung, den Motor
+    # schuetzt der HW-Trip Groessenordnungen frueher.
+    s.add("F1", "Device:Fuse", "15A flink",
           "Fuse:Fuse_Littelfuse-NANO2-451_453",
           MPN="SMD NANO2, messabhaengig - siehe docs/11")
     s.connect("24V_IN", ("F1", "1"))
@@ -324,8 +328,11 @@ def build():
         s.connect("PGND",      ("R_%s_IL" % p, "2"))
 
         # Bulk direkt an der Bruecke
-        s.add("C_%s_BR" % p, "Device:C", "100u 50V",
-              "Capacitor_SMD:C_1210_3225Metric",
+        # POLYMER statt 1210-Keramik (20.08.2026): "100u 50V" als
+        # 1210-MLCC EXISTIERT NICHT - Keramik in 1210 endet bei 100 uF /
+        # ~10 V. Aufgefallen beim LCSC-Abgleich. Gleiche Bauform wie C3/C4.
+        s.add("C_%s_BR" % p, "Device:C", "100u/35V Polymer",
+              "Capacitor_SMD:CP_Elec_8x6.5",
               MPN="Bulk je Bruecke. Das Original kommt mit 47 uF fuer BEIDE "
                   "Motoren aus (docs/14) - 100 uF je Kanal ist reichlich")
         s.connect("24V_PROT", ("C_%s_BR" % p, "1"))

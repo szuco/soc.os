@@ -284,6 +284,26 @@ def connect(name, max_rounds=4):
                         if not all((x - hx) ** 2 + (y - hy) ** 2 >= 1.0
                                    for hx, hy in holes):
                             continue
+                        # Keine Vias in Footprint-Sperrflaechen: Der
+                        # SKQG-Taster verbietet Vias unter seinem
+                        # Metalldom, und gnd_connect setzte prompt zwei
+                        # hinein (20.08.2026).
+                        in_sperre = False
+                        for z in board.Zones():
+                            if (z.GetIsRuleArea()
+                                    and z.GetDoNotAllowVias()
+                                    and z.HitTestFilledArea(
+                                        pcbnew.F_Cu,
+                                        pcbnew.VECTOR2I(mm(x), mm(y)), 0)):
+                                in_sperre = True
+                                break
+                            if (z.GetIsRuleArea() and z.GetDoNotAllowVias()
+                                    and z.Outline().Contains(
+                                        pcbnew.VECTOR2I(mm(x), mm(y)))):
+                                in_sperre = True
+                                break
+                        if in_sperre:
+                            continue
                         # Freiraum auf ALLEN Lagen pruefen - das Via geht
                         # durch das ganze Board, nicht nur durch F und B.
                         # Die Suchbreite folgt der VIAGROESSE: Auf Bottom

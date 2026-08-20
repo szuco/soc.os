@@ -32,9 +32,9 @@ Soft-Limit und der einzige noch offene Leistungshalbleiter provisorisch.
 
 | Board | Schaltplan | Layout / Routing | Fertigungsdaten |
 |---|---|---|---|
-| **BOTTOM** `bottom_power_motor` | ✅ **82 Bauteile** statt 102 — dazu R1B und die EN_LOOP-Schleife (Hauptschalter, v0.7) — integrierte Brücken DRV8871 statt acht MOSFETs, ein Feldstecker statt vier | 🟡 **vierlagig, 974 Segmente, 121 Vias, null Kupferfehler**; neu erzeugt am 20.08. (Flip-Flop im VSSOP-8, SENSE-Abstandsklasse, LCSC-Felder); offene Netze in docs/16 | ⛔ Handarbeit, siehe [`16`](16-kicad-handgriffe.md) |
+| **BOTTOM** `bottom_power_motor` | ✅ **82 Bauteile** statt 102 — dazu R1B und die EN_LOOP-Schleife (Hauptschalter, v0.7) — integrierte Brücken DRV8871 statt acht MOSFETs, ein Feldstecker statt vier | 🟡 **vierlagig, 1103 Segmente, 129 Vias, null Kupferfehler**; Polymer-Bulk statt unmöglichem 1210-Keramik, Sicherung flink, FF im VSSOP-8 | ⛔ Handarbeit, siehe [`16`](16-kicad-handgriffe.md) |
 | **MID** `mid_logic` | ✅ 49 Bauteile — Feldstecker abgegeben, USB-C übernommen | 🟡 **vierlagig, 776 Segmente, 85 Vias, null Kupferfehler**; RELAY_CTL an der USB-Bohrung bleibt Handarbeit | ⛔ Handarbeit |
-| **TOP** `top_ui` | ✅ 26 Bauteile — kein USB; ToF und Raumsensor symmetrisch bei ±5,5, Hauptschalter SW5 hochkant daneben | 🟡 **vierlagig, 176 Segmente, 20 Vias, null Kupferfehler**; 9 Signale offen (Handarbeit) | ⛔ Handarbeit |
+| **TOP** `top_ui` | ✅ 26 Bauteile — kein USB; ToF und Raumsensor symmetrisch bei ±5,5, Hauptschalter SW5 hochkant daneben | 🟡 **vierlagig, 160 Segmente, 19 Vias, null Kupferfehler**; Ecktaster jetzt Alps SKQG (C115351, Punkt 69), 11 Signale offen (Handarbeit) | ⛔ Handarbeit |
 | **Nutzen** `fab/panel` | — (Build-Ergebnis) | ✅ **vierlagig, 173,4 × 72,4 mm**, mit Passermarken und Werkzeugbohrungen, deckungsgleich mit der Summe der Einzelboards | 🟡 bestellbar, sobald die Handarbeit erledigt ist |
 
 Die 43 offenen Verbindungen auf Bottom sind **kein Rückstand des Autorouters**,

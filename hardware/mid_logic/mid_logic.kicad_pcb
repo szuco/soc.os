@@ -5168,6 +5168,17 @@
 				)
 			)
 		)
+		(property "LCSC" "C78726"
+			(at 0 0 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "207f343a-00c7-4521-82a9-6b5cc113b122")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -5441,6 +5452,17 @@
 				(font
 					(size 1.27 1.27)
 					(thickness 0.15)
+				)
+			)
+		)
+		(property "LCSC" "C910763"
+			(at 0 0 0)
+			(layer "F.SilkS")
+			(hide yes)
+			(uuid "d7092cc6-439c-48ed-8268-caaf2a41e264")
+			(effects
+				(font
+					(size 1.27 1.27)
 				)
 			)
 		)
@@ -8908,6 +8930,17 @@
 				(justify mirror)
 			)
 		)
+		(property "LCSC" "C78726"
+			(at 0 0 0)
+			(layer "B.SilkS")
+			(hide yes)
+			(uuid "09d727d2-80aa-4ed4-abfb-c365918f6860")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -9187,6 +9220,17 @@
 					(thickness 0.15)
 				)
 				(justify mirror)
+			)
+		)
+		(property "LCSC" "C545300"
+			(at 0 0 0)
+			(layer "B.SilkS")
+			(hide yes)
+			(uuid "830da88c-f9f2-4a3e-8762-2f34622aefa8")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
 		)
 		(attr smd)
@@ -9979,6 +10023,7 @@
 			(effects
 				(font
 					(size 1.27 1.27)
+					(thickness 0.15)
 				)
 			)
 		)
@@ -10343,6 +10388,17 @@
 					(thickness 0.15)
 				)
 				(justify mirror)
+			)
+		)
+		(property "LCSC" "C78726"
+			(at 0 0 0)
+			(layer "B.SilkS")
+			(hide yes)
+			(uuid "8e9b2834-671b-40b5-944f-80a655c78401")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
 		)
 		(attr smd)
@@ -11802,6 +11858,17 @@
 					(thickness 0.15)
 				)
 				(justify mirror)
+			)
+		)
+		(property "LCSC" "C78726"
+			(at 0 0 0)
+			(layer "B.SilkS")
+			(hide yes)
+			(uuid "1fb1001a-3069-4179-9a7a-f1d93646419a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
 		)
 		(attr smd)
