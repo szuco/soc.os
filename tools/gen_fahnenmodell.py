@@ -7,9 +7,9 @@ Bestell-Tor mehr, sondern die KONTROLLE am ersten Muster: Fahne falten,
 auf den Pad-Streifen legen, pruefen, dass die Goldfinger nach unten auf
 die Pads zeigen und Pin 1 rechts ankommt.
 
-Masse aus docs/datasheets/ER-TFT1.69-3.md (Fahne 18,15 lang, 8,47 und
-6,50 breit) und gen_layouts.py (Schlitz 10,0 x 1,6 bei y = 6,4;
-Panelunterkante y = 15,3; J5-Kontakte bei y = 1,93). Beim Drucken:
+Masse aus der Originalzeichnung (Fahne 12,96 +-0,3 lang, 11,4 bzw. 9,34
+breit, Finger 0,35/2,0 im 0,7-Raster) und gen_layouts.py (Loetpads um
+y = 3,6; Panelunterkante y = 15,3). Beim Drucken:
 100 %, keine Seitenanpassung - das 50-mm-Lineal auf dem Blatt nachmessen.
 """
 
@@ -61,10 +61,11 @@ def main():
     # --- Teil 1: die Fahne (1:1) ------------------------------------------
     ox, oy = 10, 38
     text(ox, oy - 3, "TEIL 1 — die Fahne (ausschneiden)", 3.4, True)
-    # Trapez: 8,47 breit am Abgang, 6,50 an der Spitze, 18,15 lang (nach unten)
-    x0, x1 = ox, ox + 8.47
-    xs0, xs1 = ox + (8.47 - 6.5) / 2, ox + (8.47 + 6.5) / 2
-    yA, yS = oy, oy + 18.15
+    # Trapez nach Originalzeichnung: 11,4 am Abgang, 9,34 an der Spitze,
+    # 12,96 lang (nach unten)
+    x0, x1 = ox, ox + 11.4
+    xs0, xs1 = ox + (11.4 - 9.34) / 2, ox + (11.4 + 9.34) / 2
+    yA, yS = oy, oy + 12.96
     a('<polygon points="%f,%f %f,%f %f,%f %f,%f" fill="none" '
       'stroke="#000" stroke-width="%f"/>'
       % (mm(x0), mm(yA), mm(x1), mm(yA), mm(xs1), mm(yS), mm(xs0), mm(yS),
@@ -72,7 +73,7 @@ def main():
     # Kontaktzone an der Spitze (3 mm), schraffiert
     a('<rect x="%f" y="%f" width="%f" height="%f" fill="#ffd" '
       'stroke="#b90" stroke-width="%f"/>'
-      % (mm(xs0), mm(yS - 3), mm(6.5), mm(3), mm(0.3)))
+      % (mm(xs0), mm(yS - 2), mm(9.34), mm(2), mm(0.3)))
     text(x1 + 3, yS - 4.5, "Kontaktzone: am ECHTEN Panel nachsehen,", 2.8)
     text(x1 + 3, yS - 0.7, "auf welcher Seite die Goldfinger liegen —", 2.8)
     text(x1 + 3, yS + 3.1, "diese Seite der Schablone ankreuzen und beschriften", 2.8)
@@ -90,8 +91,6 @@ def main():
     # Masse in Board-y: Panelkante 15,3 / Loetpads 2,0..5,2 (Mitte 3,6)
     sb, sh = 30, 20  # Streifen 30 breit, 20 hoch (y 0..20 des Boards)
     kasten(ox2, oy2, sb, sh)
-    # Schlitz bei Board-y 5,6..7,2 -> im Streifen von oben (y=20 oben? Wir
-    # zeichnen Board-y nach unten wachsend wie KiCad: Streifen-oben = y=0)
     # Padfeld: 12 Streifen, 0,7-Raster, um Boardmitte (Fahnenmitte)
     for i in range(12):
         px = ox2 + sb / 2 - 7.7 / 2 + i * 0.7 - 0.2
@@ -114,7 +113,8 @@ def main():
         "6. KONTROLLE 3: Die Kontaktzone (2,0 lang) muss die Pads (y 2,0..5,2) ueberdecken -",
         "   Fahnenlaenge 12,96 +-0,3 ab Panelkante.",
     ]):
-    text(10, oy3 + 40, "Rechnung sagt: alles passt - dieses Blatt ist die Bestaetigung am ersten Muster.", 2.9, True)
+        text(10, oy3 + 5 + i * 4.5, z, 2.9)
+    text(10, oy3 + 42, "Rechnung sagt: alles passt - dieses Blatt ist die Bestaetigung am ersten Muster.", 2.9, True)
 
     a('</svg>')
     open(ZIEL, "w", encoding="utf-8").write("\n".join(e))
