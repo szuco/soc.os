@@ -524,6 +524,24 @@ Becher außen 54,6 — deshalb ist die Wand an 3 und 9 Uhr gefenstert, dort
 schaut die Platinenkante heraus. **Messpunkt F16:** lichte Weite der
 echten Dose und Lage/Breite ihrer Schraubdome, vor dem Druck.
 
+**Falls F16 eng ausfällt — Hebel in dieser Reihenfolge (20.08., nachts,
+Einwand des Nutzers):** Der Becher steht mit 54,6 gegen die 55er-Annahme
+rechnerisch auf Kante; ob das real reicht, entscheidet allein F16 (eine
+60er-Dose hat nominell ~60 lichte Weite, die Annahme ist bewusst
+pessimistisch). Wird es eng: **1.** Wand 1,1 → 0,8 und Spiel 0,4 → 0,3
+(außen 53,7 — ein Parameter, ein Neudruck); **2.** Dome-Fenster
+verbreitern (kostet Wandanteil, keine Elektronik); **3.** erst als
+letzter Hebel die Boards verkleinern — Ø 52 → Ø 50 wäre ein Neulayout
+beider runden Boards, und Bottom ist heute schon das vollste.
+
+**Baugruppe ≠ Druckdatei.** Wer `switchstack_stack.step` sliced, sieht
+den 70er-Ring frei über dem Becher schweben — im Einbau liegt er auf
+Dosenrand und Wandputz, die das Modell nicht enthält. Gedruckt werden
+**drei Einzelteile**, jedes flach: der Becher auf dem Boden (Wände
+senkrecht, Zapfen minimal überhängend), der Tragring als Platte, der
+Adapter auf der Lippenseite. Nichts davon braucht Stützen; verbunden
+wird erst nach dem Druck, per Bajonett.
+
 Montage ändert sich vorn nicht; neu ist Schritt 2b: Boards in den Becher,
 Leiste durch das Rückwandfenster anstecken, Becher an den Tragring
 bajonettieren — dann als Einheit in die Dose.
