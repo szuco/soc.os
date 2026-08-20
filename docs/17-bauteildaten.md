@@ -74,23 +74,25 @@ Panel bis ±15,04 und bleibt damit frei von den Ecktastern bei 18,27…21,73. In
 x reicht es bis ±18,71 und liegt damit **neben** den Tastern — rund 1,5 mm
 diagonaler Abstand. Am realen Teil ansehen.
 
-### Der Weg der Fahne (20.08.2026)
+### Der Weg der Fahne — Direktlöten (Stand 20.08. spätabends)
 
-Die 18,15-mm-FPC erreicht ihre Buchse **durch einen Schlitz im Board**,
-nicht um die Kante — der früher dokumentierte Weg um die Boardkante braucht
-30,3 mm und war nie möglich:
+> Die frühere Fassung dieses Abschnitts beschrieb einen FPC-Schlitz und
+> die Buchse J5 auf der Rückseite — beides beruhte auf den falschen
+> Fahnendaten (0,5-Raster, 18,15 lang) und ist ersatzlos entfallen.
 
 ```
-Panel (vorn, geklebt)
-  └─ Fahne faltet an der Panelunterkante (y 15,3) um 180°
-     └─ läuft unter dem Glas zurück (~8,9 mm)
-        └─ taucht durch den FPC-Schlitz 10,0 × 1,6 bei (0 / 6,4)
-           └─ steckt hinten in J5 (0 / 3,8), Einschub zeigt zum Schlitz
+Panel (Werksklebeband auf der Rückseite)
+  └─ Fahne faltet ab Werk an der Panelunterkante (y 15,3)
+     └─ Goldfinger zeigen nach der Faltung NACH UNTEN aufs Board
+        └─ landen face-down auf 12 Lötpads (0,7 mm) der VORDERSEITE
+           bei (−0,95 / 3,6) — Footprint `FPC_Loetfeld_12x0.7mm`
 ```
 
-Rechnerisch ~17,6 mm von 18,15 — etwa 0,6 mm Reserve. Beim ersten
-Musteraufbau prüfen; falls es klemmt, wandert der Schlitz näher an die
-Panelkante (FPC_Y in `gen_layouts.py`).
+**Reihenfolge beim Aufbau:** erst löten (Kolben + Flussmittel, Pin-1-
+Marke auf F.Fab, Pin 1 in Frontsicht rechts), dann das Panel mit dem
+Werksklebeband aufkleben. Kein Schlitz, keine Buchse, keine Spiegelung —
+Pin 1 trifft Pin 1. Prüfpunkt am Muster: FPC 0,13 + Lot müssen in die
+0,15er-Klebebandfuge; die Fahnenzone flach halten.
 
 ### Was noch fehlt — bereinigt am 20.08.2026
 

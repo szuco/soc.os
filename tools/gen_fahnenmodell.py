@@ -2,11 +2,10 @@
 # -*- coding: utf-8 -*-
 """Erzeugt die 1:1-Papierschablone fuer die Displayfahnen-Pruefung.
 
-docs/17 verlangt vor der Bestellung ein Papiermodell: Kontaktseite und
-Pinreihenfolge der Fahne nach Werksfaltung und Schlitzdurchgang. Diese
-Schablone macht daraus eine Viertelstunde: ausschneiden, an der echten
-Fahne die Kontaktseite und die Pin-1-Kante uebertragen, falten, durch den
-Schlitzstreifen stecken, ablesen.
+Seit dem Direktloet-Entscheid (20.08. spaetabends) ist das Modell kein
+Bestell-Tor mehr, sondern die KONTROLLE am ersten Muster: Fahne falten,
+auf den Pad-Streifen legen, pruefen, dass die Goldfinger nach unten auf
+die Pads zeigen und Pin 1 rechts ankommt.
 
 Masse aus docs/datasheets/ER-TFT1.69-3.md (Fahne 18,15 lang, 8,47 und
 6,50 breit) und gen_layouts.py (Schlitz 10,0 x 1,6 bei y = 6,4;
@@ -86,38 +85,36 @@ def main():
 
     # --- Teil 2: der Boardstreifen ----------------------------------------
     ox2, oy2 = 100, 38
-    text(ox2, oy2 - 3, "TEIL 2 — Boardstreifen mit Schlitz (ausschneiden, Schlitz aufschneiden)", 3.4, True)
+    text(ox2, oy2 - 3, "TEIL 2 — Boardstreifen mit Loetpads (ausschneiden)", 3.4, True)
     # Streifen: von Panelunterkante (y=15,3) bis ueber J5 (y=1,93): Laenge 15,3-0 = 15,3+Rand
-    # Masse in Board-y: Panelkante 15,3 / Schlitz 5,6..7,2 / J5-Kontakte 1,93
+    # Masse in Board-y: Panelkante 15,3 / Loetpads 2,0..5,2 (Mitte 3,6)
     sb, sh = 30, 20  # Streifen 30 breit, 20 hoch (y 0..20 des Boards)
     kasten(ox2, oy2, sb, sh)
     # Schlitz bei Board-y 5,6..7,2 -> im Streifen von oben (y=20 oben? Wir
     # zeichnen Board-y nach unten wachsend wie KiCad: Streifen-oben = y=0)
-    a('<rect x="%f" y="%f" width="%f" height="%f" fill="#000"/>'
-      % (mm(ox2 + (sb - 10) / 2), mm(oy2 + 5.6), mm(10), mm(1.6)))
-    text(ox2 + sb + 2, oy2 + 7, "Schlitz 10,0 × 1,6 (aufschneiden)", 2.8)
+    # Padfeld: 12 Streifen, 0,7-Raster, um Boardmitte (Fahnenmitte)
+    for i in range(12):
+        px = ox2 + sb / 2 - 7.7 / 2 + i * 0.7 - 0.2
+        a('<rect x="%f" y="%f" width="%f" height="%f" fill="#b90"/>'
+          % (mm(px), mm(oy2 + 2.0), mm(0.4), mm(3.2)))
+    text(ox2 + sb + 2, oy2 + 4.5, "12 Loetpads 0,7-Raster (Pin 1 rechts)", 2.8)
     linie(ox2, oy2 + 15.3, ox2 + sb, oy2 + 15.3, 0.25, dash=1.2)
     text(ox2 + sb + 2, oy2 + 16, "Panelunterkante — Fahne hier anlegen und falten", 2.8)
-    linie(ox2, oy2 + 1.93, ox2 + sb, oy2 + 1.93, 0.3, farbe="#b00")
-    text(ox2 + sb + 2, oy2 + 2.6, "J5-Kontaktlinie (rot): bis hier muss die", 2.8, farbe="#b00")
-    text(ox2 + sb + 2, oy2 + 6.0, "Kontaktzone reichen (Einschub ~2,5)", 2.8, farbe="#b00")
+
 
     # --- Ablauf ------------------------------------------------------------
     oy3 = 78
     text(10, oy3, "ABLAUF", 3.4, True)
     for i, z in enumerate([
-        "1. Teil 1 an die echte Fahne halten: Goldfinger-Seite und Pin-1-Kante auf die Schablone uebertragen.",
-        "2. An der Faltlinie um 180° falten (wie ab Werk: Fahne liegt an der Panelrueckseite an).",
-        "3. Teil 1 auf Teil 2 legen (Faltlinie auf Panelunterkante), Spitze durch den Schlitz stecken,",
-        "   auf der Rueckseite zur roten J5-Linie fuehren.",
-        "4. KONTAKTSEITE: Zeigen die Goldfinger jetzt VOM Streifen WEG (zu dir, wenn du auf die",
-        "   Rueckseite schaust)?  JA = passt (Top-Kontakt-Buchse).  NEIN = gespiegelte Buchse noetig.",
-        "5. PIN 1: Notieren, an welcher Kante Pin 1 auf der Rueckseite ankommt (links/rechts) —",
-        "   damit gleichen wir die J5-Verdrahtung ab (Rechnung sagt: links/rechts kippt NIE,",
-        "   aber die Buchse ist auf der Rueckseite x-gespiegelt montiert).",
+        "1. Teil 1 an die echte Fahne halten: Goldfinger-Seite und Pin-1-Kante uebertragen.",
+        "2. An der Faltlinie um 180° falten (wie ab Werk).",
+        "3. Teil 1 auf Teil 2 legen: Faltlinie auf die Panelunterkante.",
+        "4. KONTROLLE 1: Die Goldfinger muessen NACH UNTEN auf die Pads zeigen (face-down).",
+        "5. KONTROLLE 2: Pin 1 der Fahne muss auf dem RECHTEN Pad ankommen.",
+        "6. KONTROLLE 3: Die Kontaktzone (2,0 lang) muss die Pads (y 2,0..5,2) ueberdecken -",
+        "   Fahnenlaenge 12,96 +-0,3 ab Panelkante.",
     ]):
-        text(10, oy3 + 5 + i * 4.5, z, 2.9)
-    text(10, oy3 + 46, "Vorhersage der Rechnung (docs/17): Kontakte am gelieferten Panel von HINTEN sichtbar -> passt.", 2.9, True)
+    text(10, oy3 + 40, "Rechnung sagt: alles passt - dieses Blatt ist die Bestaetigung am ersten Muster.", 2.9, True)
 
     a('</svg>')
     open(ZIEL, "w", encoding="utf-8").write("\n".join(e))
