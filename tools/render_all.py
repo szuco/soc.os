@@ -178,8 +178,12 @@ def main():
             print("   %s" % zeile.strip())
 
     # Gesamtbaugruppe erst danach - sie liest die eben geschriebenen STEPs.
-    r = subprocess.run([sys.executable,
-                        os.path.join(ROOT, "mechanical", "stack.py")],
+    # NICHT sys.executable: Laeuft diese Kette unter dem KiCad-Python
+    # (wegen pcbnew), fehlt dort build123d - stack.py brauchte am 20.08.
+    # deshalb einen Nachlauf von Hand. Das System-python3 hat den Kern.
+    import shutil
+    py = shutil.which("python3") or sys.executable
+    r = subprocess.run([py, os.path.join(ROOT, "mechanical", "stack.py")],
                        capture_output=True, text=True)
     print(r.stdout.strip() or r.stderr[-400:])
     return 1 if fehler else 0
