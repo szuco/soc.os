@@ -550,6 +550,20 @@ Nutzerbefund 21.08.) — der Becher bekommt vier Fenster à 10 statt zwei
 Kabeleinführungen bei ~50 mm Tiefe sind günstig: Der Kabelbogen muss
 nicht mehr hinter den Stecker, er kommt von der Seite.
 
+**Warum Tragring und Scheibenadapter so filigran aussehen — und warum
+das kein Fehler ist (21.08., Einwand des Nutzers):** Beide Teile sind
+fast nur Wände, und **jede dieser Wandstärken ist von den
+Busch-Jaeger-Schnittstellen diktiert**, nicht gewählt: Außen begrenzt
+das Rastmaß der Zentralscheibe (50,0 → Rand 49,8), innen das Top-Board
+in der Tasche (47,0 + 0,4 Spiel = 47,4) — dazwischen bleiben **1,2 mm
+Wand**, mehr gibt die Geometrie nicht her. Die Drucklippe (51,6) folgt
+dem Rahmensteg, die Ringdicke (2,0) der Klemmhöhe der Rahmen-Doppelstege
+(F13). Verstärken lässt sich nur über das Material (PETG oder PC statt
+PLA) und die Druckrichtung (flach, Lasten in der Ebene) — genau dafür
+ist der Testdruck mit F13/F15 da. Der Tragring aus dem Originalsystem
+ist zum Vergleich ~1 mm Stahlblech; unsere 2 mm Druck sind dagegen
+schon die kräftige Fassung.
+
 **Einbauprüfung gegen die gemessene Dose (21.08.,
 `mechanical/pruefe_einbau.py`):** Die Dose aus F16 (58 licht, 60 tief,
 vier Ø-6-Dome bis r 27) steht als Volumenkörper im Prüfwerkzeug; Becher,
