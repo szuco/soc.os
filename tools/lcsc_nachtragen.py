@@ -35,6 +35,39 @@ NUMMERN = {
     ("SHT40-AD1B", "SHT4x"): "C2909890",      # SHT40-AD1B-R2
     ("USB-C", "GT-USB-7051x"): "C2843970",
     ("Stern (intern)", "SM02B-GHS-TB"): "C189893",
+
+    # --- Basisbauteile, abgeglichen gegen die JLCPCB-Basisliste (Werte-
+    # und MPN-genau, z. B. 0603WAF4022T5E = 40,2 k). Quelle: Community-
+    # Scrapes der Basisliste; das Portal prueft jede Nummer beim Upload
+    # ohnehin gegen den Lagerbestand. E96-Sonderwerte (10k2, 39R, 53k6,
+    # 68k1, 88k7, 392k) und 1210-Kondensatoren sind KEINE Basisteile und
+    # bleiben bewusst offen - Extended-Suche im Portal.
+    ("0R", "R_0603"): "C21189",
+    ("100k", "R_0603"): "C25803",
+    ("10k", "R_0603"): "C25804",
+    ("10k0", "R_0603"): "C25804",
+    ("120R", "R_0603"): "C22787",
+    ("180k", "R_0603"): "C22827",
+    ("1M", "R_0603"): "C22935",
+    ("1k", "R_0603"): "C21190",
+    ("330R", "R_0603"): "C23138",
+    ("33k0", "R_0603"): "C4216",
+    ("40k2", "R_0603"): "C12447",
+    ("4k7", "R_0603"): "C23162",
+    ("560R", "R_0603"): "C23204",
+    ("5k1", "R_0603"): "C23186",
+    ("100n", "C_0603"): "C14663",
+    ("1n", "C_0603"): "C1588",
+    ("1u", "C_0603"): "C15849",
+    ("3n3", "C_0603"): "C1613",
+    ("4u7", "C_0603"): "C19666",
+    ("10u", "C_0805"): "C15850",
+    ("40V 3A", "D_SMA"): "C84635",    # SS34
+    ("40V", "D_SOD-123"): "C8598",    # B5819W, Schottky-Freilauf am Piezo
+    ("ER-TFT1.69-3", "TE_1-1734839-2"): "C3169233",   # Display-FPC-Buchse
+    ("10u", "SRP7028A"): "C2687402",  # Bourns SRP7028A-100M
+    ("33u", "SRP7028A"): "C2046760",  # Bourns SRP7028A-330M
+    ("BC847", "SOT-23"): "C181141",   # BC847C
 }
 
 

@@ -64,6 +64,32 @@ hardware/fab/bestueckung/           # das Ergebnis von gen_assembly
 Der Gerber-ZIP des Nutzens entsteht mit `gen_fab.py`, sobald das DRC-Gate
 grün ist.
 
+## 2b. Woher die LCSC-Nummern kommen (20.08.2026)
+
+Von 131 Bestückpositionen des Nutzens tragen jetzt **97 eine verifizierte
+Nummer** — aus drei Quellen, mit drei Verlässlichkeitsstufen:
+
+1. **Einzeln nachgeschlagene Katalogteile** (17 Stück): jede Nummer von
+   einer LCSC-Produktseite — alle Aktiven (DRV8871, TPS54360, INA240,
+   ESP32, …), die Steckverbinder GH und USB-C, die Display-FPC-Buchse
+   (C3169233), beide Speicherdrosseln, BC847C.
+2. **JLCPCB-Basisbauteile** (Masse der Passiven): abgeglichen gegen die
+   Basisliste, wert- und MPN-genau (z. B. `0603WAF4022T5E` = exakt
+   40,2 kΩ → C12447). Das Portal prüft beim BOM-Upload ohnehin jede
+   Nummer gegen den Lagerbestand — eine veraltete Nummer fällt dort auf,
+   eine falsche Zuordnung nicht, deshalb der MPN-Abgleich.
+3. **Werkzeug:** `tools/lcsc_nachtragen.py` schreibt alle Nummern als
+   unsichtbare Felder auf die gerouteten Boards; die Generatoren tragen
+   sie zusätzlich für künftige Neuerzeugungen. Nach jedem `gen_layouts`
+   einmal laufen lassen.
+
+**Die 54 restlichen Positionen** (38 Zeilen) sind zwei Sorten:
+
+| Sorte | Positionen | Weg |
+|---|---|---|
+| Extended-Teile — im Portal per Parametersuche wählen | ~35 | 1210-Kondensatoren (22u/47u/10u/100u-50V), E96-Widerstände (10k2, 39R, 53k6, 68k1, 88k7, 392k), Zener 5V6/12V/33V, SMBJ30A, 60V-3A-Schottky SMB, Shunts 5m0-2512, PTC + Sicherungen, SRP5030T-2R2M, Taster TL3342/SKRK/CVS-01, Buzzer PKMCS0909E |
+| **Bewusst offene Entscheidungen** — erst entscheiden, dann Nummer | ~19 | Stapelverbinder 6× (Punkt 23), Q1-FET (Punkt 8), P-/N-FET SOT-23 2×, PhotoMOS-Typ, TLV3702 (bei LCSC nicht geführt), VL53L1X (nicht geführt), Micro-Fit 43045-1612 (nicht geführt — THT, zur Not von Hand) |
+
 ## 3. Ablauf im Portal
 
 ### Schritt 1 — Gerber hochladen
