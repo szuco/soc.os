@@ -70,7 +70,10 @@ TEILE = [
 # Adapters haelt die Platinenrueckseite, und die sitzt jetzt 5,0 statt
 # 5,5 hinter der Sichtflaeche - der Adapter rueckt 0,5 nach hinten.
 # gen_explosion.py prueft diesen Wert gegen die Adapterparameter.
-ADAPTER = ("adapter.step", 15.0)
+# 15,5 seit der Einbaupruefung (21.08.): flange_t 2,5 -> 2,0, der
+# Adapter endet buendig auf der Wandebene statt 0,5 in der Dosenoeffnung
+# (Ecken gegen Dosenrand). Rechnung: Rueckseite Top (20,0) - seat (4,5).
+ADAPTER = ("adapter.step", 15.5)
 # Der Tragring liegt auf der Wandebene: Rahmenvorderkante 27,5 minus
 # Rahmentiefe 12. Der Adapter-Basisring taucht durch seine Oeffnung.
 TRAGRING = ("tragring.step", 15.5)

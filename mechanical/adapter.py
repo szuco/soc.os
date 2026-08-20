@@ -108,7 +108,15 @@ PARAMS = dict(
     # (Steg ~50) passen und darf deshalb nirgends breiter sein als der
     # Schnapprand. Die Tiefenkette bleibt unveraendert; aus dem Flansch
     # wurde ein gleich dicker Basisring in Randbreite.
-    flange_t          = 2.5,
+    # 2,0 statt 2,5 seit der Einbaupruefung gegen die GEMESSENE Dose
+    # (21.08.2026, mechanical/pruefe_einbau.py): Mit 2,5 endete der
+    # Adapter bei z = 15,0 - also 0,5 UNTER der Wandebene (15,5). Dort
+    # ist die Oeffnung aber rund (Dose r 29), und die Ecken des 49,8er
+    # Quadrats (Eckradius 35,2) drueckten auf Dosenrand und Putz
+    # (44 mm3 Kollision). Hinten gekuerzt endet er buendig auf der
+    # Wandebene; Rastraum, Auflage und Tasche bleiben im Raum exakt, wo
+    # sie waren - nur die Flanschrueckseite wandert 0,5 nach vorn.
+    flange_t          = 2.0,
     # KEIN schmaler Fuss - der Gedanke war falsch: Um die 43er Durchfuehrung
     # herum kann kein 34er Fuss existieren. Stattdessen ist die OEFFNUNG des
     # Tragrings 50,6 breit (tragring.py): Der ganze 49,8er Adapter taucht

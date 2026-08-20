@@ -27,7 +27,7 @@ Nutzerbefund 'die Raender haengen in der Luft'), und mit Domen auf allen
 vier Achsen gibt es fuer Zapfen samt Ringschlitzen kein tragfaehiges
 Band mehr (die Diagonalen blockiert die quadratische Ringoeffnung).
 Stattdessen fassen die zwei Schrauben, die Bottom ohnehin von hinten in
-die unteren Huelsen halten, jetzt DURCH den Becherboden (M2,5 x 16
+die unteren Huelsen halten, jetzt DURCH den Becherboden (M2,5 x 14
 statt x 6): Becher + Bottom + Mid sind die verschraubte Kartusche, der
 Tragring liegt lose auf dem Becherrand und kommt mit den
 Geraeteschrauben an die Dose.
@@ -229,7 +229,7 @@ def main():
           % (2 * r_out, -(p["tief_hinten"] + p["boden_t"])))
     print("Fenster      : Feldstecker %.0f x %.0f; Dom-Fenster 4 x %.0f"
           % (p["fenster_b"], p["fenster_h"], p["dom_fenster_b"]))
-    print("Kartusche    : 2 x M2,5 x 16 von hinten durch den Boden "
+    print("Kartusche    : 2 x M2,5 x 14 von hinten durch den Boden "
           "(Kanal OE%.0f auf x = +-%.1f)"
           % (p["kanal_od"], p["schraube_x"]))
     print("Export       : %s" % OUT)

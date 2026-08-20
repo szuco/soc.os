@@ -435,10 +435,10 @@ def panel_a(x0, y0):
     s.fahne("becher", g_boden, g_aus,
             ["Gehäuse-Becher, gedruckt — Untergeschoss des Tragrings",
              "Ø 54,6 · 4 Dom-Fenster à 10 (Ø-6-Dome!) · Tunnel hinten",
-             "Kartusche: 2 × M2,5 × 16 von hinten in die unteren Hülsen"],
+             "Kartusche: 2 × M2,5 × 14 von hinten in die unteren Hülsen"],
             hoch=60)
 
-    # Kartuschen-Schrauben (Konzept v3): M2,5 x 16 von hinten durch
+    # Kartuschen-Schrauben (Konzept v3): M2,5 x 14 von hinten durch
     # Boden und Fuehrungsrohr in die unteren Huelsen (H1/H2-Achse)
     for vz in (1, -1):
         s.teil("becher", g_boden + G["boden_t"], -G["kanal_luft"],

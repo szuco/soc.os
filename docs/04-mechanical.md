@@ -468,10 +468,13 @@ gehen mit ihm zusammen als **eine Kartusche** in die Dose.
    ihr Gewindestift klemmt Mid. Bottom liegt noch lose an.
 2. **Board-Paar in den Becher legen.** Bottom voran auf die vier
    Auflagebosse (Oberkante z = 0); USB-C zeigt zur 9-Uhr-Seite.
-3. **Kartusche verschrauben:** zwei **M2,5 × 16** von hinten durch den
+3. **Kartusche verschrauben:** zwei **M2,5 × 14** von hinten durch den
    Becherboden und seine Führungsrohre, durch Bottom (H1/H2) in die
    unteren Hülsen — Becher, Bottom und Mid sind jetzt EIN Teil
    (Konzept v3; das Bajonett ist Geschichte, die Dose hat vier Dome).
+   Länge gerechnet: Weg 9,7 (Boden 1,5 + Hohlraum 6,9 + Board 1,0 +
+   Luft) plus ≥ 4 Gewinde = 13,7 — eine 16er könnte in der 9er-Hülse
+   aufsetzen, falls deren Gewinde kürzer als 6,3 ist.
 4. **Feldstecker anstecken.** Die gecrimpte, in der Dose vorverdrahtete
    Micro-Fit-Leiste klickt von hinten durch den Stecker-Tunnel der
    Becher-Rückwand an Bottom.
@@ -518,7 +521,7 @@ Dose; innen der Basisring), und das Bajonett starb doppelt: Seine Zapfen
 standen auf der weggefensterten Wand (zwei von drei schwebten im STL),
 und die gemessene Dose hat Dome auf **allen vier Achsen** — es gibt kein
 tragfähiges Band mehr. Jetzt halten die zwei Hülsenschrauben der
-H1/H2-Achse die Kartusche: M2,5 × 16 von hinten durch den Becherboden,
+H1/H2-Achse die Kartusche: M2,5 × 14 von hinten durch den Becherboden,
 durch Führungsrohre und Bottom in die unteren Hülsen. Der Tragring liegt
 lose auf dem Becherrand.
 
@@ -547,6 +550,20 @@ Nutzerbefund 21.08.) — der Becher bekommt vier Fenster à 10 statt zwei
 Kabeleinführungen bei ~50 mm Tiefe sind günstig: Der Kabelbogen muss
 nicht mehr hinter den Stecker, er kommt von der Seite.
 
+**Einbauprüfung gegen die gemessene Dose (21.08.,
+`mechanical/pruefe_einbau.py`):** Die Dose aus F16 (58 licht, 60 tief,
+vier Ø-6-Dome bis r 27) steht als Volumenkörper im Prüfwerkzeug; Becher,
+Tragring, Adapter, beide Ø-52-Boards und der Feldstecker werden boolesch
+dagegen geschnitten. Ergebnis: **BESTANDEN, kleinere Boards sind NICHT
+nötig** — Board→Dom 1,0 Luft, Becher→Dose 1,7, Fensterrand→Dom-Sehne
+3,7 je Seite. Ein Treffer wurde dabei gefunden und behoben: Der
+Scheibenadapter endete 0,5 **unter** der Wandebene, seine Ecken
+(Quadrat-Eckradius 35,2) drückten auf den runden Dosenrand — der
+Flansch ist von 2,5 auf 2,0 gekürzt, der Adapter endet jetzt bündig
+(stack.py 15,5). Dazu zählt `tools/stl_shells.py` die Schalen jeder
+STL: je **eine** — nichts schwebt. Beide Werkzeuge sind die Lektion aus
+dem Zapfen-Defekt in Werkzeugform.
+
 **Der bestätigte Defekt und seine Auflösung — Konzept v3, verschraubt
 statt Bajonett (21.08.).** Der Einwand „die Ränder hängen in der Luft"
 traf: Zwei der drei Bajonettzapfen standen auf der weggefensterten Wand
@@ -555,7 +572,7 @@ ist das Bajonett auch nicht reparierbar — Zapfen und Ringschlitze
 finden kein tragfähiges Band mehr (die Diagonalen blockiert die
 quadratische Ringöffnung). Stattdessen fassen die zwei Schrauben, die
 Bottom ohnehin von hinten in die unteren Hülsen halten, jetzt **durch
-den Becherboden** (M2,5 × 16 statt × 6, Führungsrohre Ø 6 überbrücken
+den Becherboden** (M2,5 × 14 statt × 6, Führungsrohre Ø 6 überbrücken
 den Hohlraum): Becher + Bottom + Mid sind die verschraubte Kartusche.
 Der Tragring liegt lose auf dem Becherrand und kommt mit den
 Geräteschrauben an die Dose. Kein neues Teil, keine engen Toleranzen,
