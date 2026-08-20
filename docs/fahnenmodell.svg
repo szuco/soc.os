@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="190mm" height="130mm" viewBox="0 0 718.110236 491.338583" font-family="Helvetica, Arial, sans-serif">
+<rect width="100%" height="100%" fill="white"/>
+<text x="37.795276" y="37.795276" font-size="15.874016" fill="#000" font-weight="bold">Fahnenmodell ER-TFT1.69-3 — 1:1 drucken (100 %, keine Anpassung)</text>
+<text x="37.795276" y="60.472441" font-size="11.338583" fill="#000">Kontrolle: dieses Lineal muss exakt 50 mm messen</text>
+<line x1="37.795276" y1="75.590551" x2="226.771654" y2="75.590551" stroke="#000" stroke-width="1.889764"/>
+<line x1="37.795276" y1="69.921260" x2="37.795276" y2="81.259843" stroke="#000" stroke-width="1.322835"/>
+<text x="34.015748" y="94.488189" font-size="9.826772" fill="#000">0</text>
+<line x1="75.590551" y1="69.921260" x2="75.590551" y2="81.259843" stroke="#000" stroke-width="1.322835"/>
+<text x="71.811024" y="94.488189" font-size="9.826772" fill="#000">10</text>
+<line x1="113.385827" y1="69.921260" x2="113.385827" y2="81.259843" stroke="#000" stroke-width="1.322835"/>
+<text x="109.606299" y="94.488189" font-size="9.826772" fill="#000">20</text>
+<line x1="151.181102" y1="69.921260" x2="151.181102" y2="81.259843" stroke="#000" stroke-width="1.322835"/>
+<text x="147.401575" y="94.488189" font-size="9.826772" fill="#000">30</text>
+<line x1="188.976378" y1="69.921260" x2="188.976378" y2="81.259843" stroke="#000" stroke-width="1.322835"/>
+<text x="185.196850" y="94.488189" font-size="9.826772" fill="#000">40</text>
+<line x1="226.771654" y1="69.921260" x2="226.771654" y2="81.259843" stroke="#000" stroke-width="1.322835"/>
+<text x="222.992126" y="94.488189" font-size="9.826772" fill="#000">50</text>
+<text x="37.795276" y="132.283465" font-size="12.850394" fill="#000" font-weight="bold">TEIL 1 — die Fahne (ausschneiden)</text>
+<polygon points="37.795276,143.622047 69.807874,143.622047 66.085039,212.220472 41.518110,212.220472" fill="none" stroke="#000" stroke-width="1.511811"/>
+<rect x="41.518110" y="200.881890" width="24.566929" height="11.338583" fill="#ffd" stroke="#b90" stroke-width="1.133858"/>
+<text x="81.146457" y="195.212598" font-size="10.582677" fill="#000">Kontaktzone: am ECHTEN Panel nachsehen,</text>
+<text x="81.146457" y="209.574803" font-size="10.582677" fill="#000">auf welcher Seite die Goldfinger liegen —</text>
+<text x="81.146457" y="223.937008" font-size="10.582677" fill="#000">diese Seite der Schablone ankreuzen und beschriften</text>
+<text x="34.015748" y="238.677165" font-size="10.582677" fill="#000">Pin-1-Kante am echten Panel ablesen:</text>
+<text x="34.015748" y="253.795276" font-size="10.582677" fill="#000">[ ] links   [ ] rechts   (auf der Schablone markieren)</text>
+<line x1="22.677165" y1="143.622047" x2="84.925984" y2="143.622047" stroke="#000" stroke-width="0.944882" stroke-dasharray="4.535433 4.535433"/>
+<text x="88.705512" y="147.401575" font-size="10.582677" fill="#000">Faltlinie = Panelunterkante (Werksfaltung 180°)</text>
+<text x="377.952756" y="132.283465" font-size="12.850394" fill="#000" font-weight="bold">TEIL 2 — Boardstreifen mit Schlitz (ausschneiden, Schlitz aufschneiden)</text>
+<rect x="377.952756" y="143.622047" width="113.385827" height="75.590551" fill="none" stroke="#000" stroke-width="1.322835"/>
+<rect x="415.748032" y="164.787402" width="37.795276" height="6.047244" fill="#000"/>
+<text x="498.897638" y="170.078740" font-size="10.582677" fill="#000">Schlitz 10,0 × 1,6 (aufschneiden)</text>
+<line x1="377.952756" y1="201.448819" x2="491.338583" y2="201.448819" stroke="#000" stroke-width="0.944882" stroke-dasharray="4.535433 4.535433"/>
+<text x="498.897638" y="204.094488" font-size="10.582677" fill="#000">Panelunterkante — Fahne hier anlegen und falten</text>
+<line x1="377.952756" y1="150.916535" x2="491.338583" y2="150.916535" stroke="#b00" stroke-width="1.133858"/>
+<text x="498.897638" y="153.448819" font-size="10.582677" fill="#b00">J5-Kontaktlinie (rot): bis hier muss die</text>
+<text x="498.897638" y="166.299213" font-size="10.582677" fill="#b00">Kontaktzone reichen (Einschub ~2,5)</text>
+<text x="37.795276" y="294.803150" font-size="12.850394" fill="#000" font-weight="bold">ABLAUF</text>
+<text x="37.795276" y="313.700787" font-size="10.960630" fill="#000">1. Teil 1 an die echte Fahne halten: Goldfinger-Seite und Pin-1-Kante auf die Schablone uebertragen.</text>
+<text x="37.795276" y="330.708661" font-size="10.960630" fill="#000">2. An der Faltlinie um 180° falten (wie ab Werk: Fahne liegt an der Panelrueckseite an).</text>
+<text x="37.795276" y="347.716535" font-size="10.960630" fill="#000">3. Teil 1 auf Teil 2 legen (Faltlinie auf Panelunterkante), Spitze durch den Schlitz stecken,</text>
+<text x="37.795276" y="364.724409" font-size="10.960630" fill="#000">   auf der Rueckseite zur roten J5-Linie fuehren.</text>
+<text x="37.795276" y="381.732283" font-size="10.960630" fill="#000">4. KONTAKTSEITE: Zeigen die Goldfinger jetzt VOM Streifen WEG (zu dir, wenn du auf die</text>
+<text x="37.795276" y="398.740157" font-size="10.960630" fill="#000">   Rueckseite schaust)?  JA = passt (Top-Kontakt-Buchse).  NEIN = gespiegelte Buchse noetig.</text>
+<text x="37.795276" y="415.748032" font-size="10.960630" fill="#000">5. PIN 1: Notieren, an welcher Kante Pin 1 auf der Rueckseite ankommt (links/rechts) —</text>
+<text x="37.795276" y="432.755906" font-size="10.960630" fill="#000">   damit gleichen wir die J5-Verdrahtung ab (Rechnung sagt: links/rechts kippt NIE,</text>
+<text x="37.795276" y="449.763780" font-size="10.960630" fill="#000">   aber die Buchse ist auf der Rueckseite x-gespiegelt montiert).</text>
+<text x="37.795276" y="468.661417" font-size="10.960630" fill="#000" font-weight="bold">Vorhersage der Rechnung (docs/17): Kontakte am gelieferten Panel von HINTEN sichtbar -> passt.</text>
+</svg>

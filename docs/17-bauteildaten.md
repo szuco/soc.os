@@ -99,7 +99,21 @@ ist längst aus dem Datenblatt bestätigt (**0,50 mm**, siehe FPC-Tabelle
 oben), und die Pinbelegung liegt vollständig vor und ist in `gen_top_sch`
 verdrahtet. Beides stand hier trotzdem noch als offen — die Doku hinkte.
 
-**Wirklich offen sind zwei Fragen, die bisher nie gestellt wurden:**
+**Stand 20.08. abends — die Kette ist durchgerechnet** (TE 1734839 ist
+laut Herstellerserie ein **Top-Kontakt**-Verbinder; alle Biegungen der
+Fahne drehen um querliegende Achsen, links/rechts kippt also nie):
+
+> **Kriterium:** Panel umdrehen und auf die Rückseite schauen. Sind die
+> Goldfinger der werksgefalteten Fahne **sichtbar → es passt**. Liegen
+> sie verdeckt an der Panelrückseite an → gespiegelte Buchse nötig.
+> **Pin 1:** Die Buchse ist auf der Rückseite x-gespiegelt montiert — am
+> Papiermodell ablesen, an welcher Kante Pin 1 ankommt, dann gleichen
+> wir die J5-Verdrahtung ab (reiner Schaltplan-Eingriff).
+
+Die 1:1-Schablone dafür liegt unter `docs/fahnenmodell.svg` — bei 100 %
+drucken, das 50-mm-Lineal nachmessen, Ablauf steht auf dem Blatt.
+
+**Die ursprünglichen zwei Fragen im Wortlaut:**
 
 1. **Die Kontaktseite der Fahne.** Die TE-Buchse 1-1734839-2 kontaktiert
    auf EINER Seite. Die Fahne wird an der Panelunterkante um 180° gefaltet
