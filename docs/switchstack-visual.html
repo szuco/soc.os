@@ -157,13 +157,13 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
   <p class="eyebrow">ESP32 · Unterputz · Ø 60 mm</p>
   <h1>SwitchStack</h1>
   <p class="lede">Zwei runde Leiterplatten und ein 47er Quadrat, gestapelt in
-  und vor einer 61 mm tiefen Unterputzdose. Leistung unten, Logik in der Mitte, Bedienung oben — die
+  und vor einer 60 mm tiefen Unterputzdose. Leistung unten, Logik in der Mitte, Bedienung oben — die
   Trennung, die den ganzen Aufbau trägt.</p>
 
   <dl class="specs">
     <div class="spec"><dt>Leiterplatte</dt><dd>Ø52,0<small> mm</small></dd></div>
     <div class="spec"><dt>Dicke</dt><dd>1,0<small> mm</small></dd></div>
-    <div class="spec"><dt>Dosentiefe</dt><dd>61<small> mm</small></dd></div>
+    <div class="spec"><dt>Dose</dt><dd>58<small> × 60 tief, gemessen</small></dd></div>
     <div class="spec"><dt>Front</dt><dd>Busch-Jaeger<small> 55er</small></dd></div>
     <div class="spec"><dt>Motoren</dt><dd>2 ×<small> 24 V, 1,7 A blockiert</small></dd></div>
     <div class="spec"><dt>Display</dt><dd>240×280<small> ST7789V</small></dd></div>
@@ -240,8 +240,9 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
 
 <section>
   <div class="sec-head"><span class="num">03</span><h2>Tiefenbudget</h2></div>
-  <p>Die 61 mm der Dose waren lange der Engpass des Projekts. Seit das Top-Board
-  vor der Wand im Adapter sitzt, sind es <strong>17 mm Reserve</strong>. Schnitt
+  <p>Die Dosentiefe war lange der Engpass des Projekts. Seit das Top-Board
+  vor der Wand im Adapter sitzt und die Dose gemessen ist (58 lichte Weite,
+  60 tief), sind es <strong>≈ 16 mm Reserve</strong>. Schnitt
   maßstäblich, von der Wandoberfläche nach innen.</p>
 
   <div class="draw">
@@ -258,9 +259,9 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
       <text class="dim" x="2" y="70">WAND</text>
 
       <!-- Dose: 61 mm ab x=14, Skala 2,6 px/mm -->
-      <rect x="14" y="8" width="158.6" height="58" fill="none"
+      <rect x="14" y="8" width="156" height="58" fill="none"
             stroke="var(--ink-3)" stroke-width=".7" stroke-dasharray="2 1.6"/>
-      <text class="dim" x="150" y="71">DOSE 61 mm</text>
+      <text class="dim" x="148" y="71">DOSE 60 mm (gemessen)</text>
 
       <!-- VOR DER WAND: Rahmen, Adapter, Scheibe; Top-Board knapp davor -->
       <rect x="-12" y="12" width="26" height="50" fill="var(--ui-bg)"
@@ -299,9 +300,9 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
       <text class="dim" x="82" y="49">Kabelbogen 12</text>
 
       <!-- Reserve -->
-      <rect x="111.5" y="8" width="61.1" height="58" fill="var(--ui-bg)"/>
-      <text class="dim-b" x="130" y="38">RESERVE</text>
-      <text class="dim-b" x="130" y="42">&ge; 17 mm</text>
+      <rect x="111.5" y="8" width="58.5" height="58" fill="var(--ui-bg)"/>
+      <text class="dim-b" x="129" y="38">RESERVE</text>
+      <text class="dim-b" x="129" y="42">&asymp; 16 mm</text>
     </svg>
   </div>
 
@@ -318,7 +319,7 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
         <tr><td>Becher-Boden, 8,7 hinter Bottom &mdash; liegt im Steckraum</td><td class="n">1,5</td><td class="n">&mdash;</td></tr>
         <tr><td><em>Top-PCB, Tragring, Adapter, Zentralscheibe, Rahmen</em></td><td class="n">—</td><td class="n"><em>an/vor der Wand</em></td></tr>
       </tbody>
-      <tfoot><tr><td>Reserve auf 61 mm</td><td class="n">—</td><td class="n">≈ 17</td></tr></tfoot>
+      <tfoot><tr><td>Reserve auf 60 mm (F16e gemessen)</td><td class="n">—</td><td class="n">≈ 16</td></tr></tfoot>
     </table>
   </div>
 
@@ -500,10 +501,11 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
     <div class="st"><span class="part">teilweise</span><div>
       <b>Mechanik im Stapel</b>
       <p>Das Tiefenbudget geht auf, die Bauteilhöhen stecken als Hüllkörper
-      aus Datenblattmaßen in allen STEP-Ansichten. Offen sind drei Messpunkte
-      am realen Teil: F14 (Hohlraum im Rahmen für den Magnetkontakt), F15
-      (Rahmensteg für die Drucklippe) und F16 (lichte Weite der Dose — sie
-      entscheidet, ob der Becher mit außen 54,6 wirklich passt).</p></div></div>
+      aus Datenblattmaßen in allen STEP-Ansichten. Die Dose ist gemessen
+      (F16: 58 licht, 54 über die Dome, 60 tief) — der Becher hat 1,7 mm
+      Luft. Offen: F14 (Rahmen-Hohlraum), F15 (Rahmensteg), F16d (Dombreite)
+      — und die Reparatur der Bajonettzapfen an 3/9 Uhr, die im Modell auf
+      der weggefensterten Wand stehen und im STL schweben.</p></div></div>
 
     <div class="st"><span class="pill ok">geprüft</span><div>
       <b>USB-C sitzt jetzt auf dem Mid-Board</b>
@@ -571,10 +573,10 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
     nodes.push({el:wrap, z:L.z});
   });
 
-  // Dosenmantel als Segmentschale, lichte Weite ~55 mm (Annahme, F16), Tiefe 61 mm
+  // Dosenmantel als Segmentschale, lichte Weite 58 mm (F16 gemessen), Tiefe 60 mm
   var shell = document.createElement('div');
   shell.className = 'layer';
-  var R = 27.5 * S, DEPTH = 61 * S, N = 28;
+  var R = 29 * S, DEPTH = 60 * S, N = 28;
   var arc = 2 * Math.PI * R / N + 1;
   for (var i = 0; i < N; i++){
     var seg = document.createElement('div');

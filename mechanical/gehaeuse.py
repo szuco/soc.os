@@ -42,9 +42,21 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "mechanical", "export")
 
 PARAMS = dict(
-    # --- Umgebung (F16: an der echten Dose messen!) ------------------------
-    dose_licht        = 55.0,   # lichte Weite ohne Dome - ANNAHME
-    dom_fenster_b     = 16.0,   # Fensterbreite an den Schraubdomen (Sehne)
+    # --- Umgebung (F16 GEMESSEN am 21.08.2026) -----------------------------
+    dose_licht        = 58.0,   # F16a/b: vorn und in 20 mm Tiefe gemessen
+    dome_licht        = 54.0,   # F16c: Weite UEBER die Dome - sie ragen
+                                # also je 2,0 nach innen (bis r 27)
+    dose_tief         = 60.0,   # F16e: Rand bis Rueckwand innen
+    dom_fenster_b     = 16.0,   # Fensterbreite (Sehne) - F16d (Dombreite)
+                                # steht noch aus, bis dahin die Annahme
+
+    # BEKANNTER DEFEKT, bestaetigt am 21.08. (Einwand des Nutzers: die
+    # Raender haengen in der Luft): Die Zapfen an 3 und 9 Uhr stehen auf
+    # der Oberkante einer Wand, die dort vom Dom-Fenster KOMPLETT
+    # entfernt ist - zwei von drei Zapfen schweben als lose Koerper im
+    # STL. Reparatur geplant: Zapfen neben die Fenster ruecken (dort
+    # traegt wieder Wand), moeglich gemacht durch die gemessene Dose
+    # (r 29 statt 27,5). Der genaue Winkel braucht F16d.
 
     # --- Becher ------------------------------------------------------------
     board_d           = 52.0,   # Bottom und Mid

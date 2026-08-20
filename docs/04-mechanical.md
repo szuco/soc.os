@@ -527,15 +527,30 @@ echten Dose und Lage/Breite ihrer Schraubdome, vor dem Druck.
 **F16 im Detail — das Messprotokoll (mit Messschieber, an der echten
 Dose):**
 
-| # | Was | Annahme heute |
-|---|---|---|
-| F16a | Lichte Weite vorn am Rand, auf zwei Achsen (0°/90°) | 55,0 |
-| F16b | Lichte Weite in ~20 mm Tiefe (Verjüngung, Rippen?) | 55,0 |
-| F16c | Weite über die Schraubdome (Innenkante zu Innenkante) | ~54 |
-| F16d | Breite eines Doms, tangential (→ Fensterbreite) | 16 |
-| F16e | Tiefe: Dosenrand bis Rückwand innen | 61 |
-| F16f | Kabeleinführungen der Rückwand; ~22 mm hinter der Mitte frei? | mittig frei |
-| F16g | optional: Dosentyp/Aufdruck; Rand putzbündig? | — |
+| # | Was | Annahme | **gemessen 21.08.** |
+|---|---|---|---|
+| F16a | Lichte Weite vorn am Rand | 55,0 | **58,0** |
+| F16b | Lichte Weite in ~20 mm Tiefe | 55,0 | **58,0** |
+| F16c | Weite über die Schraubdome | ~54 | **54,0** |
+| F16d | Breite eines Doms, tangential (→ Fensterbreite) | 16 | *steht aus* |
+| F16e | Tiefe: Dosenrand bis Rückwand innen | 61 | **60,0** |
+| F16f | Kabeleinführungen | mittig hinten | **seitlich, ~50 mm tief** |
+| F16g | Dosentyp | — | — |
+
+**Folgen der Messung:** Der Becher (außen 54,6) hat **1,7 mm Luft**
+statt 0,2 — kein Hebel nötig, die Boards bleiben Ø 52. Die Dome ragen
+bis r 27, die Fenster bleiben Pflicht. Die Tiefe schrumpft auf 60
+(Reserve ≈ 16). Die seitlichen Kabeleinführungen bei ~50 mm Tiefe sind
+günstig: Der Kabelbogen muss nicht mehr hinter den Stecker, er kommt
+von der Seite.
+
+**Bestätigter Defekt (Einwand „die Ränder hängen in der Luft"):** Die
+Bajonettzapfen an 3 und 9 Uhr stehen im Modell auf der Oberkante der
+Wand — die dort vom Dom-Fenster komplett entfernt ist. Zwei von drei
+Zapfen schweben als lose Körper im STL; genau das war im Slicer zu
+sehen. Reparatur: Zapfen **neben die Fenster** (dort trägt Wand), nach
+außen auf das Band, das die gemessene Dose (r 29 statt 27,5) freigibt;
+der genaue Winkel folgt aus F16d.
 
 Nach der Messung werden `gehaeuse.py` (Weite, Spiel, Fensterlage/-breite,
 Tunnel), die Gegenproben in `tragring.py`, STL/STEP, Renderings und die
@@ -586,7 +601,7 @@ für die Schraubenköpfe) und `tools/gen_boards.py`; beide aus denselben Konstan
 
 ## 4. Tiefenbudget
 
-Verfügbar sind 61 mm Dosentiefe. Überschlägige Rechnung von der Dosenrückwand nach vorn:
+Verfügbar sind **60 mm** Dosentiefe (F16e gemessen; vorher 61 angenommen). Überschlägige Rechnung von der Dosenrückwand nach vorn:
 
 | # | Element | Höhe [mm] | Kumuliert |
 |---:|---|---:|---:|
@@ -598,7 +613,7 @@ Verfügbar sind 61 mm Dosentiefe. Überschlägige Rechnung von der Dosenrückwan
 | 6 | Bauteile Mid-Oberseite + Stack-Abstand | 9,0 | 43,0 |
 | 7 | Top-PCB | 1,0 | 44,0 |
 | 8 | Adapter, Zentralscheibe, Rahmen | — | **außerhalb** |
-| | **Reserve** | | **≈ 17,0** |
+| | **Reserve** | | **≈ 16,0** (auf 60 gemessen) |
 
 > **Revision 16.08.2026: das Top-Board verlässt die Dose.** Vorher standen hier
 > 8,0 mm für „OLED, Taster, Frontpanel" und ≈ 9 mm Reserve. Seit der Umstellung
