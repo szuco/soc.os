@@ -387,9 +387,10 @@ class Schnitt(object):
 
 def panel_a(x0, y0):
     s = Schnitt(x0, y0, 1000, "Schnitt A – A   ·   Ebene y = 0",
-                "Kraftfluss: Schraube → Top-Board → Adapter-Drucklippe → "
-                "Rahmensteg → Tragring → Dose · Scheibe kraftfrei · "
-                "Explosionsabstand %.0f mm, sonst maßstäblich" % LUECKE)
+                "Reihenfolge = EINBAUREIHENFOLGE, von hinten nach vorn · "
+                "Kraftfluss: Schraube → Top → Drucklippe → Rahmensteg → "
+                "Tragring → Dose · Scheibe kraftfrei, klickt zuletzt · "
+                "Explosion %.0f mm, sonst maßstäblich" % LUECKE)
     r = B["BOARD_DIAMETER"] / 2.0
     h = B["TOP_SQ"] / 2.0
     ad = Z["adapter_teile"]
@@ -402,6 +403,16 @@ def panel_a(x0, y0):
     am = SCHEIBE_AM / 2.0
 
     s.flucht(0.0, h, rand)
+
+    # Feldstecker - das ERSTE Teil der Kette: Die vorverdrahtete
+    # Micro-Fit-Leiste klickt von hinten an Bottom, bevor der Stapel in
+    # die Dose geht. Er sitzt bei y = 15,6 und ist hier projiziert.
+    s.gruppe("feld", -6.6, 0.0)
+    s.teil("feld", -6.6, 0.0, -18.7, -2.3, BAUTEIL)
+    s.fahne("feld", -6.6, r,
+            ["Feldstecker Molex Micro-Fit 43045-1612",
+             "16-polig · projiziert (y = 15,6)",
+             "Kabelbaum der Dose klickt von hinten"])
 
     # Bottom-Board samt Stapelverbinder in den 10 mm darueber
     s.gruppe("bottom", Z["bottom_power_motor"][0], Z["mid_logic"][0])
@@ -441,9 +452,45 @@ def panel_a(x0, y0):
         s.teil("tragring", Z["rahmen"][0], Z["rahmen"][0] + T["t"],
                vz * T["open_sq"] / 2.0, vz * T["grip"] / 2.0, KUNST_H, KUNST)
     s.fahne("tragring", Z["rahmen"][0], T["grip"] / 2.0,
-            ["Tragring, gedruckt — NACH dem Stapel:",
-             "70,0 × 70,0 × 2,0 · Öffnung 50,6 zentriert",
-             "Ø-52-Boards passen nicht durch 50,6"])
+            ["Tragring — NACH dem Stapel (Ø 52 > Öffnung 50,6)",
+             "70 × 70 × 2 · Geräteschrauben auf 60,0"], hoch=14)
+
+    # Abdeckrahmen
+    s.gruppe("rahmen", Z["rahmen"][0], Z["rahmen"][1], luecke=0)
+    zr = Z["rahmen"]
+    for vz in (1, -1):
+        s.teil("rahmen", zr[0], zr[1], vz * RAHMEN_FENSTER / 2.0,
+               vz * RAHMEN_AM / 2.0, WEISS)
+        s.teil("rahmen", zr[0], zr[0] + 4.0, vz * P["frame_grip"] / 2.0,
+               vz * (P["frame_grip"] / 2.0 + 1.6), BAUTEIL, None)
+    s.fahne("rahmen", zr[0], RAHMEN_AM / 2.0,
+            ["Abdeckrahmen 1721-914 · 81 × 81 × 12",
+             "klemmt am Tragring, gepresst von der Drucklippe"], hoch=-125)
+
+
+    # Adapter
+    s.gruppe("adapter", Z["adapter"][0], Z["adapter"][1])
+    for vz in (1, -1):
+        # Seit dem 19.08.2026 endet der Adapter am Schnapprand: Der 70er
+        # Flansch samt Schraubschlitzen gehoert jetzt dem Tragring-Adapter
+        # (mechanical/tragring.py), der zwischen Mid und Top an der Wand
+        # sitzt und hier nicht geschnitten wird - Befestigungskonzept v2,
+        # docs/04 Abschnitt 2b.
+        s.teil("adapter", ad["flansch"][0], ad["flansch"][1],
+               vz * bohr, vz * rand, KUNST_H, KUNST)
+        s.teil("adapter", ad["hals"][0], ad["hals"][1], vz * bohr, vz * hals,
+               KUNST_H, KUNST)
+        s.teil("adapter", ad["schulter"][0], ad["schulter"][1], vz * bohr,
+               vz * rand, KUNST_H, KUNST)
+        s.teil("adapter", ad["tasche"][0], ad["tasche"][1], vz * tasche,
+               vz * rand, KUNST_H, KUNST)
+    s.fahne("adapter", ad["flansch"][0], rand,
+            ["Scheibenadapter, gedruckt · 49,8 × 49,8 × 5,5",
+             ("Drucklippe 51,6 presst den Rahmensteg", ROT),
+             ("Steg-Innenmaß: F15 messen", ROT)])
+    s.marke("adapter", ad["hals"][0] + 0.4, hals - 4.5, "Rastraum 1,5 × 1,3")
+    s.marke("adapter", ad["tasche"][0] + 0.4, tasche - 9.0,
+            "Tasche 47,4 · Auflage 2,0")
 
     # Top-Board mit den beiden Schrauben von vorn
     s.gruppe("top", Z["top_ui"][0], Z["top_ui"][1])
@@ -474,31 +521,7 @@ def panel_a(x0, y0):
     zs = Z["schaum"]
     s.teil("schaum", zs[0], zs[1], -PANEL_X / 2, PANEL_X / 2, SCHAUM_F, GRAU)
     s.fahne("schaum", zs[0], PANEL_X / 2,
-            ["Schaumdichtung 1,90", "drückt an, hält nicht"], hoch=160)
-
-    # Adapter
-    s.gruppe("adapter", Z["adapter"][0], Z["adapter"][1])
-    for vz in (1, -1):
-        # Seit dem 19.08.2026 endet der Adapter am Schnapprand: Der 70er
-        # Flansch samt Schraubschlitzen gehoert jetzt dem Tragring-Adapter
-        # (mechanical/tragring.py), der zwischen Mid und Top an der Wand
-        # sitzt und hier nicht geschnitten wird - Befestigungskonzept v2,
-        # docs/04 Abschnitt 2b.
-        s.teil("adapter", ad["flansch"][0], ad["flansch"][1],
-               vz * bohr, vz * rand, KUNST_H, KUNST)
-        s.teil("adapter", ad["hals"][0], ad["hals"][1], vz * bohr, vz * hals,
-               KUNST_H, KUNST)
-        s.teil("adapter", ad["schulter"][0], ad["schulter"][1], vz * bohr,
-               vz * rand, KUNST_H, KUNST)
-        s.teil("adapter", ad["tasche"][0], ad["tasche"][1], vz * tasche,
-               vz * rand, KUNST_H, KUNST)
-    s.fahne("adapter", ad["flansch"][0], rand,
-            ["Scheibenadapter, gedruckt", "49,8 × 49,8 × 5,5",
-             ("Drucklippe 51,6 vorn — SIE presst den", ROT),
-             ("Rahmensteg. Steg-Innenmaß: F15 messen", ROT)])
-    s.marke("adapter", ad["hals"][0] + 0.4, hals - 4.5, "Rastraum 1,5 × 1,3")
-    s.marke("adapter", ad["tasche"][0] + 0.4, tasche - 9.0,
-            "Tasche 47,4 · Auflage 2,0")
+            ["Schaumdichtung 1,90", "drückt an, hält nicht"], hoch=205)
 
     # Zentralscheibe
     s.gruppe("scheibe", Z["scheibe"][0], Z["scheibe"][1])
@@ -521,20 +544,6 @@ def panel_a(x0, y0):
     s.marke("scheibe", zc[0] - 1.0, -am - 7.0,
             "kein radialer Hintergriff (Punkt 67)", ROT, "ra")
     s.marke("scheibe", zc[1] + 1.5, -btn, "Druckkreuz (projiziert)")
-
-    # Abdeckrahmen
-    s.gruppe("rahmen", Z["rahmen"][0], Z["rahmen"][1], luecke=0)
-    zr = Z["rahmen"]
-    for vz in (1, -1):
-        s.teil("rahmen", zr[0], zr[1], vz * RAHMEN_FENSTER / 2.0,
-               vz * RAHMEN_AM / 2.0, WEISS)
-        s.teil("rahmen", zr[0], zr[0] + 4.0, vz * P["frame_grip"] / 2.0,
-               vz * (P["frame_grip"] / 2.0 + 1.6), BAUTEIL, None)
-    s.fahne("rahmen", zr[0], RAHMEN_AM / 2.0,
-            ["Abdeckrahmen 1721-914", "81 × 81 × 12 · Fenster 56,0",
-             "klemmt auf dem Tragring (70,0) und wird",
-             "von der Adapter-Drucklippe dagegen gepresst"])
-
 
 # --- Panel B: Schnitt bei y = 19,6 ----------------------------------------
 
