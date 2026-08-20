@@ -188,8 +188,8 @@ NOTCH_KEEPOUT = (-25.0, -16.75, -13.25, -2.75)   # DSN: x0, x1, y0, y1
 # Ohne eigenen Keepout routet Freerouting quer durch den Ausschnitt.
 KERB_KEEPOUT = (-3.0, 3.0, -23.6, -21.0)   # DSN: x0, x1, y0, y1
 # Der FPC-Schlitz unter dem Displaypanel (KiCad x +-5, y 5,4..7,0).
-# Grosszuegig: 0,5 Randabstand + halbe Bahnbreite + Freerouting-Untermass.
-FPC_KEEPOUT = (-6.2, 6.2, -8.4, -4.5)      # DSN: x0, x1, y0, y1
+# Der FPC-Schlitz ist Geschichte (Direktloeten seit 20.08. spaetabends) -
+# der Keepout bleibt als leeres Relikt entfernt.
 
 
 def _ring_polygon(a0, a1, step=3.0):
@@ -239,8 +239,6 @@ def _square_bars(gap=None):
     bars.append(poly(nx0, nx1, ny0, ny1))
     kx0, kx1, ky0, ky1 = KERB_KEEPOUT
     bars.append(poly(kx0, kx1, ky0, ky1))
-    fx0, fx1, fy0, fy1 = FPC_KEEPOUT
-    bars.append(poly(fx0, fx1, fy0, fy1))
     return bars
 
 

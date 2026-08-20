@@ -153,9 +153,10 @@ def build():
     #
     # Solange beides offen ist, darf dieses Board NICHT bestellt werden.
     s.add("J5", "Connector_Generic:Conn_01x12", "ER-TFT1.69-3",
-          "Connector_FFC-FPC:TE_1-1734839-2_1x12-1MP_P0.5mm_Horizontal",
-          MPN="Panel ER-TFT1.69-3, 12-pol FPC 0,50 mm steckbar - "
-              "Raster und Belegung aus dem Datenblatt bestaetigt")
+          "SwitchStack:FPC_Loetfeld_12x0.7mm",
+          MPN="Displayfahne DIREKT verloetet - 0,7-mm-Raster, fuer das es "
+              "keine serioese Buchse gibt; Panel klebt ohnehin am Board. "
+              "Erst loeten, dann kleben (docs/17)")
     # Belegung nach Datenblatt Abschnitt 4.1, gesichert in
     # docs/datasheets/ER-TFT1.69-3.md
     s.connect("DISP_TE",   ("J5", "1"))    # Tearing Effect, wird nicht genutzt

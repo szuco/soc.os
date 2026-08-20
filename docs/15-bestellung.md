@@ -17,10 +17,12 @@ Zwei harte Tore bestimmen den Ablauf: Das **Papiermodell der Displayfahne**
 Nutzen, also hängt die GESAMTE Platinenbestellung daran. Und `gen_fab.py`
 gibt **keine Gerber heraus, solange ein Netz offen ist**.
 
-**Schritt 1 — Papiermodell der Fahne (30 Minuten, zuerst!).**
-Fahne im Maßstab aus Papier, falten, durch den Schlitz stecken:
-Kontaktseite und Pinreihenfolge prüfen. Falsch herum → J5 wird die
-gespiegelte Buchsenvariante, ein Abend Umbau — deshalb VOR allem anderen.
+**Schritt 1 — Fahnenprüfung: ERLEDIGT (20.08., anhand Foto + Zeichnung).**
+Das Raster ist 0,7 mm (nicht 0,5), die Fahne 12,96 mm — entschieden wurde
+**Direktlöten** auf ein 12-Pad-Feld der Vorderseite; Schlitz und Buchse
+sind entfallen. Kontaktseite und Pinreihenfolge sind damit analytisch
+geklärt (docs/17). Das Papiermodell bleibt nur als Kontrolle am ersten
+Muster. **Dieses Tor ist offen — die Bestellung hängt nicht mehr daran.**
 
 **Schritt 2 — Handarbeit in KiCad (docs/16).**
 Offene Netze schließen (Top 11, Mid 4, Bottom 4), Masse-Inseln, die

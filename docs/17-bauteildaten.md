@@ -99,6 +99,32 @@ ist längst aus dem Datenblatt bestätigt (**0,50 mm**, siehe FPC-Tabelle
 oben), und die Pinbelegung liegt vollständig vor und ist in `gen_top_sch`
 verdrahtet. Beides stand hier trotzdem noch als offen — die Doku hinkte.
 
+> **KORREKTUR 20.08. spätabends, anhand von Foto + Originalzeichnung:**
+> Das Fahnenraster ist **0,70 mm** (`P0.7*(12-1)=7.7`), nicht 0,50 — die
+> TE-Buchse 1-1734839-2 passt NICHT. Die Fahne ist zudem nur **12,96 mm**
+> lang (nicht 18,15) und die Panelrückseite ist **selbstklebend**.
+> Kontaktseite und Pinlage sind jetzt vom Foto ablesbar: Goldfinger auf
+> der Vorderseite der ungefalteten Fahne, 12 links / 1 rechts.
+> **Entschieden (gleicher Abend): DIREKTLÖTEN.** Für 0,7 mm existiert
+> keine seriöse Buchse, und das Panel klebt ohnehin fest auf dem Board —
+> der Stecker hätte keine Servicefreiheit gekauft. J5 ist jetzt ein
+> **12-Pad-Lötfeld** (Projekt-Footprint `FPC_Loetfeld_12x0.7mm`, Pads
+> 0,4 × 3,2) auf der **Vorderseite** bei (−0,95 / 3,6); FPC-Schlitz und
+> TE-Buchse sind ersatzlos entfallen.
+>
+> **Beide Torfragen sind damit analytisch geschlossen:**
+> Die Werksfaltung legt die Goldfinger **face-down auf die Pads** (Foto:
+> Kontakte auf der Fahnen-Vorderseite; Faltung kippt die Fläche einmal),
+> und ohne Rückseiten-Montage gibt es **keine x-Spiegelung** — Pin 1
+> rechts trifft Pin 1 rechts. Das Papiermodell (`fahnenmodell.svg`)
+> bleibt als Verifikation am ersten Muster, ist aber kein Bestell-Tor
+> mehr.
+>
+> **Lötablauf:** erst die Fahne auf die Pads löten (0,7 mm mit Kolben und
+> Flussmittel gut machbar, Pin-1-Marke auf F.Fab), dann das Panel mit dem
+> Werksklebeband aufkleben. Prüfpunkt Musteraufbau: FPC 0,13 + Lot in der
+> 0,15-Klebebandfuge — die Fahnenzone flach halten.
+
 **Stand 20.08. abends — die Kette ist durchgerechnet** (TE 1734839 ist
 laut Herstellerserie ein **Top-Kontakt**-Verbinder; alle Biegungen der
 Fahne drehen um querliegende Achsen, links/rechts kippt also nie):

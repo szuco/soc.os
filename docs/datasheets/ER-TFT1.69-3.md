@@ -31,15 +31,22 @@ Achse die Randmaße **1,20** und **1,07** — ein Versatz von rund 0,065 mm.
 Beim Einbau ist das die Zahl, die entscheidet, ob das Bild mittig im Fenster
 der Zentralscheibe steht.
 
-## FPC
+## FPC — korrigiert am 20.08.2026 nach der Masszeichnung
+
+> Die frühere Fassung nannte 0,50-mm-Raster und 18,15 mm Länge — **beides
+> falsch**, aufgeflogen an der Originalzeichnung (Foto + Drawing im Chat
+> vom 20.08.). Der Fehler steckte auch zwei Tage in docs/17.
 
 | | |
 |---|---|
 | Pole | **12** |
-| **Raster** | **0,50 mm** (P0.50) |
-| Leiterbreite | 0,30 mm (W0.30) |
-| Dicke | 0,30 ±0,05 mm |
-| Fahnenmaße | 18,15 ±0,5 lang, 8,47 ±0,5 und 6,50 breit, Abgang 1,70 ±0,3 |
+| **Raster** | **0,70 mm** — `P0.7*(12-1)=7.7` laut Zeichnung |
+| Kontaktfinger | 0,35 breit, **2,0 ±0,2 lang** |
+| Fahnenlänge | **12,96 ±0,3** unter der LCM-Kante |
+| Fahnenbreite | 11,4 bzw. 9,34 ±0,5 an der Spitze |
+| FPC-Dicke | 0,13 ±0,03 |
+| Kontaktseite | **Vorderseite** der ungefalteten Fahne (im Foto sichtbar), Beschriftung 12 links / 1 rechts in Frontansicht |
+| Rückseite Panel | **selbstklebend** („Remove Tape, t = 0,15 max") — die Montage ist Werksklebeband, kein eigener Kleber |
 
 ## Pinbelegung
 
