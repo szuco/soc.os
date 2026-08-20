@@ -21662,6 +21662,22 @@
 		(uuid "738f95b3-acf5-443f-9fdf-7cfb972ae09a")
 	)
 	(via
+		(at -6.73 -4.635)
+		(size 0.8)
+		(drill 0.4)
+		(layers "F.Cu" "B.Cu")
+		(net "PGND")
+		(uuid "a29ba40f-92a0-4d42-9487-4b5ab797641b")
+	)
+	(via
+		(at -5.85 -4.635)
+		(size 0.8)
+		(drill 0.4)
+		(layers "F.Cu" "B.Cu")
+		(net "PGND")
+		(uuid "b54ca026-5bd0-43c5-9c48-0761b8db9179")
+	)
+	(via
 		(at -7.51329 15.327252)
 		(size 0.8)
 		(drill 0.4)

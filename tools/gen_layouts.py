@@ -1015,13 +1015,23 @@ FIXED_TOP = dict(
     # Kandidat (Punkt 43).
     # J5 ist seit dem 20.08. (spaetabends) das LOETFELD der Fahne auf der
     # VORDERSEITE - Direktloeten statt Buchse, siehe Kommentar bei der
-    # frueheren FPC-Schlitz-Konstante. Lage: Fahnenmitte = Panelmitte
-    # (x = -0,95); die Fahne ist 12,96 +-0,3 lang, faltet an der
-    # Panelunterkante (15,3), ihre 2,0-mm-Finger enden bei y ~ 2,3..4,3 -
-    # Pads 3,2 lang um y = 3,6 decken die Toleranz. Pin 1 liegt in
-    # Frontsicht RECHTS (+x), wie auf der Fahne aufgedruckt; die Faltung
-    # kippt links/rechts nicht.
-    J5=(-0.95, 3.6, 0, "F"),
+    # frueheren FPC-Schlitz-Konstante.
+    #
+    # LAGE KORRIGIERT in derselben Nacht, Einwand des Nutzers: Die Fahne
+    # verlaesst das Modul an der Datenblatt-UNTERKANTE, also an einem
+    # Ende der 37,43er-Achse. QUER eingebaut ist das die RECHTE Kante
+    # (x = -0,95 + 18,715 = 17,77) - nicht die untere; die erste Fassung
+    # faltete faelschlich bei y = 15,3. Links geht nicht, dort sitzt die
+    # USB-Freistellung (NOTCH, x bis -17,25). Also Panel so gedreht, dass
+    # die Fahne rechts abgeht, und das Feld um 90 Grad mitgedreht:
+    # Raster laeuft in y, Fahnenmitte = Panelmitte (y = 0,3, Unterkante
+    # 15,34 minus 30,07/2). Die 2,0-mm-Finger enden bei x ~ 4,8..6,8;
+    # Pads 3,2 lang um x = 6,05 decken die Toleranz wie zuvor. Pin 1
+    # liegt nach der Panel-Drehung OBEN (y = -3,55) - die Werksfaltung
+    # um die jetzt SENKRECHTE Kante kippt oben/unten nicht. Bulge der
+    # Faltung (~0,5) endet bei ~18,3, der H2-Schraubkopf beginnt erst
+    # bei 19,25.
+    J5=(6.05, 0.3, 90, "F"),
     # Die vier Durchbrueche der Zentralscheibe liegen in den Diagonalfeldern
     # zwischen Pfeil und Ecktaster, bei (+/-9 / +/-19) mathematisch. Das haelt
     # rund 8 mm Abstand zu Kreuz und Symbol und liegt sicher auf der Platine.

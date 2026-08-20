@@ -538,7 +538,8 @@ def panel_a(x0, y0):
     s.teil("panel", zp[0], zp[0] + KLEBEFUGE, -PANEL_X / 2, PANEL_X / 2,
            ROT, None)
     s.fahne("panel", zp[0], PANEL_X / 2,
-            ["Displaypanel ER-TFT1.69-3", "37,43 breit × 1,60 dick",
+            ["Displaypanel ER-TFT1.69-3",
+             "37,43 × 30,07 × 1,60 · quer · Fahne faltet RECHTS auf J5",
              "geklebt, Fuge 0,1–0,2 (rot)"])
 
     # Schaumdichtung
@@ -709,15 +710,30 @@ def panel_c(cx, cy):
     text(X(USB_X) - 8, Y(USB_Y + USB_A / 2) + 14, "USB-C auf Mid",
          KLEIN, GRAU, "rt")
 
-    # Displaypanel und Fenster
-    srechteck(-PANEL_X / 2, -PANEL_Y / 2, PANEL_X / 2, PANEL_Y / 2, DISPLAY)
+    # Displaypanel an seiner wahren Lage: Mitte (-0,95 / 0,3), quer
+    px0, px1 = -0.95 - PANEL_X / 2, -0.95 + PANEL_X / 2
+    py0, py1 = 0.3 - PANEL_Y / 2, 0.3 + PANEL_Y / 2
+    srechteck(px0, py0, px1, py1, DISPLAY)
+    # Die Fahne faltet ab Werk an der RECHTEN Panelkante (Korrektur in
+    # der Nacht zum 21.08.: quer eingebaut kommt sie seitlich, nicht von
+    # unten) und liegt unter dem Panel; ihre Finger landen auf J5.
+    strichlinie(X(px1), Y(py0) - 8, X(px1), Y(py1) + 8, ROT, 1.2, 6, 5)
+    srechteck(px1 - 12.96, 0.3 - 5.7, px1, 0.3 + 5.7, ROT, 0.6)
+    for i in range(12):
+        yy = 0.3 - 3.85 + i * 0.7
+        rechteck(4.45, yy - 0.2, 7.65, yy + 0.2, BAUTEIL, None, 0.3)
+    text(X(px1) + 6, Y(py1) + 10, "Faltkante der Fahne (x = 17,8)",
+         KLEIN, ROT, "lt")
+    text(X(4.45) - 6, Y(0.3 + 5.7) + 10,
+         "Fahne unterm Panel · Finger face-down auf J5 (Pin 1 oben)",
+         KLEIN, ROT, "lt")
     rechteck(FENSTER_M[0] - FENSTER_X / 2, FENSTER_M[1] - FENSTER_Y / 2,
              FENSTER_M[0] + FENSTER_X / 2, FENSTER_M[1] + FENSTER_Y / 2,
              None, DISPLAY, 1.2)
-    text(X(FENSTER_M[0]), Y(FENSTER_M[1]), "Fenster 32,7 × 27,0", KLEIN,
-         DISPLAY, "mm")
-    text(X(FENSTER_M[0]), Y(FENSTER_M[1]) + 14, "Panel 37,43 × 30,07", KLEIN,
-         GRAU, "mm")
+    text(X(FENSTER_M[0] - 6.5), Y(FENSTER_M[1]), "Fenster 32,7 × 27,0",
+         KLEIN, DISPLAY, "mm")
+    text(X(FENSTER_M[0] - 6.5), Y(FENSTER_M[1]) + 14, "Panel 37,43 × 30,07",
+         KLEIN, GRAU, "mm")
 
     # Ecktaster
     for bx, by in L["BTN_POS"].values():

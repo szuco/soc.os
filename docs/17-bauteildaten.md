@@ -127,9 +127,24 @@ verdrahtet. Beides stand hier trotzdem noch als offen — die Doku hinkte.
 > Werksklebeband aufkleben. Prüfpunkt Musteraufbau: FPC 0,13 + Lot in der
 > 0,15-Klebebandfuge — die Fahnenzone flach halten.
 
+> **NACHTRAG 20.08., nachts — die Faltkante war falsch (Einwand des
+> Nutzers, am Foto verifiziert):** Die Fahne verlässt das Modul an der
+> Datenblatt-**Unterkante**, also an einem Ende der 37,43er-Achse. **Quer
+> eingebaut kommt sie von der Seite**, nicht von unten — die Fassung oben
+> faltete fälschlich bei y = 15,3. Das Panel wird so gedreht, dass die
+> Fahne **rechts** abgeht (links sitzt die USB-Freistellung), und J5
+> steht seitdem **90° gedreht** bei **(6,05 / 0,3)**: Raster in y, die
+> 2,0-mm-Finger enden bei x ≈ 4,8–6,8, gefaltet wird an der rechten
+> Panelkante x = 17,77. Die Kippregel gilt sinngemäß weiter: Die
+> Werksfaltung dreht jetzt um die **senkrechte** Kante, **oben/unten
+> kippt also nie** — Pin 1 (ungefaltete Fahne, Portrait-Frontsicht:
+> rechts) landet quer eingebaut auf dem **obersten** Pad (y = −3,55).
+> Faltwulst ≈ 0,5 endet bei x ≈ 18,3, der H2-Schraubkopf beginnt erst
+> bei 19,25 — Prüfpunkt für den Musteraufbau.
+
 **Stand 20.08. abends — die Kette ist durchgerechnet** (TE 1734839 ist
 laut Herstellerserie ein **Top-Kontakt**-Verbinder; alle Biegungen der
-Fahne drehen um querliegende Achsen, links/rechts kippt also nie):
+Fahne drehen um die Faltkante, die Gegenrichtung kippt also nie):
 
 > **Kriterium:** Panel umdrehen und auf die Rückseite schauen. Sind die
 > Goldfinger der werksgefalteten Fahne **sichtbar → es passt**. Liegen

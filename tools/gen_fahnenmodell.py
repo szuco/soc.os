@@ -8,8 +8,10 @@ auf den Pad-Streifen legen, pruefen, dass die Goldfinger nach unten auf
 die Pads zeigen und Pin 1 rechts ankommt.
 
 Masse aus der Originalzeichnung (Fahne 12,96 +-0,3 lang, 11,4 bzw. 9,34
-breit, Finger 0,35/2,0 im 0,7-Raster) und gen_layouts.py (Loetpads um
-y = 3,6; Panelunterkante y = 15,3). Beim Drucken:
+breit, Finger 0,35/2,0 im 0,7-Raster) und gen_layouts.py. SEITENFALTUNG
+seit dem 20.08. nachts: Die Fahne verlaesst das quer eingebaute Panel an
+der RECHTEN Kante (x = 17,77), das Loetfeld steht 90 Grad gedreht um
+x = 6,05, Raster in y, Pin 1 OBEN (y = -3,55). Beim Drucken:
 100 %, keine Seitenanpassung - das 50-mm-Lineal auf dem Blatt nachmessen.
 """
 
@@ -82,23 +84,31 @@ def main():
     text(x0 - 1, yS + 11, "[ ] links   [ ] rechts   (auf der Schablone markieren)", 2.8)
     # Faltlinie am Abgang
     linie(x0 - 4, yA, x1 + 4, yA, 0.25, dash=1.2)
-    text(x1 + 5, yA + 1, "Faltlinie = Panelunterkante (Werksfaltung 180°)", 2.8)
+    text(x1 + 5, yA + 1, "Faltlinie = RECHTE Panelkante, quer eingebaut (Werksfaltung 180°)", 2.8)
 
     # --- Teil 2: der Boardstreifen ----------------------------------------
     ox2, oy2 = 100, 38
     text(ox2, oy2 - 3, "TEIL 2 — Boardstreifen mit Loetpads (ausschneiden)", 3.4, True)
-    # Streifen: von Panelunterkante (y=15,3) bis ueber J5 (y=1,93): Laenge 15,3-0 = 15,3+Rand
-    # Masse in Board-y: Panelkante 15,3 / Loetpads 2,0..5,2 (Mitte 3,6)
-    sb, sh = 30, 20  # Streifen 30 breit, 20 hoch (y 0..20 des Boards)
+    # Fenster in Boardkoordinaten (y nach unten wie in KiCad): x 0..22,
+    # y -8..+8. Rechte Panelkante x = 17,77, Loetfeld um (6,05 / 0,3).
+    bx0, by0, sb, sh = 0.0, -8.0, 22.0, 16.0
+
+    def BX(x):
+        return ox2 + (x - bx0)
+
+    def BY(y):
+        return oy2 + (y - by0)
+
     kasten(ox2, oy2, sb, sh)
-    # Padfeld: 12 Streifen, 0,7-Raster, um Boardmitte (Fahnenmitte)
+    # Padspalte: 12 Pads 3,2 breit / 0,4 hoch im 0,7-Raster, Pin 1 OBEN
     for i in range(12):
-        px = ox2 + sb / 2 - 7.7 / 2 + i * 0.7 - 0.2
+        py = 0.3 - 3.85 + i * 0.7
         a('<rect x="%f" y="%f" width="%f" height="%f" fill="#b90"/>'
-          % (mm(px), mm(oy2 + 2.0), mm(0.4), mm(3.2)))
-    text(ox2 + sb + 2, oy2 + 4.5, "12 Loetpads 0,7-Raster (Pin 1 rechts)", 2.8)
-    linie(ox2, oy2 + 15.3, ox2 + sb, oy2 + 15.3, 0.25, dash=1.2)
-    text(ox2 + sb + 2, oy2 + 16, "Panelunterkante — Fahne hier anlegen und falten", 2.8)
+          % (mm(BX(4.45)), mm(BY(py - 0.2)), mm(3.2), mm(0.4)))
+    text(ox2 + sb + 2, oy2 + 3.0, "12 Loetpads 0,7-Raster in y — Pin 1 OBEN (y = −3,55)", 2.8)
+    linie(BX(17.77), oy2 - 2, BX(17.77), oy2 + sh + 2, 0.25, dash=1.2)
+    text(ox2 + sb + 2, oy2 + 7.5, "gestrichelt: RECHTE Panelkante (x = 17,77) —", 2.8)
+    text(ox2 + sb + 2, oy2 + 11.5, "Fahne hier anlegen und nach links falten", 2.8)
 
 
     # --- Ablauf ------------------------------------------------------------
@@ -107,10 +117,10 @@ def main():
     for i, z in enumerate([
         "1. Teil 1 an die echte Fahne halten: Goldfinger-Seite und Pin-1-Kante uebertragen.",
         "2. An der Faltlinie um 180° falten (wie ab Werk).",
-        "3. Teil 1 auf Teil 2 legen: Faltlinie auf die Panelunterkante.",
+        "3. Teil 1 auf Teil 2 legen: Faltlinie auf die RECHTE Panelkante, Fahne zeigt nach links.",
         "4. KONTROLLE 1: Die Goldfinger muessen NACH UNTEN auf die Pads zeigen (face-down).",
-        "5. KONTROLLE 2: Pin 1 der Fahne muss auf dem RECHTEN Pad ankommen.",
-        "6. KONTROLLE 3: Die Kontaktzone (2,0 lang) muss die Pads (y 2,0..5,2) ueberdecken -",
+        "5. KONTROLLE 2: Pin 1 der Fahne muss auf dem OBERSTEN Pad ankommen (y = -3,55).",
+        "6. KONTROLLE 3: Die Kontaktzone (2,0 lang) muss die Pads (x 4,45..7,65) ueberdecken -",
         "   Fahnenlaenge 12,96 +-0,3 ab Panelkante.",
     ]):
         text(10, oy3 + 5 + i * 4.5, z, 2.9)

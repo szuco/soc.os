@@ -24,31 +24,32 @@
 <text x="34.015748" y="219.061417" font-size="10.582677" fill="#000">Pin-1-Kante am echten Panel ablesen:</text>
 <text x="34.015748" y="234.179528" font-size="10.582677" fill="#000">[ ] links   [ ] rechts   (auf der Schablone markieren)</text>
 <line x1="22.677165" y1="143.622047" x2="96.000000" y2="143.622047" stroke="#000" stroke-width="0.944882" stroke-dasharray="4.535433 4.535433"/>
-<text x="99.779528" y="147.401575" font-size="10.582677" fill="#000">Faltlinie = Panelunterkante (Werksfaltung 180°)</text>
+<text x="99.779528" y="147.401575" font-size="10.582677" fill="#000">Faltlinie = RECHTE Panelkante, quer eingebaut (Werksfaltung 180°)</text>
 <text x="377.952756" y="132.283465" font-size="12.850394" fill="#000" font-weight="bold">TEIL 2 — Boardstreifen mit Loetpads (ausschneiden)</text>
-<rect x="377.952756" y="143.622047" width="113.385827" height="75.590551" fill="none" stroke="#000" stroke-width="1.322835"/>
-<rect x="419.338583" y="151.181102" width="1.511811" height="12.094488" fill="#b90"/>
-<rect x="421.984252" y="151.181102" width="1.511811" height="12.094488" fill="#b90"/>
-<rect x="424.629921" y="151.181102" width="1.511811" height="12.094488" fill="#b90"/>
-<rect x="427.275591" y="151.181102" width="1.511811" height="12.094488" fill="#b90"/>
-<rect x="429.921260" y="151.181102" width="1.511811" height="12.094488" fill="#b90"/>
-<rect x="432.566929" y="151.181102" width="1.511811" height="12.094488" fill="#b90"/>
-<rect x="435.212598" y="151.181102" width="1.511811" height="12.094488" fill="#b90"/>
-<rect x="437.858268" y="151.181102" width="1.511811" height="12.094488" fill="#b90"/>
-<rect x="440.503937" y="151.181102" width="1.511811" height="12.094488" fill="#b90"/>
-<rect x="443.149606" y="151.181102" width="1.511811" height="12.094488" fill="#b90"/>
-<rect x="445.795276" y="151.181102" width="1.511811" height="12.094488" fill="#b90"/>
-<rect x="448.440945" y="151.181102" width="1.511811" height="12.094488" fill="#b90"/>
-<text x="498.897638" y="160.629921" font-size="10.582677" fill="#000">12 Loetpads 0,7-Raster (Pin 1 rechts)</text>
-<line x1="377.952756" y1="201.448819" x2="491.338583" y2="201.448819" stroke="#000" stroke-width="0.944882" stroke-dasharray="4.535433 4.535433"/>
-<text x="498.897638" y="204.094488" font-size="10.582677" fill="#000">Panelunterkante — Fahne hier anlegen und falten</text>
+<rect x="377.952756" y="143.622047" width="83.149606" height="60.472441" fill="none" stroke="#000" stroke-width="1.322835"/>
+<rect x="394.771654" y="159.685039" width="12.094488" height="1.511811" fill="#b90"/>
+<rect x="394.771654" y="162.330709" width="12.094488" height="1.511811" fill="#b90"/>
+<rect x="394.771654" y="164.976378" width="12.094488" height="1.511811" fill="#b90"/>
+<rect x="394.771654" y="167.622047" width="12.094488" height="1.511811" fill="#b90"/>
+<rect x="394.771654" y="170.267717" width="12.094488" height="1.511811" fill="#b90"/>
+<rect x="394.771654" y="172.913386" width="12.094488" height="1.511811" fill="#b90"/>
+<rect x="394.771654" y="175.559055" width="12.094488" height="1.511811" fill="#b90"/>
+<rect x="394.771654" y="178.204724" width="12.094488" height="1.511811" fill="#b90"/>
+<rect x="394.771654" y="180.850394" width="12.094488" height="1.511811" fill="#b90"/>
+<rect x="394.771654" y="183.496063" width="12.094488" height="1.511811" fill="#b90"/>
+<rect x="394.771654" y="186.141732" width="12.094488" height="1.511811" fill="#b90"/>
+<rect x="394.771654" y="188.787402" width="12.094488" height="1.511811" fill="#b90"/>
+<text x="468.661417" y="154.960630" font-size="10.582677" fill="#000">12 Loetpads 0,7-Raster in y — Pin 1 OBEN (y = −3,55)</text>
+<line x1="445.114961" y1="136.062992" x2="445.114961" y2="211.653543" stroke="#000" stroke-width="0.944882" stroke-dasharray="4.535433 4.535433"/>
+<text x="468.661417" y="171.968504" font-size="10.582677" fill="#000">gestrichelt: RECHTE Panelkante (x = 17,77) —</text>
+<text x="468.661417" y="187.086614" font-size="10.582677" fill="#000">Fahne hier anlegen und nach links falten</text>
 <text x="37.795276" y="294.803150" font-size="12.850394" fill="#000" font-weight="bold">ABLAUF</text>
 <text x="37.795276" y="313.700787" font-size="10.960630" fill="#000">1. Teil 1 an die echte Fahne halten: Goldfinger-Seite und Pin-1-Kante uebertragen.</text>
 <text x="37.795276" y="330.708661" font-size="10.960630" fill="#000">2. An der Faltlinie um 180° falten (wie ab Werk).</text>
-<text x="37.795276" y="347.716535" font-size="10.960630" fill="#000">3. Teil 1 auf Teil 2 legen: Faltlinie auf die Panelunterkante.</text>
+<text x="37.795276" y="347.716535" font-size="10.960630" fill="#000">3. Teil 1 auf Teil 2 legen: Faltlinie auf die RECHTE Panelkante, Fahne zeigt nach links.</text>
 <text x="37.795276" y="364.724409" font-size="10.960630" fill="#000">4. KONTROLLE 1: Die Goldfinger muessen NACH UNTEN auf die Pads zeigen (face-down).</text>
-<text x="37.795276" y="381.732283" font-size="10.960630" fill="#000">5. KONTROLLE 2: Pin 1 der Fahne muss auf dem RECHTEN Pad ankommen.</text>
-<text x="37.795276" y="398.740157" font-size="10.960630" fill="#000">6. KONTROLLE 3: Die Kontaktzone (2,0 lang) muss die Pads (y 2,0..5,2) ueberdecken -</text>
+<text x="37.795276" y="381.732283" font-size="10.960630" fill="#000">5. KONTROLLE 2: Pin 1 der Fahne muss auf dem OBERSTEN Pad ankommen (y = -3,55).</text>
+<text x="37.795276" y="398.740157" font-size="10.960630" fill="#000">6. KONTROLLE 3: Die Kontaktzone (2,0 lang) muss die Pads (x 4,45..7,65) ueberdecken -</text>
 <text x="37.795276" y="415.748032" font-size="10.960630" fill="#000">   Fahnenlaenge 12,96 +-0,3 ab Panelkante.</text>
 <text x="37.795276" y="453.543307" font-size="10.960630" fill="#000" font-weight="bold">Rechnung sagt: alles passt - dieses Blatt ist die Bestaetigung am ersten Muster.</text>
 </svg>
