@@ -389,7 +389,7 @@ class Schnitt(object):
 def panel_a(x0, y0):
     s = Schnitt(x0, y0, 1000, "Schnitt A – A   ·   Ebene y = 0",
                 "Reihenfolge = EINBAUREIHENFOLGE · Kartusche = Becher + "
-                "Bottom + Mid + Tragring, faehrt komplett in die Dose · "
+                "Bottom + Mid, von hinten verschraubt · Tragring liegt lose auf · "
                 "Kraftfluss: Schraube → Top → Drucklippe → Rahmensteg → "
                 "Tragring → Dose · Scheibe klickt zuletzt, kraftfrei · "
                 "Explosion %.0f mm, sonst maßstäblich" % LUECKE)
@@ -434,9 +434,22 @@ def panel_a(x0, y0):
                vz * (g_in - G["boss_b"]), vz * g_in, BAUTEIL, None)
     s.fahne("becher", g_boden, g_aus,
             ["Gehäuse-Becher, gedruckt — Untergeschoss des Tragrings",
-             "Ø 54,6 außen · Wand 1,1 · Boden 1,5 · Stecker-Tunnel hinten",
-             "Bottom + Mid liegen auf 4 Bossen (Oberkante z = 0, projiziert)"],
+             "Ø 54,6 · 4 Dom-Fenster à 10 (Ø-6-Dome!) · Tunnel hinten",
+             "Kartusche: 2 × M2,5 × 16 von hinten in die unteren Hülsen"],
             hoch=60)
+
+    # Kartuschen-Schrauben (Konzept v3): M2,5 x 16 von hinten durch
+    # Boden und Fuehrungsrohr in die unteren Huelsen (H1/H2-Achse)
+    for vz in (1, -1):
+        s.teil("becher", g_boden + G["boden_t"], -G["kanal_luft"],
+               vz * G["schraube_x"] - G["kanal_od"] / 2,
+               vz * G["schraube_x"] + G["kanal_od"] / 2, FEIN, TUSCHE)
+        s.teil("becher", g_boden - 1.7, g_boden,
+               vz * G["schraube_x"] - 2.25, vz * G["schraube_x"] + 2.25,
+               TUSCHE, TUSCHE)
+        s.teil("becher", g_boden, -G["kanal_luft"],
+               vz * G["schraube_x"] - 1.25, vz * G["schraube_x"] + 1.25,
+               TUSCHE, TUSCHE)
 
     # Bottom-Board samt Stapelverbinder in den 10 mm darueber
     s.gruppe("bottom", Z["bottom_power_motor"][0], Z["mid_logic"][0])
@@ -476,8 +489,8 @@ def panel_a(x0, y0):
         s.teil("tragring", Z["rahmen"][0], Z["rahmen"][0] + T["t"],
                vz * T["open_sq"] / 2.0, vz * T["grip"] / 2.0, KUNST_H, KUNST)
     s.fahne("tragring", Z["rahmen"][0], T["grip"] / 2.0,
-            ["Tragring — schließt den Becher per Bajonett (12/3/9 Uhr)",
-             "70 × 70 × 2 · Kartusche in die Dose, Schrauben auf 60,0"],
+            ["Tragring — liegt lose auf dem Becherrand",
+             "70 × 70 × 2 · Geräteschrauben auf 60,0 in die Dome"],
             hoch=14)
 
     # Abdeckrahmen

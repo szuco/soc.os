@@ -1,28 +1,36 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Das Gehaeuse um Bottom und Mid - ein Becher, der in den Tragring rastet.
+"""Das Gehaeuse um Bottom und Mid - ein verschraubter Becher unterm Tragring.
 
 Gewuenscht am 20.08.2026: Bottom und Mid sollen in der Dose verschwinden,
-fixiert, nur der Feldstecker bleibt von hinten zugaenglich. Gedruckt wird
-der Becher ZUSAMMEN mit dem Tragring; verbunden werden beide durch vier
-Rasthaken, die in Schlitze der Tragring-Platte greifen. Damit wird aus
-Becher + Boards + Tragring eine Einheit, die als Ganzes in die Dose geht
-und dort verschraubt wird.
+fixiert, nur der Feldstecker bleibt von hinten zugaenglich. Der Becher
+kapselt beide Boards; die Kartusche Becher + Bottom + Mid haelt mit zwei
+Schrauben von hinten durch den Boden (Konzept v3, unten). Der Tragring
+liegt lose auf dem Becherrand und kommt mit den Geraeteschrauben an die
+Dose - erst dann ist alles eine Einheit.
 
-DIE ENGE STELLE - und warum der Becher zwei Fenster hat:
+DIE DOME - und warum der Becher VIER Fenster hat (F16 gemessen 21.08.):
 
-    Dose, lichte Weite            ~55 mm   (mit Schraubdomen nur ~54)
-    Boards                          52 mm
-    bleibt je Seite                1,5 mm  (an den Domen 1,0)
+    Dose, lichte Weite             58 mm   (F16a/b)
+    ueber die Dome                 54 mm   (F16c - sie ragen bis r 27)
+    Dom-Durchmesser               ~ 6 mm   (F16d - Rundpfosten)
+    Becher aussen                54,6 mm   -> 1,7 mm Luft, ausser an den Domen
 
-Eine umlaufende Wand braucht aussen 52,4 + 2 x 1,1 = 54,6 - das passt an
-den Schraubdomen NICHT vorbei. Deshalb ist die Wand an der 3- und der
-9-Uhr-Seite unterbrochen (dort sitzen die Dome, auf der Achse der
-Geraeteschrauben). Durch diese zwei Fenster schaut die Platinenkante -
-der Preis dafuer, dass der Rest verschwindet.
+Die Dome sitzen auf ALLEN VIER Achsen (12/3/6/9 Uhr - Nutzerbefund
+21.08.), nicht nur auf der Schraubenachse. Die Wand ist deshalb an vier
+Stellen gefenstert (je 10 breit: Dom 6 + 2 Luft je Seite).
 
-MASSVORBEHALT F16: Die lichte Weite DEINER Dose und die Lage ihrer
-Schraubdome sind Annahmen (dose_licht, dom_fenster). Vor dem Druck messen.
+KONZEPT v3 - VERSCHRAUBT STATT BAJONETT (21.08.). Das Bajonett ist
+doppelt gestorben: Seine Zapfen an 3/9 Uhr standen auf der
+weggefensterten Wand (zwei von drei schwebten als lose Koerper im STL -
+Nutzerbefund 'die Raender haengen in der Luft'), und mit Domen auf allen
+vier Achsen gibt es fuer Zapfen samt Ringschlitzen kein tragfaehiges
+Band mehr (die Diagonalen blockiert die quadratische Ringoeffnung).
+Stattdessen fassen die zwei Schrauben, die Bottom ohnehin von hinten in
+die unteren Huelsen halten, jetzt DURCH den Becherboden (M2,5 x 16
+statt x 6): Becher + Bottom + Mid sind die verschraubte Kartusche, der
+Tragring liegt lose auf dem Becherrand und kommt mit den
+Geraeteschrauben an die Dose.
 
 Rueckwand: Fenster fuer den Micro-Fit-Feldstecker samt Rastnase - die
 vorverdrahtete Leiste wird durch dieses Fenster gesteckt, BEVOR der
@@ -47,16 +55,7 @@ PARAMS = dict(
     dome_licht        = 54.0,   # F16c: Weite UEBER die Dome - sie ragen
                                 # also je 2,0 nach innen (bis r 27)
     dose_tief         = 60.0,   # F16e: Rand bis Rueckwand innen
-    dom_fenster_b     = 16.0,   # Fensterbreite (Sehne) - F16d (Dombreite)
-                                # steht noch aus, bis dahin die Annahme
-
-    # BEKANNTER DEFEKT, bestaetigt am 21.08. (Einwand des Nutzers: die
-    # Raender haengen in der Luft): Die Zapfen an 3 und 9 Uhr stehen auf
-    # der Oberkante einer Wand, die dort vom Dom-Fenster KOMPLETT
-    # entfernt ist - zwei von drei Zapfen schweben als lose Koerper im
-    # STL. Reparatur geplant: Zapfen neben die Fenster ruecken (dort
-    # traegt wieder Wand), moeglich gemacht durch die gemessene Dose
-    # (r 29 statt 27,5). Der genaue Winkel braucht F16d.
+    dom_fenster_b     = 10.0,   # F16d: Dom OE6 + 2 Luft je Seite
 
     # --- Becher ------------------------------------------------------------
     board_d           = 52.0,   # Bottom und Mid
@@ -82,25 +81,15 @@ PARAMS = dict(
     boss_r            = 24.0,   # auf den Diagonalen, traegt die Boardkante
     boss_b            = 6.0,
 
-    # --- Bajonett in den Tragring ------------------------------------------
-    # KEINE radialen Rasthaken - die scheiterten dreifach: Auf den
-    # Diagonalen sitzt der Adapter (die 50,6er Oeffnung ist QUADRATISCH,
-    # ihre Ecken reichen bis r 35,8), radial nach aussen steht die
-    # Dosenwand (r 27,5), radial nach innen der Adapter-Basisring (24,9).
-    # Frei ist nur ein 2,2-mm-Band auf den ACHSEN: r 25,3 bis 27,5.
-    #
-    # Deshalb Bajonett: Drei Zapfen an 12, 3 und 9 Uhr fahren durch
-    # Bogenschlitze der Platte, dann wird der Becher ~7 Grad gedreht und
-    # die TANGENTIAL auskragenden Koepfe legen sich auf die
-    # Plattenvorderseite. Tangential heisst: kein Millimeter radialer
-    # Ueberstand - Dose und Adapter bleiben unberuehrt. 6 Uhr faellt aus,
-    # dort laeuft das Magnetkabel durch die Platte.
-    zapfen_r          = 26.1,   # Bandmitte; aussen 26,8 < Dose 27,5
-    zapfen_b          = 3.0,    # tangential
-    zapfen_t          = 1.4,    # radial
-    kopf_l            = 2.6,    # tangentiale Auskragung des Kopfes
-    dreh_grad         = 7.0,    # Verriegelungsdrehung
-    schlitz_luft      = 0.3,
+    # --- Kartuschen-Verschraubung von hinten (Konzept v3, 21.08.) ----------
+    # Kein Bajonett mehr (Begruendung im Kopf). Die zwei Schrauben der
+    # unteren Huelsen (H1/H2-Achse) fassen durch den Boden; ein
+    # Fuehrungsrohr ueberbrueckt den Hohlraum bis unter Bottom und
+    # stuetzt das Board gleich mit.
+    schraube_x        = 21.5,   # H1/H2-Achse, wie ueberall im Projekt
+    kanal_bohr        = 2.8,    # Durchgang M2,5
+    kanal_od          = 6.0,    # Fuehrungsrohr aussen
+    kanal_luft        = 0.3,    # Rohr endet knapp unter Bottom (z = -0,3)
 )
 
 
@@ -130,11 +119,14 @@ def _becher(p):
                 Rectangle(p["fenster_b"], p["fenster_h"])
         extrude(amount=tief + 0.5, mode=Mode.SUBTRACT)
 
-        # Dom-Fenster an 3 und 9 Uhr: Wand dort komplett heraus
+        # Dom-Fenster an ALLEN VIER Achsen: Wand dort komplett heraus
+        # (die Dose hat vier OE6-Dome bis r 27, F16c/d, Nutzerbefund)
         for vz in (1, -1):
             with BuildSketch(Plane.XY.offset(-tief)):
                 with Locations((vz * (r_in + p["wand"] / 2.0), 0)):
                     Rectangle(2 * p["wand"] + 1.0, p["dom_fenster_b"])
+                with Locations((0, vz * (r_in + p["wand"] / 2.0))):
+                    Rectangle(p["dom_fenster_b"], 2 * p["wand"] + 1.0)
             extrude(amount=tief + p["rand_vorn"], mode=Mode.SUBTRACT)
 
         # Auflagebosse: das Bottom-Board liegt bei z = 0 auf ihnen.
@@ -150,24 +142,19 @@ def _becher(p):
                     Rectangle(p["boss_b"], p["boss_b"], rotation=wink)
             extrude(amount=p["tief_hinten"])
 
-        # Bajonettzapfen an 12, 3 und 9 Uhr (siehe Parameterblock)
-        for wink in (90, 0, 180):
-            wr = math.radians(wink)
-            cx, cy = p["zapfen_r"] * math.cos(wr), -p["zapfen_r"] * math.sin(wr)
-            # Zapfen: vom Becherrand durch die Plattenebene (15,5..17,5)
-            with BuildSketch(Plane.XY.offset(p["rand_vorn"])):
-                with Locations((cx, cy)):
-                    Rectangle(p["zapfen_t"], p["zapfen_b"], rotation=-wink)
-            extrude(amount=(17.5 - p["rand_vorn"]) + 1.3)
-            # Kopf: kragt TANGENTIAL aus, liegt nach der Drehung auf der
-            # Plattenvorderseite (z 17,5)
-            tx, ty = -math.sin(wr), -math.cos(wr)
-            klen = p["zapfen_b"] + p["kopf_l"]
-            off = p["kopf_l"] / 2.0
-            with BuildSketch(Plane.XY.offset(17.5 + 0.1)):
-                with Locations((cx + off * tx, cy + off * ty)):
-                    Rectangle(p["zapfen_t"], klen, rotation=-wink)
-            extrude(amount=1.2)
+        # Schraubkanaele der Kartusche: Fuehrungsrohr vom Boden bis
+        # knapp unter Bottom, Bohrung durch Boden und Rohr. Beruehrt das
+        # Rohr einen Auflageboss, verschmelzen beide - unkritisch.
+        for vz in (1, -1):
+            with BuildSketch(Plane.XY.offset(-p["tief_hinten"])):
+                with Locations((vz * p["schraube_x"], 0)):
+                    Circle(p["kanal_od"] / 2.0)
+            extrude(amount=p["tief_hinten"] - p["kanal_luft"])
+        for vz in (1, -1):
+            with BuildSketch(Plane.XY.offset(-tief - 0.5)):
+                with Locations((vz * p["schraube_x"], 0)):
+                    Circle(p["kanal_bohr"] / 2.0)
+            extrude(amount=tief + 0.5, mode=Mode.SUBTRACT)
     return g.part
 
 
@@ -182,16 +169,13 @@ def check_gehaeuse(part, p):
     if r_in * 2 < p["board_d"] + 0.2:
         errs.append("Innenraum %.1f klemmt die Boards (%.1f)"
                     % (2 * r_in, p["board_d"]))
-    # Bajonett: Zapfenband muss zwischen Oeffnung, Adapter und Dose passen
-    from tragring import PARAMS as TP
-    innen = p["zapfen_r"] - p["zapfen_t"] / 2.0
-    aussen = p["zapfen_r"] + p["zapfen_t"] / 2.0
-    if innen < TP["open_sq"] / 2.0 + 0.1:
-        errs.append("Zapfen innen %.2f beruehrt die Oeffnungskante (25,3)"
-                    % innen)
-    if aussen > p["dose_licht"] / 2.0 - 0.6:
-        errs.append("Zapfen aussen %.2f zu nah an der Dosenwand (%.1f)"
-                    % (aussen, p["dose_licht"] / 2.0))
+    # Kartuschen-Schrauben: Kanal muss im Boden liegen und die
+    # Schraubenachse (H1/H2) treffen
+    if p["schraube_x"] + p["kanal_od"] / 2.0 > r_in:
+        errs.append("Schraubkanal ragt aus dem Boden (%.1f > %.1f)"
+                    % (p["schraube_x"] + p["kanal_od"] / 2.0, r_in))
+    if p["schraube_x"] != 21.5:
+        errs.append("Schraubkanal nicht auf der H1/H2-Achse (21,5)")
     # Steckerfenster ganz in der Rueckwand
     if abs(p["fenster_x"]) + p["fenster_b"] / 2.0 > r_in:
         errs.append("Steckerfenster ragt aus der Rueckwand")
@@ -204,10 +188,23 @@ def check_gehaeuse(part, p):
     def clear(probe, was):
         if (part & probe).volume > 1e-6:
             errs.append("nicht frei: %s" % was)
-    solid(Pos(0, -r_in - p["wand"] / 2.0, 0) * Box(0.5, 0.5, 0.5),
-          "Wand bei 6 Uhr")
-    clear(Pos(r_in + p["wand"] / 2.0, 0, 0) * Box(0.8, 4.0, 0.5),
-          "Dom-Fenster bei 3 Uhr")
+    # LEKTION aus dem Bajonett-Defekt (zwei Zapfen schwebten auf der
+    # weggefensterten Wand): Fenster an allen vier Achsen FREI pruefen,
+    # Wand ZWISCHEN den Fenstern (45 Grad) vorhanden pruefen.
+    rw = r_in + p["wand"] / 2.0
+    for wink in (0, 90, 180, 270):
+        wr = math.radians(wink)
+        clear(Pos(rw * math.cos(wr), rw * math.sin(wr), 0)
+              * Box(0.8, 0.8, 0.5), "Dom-Fenster bei %d Grad" % wink)
+    for wink in (45, 135, 225, 315):
+        wr = math.radians(wink)
+        solid(Pos(rw * math.cos(wr), rw * math.sin(wr), 0)
+              * Box(0.5, 0.5, 0.5), "Wand bei %d Grad" % wink)
+    solid(Pos(p["schraube_x"] + p["kanal_od"] / 2.0 - 0.6, 0,
+              -p["tief_hinten"] / 2.0) * Box(0.4, 0.4, 0.5),
+          "Schraubkanal-Rohr rechts")
+    clear(Pos(p["schraube_x"], 0, -tief + p["boden_t"] / 2.0)
+          * Box(1.6, 1.6, p["boden_t"] + 0.6), "Schraubbohrung rechts")
     clear(Pos(p["fenster_x"], p["fenster_y"], -tief + p["boden_t"] / 2.0)
           * Box(p["fenster_b"] - 1, p["fenster_h"] - 1, p["boden_t"] + 1),
           "Steckerfenster")
@@ -230,10 +227,11 @@ def main():
         print("   ! %s" % e)
     print("Becher       : Ø %.1f aussen, Rueckwand bei z = %.1f"
           % (2 * r_out, -(p["tief_hinten"] + p["boden_t"])))
-    print("Fenster      : Feldstecker %.0f x %.0f; Dom-Fenster 2 x %.0f"
+    print("Fenster      : Feldstecker %.0f x %.0f; Dom-Fenster 4 x %.0f"
           % (p["fenster_b"], p["fenster_h"], p["dom_fenster_b"]))
-    print("Bajonett     : 3 Zapfen (12/3/9 Uhr) auf r %.1f, Drehung %.0f Grad"
-          % (p["zapfen_r"], p["dreh_grad"]))
+    print("Kartusche    : 2 x M2,5 x 16 von hinten durch den Boden "
+          "(Kanal OE%.0f auf x = +-%.1f)"
+          % (p["kanal_od"], p["schraube_x"]))
     print("Export       : %s" % OUT)
     return 1 if errs else 0
 

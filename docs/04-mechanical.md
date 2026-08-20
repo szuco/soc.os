@@ -462,22 +462,24 @@ Dose und setzte den Tragring danach. Auch das ist überholt, seit der
 Becher da ist: Die Boards wohnen im **Becher unter dem Tragring** und
 gehen mit ihm zusammen als **eine Kartusche** in die Dose.
 
-1. **Bottom mit Mid verschrauben.** Untere Hülsen (M2,5 × 9,
-   Buchse/Buchse) mit zwei Schrauben von hinten an Bottom; Mid auflegen;
-   obere Hülsen (M2,5 × 9, **Stift/Buchse**) von vorn durch Mid in die
-   unteren schrauben — ihr Gewindestift klemmt Mid zwischen den Hülsen.
+1. **Mid zwischen die Hülsen schrauben.** Untere Hülsen (M2,5 × 9,
+   Buchse/Buchse) auf Bottom auflegen, Mid darüber, obere Hülsen
+   (M2,5 × 9, **Stift/Buchse**) von vorn durch Mid in die unteren —
+   ihr Gewindestift klemmt Mid. Bottom liegt noch lose an.
 2. **Board-Paar in den Becher legen.** Bottom voran auf die vier
    Auflagebosse (Oberkante z = 0); USB-C zeigt zur 9-Uhr-Seite.
-3. **Tragring aufsetzen und bajonettieren** (Zapfen 12/3/9 Uhr, 7°
-   Drehung). Damit sind Bottom und Mid an der **Unterseite des
-   gedruckten Tragrings** befestigt — die Kartusche ist komplett. Die
-   Öffnung fädelt dabei über die oberen Hülsen (Luft 3,8) und die
-   USB-C-Buchse (Luft 2,1).
+3. **Kartusche verschrauben:** zwei **M2,5 × 16** von hinten durch den
+   Becherboden und seine Führungsrohre, durch Bottom (H1/H2) in die
+   unteren Hülsen — Becher, Bottom und Mid sind jetzt EIN Teil
+   (Konzept v3; das Bajonett ist Geschichte, die Dose hat vier Dome).
 4. **Feldstecker anstecken.** Die gecrimpte, in der Dose vorverdrahtete
    Micro-Fit-Leiste klickt von hinten durch den Stecker-Tunnel der
    Becher-Rückwand an Bottom.
-5. **Kartusche in die Dose schieben** und mit den Geräteschrauben auf
-   60 mm festschrauben.
+5. **Tragring lose auflegen** (die Öffnung fädelt über die oberen
+   Hülsen, Luft 3,8, und die USB-C-Buchse, Luft 2,1), dann **Kartusche
+   samt Ring in die Dose schieben** und mit den Geräteschrauben auf
+   60 mm festschrauben — erst sie machen Ring und Kartusche zur
+   Einheit.
 6. **Abdeckrahmen auf den Tragring klemmen** — er sitzt noch lose.
 7. **Magnetkontakt-Kabel** aus der unteren Rahmenleiste durch den
    Kabeldurchlass des Tragrings nach innen führen und in J6 auf der
@@ -510,19 +512,19 @@ Tunnel-Fenster für die Feldstecker-Leiste — sie bleibt als einziges von
 hinten zugänglich. Vier Auflagebosse tragen das Bottom-Board; gedruckt wird
 der Becher zusammen mit dem Tragring.
 
-**Verbindung: Bajonett, kein Rasthaken.** Radiale Haken scheiterten
-dreifach — auf den Diagonalen sitzt der Adapter (die 50,6er Öffnung ist
-quadratisch, ihre Ecken reichen bis r 35,8), außen die Dosenwand (r 27,5),
-innen der Adapter-Basisring (24,9). Frei ist nur ein 2,2-mm-Band auf den
-Achsen. Drei Zapfen an 12, 3 und 9 Uhr fahren durch Bogenschlitze der
-Platte; eine Drehung um ~7° legt die **tangential** auskragenden Köpfe auf
-die Plattenvorderseite — null radialer Überstand. 6 Uhr entfällt, dort
-läuft das Magnetkabel.
+**Verbindung v3: verschraubt, kein Bajonett (21.08.).** Radiale Haken
+scheiterten dreifach (Diagonalen: Öffnungsecken bis r 35,8; außen die
+Dose; innen der Basisring), und das Bajonett starb doppelt: Seine Zapfen
+standen auf der weggefensterten Wand (zwei von drei schwebten im STL),
+und die gemessene Dose hat Dome auf **allen vier Achsen** — es gibt kein
+tragfähiges Band mehr. Jetzt halten die zwei Hülsenschrauben der
+H1/H2-Achse die Kartusche: M2,5 × 16 von hinten durch den Becherboden,
+durch Führungsrohre und Bottom in die unteren Hülsen. Der Tragring liegt
+lose auf dem Becherrand.
 
-**Die enge Stelle:** Dose lichte Weite ~55 (an den Schraubdomen ~54),
-Becher außen 54,6 — deshalb ist die Wand an 3 und 9 Uhr gefenstert, dort
-schaut die Platinenkante heraus. **Messpunkt F16:** lichte Weite der
-echten Dose und Lage/Breite ihrer Schraubdome, vor dem Druck.
+**Die Dome (F16 gemessen):** Dose 58 licht, über die Dome 54 — die
+Ø-6-Pfosten sitzen auf allen vier Achsen. Der Becher (außen 54,6) hat
+1,7 mm Luft und vier Fenster à 10; durch sie schaut die Platinenkante.
 
 **F16 im Detail — das Messprotokoll (mit Messschieber, an der echten
 Dose):**
@@ -532,25 +534,32 @@ Dose):**
 | F16a | Lichte Weite vorn am Rand | 55,0 | **58,0** |
 | F16b | Lichte Weite in ~20 mm Tiefe | 55,0 | **58,0** |
 | F16c | Weite über die Schraubdome | ~54 | **54,0** |
-| F16d | Breite eines Doms, tangential (→ Fensterbreite) | 16 | *steht aus* |
+| F16d | Breite eines Doms, tangential (→ Fensterbreite) | 16 | **Ø 6** |
 | F16e | Tiefe: Dosenrand bis Rückwand innen | 61 | **60,0** |
 | F16f | Kabeleinführungen | mittig hinten | **seitlich, ~50 mm tief** |
 | F16g | Dosentyp | — | — |
 
 **Folgen der Messung:** Der Becher (außen 54,6) hat **1,7 mm Luft**
-statt 0,2 — kein Hebel nötig, die Boards bleiben Ø 52. Die Dome ragen
-bis r 27, die Fenster bleiben Pflicht. Die Tiefe schrumpft auf 60
-(Reserve ≈ 16). Die seitlichen Kabeleinführungen bei ~50 mm Tiefe sind
-günstig: Der Kabelbogen muss nicht mehr hinter den Stecker, er kommt
-von der Seite.
+statt 0,2 — kein Hebel nötig, die Boards bleiben Ø 52. Die Dome sind
+**Ø-6-Rundpfosten bis r 27 auf ALLEN VIER Achsen** (12/3/6/9 Uhr,
+Nutzerbefund 21.08.) — der Becher bekommt vier Fenster à 10 statt zwei
+à 16. Die Tiefe schrumpft auf 60 (Reserve ≈ 16). Die seitlichen
+Kabeleinführungen bei ~50 mm Tiefe sind günstig: Der Kabelbogen muss
+nicht mehr hinter den Stecker, er kommt von der Seite.
 
-**Bestätigter Defekt (Einwand „die Ränder hängen in der Luft"):** Die
-Bajonettzapfen an 3 und 9 Uhr stehen im Modell auf der Oberkante der
-Wand — die dort vom Dom-Fenster komplett entfernt ist. Zwei von drei
-Zapfen schweben als lose Körper im STL; genau das war im Slicer zu
-sehen. Reparatur: Zapfen **neben die Fenster** (dort trägt Wand), nach
-außen auf das Band, das die gemessene Dose (r 29 statt 27,5) freigibt;
-der genaue Winkel folgt aus F16d.
+**Der bestätigte Defekt und seine Auflösung — Konzept v3, verschraubt
+statt Bajonett (21.08.).** Der Einwand „die Ränder hängen in der Luft"
+traf: Zwei der drei Bajonettzapfen standen auf der weggefensterten Wand
+und schwebten als lose Körper im STL. Mit Domen auf allen vier Achsen
+ist das Bajonett auch nicht reparierbar — Zapfen und Ringschlitze
+finden kein tragfähiges Band mehr (die Diagonalen blockiert die
+quadratische Ringöffnung). Stattdessen fassen die zwei Schrauben, die
+Bottom ohnehin von hinten in die unteren Hülsen halten, jetzt **durch
+den Becherboden** (M2,5 × 16 statt × 6, Führungsrohre Ø 6 überbrücken
+den Hohlraum): Becher + Bottom + Mid sind die verschraubte Kartusche.
+Der Tragring liegt lose auf dem Becherrand und kommt mit den
+Geräteschrauben an die Dose. Kein neues Teil, keine engen Toleranzen,
+und die Rohre stützen Bottom zusätzlich auf der Schraubenachse.
 
 Nach der Messung werden `gehaeuse.py` (Weite, Spiel, Fensterlage/-breite,
 Tunnel), die Gegenproben in `tragring.py`, STL/STEP, Renderings und die
