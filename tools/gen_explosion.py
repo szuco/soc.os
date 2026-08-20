@@ -109,6 +109,7 @@ T = lies(os.path.join(ROOT, "mechanical", "tragring.py"), "PARAMS")["PARAMS"]
 S = lies(os.path.join(ROOT, "mechanical", "stack.py"), "TEILE", "ADAPTER")
 B = lies(os.path.join(ROOT, "tools", "gen_boards.py"),
          "BOARD_DIAMETER", "BOARD_THICKNESS", "TOP_SQ", "HOLE_PITCH_R")
+G = lies(os.path.join(ROOT, "mechanical", "gehaeuse.py"), "PARAMS")["PARAMS"]
 L = lies(os.path.join(ROOT, "tools", "gen_layouts.py"),
          "NOTCH_X0", "NOTCH_X1", "NOTCH_Y0", "NOTCH_Y1",
          "KERB_W", "KERB_T", "STACK_POS", "BTN_POS")
@@ -387,9 +388,10 @@ class Schnitt(object):
 
 def panel_a(x0, y0):
     s = Schnitt(x0, y0, 1000, "Schnitt A – A   ·   Ebene y = 0",
-                "Reihenfolge = EINBAUREIHENFOLGE, von hinten nach vorn · "
+                "Reihenfolge = EINBAUREIHENFOLGE · Kartusche = Becher + "
+                "Bottom + Mid + Tragring, faehrt komplett in die Dose · "
                 "Kraftfluss: Schraube → Top → Drucklippe → Rahmensteg → "
-                "Tragring → Dose · Scheibe kraftfrei, klickt zuletzt · "
+                "Tragring → Dose · Scheibe klickt zuletzt, kraftfrei · "
                 "Explosion %.0f mm, sonst maßstäblich" % LUECKE)
     r = B["BOARD_DIAMETER"] / 2.0
     h = B["TOP_SQ"] / 2.0
@@ -411,8 +413,30 @@ def panel_a(x0, y0):
     s.teil("feld", -6.6, 0.0, -18.7, -2.3, BAUTEIL)
     s.fahne("feld", -6.6, r,
             ["Feldstecker Molex Micro-Fit 43045-1612",
-             "16-polig · projiziert (y = 15,6)",
-             "Kabelbaum der Dose klickt von hinten"])
+             "16-polig · gecrimpt · projiziert (y = 15,6)",
+             "steckt von hinten durch den Tunnel des Bechers"])
+
+    # Gehaeuse-Becher - das Untergeschoss des gedruckten Tragrings.
+    # Bottom und Mid werden HIER eingelegt (Auflagebosse tragen das
+    # Bottom-Board bei z = 0), dann schliesst der Tragring den Becher
+    # per Bajonett - die Boards gehen nie durch die 50,6er Oeffnung.
+    g_in = (G["board_d"] + G["spiel"]) / 2.0                          # 26,20
+    g_aus = g_in + G["wand"]                                          # 27,30
+    g_boden = -(G["tief_hinten"] + G["boden_t"])                      # -8,70
+    s.gruppe("becher", g_boden, G["rand_vorn"])
+    s.teil("becher", g_boden, g_boden + G["boden_t"], -g_in, g_in,
+           KUNST_H, KUNST)
+    for vz in (1, -1):
+        s.teil("becher", g_boden, G["rand_vorn"], vz * g_in, vz * g_aus,
+               KUNST_H, KUNST)
+        # Auflageboss (auf der Diagonale, hier projiziert): Oberkante z = 0
+        s.teil("becher", g_boden + G["boden_t"], 0.0,
+               vz * (g_in - G["boss_b"]), vz * g_in, BAUTEIL, None)
+    s.fahne("becher", g_boden, g_aus,
+            ["Gehäuse-Becher, gedruckt — Untergeschoss des Tragrings",
+             "Ø 54,6 außen · Wand 1,1 · Boden 1,5 · Stecker-Tunnel hinten",
+             "Bottom + Mid liegen auf 4 Bossen (Oberkante z = 0, projiziert)"],
+            hoch=60)
 
     # Bottom-Board samt Stapelverbinder in den 10 mm darueber
     s.gruppe("bottom", Z["bottom_power_motor"][0], Z["mid_logic"][0])
@@ -452,8 +476,9 @@ def panel_a(x0, y0):
         s.teil("tragring", Z["rahmen"][0], Z["rahmen"][0] + T["t"],
                vz * T["open_sq"] / 2.0, vz * T["grip"] / 2.0, KUNST_H, KUNST)
     s.fahne("tragring", Z["rahmen"][0], T["grip"] / 2.0,
-            ["Tragring — NACH dem Stapel (Ø 52 > Öffnung 50,6)",
-             "70 × 70 × 2 · Geräteschrauben auf 60,0"], hoch=14)
+            ["Tragring — schließt den Becher per Bajonett (12/3/9 Uhr)",
+             "70 × 70 × 2 · Kartusche in die Dose, Schrauben auf 60,0"],
+            hoch=14)
 
     # Abdeckrahmen
     s.gruppe("rahmen", Z["rahmen"][0], Z["rahmen"][1], luecke=0)

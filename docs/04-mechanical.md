@@ -455,30 +455,40 @@ bleibt kraftfrei beweglich. **Messpunkt F15:** Steg-Innenmaß des Rahmens
 (Lippe muss darüber greifen) und Innenmaß des Scheibenkorpus (Lippe muss
 darunter bleiben) — 51,6 ist ein Platzhalter zwischen beiden Annahmen.
 
-**Montagereihenfolge — korrigiert am 20.08.2026.** Die erste Fassung begann
-mit dem Tragring in der Dose; das ist unbaubar, denn die Ø-52-Boards passen
-nicht durch seine 50,6er Öffnung. Der Stapel muss ZUERST hinein:
+**Montagereihenfolge — Kartusche, Fassung vom 20.08.2026 (abends).** Die
+erste Fassung begann mit dem Tragring in der Dose (unbaubar: Ø 52 passt
+nicht durch die 50,6er Öffnung), die zweite schob die Boards lose in die
+Dose und setzte den Tragring danach. Auch das ist überholt, seit der
+Becher da ist: Die Boards wohnen im **Becher unter dem Tragring** und
+gehen mit ihm zusammen als **eine Kartusche** in die Dose.
 
 1. **Bottom mit Mid verschrauben.** Untere Hülsen (M2,5 × 9,
    Buchse/Buchse) mit zwei Schrauben von hinten an Bottom; Mid auflegen;
    obere Hülsen (M2,5 × 9, **Stift/Buchse**) von vorn durch Mid in die
    unteren schrauben — ihr Gewindestift klemmt Mid zwischen den Hülsen.
-2. **Feldstecker-Leiste anstecken.** Die in der Dose vorverdrahtete
-   Micro-Fit-Leiste klickt hinten an Bottom.
-3. **Einheit in die Leerdose** — Bottom voran, USB-C zeigt zur 9-Uhr-Seite.
-4. **Tragring aufsetzen und festschrauben.** Er fädelt über die oberen
-   Hülsen (Luft 3,8) und die USB-C-Buchse (Luft 2,1) und greift mit den
-   Geräteschrauben auf 60 mm in die Dose.
-5. **Abdeckrahmen auf den Tragring klemmen** — er sitzt noch lose.
-6. **Magnetkontakt-Kabel** aus der unteren Rahmenleiste durch den
+2. **Board-Paar in den Becher legen.** Bottom voran auf die vier
+   Auflagebosse (Oberkante z = 0); USB-C zeigt zur 9-Uhr-Seite.
+3. **Tragring aufsetzen und bajonettieren** (Zapfen 12/3/9 Uhr, 7°
+   Drehung). Damit sind Bottom und Mid an der **Unterseite des
+   gedruckten Tragrings** befestigt — die Kartusche ist komplett. Die
+   Öffnung fädelt dabei über die oberen Hülsen (Luft 3,8) und die
+   USB-C-Buchse (Luft 2,1).
+4. **Feldstecker anstecken.** Die gecrimpte, in der Dose vorverdrahtete
+   Micro-Fit-Leiste klickt von hinten durch den Stecker-Tunnel der
+   Becher-Rückwand an Bottom.
+5. **Kartusche in die Dose schieben** und mit den Geräteschrauben auf
+   60 mm festschrauben.
+6. **Abdeckrahmen auf den Tragring klemmen** — er sitzt noch lose.
+7. **Magnetkontakt-Kabel** aus der unteren Rahmenleiste durch den
    Kabeldurchlass des Tragrings nach innen führen und in J6 auf der
    Top-Rückseite stecken (liegende Buchse, Öffnung zur Kerbe).
-7. **Top-Board in den Scheibenadapter**, aufsetzen, zwei Schrauben M2,5
+8. **Top-Board in den Scheibenadapter**, aufsetzen, zwei Schrauben M2,5
    von vorn durch H1/H2 in die oberen Hülsen. Der Adapter taucht durch
-   die Tragring-Öffnung und wird von ihr zentriert.
-8. **Zentralscheibe aufrasten** — nur noch das: Sie hält nichts und
-   presst nichts, sie ist das bewegliche Bedienelement. Der Rahmen sitzt
-   bereits seit Schritt 7 fest, gepresst von der Drucklippe des Adapters.
+   die Tragring-Öffnung, wird von ihr zentriert und presst mit der
+   Drucklippe den Rahmensteg gegen den Tragring — jetzt erst sitzt der
+   Abdeckrahmen fest.
+9. **Zentralscheibe aufrasten** — nur noch das: Sie hält nichts und
+   presst nichts, sie ist das bewegliche Bedienelement.
 
 **Die Steckverbinder tragen seitdem nichts mehr.** Sie sind rein elektrisch;
 Punkt 23 (durchsteckbarer Stapelverbinder) verliert dadurch seine mechanische
