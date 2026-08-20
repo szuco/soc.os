@@ -22,6 +22,7 @@ ersten via_check-Verdopplung (20.08.): Pruefen ist gut, DRC ist besser.
 
 import json
 import math
+import re
 import os
 import subprocess
 import sys
@@ -56,6 +57,15 @@ def drc(pfad):
     os.unlink(ziel)
     err = [v for v in d.get("violations", []) if v.get("severity") == "error"]
     return err, d.get("unconnected_items", [])
+
+
+def netz_von(it):
+    """KiCad 10 traegt den Netznamen NICHT als eigenes Feld ins
+    DRC-JSON - er steht nur im Beschreibungstext: 'Pad 2 [PGND] of C7'.
+    Ohne diesen Griff lief das Werkzeug komplett leer (20.08., Runde 1:
+    'nichts sicher schliessbar' auf allen drei Boards)."""
+    m = re.search(r"\[([^\]]+)\]", it.get("description", ""))
+    return m.group(1) if m else (it.get("net") or "")
 
 
 def frei_segment(board, umriss, x0, y0, x1, y1, lage, breite, eigen):
@@ -147,12 +157,13 @@ def schliesse(name):
     if board.GetCopperLayerCount() == 4:
         CU = [pcbnew.F_Cu, pcbnew.In1_Cu, pcbnew.In2_Cu, pcbnew.B_Cu]
     umriss = pcbnew.SHAPE_POLY_SET()
-    board.GetBoardPolygonOutlines(umriss)
-    umriss = umriss.Outline(0) if umriss.OutlineCount() else None
+    board.GetBoardPolygonOutlines(umriss, True)
+    # KEIN umriss.Outline(0): Das liefert eine Referenz in das Poly-Set,
+    # SWIG gibt das Set frei, der naechste PointInside segfaultet (20.08.).
 
     class _Um:
         def Contains(self, p):
-            return umriss.PointInside(p) if umriss else True
+            return umriss.Contains(p) if umriss.OutlineCount() else True
     um = _Um()
 
     via_b, via_d = (0.8, 0.4) if "bottom" in name else (0.6, 0.3)
@@ -166,7 +177,7 @@ def schliesse(name):
         pa, pb = a.get("pos", {}), b.get("pos", {})
         ax, ay = pa.get("x", 0), pa.get("y", 0)
         bx, by = pb.get("x", 0), pb.get("y", 0)
-        netz = a.get("net") or b.get("net") or ""
+        netz = netz_von(a) or netz_von(b)
         dist = math.hypot(ax - bx, ay - by)
         net = board.FindNet(netz)
         if net is None:
@@ -203,6 +214,17 @@ def schliesse(name):
             continue
         la = lagen_von(a, board, ax, ay, netz)
         lb = lagen_von(b, board, bx, by, netz)
+        if dist <= 0.6 and la and lb and not (la & lb):
+            x, y = (ax + bx) / 2.0, (ay + by) / 2.0
+            if frei_via(board, um, x, y, netz, via_b / 2.0):
+                v = pcbnew.PCB_VIA(board)
+                v.SetPosition(pcbnew.VECTOR2I(mm(x), mm(y)))
+                v.SetDrill(mm(via_d))
+                v.SetWidth(mm(via_b))
+                v.SetNet(net)
+                board.Add(v)
+                gesetzt.append(v)
+            continue
         breite = BREITE.get(netz, 0.25)
         for lage in [l for l in CU if l in la and l in lb]:
             if frei_segment(board, um, ax, ay, bx, by, lage, breite, netz):

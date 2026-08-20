@@ -12,6 +12,7 @@ schrumpft mit. Bei Null: weiter mit gen_panel/gen_fab/gen_assembly.
 
 import json
 import math
+import re
 import os
 import subprocess
 import sys
@@ -52,7 +53,9 @@ def pruefe(name):
         pa, pb = a.get("pos", {}), b.get("pos", {})
         d_mm = math.hypot(pa.get("x", 0) - pb.get("x", 0),
                           pa.get("y", 0) - pb.get("y", 0))
-        netz = a.get("net") or b.get("net") or "?"
+        m = (re.search(r"\[([^\]]+)\]", a.get("description", ""))
+             or re.search(r"\[([^\]]+)\]", b.get("description", "")))
+        netz = m.group(1) if m else "?"
         zeilen.append((netz, d_mm, a, b))
     zeilen.sort(key=lambda z: (z[0], z[1]))
     for netz, d_mm, a, b in zeilen:

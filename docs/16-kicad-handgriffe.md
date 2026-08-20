@@ -84,15 +84,15 @@ parallel). `--fix` setzt Zwillinge — wo kein Platz war, bleibt Handarbeit.
 Der Weg ist immer derselbe: eine Signalbahn im Umkreis um 1–2 mm verlegen,
 dann ein zweites Via 0,8/0,4 neben das gemeldete setzen.
 
-Stand nach dem letzten Lauf (Koordinaten aus `via_check.py`):
+Stand nach dem dritten Router-Pass (20.08. abends, Koordinaten aus
+`via_check.py` — der Pass hat neu geroutet, die Stellen sind gewandert):
 
 | Board | Netz | Stelle | trägt / braucht |
 |---|---|---|---|
-| Bottom | `24V_PROT` | (−3,6/−1,0), (−15,1/15,2) | 1,6 / 4,1 A |
-| Bottom | `24V_PROT` | (−20,0/−7,9), (5,8/4,2) | 3,2 / 4,1 A |
-| Bottom | `PGND` | (−3,5/5,9) | 3,2 / 4,1 A |
-| Bottom | `5V_SYS` | (−16,1/−12,8), (−3,1/−6,7), (−12,2/−9,4), (−16,9/−8,4) | 1,6 / 2,0 A |
-| Bottom | `5V_BUCK` | (−7,7/−16,2) | 1,6 / 2,0 A |
+| Bottom | `24V_PROT` | (−2,5/20,0), (−11,2/−1,1), (8,1/−1,5) | 1,6 / 4,1 A |
+| Bottom | `5V_BUCK` | (−6,7/−16,7) | 1,6 / 2,0 A |
+| Bottom | `5V_SYS` | (−16,6/−4,3) | 1,6 / 2,0 A |
+| Bottom | `PGND` | (−5,8/−4,6) | 1,6 / 4,1 A |
 | Mid | `PGND` | (5,8/2,6) | 1,2 / 1,5 A |
 
 Einordnung: 4,1 A ist der rechnerische Grenzfall (beide Motoren blockiert
@@ -107,8 +107,9 @@ die Massefläche nicht erreicht.
 - **Meist genügt ein Via:** Taste **V** neben dem Pad, dann eine kurze Bahn
   vom Pad zum Via. Das Via verbindet sich mit der Fläche der anderen Lage von
   selbst.
-- **Ausnahme Klinkenbuchse J6 auf Top:** Ihr Schirmpad ragt absichtlich über
-  die Boardkante. Dort geht kein Via — eine kurze Bahn nach innen zur Fläche.
+- **Was `tools/rest_schliessen.py` liegen lässt** (es probiert Stitch-Vias
+  und gerade Züge automatisch, mit DRC-Rückabwicklung), braucht einen
+  Umweg: erst eine kurze Bahn vom Pad weg, dann das Via.
 
 ## 4. Danach — und das ist wichtig
 
