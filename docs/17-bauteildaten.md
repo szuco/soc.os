@@ -141,6 +141,17 @@ verdrahtet. Beides stand hier trotzdem noch als offen — die Doku hinkte.
 > rechts) landet quer eingebaut auf dem **obersten** Pad (y = −3,55).
 > Faltwulst ≈ 0,5 endet bei x ≈ 18,3, der H2-Schraubkopf beginnt erst
 > bei 19,25 — Prüfpunkt für den Musteraufbau.
+>
+> **Kann eine zu lange Fahne die Zentralscheibe stören? Nein.** Gelötet
+> wird vor dem Falten, die 2,0-mm-Finger auf 3,2-mm-Pads geben ±0,6
+> Positionierspiel; was übrig bleibt, geht in die Schlaufe, und dort
+> wird aus +0,3 Länge nur ~0,1 mehr Radius (ΔL = π·Δr, Wulst 0,5 → 0,6).
+> Die Scheibe ist weit weg: Rastnase x = 25,0, Wand innen 26,6, Kavität
+> ab z ≈ 24,65 — die Schlaufe bleibt unter der Panel-Vorderseite (22,75),
+> darüber federt der Schaum (1,90). Eng ist allein der **H2-Schraubkopf
+> (ab 19,25, ≈ 0,9 frei)**; zweites Risiko ist die Sandwich-Dicke
+> (FPC 0,13 + Lot in der 0,15er-Fuge — Falten heben das Panel lokal an,
+> kosten Schaumweg, erreichen die Scheibe aber nicht).
 
 **Stand 20.08. abends — die Kette ist durchgerechnet** (TE 1734839 ist
 laut Herstellerserie ein **Top-Kontakt**-Verbinder; alle Biegungen der
