@@ -41,6 +41,15 @@ Gerber dafür erzeugt derselbe Ablauf wie unten, nur mit
 **2 Lagen, 1,0 mm, beliebige Farbe** wählen; Stückzahl 5 ist das Minimum und
 mehr als genug.
 
+### Panel-DRC: zwölf bekannte Meldungen, bewusst akzeptiert (20.08.2026)
+
+Die DRC des Nutzens meldet 6× `items_not_allowed` und 6×
+`npth_inside_courtyard` — alle zwölf sind **dieselbe Sache**: Die
+Mausbiss-Bohrungen des Stegs an der 12-Uhr-Kante des Mid-Boards liegen in
+der (absichtlich riesigen) ESP32-Sperrfläche. Dort ist kein Kupfer im
+Spiel, und die Bohrungen verschwinden mitsamt dem Steg beim Heraustrennen.
+Kein Handlungsbedarf; alles andere im Nutzen ist kupferfehlerfrei.
+
 ## 2. Die Dateien
 
 ```

@@ -1,0 +1,50 @@
+%TF.GenerationSoftware,KiCad,Pcbnew,10.0.5*%
+%TF.CreationDate,2026-08-20T09:48:50+02:00*%
+%TF.ProjectId,stern_puck,73746572-6e5f-4707-9563-6b2e6b696361,rev?*%
+%TF.SameCoordinates,Original*%
+%TF.FileFunction,Copper,L2,Bot*%
+%TF.FilePolarity,Positive*%
+%FSLAX46Y46*%
+G04 Gerber Fmt 4.6, Leading zero omitted, Abs format (unit mm)*
+G04 Created by KiCad (PCBNEW 10.0.5) date 2026-08-20 09:48:50*
+%MOMM*%
+%LPD*%
+G01*
+G04 APERTURE LIST*
+%TA.AperFunction,ComponentPad*%
+%ADD10C,1.600000*%
+%TD*%
+%TA.AperFunction,ComponentPad*%
+%ADD11C,2.600000*%
+%TD*%
+%TA.AperFunction,Conductor*%
+%ADD12C,0.800000*%
+%TD*%
+G04 APERTURE END LIST*
+D10*
+%TO.P,X1,1*%
+%TO.N,STAR_PLUS*%
+X0Y0D03*
+%TO.P,X1,2*%
+%TO.N,STAR_MINUS*%
+X-1850000Y0D03*
+%TO.P,X1,3*%
+X1850000Y0D03*
+D11*
+%TO.P,X1,4*%
+%TO.N,STAR_PLUS*%
+X-2600000Y-5000000D03*
+%TO.P,X1,5*%
+%TO.N,STAR_MINUS*%
+X2600000Y-5000000D03*
+%TD*%
+%TO.N,STAR_MINUS*%
+D12*
+X1850000Y0D02*
+X2600000Y-5000000D01*
+X0Y2200000D02*
+X1850000Y0D01*
+X-1850000Y0D02*
+X0Y2200000D01*
+%TD*%
+M02*

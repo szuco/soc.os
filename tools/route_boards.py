@@ -137,6 +137,14 @@ CLASSES = {
             "24V_IN", "24V_F", "24V_PROT", "M1_A", "M1_B", "M2_A", "M2_B",
             "M1_SWA", "M1_SWB", "M2_SWA", "M2_SWB",
         ]),
+        # Messsignale mit ZWANGSABSTAND (20.08.2026): Freerouting hatte
+        # M1_ISNS an die Vergleichsschwelle V_TRIP_LO gepresst - vier
+        # Kurzschluesse, und sachlich die schlechteste Paarung des Boards
+        # (docs/16). 300 um Klassenabstand zwingen die Trennung, die der
+        # Kommentar bisher nur erbat.
+        "SENSE": (250, 300, VIA_STD, [
+            "M1_ISNS", "M2_ISNS", "V_TRIP_LO", "V_TRIP_HI",
+        ]),
         "RAIL": (500, 200, VIA_PWR, [
             "5V_BUCK", "5V_SYS", "3V3_SYS", "6V2_STAR", "6V2_STAR_F",
             "12V_RAW", "12V_GATE", "U2_SW", "U3_SW", "U4_SW", "USB_VBUS",
@@ -236,7 +244,17 @@ def _square_bars(gap=None):
     return bars
 
 
-def _edge_ring(src, slit=None, square=False):
+# Zusaetzliche Rechteck-Keepouts je Board, in DSN-Koordinaten (y gekippt).
+# LEER, aber mit Geschichte: Fuer Mid war hier ein Keepout um die beiden
+# NPTH-Loecher der USB-Buchse geplant (Freerouting kennt die projekteigene
+# Bohrungsabstand-Regel nicht; eine RELAY_CTL-Bahn lief 0,08 mm daran
+# vorbei). Verworfen: Die USB-Pads liegen nur 1,0 mm neben den Loechern -
+# jeder wirksame Keepout haette sie mitabgedeckt und die USB-Netze
+# unroutbar gemacht. Die Regel bleibt DRC-geprueft und notfalls Handarbeit.
+EXTRA_KEEPOUTS = {}
+
+
+def _edge_ring(src, slit=None, square=False, extra=()):
     """Randkeepout in den DSN-Structure-Block einfuegen.
 
     KiCad exportiert die Kante ohne den Kupfer-Randabstand, und Freerouting
@@ -260,6 +278,11 @@ def _edge_ring(src, slit=None, square=False):
                  ((s1, (s0 + 360.0 + s1) / 2.0 + 2.5),
                   ((s0 + 360.0 + s1) / 2.0 - 2.5, s0 + 360.0))]
 
+    for x0, x1, y0, y1 in extra:
+        pts = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+        polys.append(" ".join("%.1f %.1f" % (x * 1000, y * 1000)
+                              for x, y in pts))
+
     layers = re.findall(r'\(layer (\S+)\s*\n\s*\(type signal\)', src)
     if not layers:
         layers = ["F.Cu", "B.Cu"]
@@ -280,9 +303,9 @@ def _edge_ring(src, slit=None, square=False):
     return src[:i + 1] + "\n" + "\n".join(blocks) + src[i + 1:]
 
 
-def patch_dsn(path, classes, slit=None, square=False):
+def patch_dsn(path, classes, slit=None, square=False, extra=()):
     src = open(path, encoding="utf-8").read()
-    src = _edge_ring(src, slit=slit, square=square)
+    src = _edge_ring(src, slit=slit, square=square, extra=extra)
 
     via_std, via_pwr = _via_names(src)
 
@@ -436,7 +459,8 @@ def route(name, passes=None, timeout=None):
     pcbnew.ExportSpecctraDSN(board, dsn)
     # Top: Schlitz im Ring-Keepout am USB-C-Sektor (270 Grad), dessen
     # Pads beabsichtigt ueber die Boardkante ragen
-    patch_dsn(dsn, CLASSES.get(name, {}), square=(name == "top_ui"))
+    patch_dsn(dsn, CLASSES.get(name, {}), square=(name == "top_ui"),
+              extra=EXTRA_KEEPOUTS.get(name, ()))
     print("%-20s DSN exportiert und gepatcht" % name)
 
     if os.path.exists(ses):

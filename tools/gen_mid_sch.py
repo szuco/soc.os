@@ -68,7 +68,7 @@ def build():
     # =====================================================================
     s.add("U1", "RF_Module:ESP32-S3-WROOM-1", "ESP32-S3-WROOM-1-N16R8",
           "RF_Module:ESP32-S3-WROOM-1",
-          MPN="Antenne zeigt zur Front (+Y), Keepout auf allen Lagen")
+          MPN="Antenne zeigt zur Front (+Y), Keepout auf allen Lagen, LCSC C2913202")
     s.connect("PGND",    ("U1", "1"), ("U1", "40"), ("U1", "41"))
     s.connect("3V3_SYS", ("U1", "2"))
     s.connect("ESP_EN",  ("U1", "3"))
@@ -138,7 +138,7 @@ def build():
 
     # ESD direkt an der Buchse, danach an den Prozessor
     s.add("U5", "Power_Protection:USBLC6-2SC6", "USBLC6-2SC6",
-          "Package_TO_SOT_SMD:SOT-23-6")
+          "Package_TO_SOT_SMD:SOT-23-6", MPN="USBLC6-2SC6, LCSC C7519")
     s.connect("USB_DN_C", ("U5", "1"))
     s.connect("PGND",     ("U5", "2"))
     s.connect("USB_DP_C", ("U5", "3"))
@@ -188,7 +188,7 @@ def build():
     # =====================================================================
     s.add("U2", "Interface_UART:MAX3485", "MAX3485",
           "Package_SO:SOIC-8_3.9x4.9mm_P1.27mm",
-          MPN="3,3-V-Typ; Pinbelegung gegen Datenblatt pruefen")
+          MPN="3,3-V-Typ; Pinbelegung gegen Datenblatt pruefen, LCSC C18148")
     s.connect("UART485_RX", ("U2", "1"))      # RO -> ESP RX
     s.connect("RS485_DIR",  ("U2", "2"), ("U2", "3"))   # ~RE + DE gemeinsam
     s.connect("UART485_TX", ("U2", "4"))      # DI <- ESP TX
@@ -236,7 +236,7 @@ def build():
     # (3,9 x 9,9). ESPHome kennt ihn als pcf8574 mit pcf8575: true.
     s.add("U3", "Interface_Expansion:PCF8575DBR", "PCF8575",
           "Package_SO:SSOP-24_5.3x8.2mm_P0.65mm",
-          MPN="Adresse 0x20: A0=A1=A2=GND - muss zur YAML passen")
+          MPN="Adresse 0x20: A0=A1=A2=GND - muss zur YAML passen, LCSC C12251")
     s.connect("PGND",     ("U3", "2"), ("U3", "3"), ("U3", "12"), ("U3", "21"))
     s.connect("3V3_SYS",  ("U3", "24"))
     s.connect("I2C_SCL",  ("U3", "22"))

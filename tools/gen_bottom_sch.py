@@ -161,7 +161,7 @@ def build():
     def buck_tps54360(u, rail, r_hi, r_lo, l_val, cout, cout_fp):
         """TPS54360: 60 V Eingang, Vref 0,8 V."""
         s.add(u, "Regulator_Switching:TPS54360DDA", "TPS54360",
-              "Package_SO:HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm")
+              "Package_SO:HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm", MPN="TPS54360DDAR, LCSC C44377")
         s.connect("24V_PROT", (u, "2"))
         s.connect("PGND",     (u, "7"), (u, "9"))
         s.connect(u + "_SW",   (u, "8"))
@@ -219,7 +219,7 @@ def build():
 
     # 5 V -> 3,3 V : TLV62569, Vref 0,6 V -> 0,6 x (1 + 180k/40k2) = 3,29 V
     s.add("U3", "Regulator_Switching:TLV62569DBV", "TLV62569",
-          "Package_TO_SOT_SMD:SOT-23-5")
+          "Package_TO_SOT_SMD:SOT-23-5", MPN="TLV62569DBVR, LCSC C141836")
     s.connect("5V_SYS", ("U3", "4"), ("U3", "1"))
     s.connect("PGND",   ("U3", "2"))
     s.connect("U3_SW",  ("U3", "3"))
@@ -302,7 +302,7 @@ def build():
 
         s.add("U%s_BR" % p, "Driver_Motor:DRV8871DDA", "DRV8871",
               "Package_SO:HSOP-8-1EP_3.9x4.9mm_P1.27mm_EP2.41x3.1mm_ThermalVias",
-              MPN="45 V, 3,6 A Spitze, Strombegrenzung ueber ILIM - "
+              MPN="45 V, 3,6 A Spitze, Strombegrenzung ueber ILIM - , LCSC C75864"
                   "Thermalpad an PGND anbinden")
         s.connect("PGND",      ("U%s_BR" % p, "1"), ("U%s_BR" % p, "7"),
                   ("U%s_BR" % p, "9"))
@@ -335,7 +335,7 @@ def build():
         for leg, inp in (("A", "%s_INA" % p), ("B", "%s_INB" % p)):
             g = "U%s_G%s" % (p, leg)
             s.add(g, "74xGxx:74AHC1G08", "74AHC1G08",
-                  "Package_TO_SOT_SMD:SOT-353_SC-70-5")
+                  "Package_TO_SOT_SMD:SOT-353_SC-70-5", MPN="74AHC1G08GW, LCSC C12490")
             s.connect(inp,            (g, "1"))
             s.connect(sd,             (g, "2"))
             s.connect("PGND",         (g, "3"))
@@ -362,7 +362,7 @@ def build():
         # Strommessverstaerker, bidirektional, aus 3,3 V -> ADC-sicher
         amp = "U%s_CS" % p
         s.add(amp, "Amplifier_Current:INA240A2D", "INA240A2", SOIC8,
-              MPN="Pinbelegung gegen Datenblatt pruefen")
+              MPN="Pinbelegung gegen Datenblatt pruefen, LCSC C2060768")
         s.connect(p + "_SWA",  (amp, "8"))
         s.connect(out_a,       (amp, "1"))
         s.connect("AGND",      (amp, "2"), (amp, "4"))
@@ -431,8 +431,12 @@ def build():
 
         # Latch: Trip setzt asynchron, Reset ueber TRIP_RST und Power-On-RC
         ff = "U%s_FF" % p
+        # VSSOP-8, nicht SOT-353 (20.08.2026): Ein D-Flip-Flop hat 8 Pins,
+        # das SC-70-5 nur fuenf Pads - Pins 6/7/8 hingen in der Luft, das
+        # Board waere unbestueckbar gewesen. Aufgefallen beim LCSC-Abgleich.
         s.add(ff, "74xGxx:74AUP1G74", "74AUP1G74",
-              "Package_TO_SOT_SMD:SOT-353_SC-70-5", MPN="D-FF mit PRE und CLR")
+              "Package_SO:VSSOP-8_2.3x2mm_P0.5mm",
+              MPN="SN74AUP1G74DCUR, D-FF mit PRE und CLR, LCSC C140267")
         s.connect("AGND",      (ff, "1"), (ff, "2"), (ff, "4"))
         s.connect("3V3_SYS",   (ff, "8"))
         s.connect(p + "_TRIP", (ff, "7"))     # ~PRE, aktiv low

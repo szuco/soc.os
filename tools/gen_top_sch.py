@@ -93,7 +93,7 @@ def build():
     # =====================================================================
     s.add("U2", "Sensor_Humidity:SHT4x", "SHT40-AD1B",
           "Sensor_Humidity:Sensirion_DFN-4_1.5x1.5mm_P0.8mm_SHT4x_NoCentralPad",
-          MPN="Adresse 0x44 - muss zur YAML passen; thermisch vom Board entkoppeln (Schlitze)")
+          MPN="Adresse 0x44 - muss zur YAML passen; thermisch vom Board entkoppeln (Schlitze), LCSC C2909890")
     s.connect("I2C_SDA", ("U2", "1"))
     s.connect("I2C_SCL", ("U2", "2"))
     s.connect("3V3_SYS", ("U2", "3"))
@@ -268,7 +268,7 @@ def build():
     # Litzen WAAGERECHT - genau in die Kabelkerbe.
     s.add("J6", "Connector_Generic:Conn_01x02", "Stern (intern)",
           "Connector_JST:JST_GH_SM02B-GHS-TB_1x02-1MP_P1.25mm_Horizontal",
-          MPN="JST GH SM02B-GHS-TB, 2-polig liegend mit Verriegelung")
+          MPN="JST GH SM02B-GHS-TB(LF)(SN), 2-polig liegend, LCSC C189893")
     s.connect("STAR_OUT", ("J6", "1"))
     s.connect("PGND",     ("J6", "2"))
 

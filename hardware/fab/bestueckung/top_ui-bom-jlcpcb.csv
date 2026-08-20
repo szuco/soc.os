@@ -17,6 +17,6 @@ J_STK_A,J2,PinSocket_2x20_P1.27mm_Vertical,
 J_STK_B,J3,PinSocket_2x20_P1.27mm_Vertical,
 N-FET 30V 1A,Q_BL,SOT-23,
 P-FET 20V 1A,Q2,SOT-23,
-SHT40-AD1B,U2,Sensirion_DFN-4_1.5x1.5mm_P0.8mm_SHT4x_NoCentralPad,
-Stern (intern),J6,JST_GH_BM02B-GHS-TBT_1x02-1MP_P1.25mm_Vertical,
+SHT40-AD1B,U2,Sensirion_DFN-4_1.5x1.5mm_P0.8mm_SHT4x_NoCentralPad,C2909890
+Stern (intern),J6,JST_GH_SM02B-GHS-TB_1x02-1MP_P1.25mm_Horizontal,C189893
 VL53L1X,U3,ST_VL53L1x,
