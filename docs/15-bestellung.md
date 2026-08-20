@@ -10,6 +10,46 @@ die begründet, *warum* die Daten so aussehen.
 > bestellen. Wenn `gen_fab.py` kein ZIP herausgibt, ist die Bestellung noch
 > nicht dran, egal wie fertig alles andere aussieht.
 
+## 0. Die Reihenfolge der Abarbeitung (20.08.2026)
+
+Zwei harte Tore bestimmen den Ablauf: Das **Papiermodell der Displayfahne**
+(docs/17) entscheidet, ob J5 richtig herum sitzt — und Top steckt im
+Nutzen, also hängt die GESAMTE Platinenbestellung daran. Und `gen_fab.py`
+gibt **keine Gerber heraus, solange ein Netz offen ist**.
+
+**Schritt 1 — Papiermodell der Fahne (30 Minuten, zuerst!).**
+Fahne im Maßstab aus Papier, falten, durch den Schlitz stecken:
+Kontaktseite und Pinreihenfolge prüfen. Falsch herum → J5 wird die
+gespiegelte Buchsenvariante, ein Abend Umbau — deshalb VOR allem anderen.
+
+**Schritt 2 — Handarbeit in KiCad (docs/16).**
+Offene Netze schließen (Top 11, Mid 4, Bottom 4), Masse-Inseln, die
+Via-Engpassliste. Danach Zonen füllen, DRC bis `unconnected = 0`.
+
+**Schritt 3 — Fertigungsdaten erzeugen.**
+`gen_panel.py` → `gen_fab.py` (das Gate öffnet sich) → `gen_assembly.py`.
+Ergebnis: Gerber-ZIP, BOM, CPL für den Nutzen.
+
+**Schritt 4 — parallel dazu: Messen und Testdruck.**
+F14/F15/F16 am echten Rahmen/Scheibe/Dose messen → Werte in die PARAMS
+von `adapter.py`/`tragring.py`/`gehaeuse.py` → Teile drucken →
+Prüfpunkte 25/51/62/63/67 am Druck. Unabhängig von den Platinen.
+
+**Schritt 5 — parallel dazu: Bestellungen ohne Tor.**
+Mouser-Sammelbestellung (Abschnitt 2c), Display bei BuyDisplay (nach
+Schritt 1!), Stapelverbinder-Paar aus dem Herstellerkatalog (Punkt 23),
+Lötscheibe (`stern_puck_gerber.zip` liegt), DCX-909-Set, Hülsen M2,5 × 9.
+
+**Schritt 6 — JLCPCB-Bestellung (nach 2 + 3).**
+ZIP hochladen, BOM/CPL dazu, die ~29 Extended-Positionen per
+Parametersuche wählen (E96-Werte, 1210-Kondensatoren, Zener),
+VL53L1X als Global Sourcing, **Drehwinkel in der Vorschau prüfen**
+(Abschnitt 4), bestellen.
+
+**Schritt 7 — Aufbau (wenn alles da ist).**
+Kabelbaum crimpen, Lötscheibe konfektionieren, Montage nach docs/04
+(acht Schritte), flashen über USB-C bei abgenommener Scheibe.
+
 ## 1. Was bestellt wird
 
 **Ein Nutzen, nicht drei Platinen.** `hardware/fab/panel/` enthält alle drei
