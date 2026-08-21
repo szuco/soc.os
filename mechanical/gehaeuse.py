@@ -35,6 +35,21 @@ Geraeteschrauben an die Dose.
 Rueckwand: Fenster fuer den Micro-Fit-Feldstecker samt Rastnase - die
 vorverdrahtete Leiste wird durch dieses Fenster gesteckt, BEVOR der
 Becher in die Dose geht.
+
+KOORDINATEN - die Falle vom 21.08.2026
+--------------------------------------
+Alle PARAMS unten stehen in LAYOUT-Koordinaten, also wie in KiCad:
+x nach rechts, y NACH UNTEN. build123d (und der STEP-Export von KiCad)
+zaehlen y dagegen NACH OBEN. Jede Feature-Lage, die aus dem Layout
+kommt, wird deshalb beim Bauen mit -y gespiegelt; die Parameter selbst
+bleiben vergleichbar mit gen_layouts.py, und die Zeichnungen, die sie
+lesen, stimmen weiter.
+
+Gefunden hat das der Nutzer mit blossem Auge ("warum hat der Tragring
+oben eine Aussparung?"). Nachgemessen am exportierten Top-Board: Die
+USB-Randkerbe steht im Layout bei y = +8 und im STEP bei y = -8.
+Betroffen waren drei Ausschnitte - USB-Freistellung, Kabeldurchlass
+und Steckertunnel -, alle drei auf der falschen Seite.
 """
 
 import math
@@ -72,8 +87,11 @@ PARAMS = dict(
     # --- Feldstecker-Fenster in der Rueckwand ------------------------------
     # Micro-Fit 43045-1612 bei (-10,5 / 15,6), Koerper 16,4 x 8,6; die
     # Rastnase der Kabelleiste braucht nach oben Luft.
-    fenster_x         = -10.5,
-    fenster_y         = 15.6,
+    # J1 steht laut gen_layouts.py bei (0,0 / 17,5) - hier standen
+    # -10,5 / 15,6, eine Position aus einem frueheren Layoutstand.
+    # Layout-Koordinaten, beim Bauen mit -y gespiegelt (siehe Kopf).
+    fenster_x         = 0.0,
+    fenster_y         = 17.5,
     fenster_b         = 18.0,
     fenster_h         = 11.0,
 
@@ -115,7 +133,7 @@ def _becher(p):
         # Wandring (ab 26,2) liegt - das Fenster muss also auch die Wand
         # an dieser Stelle oeffnen, nicht nur die Rueckwand.
         with BuildSketch(Plane.XY.offset(-tief - 0.5)):
-            with Locations((p["fenster_x"], p["fenster_y"])):
+            with Locations((p["fenster_x"], -p["fenster_y"])):
                 Rectangle(p["fenster_b"], p["fenster_h"])
         extrude(amount=tief + 0.5, mode=Mode.SUBTRACT)
 
@@ -205,7 +223,7 @@ def check_gehaeuse(part, p):
           "Schraubkanal-Rohr rechts")
     clear(Pos(p["schraube_x"], 0, -tief + p["boden_t"] / 2.0)
           * Box(1.6, 1.6, p["boden_t"] + 0.6), "Schraubbohrung rechts")
-    clear(Pos(p["fenster_x"], p["fenster_y"], -tief + p["boden_t"] / 2.0)
+    clear(Pos(p["fenster_x"], -p["fenster_y"], -tief + p["boden_t"] / 2.0)
           * Box(p["fenster_b"] - 1, p["fenster_h"] - 1, p["boden_t"] + 1),
           "Steckerfenster")
     solid(Pos(p["boss_r"] * math.cos(math.radians(15)),

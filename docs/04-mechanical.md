@@ -564,6 +564,32 @@ Nutzerbefund 21.08.) — der Becher bekommt vier Fenster à 10 statt zwei
 Kabeleinführungen bei ~50 mm Tiefe sind günstig: Der Kabelbogen muss
 nicht mehr hinter den Stecker, er kommt von der Seite.
 
+**Die y-Falle — drei Ausschnitte lagen spiegelverkehrt (21.08., mit
+bloßem Auge gefunden: „warum hat der Tragring oben eine Aussparung?").**
+KiCad zählt y **nach unten**, build123d und der STEP-Export **nach
+oben**. Die gedruckten Teile hatten Layout-Zahlen direkt übernommen —
+damit saßen **USB-Freistellung** (Adapter), **Kabeldurchlass**
+(Tragring) und **Steckertunnel** (Becher) alle auf der falschen Seite.
+Nachgemessen am exportierten Top-Board: Die USB-Randkerbe steht im
+Layout bei y = +8 und im STEP bei y = −8 — Beweis geführt, nicht
+vermutet. Der Steckertunnel war zusätzlich an einer veralteten
+Position (−10,5 / 15,6 statt J1 bei 0,0 / 17,5).
+
+Behoben, indem die PARAMS in Layout-Koordinaten **bleiben** (so bleiben
+sie mit `gen_layouts.py` vergleichbar und die Zeichnungen, die sie
+lesen, stimmen weiter) und die `build_*`-Funktionen beim Erzeugen mit
+−y spiegeln; der Konventionsblock steht im Kopf aller drei Dateien.
+
+**Warum das keiner der Selbsttests gemerkt hat — und was jetzt anders
+ist:** Fenster und Prüfkörper kamen aus **derselben** Konstante, jede
+Verschiebung hob sich auf. `mechanical/pruefe_einbau.py` liest die
+Gegenstücke jetzt per `ast` aus `gen_layouts.py` (Feldstecker J1,
+USB-Buchse J7, Kabelkerbe) und prüft sie boolesch gegen die gedruckten
+Teile — die Teile müssen sich nach dem Layout richten, nicht umgekehrt.
+Der Fehler war damit reproduzierbar (212 mm³ Stecker im Becherboden,
+76 mm³ Buchse im Adapter), und die Prüfung ist grün, seit er behoben
+ist.
+
 **Warum Tragring und Scheibenadapter so filigran aussehen — und warum
 das kein Fehler ist (21.08., Einwand des Nutzers):** Beide Teile sind
 fast nur Wände, und **jede dieser Wandstärken ist von den

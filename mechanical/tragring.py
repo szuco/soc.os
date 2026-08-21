@@ -26,6 +26,21 @@ loest zwei Schrauben von vorn.
 MASSVORBEHALT: Die Rahmenmasse F11/F13 (docs/04) sind weiterhin ungemessen.
 frame_grip = 70 stammt aus der Messung am Adapter-Vorgaenger; die
 Klemmhoehe der Doppelstege ist eine Annahme und gehoert zum Testdruck.
+
+KOORDINATEN - die Falle vom 21.08.2026
+--------------------------------------
+Alle PARAMS unten stehen in LAYOUT-Koordinaten, also wie in KiCad:
+x nach rechts, y NACH UNTEN. build123d (und der STEP-Export von KiCad)
+zaehlen y dagegen NACH OBEN. Jede Feature-Lage, die aus dem Layout
+kommt, wird deshalb beim Bauen mit -y gespiegelt; die Parameter selbst
+bleiben vergleichbar mit gen_layouts.py, und die Zeichnungen, die sie
+lesen, stimmen weiter.
+
+Gefunden hat das der Nutzer mit blossem Auge ("warum hat der Tragring
+oben eine Aussparung?"). Nachgemessen am exportierten Top-Board: Die
+USB-Randkerbe steht im Layout bei y = +8 und im STEP bei y = -8.
+Betroffen waren drei Ausschnitte - USB-Freistellung, Kabeldurchlass
+und Steckertunnel -, alle drei auf der falschen Seite.
 """
 
 import os
@@ -82,7 +97,8 @@ def build_tragring(p=PARAMS):
             # zentrale Oeffnung - der Scheibenadapter taucht hindurch
             Rectangle(p["open_sq"], p["open_sq"], mode=Mode.SUBTRACT)
             # Kabeldurchlass, offen zur Kante
-            with Locations((0, (p["kabel_y0"] + half) / 2.0)):
+            # -y: kabel_y0 ist Layout-Koordinate (unten = +y in KiCad)
+            with Locations((0, -(p["kabel_y0"] + half) / 2.0)):
                 Rectangle(p["kabel_w"], half - p["kabel_y0"] + 1.0,
                           mode=Mode.SUBTRACT)
             # KEINE Bajonettschlitze mehr (Konzept v3, 21.08.): Die Dose
@@ -126,7 +142,8 @@ def check_tragring(part, p=PARAMS):
         if (part & Pos(x, y, p["t"] / 2.0) * Box(0.6, 0.6, p["t"] - 0.4)).volume < 1e-6:
             errs.append("kein Material: %s" % name)
     # Kabeldurchlass frei
-    if (part & Pos(0, half - 2.0, p["t"] / 2.0) * Box(4.0, 2.0, p["t"] + 1.0)).volume > 1e-6:
+    if (part & Pos(0, -(half - 2.0), p["t"] / 2.0)
+            * Box(4.0, 2.0, p["t"] + 1.0)).volume > 1e-6:
         errs.append("Kabeldurchlass nicht frei")
     # Die Oeffnung selbst frei - auch dort, wo frueher USB-Freistellung
     # und Huelsenfuehrungen extra geschnitten waren.

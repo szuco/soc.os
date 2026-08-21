@@ -53,6 +53,21 @@ Daraus folgen zwei Dinge, die nicht verhandelbar sind:
     und mit Randabstand braucht es mindestens 45,4.
 
 Alle Masse in mm. Aenderungen ausschliesslich im PARAMS-Block.
+
+KOORDINATEN - die Falle vom 21.08.2026
+--------------------------------------
+Alle PARAMS unten stehen in LAYOUT-Koordinaten, also wie in KiCad:
+x nach rechts, y NACH UNTEN. build123d (und der STEP-Export von KiCad)
+zaehlen y dagegen NACH OBEN. Jede Feature-Lage, die aus dem Layout
+kommt, wird deshalb beim Bauen mit -y gespiegelt; die Parameter selbst
+bleiben vergleichbar mit gen_layouts.py, und die Zeichnungen, die sie
+lesen, stimmen weiter.
+
+Gefunden hat das der Nutzer mit blossem Auge ("warum hat der Tragring
+oben eine Aussparung?"). Nachgemessen am exportierten Top-Board: Die
+USB-Randkerbe steht im Layout bei y = +8 und im STEP bei y = -8.
+Betroffen waren drei Ausschnitte - USB-Freistellung, Kabeldurchlass
+und Steckertunnel -, alle drei auf der falschen Seite.
 """
 
 from pathlib import Path
@@ -285,8 +300,9 @@ def build_adapter(p=PARAMS):
 
         # -- Freistellung fuer die USB-C-Buchse: Kerbe der linken Kante ----
         with BuildSketch(Plane.XY) as u:
+            # -y: PARAMS sind Layout-Koordinaten (siehe Kopf)
             with Locations(((p["usb_relief_x0"] + p["usb_relief_x1"]) / 2.0,
-                            (p["usb_relief_y0"] + p["usb_relief_y1"]) / 2.0)):
+                            -(p["usb_relief_y0"] + p["usb_relief_y1"]) / 2.0)):
                 Rectangle(p["usb_relief_x1"] - p["usb_relief_x0"],
                           p["usb_relief_y1"] - p["usb_relief_y0"])
         extrude(amount=z["total"], mode=Mode.SUBTRACT)

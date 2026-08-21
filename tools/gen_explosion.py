@@ -408,12 +408,13 @@ def panel_a(x0, y0):
 
     # Feldstecker - das ERSTE Teil der Kette: Die vorverdrahtete
     # Micro-Fit-Leiste klickt von hinten an Bottom, bevor der Stapel in
-    # die Dose geht. Er sitzt bei y = 15,6 und ist hier projiziert.
+    # die Dose geht. J1 sitzt laut gen_layouts bei (0,0 / 17,5) und ist
+    # hier in die Schnittebene projiziert.
     s.gruppe("feld", -6.6, 0.0)
     s.teil("feld", -6.6, 0.0, -18.7, -2.3, BAUTEIL)
     s.fahne("feld", -6.6, r,
             ["Feldstecker Molex Micro-Fit 43045-1612",
-             "16-polig · gecrimpt · projiziert (y = 15,6)",
+             "16-polig · gecrimpt · projiziert (y = 17,5)",
              "steckt von hinten durch den Tunnel des Bechers"])
 
     # Gehaeuse-Becher - das Untergeschoss des gedruckten Tragrings.
