@@ -24,9 +24,23 @@ sind entfallen. Kontaktseite und Pinreihenfolge sind damit analytisch
 geklärt (docs/17). Das Papiermodell bleibt nur als Kontrolle am ersten
 Muster. **Dieses Tor ist offen — die Bestellung hängt nicht mehr daran.**
 
-**Schritt 2 — Handarbeit in KiCad (docs/16).**
-Offene Netze schließen (Top 11, Mid 4, Bottom 4), Masse-Inseln, die
-Via-Engpassliste. Danach Zonen füllen, DRC bis `unconnected = 0`.
+**Schritt 2 — Handarbeit in KiCad (docs/16). DAS EINZIGE TOR VOR DEN
+GERBER-DATEN.** Stand 21.08.2026: **48 offene Verbindungen** (Top 5,
+Mid 15, Bottom 28) bei **0 Kupferfehlern** auf allen drei Boards. Was
+automatisch zu schließen war, ist geschlossen — `rest_schliessen.py`
+hat drei Runden lang Stitch-Vias und gerade Züge gesetzt und alles
+zurückgenommen, was die DRC verschlechtert hätte. Der Rest sind fast
+ausschließlich Seitenwechsler, die ein Via **mit kurzem Umweg**
+brauchen (erst eine Bahn vom Pad weg, dann das Via) — das kann kein
+Skript blind. Begleiter: `tools/handarbeit_liste.py` nach jedem
+Speichern aufrufen, die Liste schrumpft mit. Danach Zonen füllen (**B**),
+DRC bis `unconnected = 0`, dazu die Via-Engpassliste in docs/16 2b.
+
+> **Nach jedem `gen_layouts.py`-Lauf: `tools/lcsc_nachtragen.py`
+> erneut ausführen.** Am 21.08. aufgeflogen: Der J5-Umzug hat das
+> Top-Board neu erzeugt — und damit alle 18 LCSC-Felder darauf
+> gelöscht. Das Gate merkt das nicht, die Bestückung wäre unvollständig
+> ins Portal gegangen.
 
 **Schritt 3 — Fertigungsdaten erzeugen.**
 `gen_panel.py` → `gen_fab.py` (das Gate öffnet sich) → `gen_assembly.py`.
