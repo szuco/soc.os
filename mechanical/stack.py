@@ -44,9 +44,23 @@ OUT = os.path.join(ROOT, "mechanical", "export", "switchstack_stack.step")
 
 # (Datei, z der Platinen-RUECKSEITE in mm)
 TEILE = [
+    # EBENENABSTAND 5,0 statt 9,0 (21.08.2026, Entscheidung des Nutzers
+    # nach der Steckverbinder-Recherche, Punkt 23): Eine erhoehte
+    # 1,27-mm-Buchse mit 9 mm Bauhoehe existiert nicht - herstellerweit
+    # ist bei 4,0..4,6 mm Schluss. Mit einem kurzen Stapel greifen
+    # dagegen ganz normale Katalogteile (Buchse 4,3 + durchgesteckter
+    # Stift 8,1), das Durchsteck-Konzept bleibt, und die Lochbilder
+    # aller drei Boards bleiben unveraendert.
+    #
+    # Gegenprobe der Bauteilhoehen (per Kollisionspruefung):
+    #   Bottom-Vorderseite -> Mid: hoechstes Teil Drossel SRP7028A 2,8
+    #   Mid-Vorderseite -> Top:    ESP32-Modul 3,2 und J6 4,25, die sich
+    #                              oertlich NICHT ueberlappen
+    # 5,0 mm reichen also mit Luft; die USB-C-Buchse ragt wie bisher
+    # durch die Randkerbe des Top-Boards.
     ("bottom_power_motor.step", 0.0),
-    ("mid_logic.step", 10.0),
-    ("top_ui.step", 20.0),
+    ("mid_logic.step", 6.0),
+    ("top_ui.step", 12.0),
 ]
 
 # Der Adapter sitzt vor dem Top-Board. Seine Platinentasche nimmt das
@@ -70,13 +84,13 @@ TEILE = [
 # Adapters haelt die Platinenrueckseite, und die sitzt jetzt 5,0 statt
 # 5,5 hinter der Sichtflaeche - der Adapter rueckt 0,5 nach hinten.
 # gen_explosion.py prueft diesen Wert gegen die Adapterparameter.
-# 15,5 seit der Einbaupruefung (21.08.): flange_t 2,5 -> 2,0, der
-# Adapter endet buendig auf der Wandebene statt 0,5 in der Dosenoeffnung
-# (Ecken gegen Dosenrand). Rechnung: Rueckseite Top (20,0) - seat (4,5).
-ADAPTER = ("adapter.step", 15.5)
-# Der Tragring liegt auf der Wandebene: Rahmenvorderkante 27,5 minus
-# Rahmentiefe 12. Der Adapter-Basisring taucht durch seine Oeffnung.
-TRAGRING = ("tragring.step", 15.5)
+# 7,5 seit dem kurzen Stapel (21.08.): Rueckseite Top (12,0) - seat (4,5).
+# Der Wert davor war 15,5 bei Top-Rueckseite 20,0 - dieselbe Rechnung.
+ADAPTER = ("adapter.step", 7.5)
+# Der Tragring liegt auf der Wandebene - dieselbe Ebene wie die
+# Adapterrueckseite (7,5 seit dem kurzen Stapel). Der Adapter-Basisring
+# taucht durch seine Oeffnung, sein Kragen legt sich auf die Platte.
+TRAGRING = ("tragring.step", 7.5)
 # Der Becher ist in seinen eigenen Koordinaten schon richtig gelagert
 # (z 0 = Rueckseite Bottom-Board), deshalb Versatz 0.
 GEHAEUSE = ("gehaeuse.step", 0.0)

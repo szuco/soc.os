@@ -11297,6 +11297,17 @@
 				(justify mirror)
 			)
 		)
+		(property "LCSC" "C41370657"
+			(at 0 0 0)
+			(layer "B.SilkS")
+			(hide yes)
+			(uuid "b675af69-1d7f-4514-a5e4-4b6b55b42c8b")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
 		(attr through_hole)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -13498,6 +13509,17 @@
 					(thickness 0.15)
 				)
 				(justify mirror)
+			)
+		)
+		(property "LCSC" "C41370657"
+			(at 0 0 0)
+			(layer "B.SilkS")
+			(hide yes)
+			(uuid "1f1e69de-ad49-4942-ae7d-9f4d42cc4972")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
 			)
 		)
 		(attr through_hole)

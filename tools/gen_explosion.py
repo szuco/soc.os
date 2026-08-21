@@ -218,9 +218,9 @@ def selbsttest():
                  "Hintergriff je Seite - Punkt 67"
                  % (P["snap_nose"], P["snap_inner"], hinter))
     frei = Z["mid_logic"][0] - Z["bottom_power_motor"][1]
-    if abs(frei - 10.0) > 0.01:
-        m.append("Ebenenabstand im Modell %.1f mm frei, docs/04 budgetiert "
-                 "10,0 mm ab Boardvorderseite - Punkt 66" % frei)
+    if abs(frei - 5.0) > 0.01:
+        m.append("Ebenenabstand im Modell %.1f mm frei, erwartet 5,0 "
+                 "(kurzer Stapel, Punkt 23/66)" % frei)
     ux0, ux1 = USB_X - USB_B / 2.0, USB_X + USB_B / 2.0
     if not (P["usb_relief_x0"] <= ux0 and P["usb_relief_x1"] >= ux1):
         m.append("USB-Freistellung des Adapters bei x = %.1f…%.1f, die "
@@ -464,12 +464,12 @@ def panel_a(x0, y0):
                vz * sx + STK_B / 2, BAUTEIL)
     s.fahne("bottom", zb[0], r, ["Bottom-Board", "Ø 52,0 × 1,0"])
     s.marke("bottom", zb[1] + 1.4, -sx - 7.0, "Stapelverbinder 2×20,")
-    s.marke("bottom", zb[1] + 1.4, -sx - 11.0, "1,27 mm · Stapelhöhe 10,0")
+    s.marke("bottom", zb[1] + 1.4, -sx - 11.0, "1,27 mm · Stapelhöhe 6,0")
     for vz in (1, -1):
         s.teil("bottom", zb[1], Z["mid_logic"][0], vz * HUELSE_X - HUELSE_B,
                vz * HUELSE_X + HUELSE_B, FEIN, TUSCHE)
     s.marke("bottom", zb[1] + 1.4, HUELSE_X + 3.5,
-            "Hülse M2,5 × 9", TUSCHE)
+            "Hülse M2,5 × 5", TUSCHE)
 
     # Mid-Board
     s.gruppe("mid", Z["mid_logic"][0], Z["top_ui"][0])
@@ -483,7 +483,7 @@ def panel_a(x0, y0):
         s.teil("mid", zm[1], Z["top_ui"][0], vz * HUELSE_X - HUELSE_B,
                vz * HUELSE_X + HUELSE_B, FEIN, TUSCHE)
     s.marke("mid", zm[1] + 1.4, HUELSE_X + 3.5,
-            "Hülse M2,5 × 9", TUSCHE)
+            "Hülse M2,5 × 5", TUSCHE)
 
     # Tragring - er liegt auf der Wandebene, zwischen Mid und Top. Die
     # Huelsen laufen frei durch seine 50,6er Oeffnung; der Basisring des

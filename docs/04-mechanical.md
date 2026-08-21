@@ -476,9 +476,9 @@ Dose und setzte den Tragring danach. Auch das ist überholt, seit der
 Becher da ist: Die Boards wohnen im **Becher unter dem Tragring** und
 gehen mit ihm zusammen als **eine Kartusche** in die Dose.
 
-1. **Mid zwischen die Hülsen schrauben.** Untere Hülsen (M2,5 × 9,
+1. **Mid zwischen die Hülsen schrauben.** Untere Hülsen (M2,5 × 5,
    Buchse/Buchse) auf Bottom auflegen, Mid darüber, obere Hülsen
-   (M2,5 × 9, **Stift/Buchse**) von vorn durch Mid in die unteren —
+   (M2,5 × 5, **Stift/Buchse**) von vorn durch Mid in die unteren —
    ihr Gewindestift klemmt Mid. Bottom liegt noch lose an.
 2. **Board-Paar in den Becher legen.** Bottom voran auf die vier
    Auflagebosse (Oberkante z = 0); USB-C zeigt zur 9-Uhr-Seite.
@@ -730,12 +730,23 @@ Verfügbar sind **60 mm** Dosentiefe (F16e gemessen; vorher 61 angenommen). Übe
 | 1 | Kabelbogen / Steckraum hinter dem Bottom-Connector | 12,0 | 12,0 |
 | 2 | Bottom-Connector inkl. gestecktem Gegenstück über PCB | 10,0 | 22,0 |
 | 3 | Bottom-PCB | 1,0 | 23,0 |
-| 4 | Bauteile Bottom-Oberseite + Stack-Abstand | 10,0 | 33,0 |
-| 5 | Mid-PCB | 1,0 | 34,0 |
-| 6 | Bauteile Mid-Oberseite + Stack-Abstand | 9,0 | 43,0 |
-| 7 | Top-PCB | 1,0 | 44,0 |
+| 4 | Bauteile Bottom-Oberseite + Stack-Abstand | **5,0** | 28,0 |
+| 5 | Mid-PCB | 1,0 | 29,0 |
+| 6 | Bauteile Mid-Oberseite + Stack-Abstand | **5,0** | 34,0 |
+| 7 | Top-PCB | 1,0 | 35,0 |
 | 8 | Adapter, Zentralscheibe, Rahmen | — | **außerhalb** |
-| | **Reserve** | | **≈ 16,0** (auf 60 gemessen) |
+| | **Reserve** | | **≈ 25,0** (auf 60 gemessen) |
+
+> **Kurzer Stapel seit 21.08.2026 (Punkt 23).** Die Ebenen standen
+> 9,0 mm frei auseinander, weil der Steckverbinder diese Höhe tragen
+> sollte — bis die Recherche zeigte, dass es erhöhte 1,27-mm-Buchsen
+> gar nicht gibt. Jetzt sind es **5,0 mm**, womit gewöhnliche
+> Katalogteile passen (Buchse 4,3 mm + durchgesteckter Stift 8,1 mm).
+> Die Bauteilhöhen wurden dagegen geprüft: unten steht als höchstes die
+> Drossel SRP7028A mit 2,8 mm, oben das ESP32-Modul (3,2) und J6 (4,25),
+> die sich örtlich **nicht** überlappen. Nebeneffekt: **9 mm mehr
+> Reserve** — und Punkt 66 (Modell 9,0 gegen Doku 10,0) löst sich auf,
+> weil Modell und Doku jetzt beide 5,0 sagen.
 
 > **Revision 16.08.2026: das Top-Board verlässt die Dose.** Vorher standen hier
 > 8,0 mm für „OLED, Taster, Frontpanel" und ≈ 9 mm Reserve. Seit der Umstellung

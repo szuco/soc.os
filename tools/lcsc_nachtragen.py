@@ -83,7 +83,26 @@ NUMMERN = {
     ("BTN2", "SKQG"): "C115351",
     ("BTN3", "SKQG"): "C115351",
     ("BTN4", "SKQG"): "C115351",
-    ("PhotoMOS 60V", "SOP-4"): "C1525231",  # Panasonic AQY212S (Entscheid 20.08.)
+    ("PhotoMOS 60V", "SOP-4"): "C1525231",
+    # --- Stapelverbinder, Punkt 23 entschieden am 21.08.2026 -------------
+    # Erhoehte 1,27-mm-Buchsen mit 9 mm Bauhoehe gibt es nicht (Recherche
+    # ueber alle Kataloge plus LCSC-Vollauswertung ~1.800 Teile). Statt
+    # eines Sonderteils wurde der Stapel auf 5,0 mm verkuerzt - damit
+    # passen normale Katalogteile, und das Durchsteck-Konzept bleibt:
+    # Mid traegt EINEN durchgesteckten Stift, Bottom und Top je eine
+    # Buchse. Beide im echten Raster 1,27 x 1,27, THT, 1 A/Pin.
+    # (board-spezifisch, siehe NUMMERN_JE_BOARD unten)  # Panasonic AQY212S (Entscheid 20.08.)
+}
+
+# Board-spezifisch: Dasselbe Bauteil-Wertepaar bekommt je nach Ebene ein
+# ANDERES Teil. Der Stapel ist seit dem 21.08. 5,0 mm hoch (Punkt 23):
+# Bottom und Top tragen die Buchse, Mid den durchgesteckten Stift.
+NUMMERN_JE_BOARD = {
+    "bottom_power_motor": {("J_STK_A", "PinSocket_2x20"): "C41370657",
+                           ("J_STK_B", "PinSocket_2x20"): "C41370657"},
+    "top_ui":             {("J_STK_A", "PinSocket_2x20"): "C41370657",
+                           ("J_STK_B", "PinSocket_2x20"): "C41370657"},
+    # mid_logic: durchgesteckter Stift - Teil wird noch bestimmt
 }
 
 
@@ -94,10 +113,12 @@ def main():
             continue
         board = pcbnew.LoadBoard(pfad)
         gesetzt = 0
+        tabelle = dict(NUMMERN)
+        tabelle.update(NUMMERN_JE_BOARD.get(name, {}))
         for fp in board.GetFootprints():
             wert = fp.GetValue()
             fpn = str(fp.GetFPID().GetLibItemName())
-            for (w, teil), nummer in NUMMERN.items():
+            for (w, teil), nummer in tabelle.items():
                 if wert == w and teil in fpn:
                     try:
                         alt = fp.GetFieldText("LCSC")

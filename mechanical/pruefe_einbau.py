@@ -41,7 +41,27 @@ def ky(y):
     return -y
 
 
-WAND_Z = 15.5          # Tragring-Auflage = Wandebene (docs/04)
+# Wandebene = Tragring-Auflage. NICHT abschreiben, sondern aus stack.py
+# lesen - beim Umbau auf den kurzen Stapel (21.08.) haette eine
+# Konstante hier still das falsche Ergebnis geliefert.
+import ast as _a
+_q = _a.parse(open(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "stack.py"), encoding="utf-8").read())
+def _konst(name):
+    for k in _q.body:
+        if (isinstance(k, _a.Assign) and isinstance(k.targets[0], _a.Name)
+                and k.targets[0].id == name):
+            return _a.literal_eval(k.value)
+    raise KeyError(name)
+
+
+WAND_Z = _konst("TRAGRING")[1]
+# Auch die Boardlagen aus stack.py holen - hier stand 20,0 hart im Code
+# und ueberlebte den Umbau auf den kurzen Stapel um genau einen Lauf.
+_TEILE = dict((n.replace(".step", ""), z) for n, z in _konst("TEILE"))
+Z_BOTTOM = _TEILE["bottom_power_motor"]
+Z_MID = _TEILE["mid_logic"]
+Z_TOP = _TEILE["top_ui"]
 DOM_KREIS = 30.0       # Schraubkreis 60 mm - Dommitte
 DOM_R = 3.0            # F16d: OE 6
 BOARD_R = 26.0         # OE 52
@@ -68,10 +88,10 @@ def main():
     ring = Location((0, 0, WAND_Z)) * build_tragring(TP)
     # Lage aus der Tiefenkette ABLEITEN, nicht hart kodieren: Die
     # Auflage (seat) traegt die Rueckseite des Top-Boards bei z = 20,0.
-    adapter = (Location((0, 0, 20.0 - adapter_z(AP)["seat"]))
+    adapter = (Location((0, 0, Z_TOP - adapter_z(AP)["seat"]))
                * build_adapter(AP))
-    boards = [Pos(0, 0, 0.5) * Cylinder(BOARD_R, 1.0),
-              Pos(0, 0, 10.5) * Cylinder(BOARD_R, 1.0)]
+    boards = [Pos(0, 0, Z_BOTTOM + 0.5) * Cylinder(BOARD_R, 1.0),
+              Pos(0, 0, Z_MID + 0.5) * Cylinder(BOARD_R, 1.0)]
     # DIE GEGENSTUECKE AUS DEM LAYOUT - nicht aus den Gehaeuseparametern.
     # Genau hier lag der Denkfehler: Solange Becherfenster und Pruefkoerper
     # aus DERSELBEN Konstante kamen, hob sich jede Verschiebung auf und
@@ -95,7 +115,8 @@ def main():
     feld = Pos(j1x, ky(j1y), -5.0) * Box(16.4, 8.6, 10.0)
     # USB-C des Mid-Boards: greift durch die Randkerbe des Top-Boards
     # nach vorn; Koerper 9,94 x 6,40, Hoehe 9,25 ab Mid-Vorderseite (11,0)
-    usb = Pos(-20.0, ky(8.4), 11.0 + 9.25 / 2.0) * Box(6.40, 9.94, 9.25)
+    usb = (Pos(-20.0, ky(8.4), Z_MID + 1.0 + 9.25 / 2.0)
+           * Box(6.40, 9.94, 9.25))
     # Magnetkabel: laeuft von der Kabelkerbe des Top-Boards (Unterkante,
     # KiCad y = +22,5) hinter dem Rahmen nach aussen durch den Tragring.
     kabel = Pos(0.0, ky(22.5), WAND_Z + 1.0) * Box(4.0, 3.0, 6.0)
