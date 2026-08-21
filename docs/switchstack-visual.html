@@ -174,8 +174,10 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
 
 <section>
   <div class="sec-head"><span class="num">01</span><h2>Der Stapel</h2></div>
-  <p>Ziehen zum Drehen, Schieberegler zum Auseinanderziehen. Alle Abstände sind
-  maßstäblich zu den geprüften Modelldaten.</p>
+  <p>Ziehen zum Drehen, Schieberegler zum Auseinanderziehen. Die Nummern sind
+  die <strong>Einbaureihenfolge</strong>, von hinten nach vorn:
+  Feldstecker → Becher → Bottom → Mid → Tragring → Abdeckrahmen →
+  Scheibenadapter → Top → Zentralscheibe.</p>
 
   <div class="viewer">
     <div class="stage" id="stage" tabindex="0" role="img"
@@ -540,15 +542,15 @@ tfoot td{font-weight:660;color:var(--ink);border-top:2px solid var(--rule-2)}
 
   // z in mm, von der Wandoberflaeche nach innen (negativ = tiefer in der Dose)
   var LAYERS = [
-    {z:  8.0, kind:'plate', size:55.2, col:'--ui',     label:'Zentralscheibe 6435-914'},
-    {z:  6.0, kind:'plate', size:81.0, col:'--ink-3',  label:'Abdeckrahmen 1721-914'},
-    {z:  5.0, kind:'plate', size:47.0, col:'--copper', label:'Top · UI  47×47'},
-    {z:  2.5, kind:'plate', size:49.8, col:'--ui',     label:'Scheibenadapter, gedruckt'},
-    {z:  1.0, kind:'plate', size:70.0, col:'--ui',     label:'Tragring, gedruckt · liegt lose auf'},
-    {z: -5.0, kind:'disc',  size:52.0, col:'--logic',  label:'Mid · Logic'},
-    {z:-12.0, kind:'disc',  size:54.6, col:'--ui',     label:'Gehäuse-Becher, gedruckt'},
-    {z:-15.0, kind:'disc',  size:52.0, col:'--pwr',    label:'Bottom · Power'},
-    {z:-25.0, kind:'plate', size:22.0, col:'--pwr',    label:'Feldstecker Micro-Fit'}
+    {z: 10.0, kind:'plate', size:55.2, col:'--ui',     label:'9 · Zentralscheibe 6435-914'},
+    {z:  7.0, kind:'plate', size:47.0, col:'--copper', label:'8 · Top · UI  47×47'},
+    {z:  4.0, kind:'plate', size:49.8, col:'--ui',     label:'7 · Scheibenadapter, gedruckt'},
+    {z:  1.0, kind:'plate', size:81.0, col:'--ink-3',  label:'6 · Abdeckrahmen 1721-914'},
+    {z: -2.0, kind:'plate', size:70.0, col:'--ui',     label:'5 · Tragring, gedruckt'},
+    {z: -8.0, kind:'disc',  size:52.0, col:'--logic',  label:'4 · Mid · Logic'},
+    {z:-14.0, kind:'disc',  size:52.0, col:'--pwr',    label:'3 · Bottom · Power'},
+    {z:-20.0, kind:'disc',  size:54.6, col:'--print',  label:'2 · Gehäuse-Becher, gedruckt'},
+    {z:-27.0, kind:'plate', size:22.0, col:'--pwr',    label:'1 · Feldstecker Micro-Fit'}
   ];
 
   var nodes = [];

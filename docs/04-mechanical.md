@@ -455,6 +455,20 @@ bleibt kraftfrei beweglich. **Messpunkt F15:** Steg-Innenmaß des Rahmens
 (Lippe muss darüber greifen) und Innenmaß des Scheibenkorpus (Lippe muss
 darunter bleiben) — 51,6 ist ein Platzhalter zwischen beiden Annahmen.
 
+> **DIE KETTE — neun Stationen, von hinten nach vorn.** So und nur so
+> steht sie in jeder Zeichnung und jeder Ansicht (Festlegung des Nutzers
+> vom 21.08.):
+>
+> **1** Feldstecker → **2** Gehäuse-Becher → **3** Bottom → **4** Mid →
+> **5** Tragring → **6** Abdeckrahmen → **7** Scheibenadapter →
+> **8** Top-Board → **9** Zentralscheibe
+>
+> Displaypanel und Schaumdichtung sind **keine** eigenen Stationen: Sie
+> sind vor der Montage auf das Top-Board geklebt bzw. aufgelegt und
+> gehören zu Station 8. Die Handgriffe unten folgen derselben Kette; nur
+> der Feldstecker wird praktisch erst angesteckt, wenn die Kartusche
+> verschraubt ist — räumlich bleibt er das hinterste Glied.
+
 **Montagereihenfolge — Kartusche, Fassung vom 20.08.2026 (abends).** Die
 erste Fassung begann mit dem Tragring in der Dose (unbaubar: Ø 52 passt
 nicht durch die 50,6er Öffnung), die zweite schob die Boards lose in die

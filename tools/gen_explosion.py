@@ -232,8 +232,9 @@ def selbsttest():
 
 SS = 2                   # Ueberabtastung, am Ende wird herunterskaliert
 PX_MM = 6.5              # Massstab
-LUECKE = 13.0            # Explosionsabstand in mm
-BREITE, HOEHE = 2120, 1500
+LUECKE = 15.0            # Explosionsabstand in mm - neun getrennte
+                         # Stationen brauchen Luft fuer ihre Fahnen
+BREITE, HOEHE = 2700, 1500
 
 PAPIER = (250, 249, 246)
 TUSCHE = (28, 28, 30)
@@ -388,10 +389,9 @@ class Schnitt(object):
 
 def panel_a(x0, y0):
     s = Schnitt(x0, y0, 1000, "Schnitt A – A   ·   Ebene y = 0",
-                "Reihenfolge = EINBAUREIHENFOLGE · Kartusche = Becher + "
-                "Bottom + Mid, von hinten verschraubt · Tragring liegt lose auf · "
-                "Kraftfluss: Schraube → Top → Drucklippe → Rahmensteg → "
-                "Tragring → Dose · Scheibe klickt zuletzt, kraftfrei · "
+                "EINBAUREIHENFOLGE, von hinten nach vorn: Feldstecker → "
+                "Becher → Bottom → Mid → Tragring → Abdeckrahmen → "
+                "Scheibenadapter → Top → Zentralscheibe · "
                 "Explosion %.0f mm, sonst maßstäblich" % LUECKE)
     r = B["BOARD_DIAMETER"] / 2.0
     h = B["TOP_SQ"] / 2.0
@@ -484,17 +484,16 @@ def panel_a(x0, y0):
     # Tragring - er liegt auf der Wandebene, zwischen Mid und Top. Die
     # Huelsen laufen frei durch seine 50,6er Oeffnung; der Basisring des
     # Adapters taucht hindurch und wird von ihr zentriert.
-    s.gruppe("tragring", Z["rahmen"][0], Z["rahmen"][0] + T["t"], luecke=0)
+    s.gruppe("tragring", Z["rahmen"][0], Z["rahmen"][0] + T["t"])
     for vz in (1, -1):
         s.teil("tragring", Z["rahmen"][0], Z["rahmen"][0] + T["t"],
                vz * T["open_sq"] / 2.0, vz * T["grip"] / 2.0, KUNST_H, KUNST)
     s.fahne("tragring", Z["rahmen"][0], T["grip"] / 2.0,
-            ["Tragring — liegt lose auf dem Becherrand",
-             "70 × 70 × 2 · Geräteschrauben auf 60,0 in die Dome"],
-            hoch=14)
+            ["Tragring — liegt lose auf",
+             "70 × 70 × 2 · Schrauben auf 60,0"], hoch=40)
 
     # Abdeckrahmen
-    s.gruppe("rahmen", Z["rahmen"][0], Z["rahmen"][1], luecke=0)
+    s.gruppe("rahmen", Z["rahmen"][0], Z["rahmen"][1])
     zr = Z["rahmen"]
     for vz in (1, -1):
         s.teil("rahmen", zr[0], zr[1], vz * RAHMEN_FENSTER / 2.0,
@@ -502,8 +501,8 @@ def panel_a(x0, y0):
         s.teil("rahmen", zr[0], zr[0] + 4.0, vz * P["frame_grip"] / 2.0,
                vz * (P["frame_grip"] / 2.0 + 1.6), BAUTEIL, None)
     s.fahne("rahmen", zr[0], RAHMEN_AM / 2.0,
-            ["Abdeckrahmen 1721-914 · 81 × 81 × 12",
-             "klemmt am Tragring, gepresst von der Drucklippe"], hoch=-125)
+            ["Abdeckrahmen 1721-914",
+             "81 × 81 × 12 · klemmt am Tragring"], hoch=-150)
 
 
     # Adapter
@@ -523,18 +522,24 @@ def panel_a(x0, y0):
         s.teil("adapter", ad["tasche"][0], ad["tasche"][1], vz * tasche,
                vz * rand, KUNST_H, KUNST)
     s.fahne("adapter", ad["flansch"][0], rand,
-            ["Scheibenadapter, gedruckt · 49,8 × 49,8 × 5,5",
-             ("Drucklippe 51,6 presst den Rahmensteg", ROT),
-             ("Steg-Innenmaß: F15 messen", ROT)])
+            ["Scheibenadapter, gedruckt",
+             "49,8 × 49,8 × 5,5"], hoch=-45)
     s.marke("adapter", ad["hals"][0] + 0.4, hals - 4.5, "Rastraum 1,5 × 1,3")
     s.marke("adapter", ad["tasche"][0] + 0.4, tasche - 9.0,
             "Tasche 47,4 · Auflage 2,0")
+    s.marke("adapter", ad["flansch"][0], -rand - 4.0,
+            "Drucklippe 51,6 presst den Rahmensteg", ROT)
+    s.marke("adapter", ad["flansch"][0], -rand - 8.0,
+            "Steg-Innenmaß: F15 messen", ROT)
 
     # Top-Board mit den beiden Schrauben von vorn
-    s.gruppe("top", Z["top_ui"][0], Z["top_ui"][1])
+    s.gruppe("top", Z["top_ui"][0], Z["schaum"][1])
     zt = Z["top_ui"]
     s.teil("top", zt[0], zt[1], -h, h, PCB)
-    s.fahne("top", zt[0], h, ["Top-Board", "47,0 × 47,0 × 1,0"])
+    s.fahne("top", zt[0], h,
+            ["Top-Board 47 × 47",
+             "+ Displaypanel, geklebt",
+             "+ Schaumdichtung 1,90"], hoch=40)
     for vz in (1, -1):
         # Kopf auf der Platinenvorderseite, Schaft durch H1/H2 in die Huelse
         s.teil("top", zt[1], zt[1] + 1.7, vz * HUELSE_X - 2.25,
@@ -544,23 +549,16 @@ def panel_a(x0, y0):
     s.marke("top", zt[0] - 1.0, -(HUELSE_X + 4.5),
             "M2,5 Flachkopf von vorn — zieht alles zusammen", TUSCHE, "rm")
 
-    # Displaypanel, aufgeklebt
-    s.gruppe("panel", Z["panel"][0], Z["panel"][1])
+    # Displaypanel und Schaumdichtung: TEIL der Top-Station (das Panel
+    # ist vor der Montage aufgeklebt, der Schaum aufgelegt) - keine
+    # eigenen Kettenglieder.
     zp = Z["panel"]
-    s.teil("panel", zp[0], zp[1], -PANEL_X / 2, PANEL_X / 2, DISPLAY)
-    s.teil("panel", zp[0], zp[0] + KLEBEFUGE, -PANEL_X / 2, PANEL_X / 2,
+    s.teil("top", zp[0], zp[1], -PANEL_X / 2, PANEL_X / 2, DISPLAY)
+    s.teil("top", zp[0], zp[0] + KLEBEFUGE, -PANEL_X / 2, PANEL_X / 2,
            ROT, None)
-    s.fahne("panel", zp[0], PANEL_X / 2,
-            ["Displaypanel ER-TFT1.69-3",
-             "37,43 × 30,07 × 1,60 · quer · Fahne faltet RECHTS auf J5",
-             "geklebt, Fuge 0,1–0,2 (rot)"])
 
-    # Schaumdichtung
-    s.gruppe("schaum", Z["schaum"][0], Z["schaum"][1])
     zs = Z["schaum"]
-    s.teil("schaum", zs[0], zs[1], -PANEL_X / 2, PANEL_X / 2, SCHAUM_F, GRAU)
-    s.fahne("schaum", zs[0], PANEL_X / 2,
-            ["Schaumdichtung 1,90", "drückt an, hält nicht"], hoch=205)
+    s.teil("top", zs[0], zs[1], -PANEL_X / 2, PANEL_X / 2, SCHAUM_F, GRAU)
 
     # Zentralscheibe
     s.gruppe("scheibe", Z["scheibe"][0], Z["scheibe"][1])
@@ -577,10 +575,10 @@ def panel_a(x0, y0):
     s.fahne("scheibe", zc[0], am,
             ["Zentralscheibe 6435-914", "55,2 × 55,2 × 7,5",
              "kraftfrei aufgeclippt — sie ist das",
-             "Bedienelement und bleibt beweglich"])
-    s.marke("scheibe", zc[0] - 1.0, -am - 3.0,
+             "Bedienelement und bleibt beweglich"], hoch=-60)
+    s.marke("scheibe", zc[0] - 1.0, -am - 9.0,
             "Rastnase 1,0 – nur 0,10 mm Luft je Seite,", ROT, "ra")
-    s.marke("scheibe", zc[0] - 1.0, -am - 7.0,
+    s.marke("scheibe", zc[0] - 1.0, -am - 13.0,
             "kein radialer Hintergriff (Punkt 67)", ROT, "ra")
     s.marke("scheibe", zc[1] + 1.5, -btn, "Druckkreuz (projiziert)")
 
@@ -613,6 +611,19 @@ def panel_b(x0, y0):
     s.marke("mid", zm[1] + 1.2, USB_X - USB_B / 2 - 2.5,
             "USB-C 9,25 hoch (projiziert, y = 8,4)", GRAU, "rm")
 
+    # Scheibenadapter - dieselbe Kette wie in Schnitt A:
+    # ... Tragring, Abdeckrahmen, ADAPTER, Top, Zentralscheibe
+    s.gruppe("adapter", Z["adapter"][0], Z["adapter"][1])
+    for vz in (1, -1):
+        s.teil("adapter", ad["flansch"][0], ad["flansch"][1], vz * bohr,
+               vz * P["frame_grip"] / 2.0, KUNST_H, KUNST)
+        s.teil("adapter", ad["hals"][0], ad["schulter"][1], vz * bohr,
+               vz * rand, KUNST_H, KUNST)
+        s.teil("adapter", ad["tasche"][0], ad["tasche"][1], vz * tasche,
+               vz * rand, KUNST_H, KUNST)
+    s.fahne("adapter", ad["flansch"][0], P["frame_grip"] / 2.0,
+            ["Adapter", "Durchführung 43 × 43"])
+
     # Top mit Durchbruch, Tastern und J6
     s.gruppe("top", Z["top_ui"][0] - J6_H, Z["top_ui"][1])
     zt = Z["top_ui"]
@@ -633,18 +644,6 @@ def panel_b(x0, y0):
     s.marke("top", zt[0] - J6_H - 1.2, -30.0, "J6 (JST GH, hinten)",
             GRAU, "rm")
     s.marke("top", Z["taster"][0] + 0.5, btn + 4.0, "Ecktaster 2,0 hoch")
-
-    # Adapter
-    s.gruppe("adapter", Z["adapter"][0], Z["adapter"][1])
-    for vz in (1, -1):
-        s.teil("adapter", ad["flansch"][0], ad["flansch"][1], vz * bohr,
-               vz * P["frame_grip"] / 2.0, KUNST_H, KUNST)
-        s.teil("adapter", ad["hals"][0], ad["schulter"][1], vz * bohr,
-               vz * rand, KUNST_H, KUNST)
-        s.teil("adapter", ad["tasche"][0], ad["tasche"][1], vz * tasche,
-               vz * rand, KUNST_H, KUNST)
-    s.fahne("adapter", ad["flansch"][0], P["frame_grip"] / 2.0,
-            ["Adapter", "Durchführung 43 × 43"])
 
     # Zentralscheibe mit den Druckkreuzen
     s.gruppe("scheibe", Z["scheibe"][0], Z["scheibe"][1])
@@ -867,8 +866,8 @@ def main():
 
     panel_a(300, 470)
     panel_b(300, 1120)
-    panel_c(1810, 470)
-    tiefenband(1650, 830)
+    panel_c(2350, 470)
+    tiefenband(2190, 830)
     kopf_und_notizen(meldungen)
 
     aus = bild.resize((BREITE, HOEHE), Image.LANCZOS)
