@@ -165,7 +165,27 @@ PARAMS = dict(
     # Innenmass des Scheibenkorpus (Lippe muss DARUNTER bleiben,
     # angenommen ~52,5). lip_sq liegt dazwischen.
     lip_sq            = 51.6,   # PLATZHALTER - F15 messen
-    lip_gap           = 14.0,   # Unterbrechung je Kantenmitte (Nasenpass)
+    # 3,0 statt 14,0 (21.08., Einwand des Nutzers "es darf doch keine
+    # Aussparungen geben"): F8 misst die Rastnasen mit 1,0 mm Breite -
+    # der alte Wert war vierzehnfach ueberdimensioniert und hat den
+    # tragenden Ring an vier Stellen unnoetig weit aufgerissen. 3,0 gibt
+    # der Nase 1,0 mm Luft je Seite; ganz ohne Schlitz geht es nicht,
+    # denn die Nasen muessen an Lippe und Kragen VORBEI in den Rastraum.
+    nose_gap          = 3.0,    # Unterbrechung je Kantenmitte (Nasenpass)
+
+    # --- Auflagekragen auf dem Tragring (21.08.) --------------------------
+    # Forderung des Nutzers: "sichergestellt sein, dass der
+    # Scheibenadapter auch wirklich auf den Tragring drueckt". Bisher lief
+    # die Klemmkraft ueber die Drucklippe auf den RAHMENSTEG - und dessen
+    # Lage ist mit F15 unbekannt. Der Kragen macht die Kraftkette davon
+    # unabhaengig: Er kragt auf der Vorderseite des Basisrings nach aussen
+    # ueber die Tragring-Oeffnung (50,6) und legt sich auf die Platte.
+    # Kraftfluss: Schraube -> Top-Board -> Adapterauflage -> KRAGEN ->
+    # Tragring -> Geraeteschrauben -> Dose.
+    # Obergrenze: Der Kragen liegt in der Rahmenoeffnung (F11: 56,0) und
+    # muss im Scheibenkorpus bleiben (55,2 aussen, Wand 1,0 -> 53,2 innen).
+    collar_sq         = 52.0,   # Auflage 0,7 je Seite, Luft zur Scheibe 0,6
+    collar_t          = 0.8,
 
     # --- Zentrale Durchfuehrung -------------------------------------------
     # Muss die beiden Stackverbinder durchlassen: sie stehen bei x = +/-14,2,
@@ -270,6 +290,16 @@ def build_adapter(p=PARAMS):
             fillet(s.vertices(), 2.0)
         extrude(amount=z["flange"])
 
+        # -- Auflagekragen: legt sich auf den Tragring (siehe PARAMS) -------
+        # Die vier Nasenpaesse sind dieselben wie bei der Lippe - die
+        # Nasen fahren an dieser Ebene vorbei nach hinten.
+        with BuildSketch(Plane.XY.offset(z["flange"])) as c:
+            Rectangle(p["collar_sq"], p["collar_sq"])
+            Rectangle(p["nose_gap"], p["collar_sq"], mode=Mode.SUBTRACT)
+            Rectangle(p["collar_sq"], p["nose_gap"], mode=Mode.SUBTRACT)
+            Rectangle(neck_out, neck_out, mode=Mode.ADD)
+        extrude(amount=p["collar_t"])
+
         # -- Rastraum: hier sitzen die vier Nasen der Scheibe ---------------
         with BuildSketch(Plane.XY.offset(z["flange"])):
             Rectangle(neck_out, neck_out)
@@ -286,8 +316,8 @@ def build_adapter(p=PARAMS):
             # (Nasenpass), dann das Grundband in Randbreite wieder
             # auffuellen, zuletzt die Tasche.
             Rectangle(p["lip_sq"], p["lip_sq"])
-            Rectangle(p["lip_gap"], p["lip_sq"], mode=Mode.SUBTRACT)
-            Rectangle(p["lip_sq"], p["lip_gap"], mode=Mode.SUBTRACT)
+            Rectangle(p["nose_gap"], p["lip_sq"], mode=Mode.SUBTRACT)
+            Rectangle(p["lip_sq"], p["nose_gap"], mode=Mode.SUBTRACT)
             Rectangle(rim_out, rim_out, mode=Mode.ADD)
             Rectangle(pocket_in, pocket_in, mode=Mode.SUBTRACT)
         extrude(amount=z["pocket"] - z["seat"])
@@ -305,7 +335,15 @@ def build_adapter(p=PARAMS):
                             -(p["usb_relief_y0"] + p["usb_relief_y1"]) / 2.0)):
                 Rectangle(p["usb_relief_x1"] - p["usb_relief_x0"],
                           p["usb_relief_y1"] - p["usb_relief_y0"])
-        extrude(amount=z["total"], mode=Mode.SUBTRACT)
+        # NUR bis zur Auflage (21.08., Einwand des Nutzers: "der Adapter
+        # muss ja trotzdem geschlossen sein, sonst haelt ja nichts").
+        # Vorher lief der Schnitt ueber die volle Hoehe und trennte den
+        # tragenden Ring an der linken Kante komplett auf. Die USB-Buchse
+        # endet bei z 4,75 des Modells und liegt dort mit x = -23,2 laengst
+        # INNERHALB der Platinentasche (Rand ab 23,7) - oberhalb der
+        # Auflage braucht sie keinen Millimeter. Tasche, Lippe und Kragen
+        # bleiben damit umlaufend geschlossen.
+        extrude(amount=z["seat"], mode=Mode.SUBTRACT)
 
         # -- Halter fuer den Magnetkontakt des Sterns -----------------------
         # Huelse + zwei Stuetzen + Kabelnut. Siehe Parameterblock.
@@ -486,6 +524,23 @@ def check_adapter(part, p=PARAMS):
         errs.append("Drucklippe %.1f greift nicht ueber den Rand %.1f - "
                     "sie wuerde den Rahmensteg nie beruehren"
                     % (p["lip_sq"], rim_out))
+    # Der Auflagekragen ist seit dem 21.08. die definierte Kraftkette:
+    # Er MUSS ueber die Tragring-Oeffnung greifen und DARF nicht am
+    # Scheibenkorpus schaben.
+    from tragring import PARAMS as TRP
+    if p["collar_sq"] <= TRP["open_sq"] + 0.6:
+        errs.append("Kragen %.1f greift nicht sicher ueber die "
+                    "Tragring-Oeffnung %.1f"
+                    % (p["collar_sq"], TRP["open_sq"]))
+    if p["collar_sq"] >= 53.2 - 0.4:
+        errs.append("Kragen %.1f schabt am Scheibenkorpus (innen 53,2)"
+                    % p["collar_sq"])
+    if p["collar_sq"] >= 56.0:
+        errs.append("Kragen %.1f passt nicht in das Rahmenfenster 56,0 (F11)"
+                    % p["collar_sq"])
+    if p["nose_gap"] < 2.0 or p["nose_gap"] > 5.0:
+        errs.append("Nasenpass %.1f unplausibel - F8 misst die Nase mit "
+                    "1,0 mm Breite" % p["nose_gap"])
     if p["lip_sq"] >= p["snap_inner"] + 2.4:
         errs.append("Drucklippe %.1f vermutlich groesser als der "
                     "Scheibenkorpus innen (F15 messen!)" % p["lip_sq"])

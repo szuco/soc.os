@@ -122,6 +122,22 @@ def main():
     frei(boards[0], becher, "Bottom-Board gegen Becher")
     frei(boards[1], becher, "Mid-Board gegen Becher")
 
+    # KRAFTKETTE: Der Adapter muss den Tragring wirklich beruehren -
+    # Forderung des Nutzers vom 21.08. Geprueft wird, ob in der
+    # Kragenebene (Tragring-Vorderseite) Adaptermaterial ausserhalb der
+    # Ringoeffnung steht, also Auflage vorhanden ist.
+    o = TP["open_sq"] / 2.0
+    auflage = 0.0
+    for sx, sy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+        # Kragenebene = Tragring-VORDERseite (WAND_Z + Plattendicke)
+        probe = (Pos(sx * (o + 0.45), sy * (o + 0.45),
+                     WAND_Z + TP["t"] + AP["collar_t"] / 2.0)
+                 * Box(12.0 if sy else 0.7, 0.7 if sy else 12.0, 0.8))
+        auflage += (adapter & probe).volume
+    if auflage < 1.0:
+        errs.append("Adapter liegt NICHT auf dem Tragring auf "
+                    "(Kragenprobe %.2f mm3)" % auflage)
+
     print("Einbaupruefung: %s" % ("BESTANDEN" if not errs else "FEHLGESCHLAGEN"))
     for e in errs:
         print("   ! %s" % e)
@@ -136,6 +152,11 @@ def main():
     print("Dom-Fenster %.0f -> Dom-Sehne %.1f : %.1f mm Luft je Seite"
           % (GP["dom_fenster_b"], 2 * sehne,
              GP["dom_fenster_b"] / 2.0 - sehne))
+    print("Kragen %.1f  -> Ringoeffnung %.1f : %.2f mm je Seite Auflage"
+          % (AP["collar_sq"], TP["open_sq"],
+             (AP["collar_sq"] - TP["open_sq"]) / 2.0))
+    print("Kragen %.1f  -> Scheibe innen 53,2 : %.2f mm je Seite Luft"
+          % (AP["collar_sq"], (53.2 - AP["collar_sq"]) / 2.0))
     print("Schraube M2,5: Weg %.1f + Gewinde >= 4 -> Laenge >= %.0f"
           % (GP["tief_hinten"] + GP["boden_t"] + 1.0,
              math.ceil(GP["tief_hinten"] + GP["boden_t"] + 1.0 + 4)))

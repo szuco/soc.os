@@ -564,6 +564,37 @@ Nutzerbefund 21.08.) — der Becher bekommt vier Fenster à 10 statt zwei
 Kabeleinführungen bei ~50 mm Tiefe sind günstig: Der Kabelbogen muss
 nicht mehr hinter den Stecker, er kommt von der Seite.
 
+**Der Adapter trägt wieder — drei Einwände des Nutzers vom 21.08.**
+„Der Adapter muss ja trotzdem geschlossen sein, sonst hält ja nichts",
+„die Aussparungen sind doch genau invers, dort hält doch die
+Zentralscheibe" und „es muss sichergestellt sein, dass der
+Scheibenadapter auch wirklich auf den Tragring drückt". Alle drei
+trafen, alle drei sind behoben:
+
+1. **USB-Freistellung endet an der Auflage.** Sie lief über die volle
+   Bauhöhe und trennte den tragenden Ring an der linken Kante komplett
+   auf. Die Buchse endet aber bei Modellhöhe 4,75 und liegt dort mit
+   x = −23,2 längst **innerhalb** der Platinentasche (deren Rand erst
+   bei 23,7 beginnt) — oberhalb der Auflage braucht sie keinen
+   Millimeter. Tasche, Lippe und Kragen sind jetzt umlaufend
+   geschlossen.
+2. **Nasenpass 14,0 → 3,0 mm.** F8 misst die Rastnasen mit **1,0 mm
+   Breite**; der Platzhalter war vierzehnfach überdimensioniert. Ganz
+   ohne Schlitz geht es nicht — die Nasen müssen an Lippe und Kragen
+   vorbei in den Rastraum —, aber jetzt sind es vier schmale Schlitze
+   statt vier großer Löcher. Gehalten wird die Scheibe ohnehin nicht
+   von der Lippe, sondern von der **Schulter** (49,8) und dem Rastraum
+   dahinter (48,3).
+3. **Neuer Auflagekragen 52,0 × 0,8.** Er kragt auf der Vorderseite des
+   Basisrings über die Tragring-Öffnung (50,6) und legt sich mit
+   **0,70 mm je Seite** auf die Platte. Damit läuft die Kraft
+   nachweisbar Schraube → Top-Board → Adapterauflage → **Kragen** →
+   Tragring → Geräteschrauben → Dose — **unabhängig von F15**, dessen
+   Rahmensteg-Maß weiter offen ist. Obergrenzen eingehalten: Der Kragen
+   bleibt im Rahmenfenster (F11: 56,0) und hält 0,60 mm je Seite Luft
+   zum Scheibenkorpus (innen 53,2). `pruefe_einbau.py` prüft die
+   Auflage jetzt als eigene Materialprobe in der Kragenebene.
+
 **Die y-Falle — drei Ausschnitte lagen spiegelverkehrt (21.08., mit
 bloßem Auge gefunden: „warum hat der Tragring oben eine Aussparung?").**
 KiCad zählt y **nach unten**, build123d und der STEP-Export **nach

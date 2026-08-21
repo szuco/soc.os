@@ -529,9 +529,9 @@ def panel_a(x0, y0):
     s.marke("adapter", ad["tasche"][0] + 0.4, tasche - 9.0,
             "Tasche 47,4 · Auflage 2,0")
     s.marke("adapter", ad["flansch"][0], -rand - 4.0,
-            "Drucklippe 51,6 presst den Rahmensteg", ROT)
+            "Kragen 52,0 liegt auf dem Tragring — Kraftkette gesichert")
     s.marke("adapter", ad["flansch"][0], -rand - 8.0,
-            "Steg-Innenmaß: F15 messen", ROT)
+            "Drucklippe 51,6 zusätzlich am Rahmensteg (F15 offen)", ROT)
 
     # Top-Board mit den beiden Schrauben von vorn
     s.gruppe("top", Z["top_ui"][0], Z["schaum"][1])
