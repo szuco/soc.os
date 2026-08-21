@@ -94,7 +94,7 @@ danach entweder verklebt (A1) oder von Mid in 10,0 mm Abstand verdeckt ist
 
 | # | Schritt | Warum genau hier |
 |---|---|---|
-| B1 | **Top auf Mid stecken** — Stackverbinder bei x = ±14,2, Stapelhöhe 6,0 mm | Mid trägt die USB-C-Buchse auf seiner Vorderseite (3,5 / 20,3); sie **greift durch die Randkerbe** des Top-Boards (6,25 × 9,5 mm, linker Rand). Steckt man verdreht, stößt der Buchsenkörper gegen das Board statt durch die Kerbe |
+| B1 | **Top auf Mid stecken** — Stackverbinder bei x = ±14,2, Stapelhöhe 7,0 mm | Mid trägt die USB-C-Buchse auf seiner Vorderseite (3,5 / 20,3); sie **greift durch die Randkerbe** des Top-Boards (6,25 × 9,5 mm, linker Rand). Steckt man verdreht, stößt der Buchsenkörper gegen das Board statt durch die Kerbe |
 | B2 | **Mid auf Bottom stecken** — wieder 10,0 mm | Bottom↔Mid trägt keine Sonderteile; die Reihenfolge B1/B2 ist frei tauschbar |
 | B3 | **Kabelbaum an den Bottom-Connector** (Micro-Fit 3.0, 2×8) | Hinter Bottom sind laut Tiefenbudget nur 12,0 mm Steckraum plus Kabelbogen vorgesehen; in der Dose ist der Stecker nicht mehr bequem zu treffen |
 
@@ -151,7 +151,7 @@ auffängt — und wo nichts steht, fängt nichts auf.
 | **FPC ↔ J5** | **gesteckt**, 12-polige FPC-Buchse auf der Rückseite | Fahne 18,15 mm, gefaltet um die Boardkante | Die Faltung. Raster (0,5 oder 0,7 mm) und Pinbelegung sind noch offen (Punkt 15c, `17-bauteildaten.md`) |
 | **Magnetkontakt ↔ Top-Board** | **im Durchbruch Ø 6,7 gehalten** — „die Platine hält ihn" (`adapter.py`) | Körper 6,5 + 0,2 Spiel; freier Streifen zwischen Panelkante (y 15,9) und Boardkante (23,5) beträgt 7,6 mm | **Die Befestigungsart ist nirgends festgelegt** — Flansch vorn, Mutter hinten, Kleber? Punkt 64 |
 | **Sternstecker ↔ Magnetkontakt** | **magnetisch** | Maße sind Platzhalter (`magnet_d = None`, `magnet_h = 3,0`) | Haltekraft, Abzugskraft und Kontaktwiderstand unbekannt — zum Teil (Elsaybro) gibt es kein Datenblatt |
-| **Top ↔ Mid ↔ Bottom** | **gesteckt**, zwei Stackverbinder 2×20, 1,27 mm, Stapelhöhe 6,0 mm | x = ±14,2, y = −2,0; auf allen drei Boards deckungsgleich | **keines, und kein Distanzbolzen** — der Plattenabstand soll aus der Steckhöhe kommen. Das Bauteil ist noch nicht ausgewählt (Punkt 23); heute sitzt dreimal dieselbe Buchse |
+| **Top ↔ Mid ↔ Bottom** | **gesteckt**, zwei Stackverbinder 2×20, 1,27 mm, Stapelhöhe 7,0 mm | x = ±14,2, y = −2,0; auf allen drei Boards deckungsgleich | **keines, und kein Distanzbolzen** — der Plattenabstand soll aus der Steckhöhe kommen. Das Bauteil ist noch nicht ausgewählt (Punkt 23); heute sitzt dreimal dieselbe Buchse |
 | **Mid, Bottom ↔ Dose** | **nichts** | — | Beide hängen ausschließlich an den Stackverbindern am Top-Board, das seinerseits in der Adaptertasche liegt. Die Befestigungsbohrungen M2,5 auf r = 21,5 haben **im Adapter kein Gegenstück** (Punkt 61) |
 
 ### Der Kraftweg in einem Satz

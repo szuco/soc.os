@@ -54,7 +54,7 @@ Prüfpunkte 25/51/62/63/67 am Druck. Unabhängig von den Platinen.
 **Schritt 5 — parallel dazu: Bestellungen ohne Tor.**
 Mouser-Sammelbestellung (Abschnitt 2c), Display bei BuyDisplay (nach
 Schritt 1!), Stapelverbinder-Paar aus dem Herstellerkatalog (Punkt 23),
-Lötscheibe (`stern_puck_gerber.zip` liegt), DCX-909-Set, Hülsen M2,5 × 5.
+Lötscheibe (`stern_puck_gerber.zip` liegt), DCX-909-Set, Hülsen M2,5 × 6.
 
 **Schritt 6 — JLCPCB-Bestellung (nach 2 + 3).**
 ZIP hochladen, BOM/CPL dazu, die ~29 Extended-Positionen per

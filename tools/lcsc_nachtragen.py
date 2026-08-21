@@ -102,7 +102,13 @@ NUMMERN_JE_BOARD = {
                            ("J_STK_B", "PinSocket_2x20"): "C41370657"},
     "top_ui":             {("J_STK_A", "PinSocket_2x20"): "C41370657",
                            ("J_STK_B", "PinSocket_2x20"): "C41370657"},
-    # mid_logic: durchgesteckter Stift - Teil wird noch bestimmt
+    # Mid traegt den durchgesteckten STIFT. C43383 ist 2x40 und wird auf
+    # 2x20 gekuerzt; sein Isolator (1,5) muss beim Loeten MITTIG auf den
+    # Pins sitzen, also 1,45 mm angehoben - sonst erreicht der Pin unten
+    # die Buchse nicht. THT bestueckt JLCPCB ohnehin nicht, das ist
+    # Handarbeit mit einer 1,45-mm-Unterlage.
+    "mid_logic":          {("J_STK_A", "PinSocket_2x20"): "C43383",
+                           ("J_STK_B", "PinSocket_2x20"): "C43383"},
 }
 
 

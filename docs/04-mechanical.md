@@ -476,9 +476,9 @@ Dose und setzte den Tragring danach. Auch das ist überholt, seit der
 Becher da ist: Die Boards wohnen im **Becher unter dem Tragring** und
 gehen mit ihm zusammen als **eine Kartusche** in die Dose.
 
-1. **Mid zwischen die Hülsen schrauben.** Untere Hülsen (M2,5 × 5,
+1. **Mid zwischen die Hülsen schrauben.** Untere Hülsen (M2,5 × 6,
    Buchse/Buchse) auf Bottom auflegen, Mid darüber, obere Hülsen
-   (M2,5 × 5, **Stift/Buchse**) von vorn durch Mid in die unteren —
+   (M2,5 × 6, **Stift/Buchse**) von vorn durch Mid in die unteren —
    ihr Gewindestift klemmt Mid. Bottom liegt noch lose an.
 2. **Board-Paar in den Becher legen.** Bottom voran auf die vier
    Auflagebosse (Oberkante z = 0); USB-C zeigt zur 9-Uhr-Seite.
@@ -730,18 +730,25 @@ Verfügbar sind **60 mm** Dosentiefe (F16e gemessen; vorher 61 angenommen). Übe
 | 1 | Kabelbogen / Steckraum hinter dem Bottom-Connector | 12,0 | 12,0 |
 | 2 | Bottom-Connector inkl. gestecktem Gegenstück über PCB | 10,0 | 22,0 |
 | 3 | Bottom-PCB | 1,0 | 23,0 |
-| 4 | Bauteile Bottom-Oberseite + Stack-Abstand | **5,0** | 28,0 |
-| 5 | Mid-PCB | 1,0 | 29,0 |
-| 6 | Bauteile Mid-Oberseite + Stack-Abstand | **5,0** | 34,0 |
-| 7 | Top-PCB | 1,0 | 35,0 |
+| 4 | Bauteile Bottom-Oberseite + Stack-Abstand | **6,0** | 29,0 |
+| 5 | Mid-PCB | 1,0 | 30,0 |
+| 6 | Bauteile Mid-Oberseite + Stack-Abstand | **6,0** | 36,0 |
+| 7 | Top-PCB | 1,0 | 37,0 |
 | 8 | Adapter, Zentralscheibe, Rahmen | — | **außerhalb** |
-| | **Reserve** | | **≈ 25,0** (auf 60 gemessen) |
+| | **Reserve** | | **≈ 23,0** (auf 60 gemessen) |
 
 > **Kurzer Stapel seit 21.08.2026 (Punkt 23).** Die Ebenen standen
 > 9,0 mm frei auseinander, weil der Steckverbinder diese Höhe tragen
 > sollte — bis die Recherche zeigte, dass es erhöhte 1,27-mm-Buchsen
-> gar nicht gibt. Jetzt sind es **5,0 mm**, womit gewöhnliche
-> Katalogteile passen (Buchse 4,3 mm + durchgesteckter Stift 8,1 mm).
+> Jetzt sind es **6,0 mm** — und diese Zahl gibt der Verbinder vor,
+> nicht die Mechanik. **Korrigiertes Steckmodell (22.08.):** Die 2,4 mm
+> der Buchse sind ihr *Lötpin*, nicht die Einstecktiefe; beim Stecken
+> stoßen die Kunststoffkörper aneinander. Es gilt **Spalt =
+> Isolatorhöhe des Stifts + Buchsenhöhe** und **Eingriff = Pin-Überstand
+> − (Spalt − Buchsenhöhe)**. Mit der 4,3er Buchse braucht der günstigste
+> Stift (Isolator 1,5) mindestens 5,80 mm — bei 5,0 würde **jeder** am
+> Markt verfügbare Stift klemmen. Nächste Standard-Hülsenlänge: 6,0,
+> dort bleiben 1,35 mm Kontakteingriff.
 > Die Bauteilhöhen wurden dagegen geprüft: unten steht als höchstes die
 > Drossel SRP7028A mit 2,8 mm, oben das ESP32-Modul (3,2) und J6 (4,25),
 > die sich örtlich **nicht** überlappen. Nebeneffekt: **9 mm mehr

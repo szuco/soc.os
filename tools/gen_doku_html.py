@@ -193,7 +193,7 @@ def main():
         a('<li><b>Bottom und Mid verschrauben:</b> untere Hülsen '
           'Buchse/Buchse von hinten an Bottom, Mid auflegen, obere Hülsen '
           'Stift/Buchse von vorn durch Mid — der Stift klemmt Mid zwischen '
-          'den Hülsen. Alle M2,5 × 5.</li>')
+          'den Hülsen. Alle M2,5 × 6.</li>')
         a('<li>Die in der Dose vorverdrahtete <b>Feldstecker-Leiste</b> '
           'hinten an Bottom klicken, die Einheit in die Leerdose '
           'schieben.</li>')
@@ -226,7 +226,7 @@ def main():
       'nicht ineinander. Der Footprint ist ein Platzhalter für die '
       'Mechanik. Gesucht ist ein durchsteckbarer Stapelverbinder: ein '
       'Buchsenkörper mit verlängerten Schwänzen, die in die Buchse '
-      'darunter greifen, Stapelhöhe 6 mm. Dasselbe Teil auf allen drei '
+      'darunter greifen, Stapelhöhe 7 mm. Dasselbe Teil auf allen drei '
       'Boards, damit es keine Buchse/Stecker-Zuordnung und keine zweite '
       'Bestellnummer gibt. Die Teilenummer steht noch aus.</p>')
     a('</aside>')

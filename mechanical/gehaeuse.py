@@ -81,8 +81,8 @@ PARAMS = dict(
     # --- Tiefen, z ab Rueckseite Bottom-Board ------------------------------
     # Der Feldstecker ragt 6,6 nach hinten; die Rueckwand liegt dahinter.
     tief_hinten       = 7.2,    # Innenraum hinter Bottom
-    rand_vorn         = 7.4,    # Becherrand endet knapp unter dem Tragring
-                                # (Platte ab 7,5 - kurzer Stapel, 21.08.)
+    rand_vorn         = 9.4,    # Becherrand endet knapp unter dem Tragring
+                                # (Platte ab 9,5 - kurzer Stapel, 22.08.)
 
     # --- Feldstecker-Fenster in der Rueckwand ------------------------------
     # Micro-Fit 43045-1612 bei (-10,5 / 15,6), Koerper 16,4 x 8,6; die

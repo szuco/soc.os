@@ -44,7 +44,7 @@ OUT = os.path.join(ROOT, "mechanical", "export", "switchstack_stack.step")
 
 # (Datei, z der Platinen-RUECKSEITE in mm)
 TEILE = [
-    # EBENENABSTAND 5,0 statt 9,0 (21.08.2026, Entscheidung des Nutzers
+    # EBENENABSTAND 6,0 statt 9,0 (21.08.2026, Entscheidung des Nutzers
     # nach der Steckverbinder-Recherche, Punkt 23): Eine erhoehte
     # 1,27-mm-Buchse mit 9 mm Bauhoehe existiert nicht - herstellerweit
     # ist bei 4,0..4,6 mm Schluss. Mit einem kurzen Stapel greifen
@@ -56,11 +56,20 @@ TEILE = [
     #   Bottom-Vorderseite -> Mid: hoechstes Teil Drossel SRP7028A 2,8
     #   Mid-Vorderseite -> Top:    ESP32-Modul 3,2 und J6 4,25, die sich
     #                              oertlich NICHT ueberlappen
-    # 5,0 mm reichen also mit Luft; die USB-C-Buchse ragt wie bisher
-    # durch die Randkerbe des Top-Boards.
+    # 5,0 mm haetten mechanisch gereicht - der Verbinder gibt aber 6,0
+    # vor. KORRIGIERTES MODELL (22.08.): Die 2,4 mm der Buchse sind ihr
+    # LOETPIN, nicht die Einstecktiefe. Beim Stecken stossen die
+    # Kunststoffkoerper aneinander, also gilt
+    #     Spalt    = Isolatorhoehe des Stifts + Buchsenhoehe
+    #     Eingriff = Pin-Ueberstand - (Spalt - Buchsenhoehe)
+    # Mit der 4,3er Buchse braucht der guenstigste Stift (C43383,
+    # Isolator 1,5) mindestens 5,80 - bei 5,0 wuerde JEDER am Markt
+    # verfuegbare Stift klemmen. Naechste Standard-Huelsenlaenge: 6,0,
+    # dort bleiben 1,35 mm Kontakteingriff.
+    # Die USB-C-Buchse ragt wie bisher durch die Randkerbe des Top-Boards.
     ("bottom_power_motor.step", 0.0),
-    ("mid_logic.step", 6.0),
-    ("top_ui.step", 12.0),
+    ("mid_logic.step", 7.0),
+    ("top_ui.step", 14.0),
 ]
 
 # Der Adapter sitzt vor dem Top-Board. Seine Platinentasche nimmt das
@@ -84,13 +93,12 @@ TEILE = [
 # Adapters haelt die Platinenrueckseite, und die sitzt jetzt 5,0 statt
 # 5,5 hinter der Sichtflaeche - der Adapter rueckt 0,5 nach hinten.
 # gen_explosion.py prueft diesen Wert gegen die Adapterparameter.
-# 7,5 seit dem kurzen Stapel (21.08.): Rueckseite Top (12,0) - seat (4,5).
-# Der Wert davor war 15,5 bei Top-Rueckseite 20,0 - dieselbe Rechnung.
-ADAPTER = ("adapter.step", 7.5)
+# 9,5 seit dem kurzen Stapel (22.08.): Rueckseite Top (14,0) - seat (4,5).
+ADAPTER = ("adapter.step", 9.5)
 # Der Tragring liegt auf der Wandebene - dieselbe Ebene wie die
 # Adapterrueckseite (7,5 seit dem kurzen Stapel). Der Adapter-Basisring
 # taucht durch seine Oeffnung, sein Kragen legt sich auf die Platte.
-TRAGRING = ("tragring.step", 7.5)
+TRAGRING = ("tragring.step", 9.5)
 # Der Becher ist in seinen eigenen Koordinaten schon richtig gelagert
 # (z 0 = Rueckseite Bottom-Board), deshalb Versatz 0.
 GEHAEUSE = ("gehaeuse.step", 0.0)
