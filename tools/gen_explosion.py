@@ -209,11 +209,14 @@ def selbsttest():
     if abs(soll - ist) > 0.01:
         m.append("stack.py setzt den Adapter auf z = %.1f; aus der "
                  "Taschenlage folgt %.1f" % (ist, soll))
-    rand = P["snap_inner"] - P["rim_play"]
-    if rand < P["snap_inner"]:
-        m.append("Rastnase: %.2f mm Luft je Seite, kein radialer Hintergriff "
-                 "(Rand %.1f gegen Rastmass %.1f) - Punkt 67"
-                 % ((P["snap_inner"] - rand) / 2.0, rand, P["snap_inner"]))
+    # Punkt 67: Den Halt gibt seit dem 21.08. nicht mehr der umlaufende
+    # Rand (49,8 - der lag UNTER dem Nasenmass), sondern der Rastnocken
+    # an den vier Kantenmitten.
+    hinter = (P["snap_nose"] - P["snap_inner"]) / 2.0
+    if hinter < 0.2:
+        m.append("Rastnocken %.1f gegen Nasenmass %.1f: nur %.2f mm "
+                 "Hintergriff je Seite - Punkt 67"
+                 % (P["snap_nose"], P["snap_inner"], hinter))
     frei = Z["mid_logic"][0] - Z["bottom_power_motor"][1]
     if abs(frei - 10.0) > 0.01:
         m.append("Ebenenabstand im Modell %.1f mm frei, docs/04 budgetiert "
@@ -524,7 +527,7 @@ def panel_a(x0, y0):
                vz * rand, KUNST_H, KUNST)
     s.fahne("adapter", ad["flansch"][0], rand,
             ["Scheibenadapter, gedruckt",
-             "49,8 × 49,8 × 5,5"], hoch=-45)
+             "49,8 · Rastnocken 50,6 an 4 Kantenmitten"], hoch=-45)
     s.marke("adapter", ad["hals"][0] + 0.4, hals - 4.5, "Rastraum 1,5 × 1,3")
     s.marke("adapter", ad["tasche"][0] + 0.4, tasche - 9.0,
             "Tasche 47,4 · Auflage 2,0")
@@ -578,9 +581,11 @@ def panel_a(x0, y0):
              "kraftfrei aufgeclippt — sie ist das",
              "Bedienelement und bleibt beweglich"], hoch=-60)
     s.marke("scheibe", zc[0] - 1.0, -am - 9.0,
-            "Rastnase 1,0 – nur 0,10 mm Luft je Seite,", ROT, "ra")
+            "Rastnase 1,0 klickt über den Nocken 50,6 (0,30 Hintergriff)",
+            GRAU, "ra")
     s.marke("scheibe", zc[0] - 1.0, -am - 13.0,
-            "kein radialer Hintergriff (Punkt 67)", ROT, "ra")
+            "durch die Nasenpässe in Lippe und Kragen (Punkt 67 erledigt)",
+            GRAU, "ra")
     s.marke("scheibe", zc[1] + 1.5, -btn, "Druckkreuz (projiziert)")
 
 # --- Panel B: Schnitt bei y = 19,6 ----------------------------------------

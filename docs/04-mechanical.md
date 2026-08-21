@@ -578,13 +578,24 @@ trafen, alle drei sind behoben:
    bei 23,7 beginnt) — oberhalb der Auflage braucht sie keinen
    Millimeter. Tasche, Lippe und Kragen sind jetzt umlaufend
    geschlossen.
-2. **Nasenpass 14,0 → 3,0 mm.** F8 misst die Rastnasen mit **1,0 mm
-   Breite**; der Platzhalter war vierzehnfach überdimensioniert. Ganz
-   ohne Schlitz geht es nicht — die Nasen müssen an Lippe und Kragen
-   vorbei in den Rastraum —, aber jetzt sind es vier schmale Schlitze
-   statt vier großer Löcher. Gehalten wird die Scheibe ohnehin nicht
-   von der Lippe, sondern von der **Schulter** (49,8) und dem Rastraum
-   dahinter (48,3).
+2. **Nasenpass 14,0 → 3,0 mm — und ein Rastnocken dahinter.** F8 misst
+   die Rastnasen mit **1,0 mm Breite**; der Platzhalter war
+   vierzehnfach überdimensioniert. Die Durchfahrt bleibt nötig — die
+   Nasen müssen an Lippe und Kragen vorbei —, ist aber jetzt ein
+   schmaler Schlitz statt eines großen Lochs.
+
+   **Und der eigentliche Halt fehlte bisher ganz (Punkt 67).** Der
+   umlaufende Rand ist 49,8, das lichte Nasenmaß 50,0: Die Nase fuhr mit
+   0,1 mm Luft darüber und griff hinter **nichts** — die Scheibe hätte
+   nur lose aufgelegen. Auf den Punkt gebracht hat es der Nutzer: „die
+   Zentralscheibe muss sich praktisch in diesen Aussparungen
+   rüberklicken." Jetzt sitzt an jeder der vier Kantenmitten — genau
+   dort, wo F8 die Nasen misst — ein **Rastnocken 50,6** (6,0 breit,
+   0,7 hoch) am hinteren Ende der Schulter. Die Nase weitet sich beim
+   Aufschieben um **0,30 mm je Seite** auf (ihre eigene Auflauffase
+   1,0 → 1,4 aus F8 übernimmt das) und fällt dahinter in den Rastraum.
+   Erst dieser Nocken macht aus dem Aufstecken ein Einrasten; der
+   Selbsttest prüft den Hintergriff seither auf 0,2…0,6 mm.
 3. **Neuer Auflagekragen 52,0 × 0,8.** Er kragt auf der Vorderseite des
    Basisrings über die Tragring-Öffnung (50,6) und legt sich mit
    **0,70 mm je Seite** auf die Platte. Damit läuft die Kraft

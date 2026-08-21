@@ -187,6 +187,24 @@ PARAMS = dict(
     collar_sq         = 52.0,   # Auflage 0,7 je Seite, Luft zur Scheibe 0,6
     collar_t          = 0.8,
 
+    # --- Rastnocken: der HALT der Zentralscheibe (21.08.) -----------------
+    # Punkt 67, seit Wochen als Warnung im Selbsttest und jetzt vom
+    # Nutzer auf den Punkt gebracht: "die Zentralscheibe muss sich
+    # praktisch in diesen Aussparungen rueberklicken". Genau das ging
+    # nicht - der umlaufende Rand ist 49,8, das lichte Nasenmass 50,0
+    # (F8). Die Nase fuhr mit 0,1 mm Luft darueber und griff hinter
+    # NICHTS; die Scheibe haette nur lose aufgelegen.
+    #
+    # Jetzt sitzt an jeder der vier Kantenmitten - also genau dort, wo
+    # F8 die Nasen misst - ein Nocken, der ueber das Nasenmass hinaus
+    # steht. Die Nase weitet sich beim Aufschieben um 0,3 mm je Seite
+    # auf (ihre eigene Auflauffase 1,0 -> 1,4 laut F8 uebernimmt das)
+    # und faellt dahinter in den Rastraum. Der Nocken sitzt am hinteren
+    # Ende der Schulter, damit die Nase davor einrastet.
+    snap_nose         = 50.6,   # > snap_inner 50,0 -> 0,3 Hintergriff
+    nose_lug_b        = 6.0,    # Nockenbreite (Nase ist 1,0 - Toleranz)
+    nose_lug_h        = 0.7,    # axiale Hoehe des Nockens
+
     # --- Zentrale Durchfuehrung -------------------------------------------
     # Muss die beiden Stackverbinder durchlassen: sie stehen bei x = +/-14,2,
     # sind 4,1 breit und 26,4 lang -> bis (16,25 / 13,2).
@@ -309,6 +327,16 @@ def build_adapter(p=PARAMS):
         with BuildSketch(Plane.XY.offset(z["neck"])):
             Rectangle(rim_out, rim_out)
         extrude(amount=z["seat"] - z["neck"])
+
+        # -- Rastnocken an den vier Kantenmitten ----------------------------
+        # Das Gegenstueck zu den Nasen der Scheibe: Material dort, wo die
+        # Durchfahrten in Lippe und Kragen liegen, nur eine Ebene weiter
+        # vorn. Erst dieser Nocken macht aus dem Aufstecken ein Einrasten.
+        with BuildSketch(Plane.XY.offset(z["neck"])) as nk:
+            Rectangle(p["nose_lug_b"], p["snap_nose"])
+            Rectangle(p["snap_nose"], p["nose_lug_b"])
+            Rectangle(rim_out, rim_out, mode=Mode.SUBTRACT)
+        extrude(amount=p["nose_lug_h"])
 
         # -- Tasche fuer die Leiterplatte, aussen mit der Drucklippe --------
         with BuildSketch(Plane.XY.offset(z["seat"])) as s:
@@ -538,6 +566,23 @@ def check_adapter(part, p=PARAMS):
     if p["collar_sq"] >= 56.0:
         errs.append("Kragen %.1f passt nicht in das Rahmenfenster 56,0 (F11)"
                     % p["collar_sq"])
+    # PUNKT 67 - der eigentliche Halt der Scheibe. Ohne Hintergriff
+    # liegt sie nur auf.
+    if p["snap_nose"] <= p["snap_inner"]:
+        errs.append("Rastnocken %.1f bietet keinen Hintergriff gegen das "
+                    "Nasenmass %.1f (Punkt 67)"
+                    % (p["snap_nose"], p["snap_inner"]))
+    hinter = (p["snap_nose"] - p["snap_inner"]) / 2.0
+    if hinter < 0.2:
+        errs.append("Hintergriff nur %.2f mm je Seite - zu wenig zum "
+                    "Einrasten" % hinter)
+    if hinter > 0.6:
+        errs.append("Hintergriff %.2f mm je Seite - die Scheibe muss sich "
+                    "zu weit aufweiten" % hinter)
+    if p["nose_lug_b"] <= p["nose_gap"]:
+        errs.append("Nocken %.1f nicht breiter als die Durchfahrt %.1f - "
+                    "die Nase traefe ihn nicht sicher"
+                    % (p["nose_lug_b"], p["nose_gap"]))
     if p["nose_gap"] < 2.0 or p["nose_gap"] > 5.0:
         errs.append("Nasenpass %.1f unplausibel - F8 misst die Nase mit "
                     "1,0 mm Breite" % p["nose_gap"])
