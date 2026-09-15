@@ -95,7 +95,7 @@ NUMMERN = {
 }
 
 # Board-spezifisch: Dasselbe Bauteil-Wertepaar bekommt je nach Ebene ein
-# ANDERES Teil. Der Stapel ist seit dem 21.08. 5,0 mm hoch (Punkt 23):
+# ANDERES Teil. Der Stapel ist seit dem 22.08. 6,0 mm hoch (Punkt 23):
 # Bottom und Top tragen die Buchse, Mid den durchgesteckten Stift.
 NUMMERN_JE_BOARD = {
     "bottom_power_motor": {("J_STK_A", "PinSocket_2x20"): "C41370657",
@@ -107,8 +107,8 @@ NUMMERN_JE_BOARD = {
     # Pins sitzen, also 1,45 mm angehoben - sonst erreicht der Pin unten
     # die Buchse nicht. THT bestueckt JLCPCB ohnehin nicht, das ist
     # Handarbeit mit einer 1,45-mm-Unterlage.
-    "mid_logic":          {("J_STK_A", "PinSocket_2x20"): "C43383",
-                           ("J_STK_B", "PinSocket_2x20"): "C43383"},
+    "mid_logic":          {("J_STK_A", "PinHeader_2x20"): "C43383",
+                           ("J_STK_B", "PinHeader_2x20"): "C43383"},
 }
 
 

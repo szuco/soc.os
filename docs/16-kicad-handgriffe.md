@@ -174,7 +174,7 @@ python3 mechanical/stack.py      # 3D-Baugruppe zur Kontrolle
 schreibt es **keine** Fertigungsdaten. Wenn es ein ZIP herausgibt, bist du
 fertig — dann weiter mit [`15-bestellung.md`](15-bestellung.md).
 
-## 6. Zwei Dinge, die du nicht anfassen solltest
+## 6. Drei Dinge, die du nicht anfassen solltest
 
 **Bauteile verschieben.** Die Positionen kommen aus `tools/gen_layouts.py`
 und sind gegen Zentralscheibe, Adapter und Tiefenbudget gerechnet. Wer in
@@ -183,3 +183,11 @@ womöglich erst am gedruckten Adapter.
 
 **Die Regeln lockern.** 0,15 mm Abstand und ein Wärmefallensteg sind bewusst
 gesetzt (docs/05). Wenn die DRC meckert, ist die Bahn falsch, nicht die Regel.
+
+**Den Stapelverbinder auf Mid.** J2 und J3 tragen seit dem 15.09.2026 den
+Footprint `SwitchStack:PinHeader_2x20_P1.27mm_Vertical_Durchsteck` — das
+Lochbild der Buchse (Reihe 2 bei −1,27), damit die Stifte in die Buchsen auf
+Bottom und Top treffen, mit dem 3D-Modell des Stifts 1,45 mm angehoben (so
+wird er gelötet). KiCads eigener Header-Footprint hätte Reihe 2 bei +1,27
+und alle 40 Bahnen abgerissen. Beim Regenerieren kommt der Footprint aus
+`gen_mid_sch.py`; die LCSC-Nummer C43383 setzt `lcsc_nachtragen.py`.

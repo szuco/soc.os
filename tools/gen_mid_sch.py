@@ -355,7 +355,9 @@ def build():
     # =====================================================================
     # 5. Stackverbinder - identische Quelle wie Bottom/Top
     # =====================================================================
-    connect_stack(s)
+    # Mid traegt den DURCHGESTECKTEN Stift (Punkt 23, 22.08.2026) - eigener
+    # Footprint mit dem Lochbild der Buchse, sonst wandert Reihe 2 um 2,54 mm.
+    connect_stack(s, fp="SwitchStack:PinHeader_2x20_P1.27mm_Vertical_Durchsteck")
 
     return s
 
