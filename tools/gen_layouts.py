@@ -842,6 +842,16 @@ def build_board(name, module, fixed, auto_sides=("F", "B"),
     return out, len(sch.components), bb.errors
 
 
+def kicad_cli():
+    """kicad-cli liegt auf dem Mac nur im App-Bundle, nicht im PATH."""
+    import shutil as _sh
+    for k in (_sh.which("kicad-cli"),
+              "/Applications/KiCad/KiCad.app/Contents/MacOS/kicad-cli"):
+        if k and os.path.exists(k):
+            return k
+    return "kicad-cli"
+
+
 def run_drc(path):
     """DRC ueber die pcbnew-API - kicad-cli kann das erst ab KiCad 8."""
     import re as _re
@@ -849,13 +859,18 @@ def run_drc(path):
     # WriteDRCReport braucht ab KiCad 10 eine initialisierte wxApp und bricht
     # im blanken Python ab. kicad-cli macht dasselbe aus einem eigenen Prozess
     # und ist versionsstabil.
-    r = subprocess.run(["kicad-cli", "pcb", "drc", "--format", "report",
+    if os.path.exists(rpt):
+        os.unlink(rpt)          # nie einen alten Report als Ergebnis lesen
+    r = subprocess.run([kicad_cli(), "pcb", "drc", "--format", "report",
                         "--exit-code-violations",
                         "-o", rpt, path],
                        capture_output=True, text=True)
     if not os.path.exists(rpt):
-        return {"violations": {}, "unconnected": 0,
-                "details": []}, ["kicad-cli drc: " + (r.stdout + r.stderr).strip()[:200]]
+        # Kein Report = keine Pruefung. Frueher kam hier ein leeres Ergebnis
+        # zurueck, und gnd_stitch hat damit am 22.08. einen Kurzschluss als
+        # "DRC-sauber" gespeichert. Lieber laut scheitern.
+        raise RuntimeError("kicad-cli drc hat keinen Report geschrieben: "
+                           + (r.stdout + r.stderr).strip()[:300])
     txt = open(rpt, encoding="utf-8").read()
     counts = {}
     unconnected = 0
